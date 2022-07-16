@@ -1,5 +1,6 @@
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/material.dart';
+import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/widgets/widgets.dart';
 
 class Layout extends StatelessWidget {
@@ -16,7 +17,7 @@ class Layout extends StatelessWidget {
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
       stops: [0.005, 0.3],
-      colors: [Color.fromARGB(255, 36, 41, 170), Color.fromARGB(255, 8, 19, 79)],
+      colors: [Color(0xFF2429AA), Color(0xFF08134F)],
     ),
   );
 
@@ -82,9 +83,9 @@ class _Body extends StatelessWidget {
             borderRadius: const BorderRadius.only(topLeft: Radius.circular(80)),
             child: Container(
               width: double.infinity,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(80)),
-                color: Color.fromARGB(255, 230, 235, 237),
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(topLeft: Radius.circular(80)),
+                color: AppThemes.fondos[AppThemes.currentTheme],
               ),
               child: child,
             ),
