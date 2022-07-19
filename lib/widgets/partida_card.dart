@@ -6,10 +6,12 @@ import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/widgets/widgets.dart';
 
 class PartidaCard extends StatelessWidget {
-  const PartidaCard({Key? key, required this.partida, required this.function, required this.index}) : super(key: key);
+  const PartidaCard({Key? key, required this.partida, required this.functionBorrar, required this.functionEditar, required this.index})
+      : super(key: key);
   final int index;
   final Partida partida;
-  final Function function;
+  final Function functionBorrar;
+  final Function functionEditar;
 
   @override
   Widget build(BuildContext context) {
@@ -31,16 +33,17 @@ class PartidaCard extends StatelessWidget {
               title: "Borrar",
               onTap: (CompletionHandler handler) async {
                 await handler(true);
-                function();
+                functionBorrar();
               },
               color: Colors.red,
             ),
             SwipeAction(
                 title: "Editar",
                 onTap: (CompletionHandler handler) async {
-                  /// false means that you just do nothing,it will close
-                  /// action buttons by default
-                  handler(false);
+                  print('andoAqui');
+
+                  functionEditar();
+                  await handler(false);
                 },
                 color: Colors.grey),
           ],

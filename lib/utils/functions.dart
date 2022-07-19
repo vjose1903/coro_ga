@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:motion_toast/motion_toast.dart';
 import 'package:palestine_console/palestine_console.dart';
@@ -15,7 +17,7 @@ class Colores {
 }
 
 class Fun {
-  static void logColor({required String color, required dynamic body, String title = ''}) {
+  static void logColor({required String color, required dynamic body, String title = '', bool pretty = false}) {
     final printColors = {
       'red': Print.red,
       'white': Print.white,
@@ -28,12 +30,16 @@ class Fun {
 
     if (title != '') {
       printColors[color]!(title);
-      Print.white('$body');
+      pretty ? Print.white(getPrettyJSONString(jsonDecode(body))) : Print.white(body);
       print(' ');
     } else {
-      printColors[color]!('$body');
-      print(' ');
+      pretty ? printColors[color]!(getPrettyJSONString(jsonDecode(body))) : printColors[color]!(body);
     }
+  }
+
+  static String getPrettyJSONString(jsonObject) {
+    const encoder = JsonEncoder.withIndent("  ");
+    return encoder.convert(jsonObject);
   }
 
   static bool toBoolean(dynamic arg) {

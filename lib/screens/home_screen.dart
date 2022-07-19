@@ -19,6 +19,7 @@ class HomeScreen extends StatelessWidget {
       body: Layout(
         appBarTitle: 'Mis Partidas',
         appBarTrailing: CustomIconButtom(
+          iconSize: 25,
           icon: Icons.menu,
           onTap: () => print('algo'),
         ),
@@ -56,18 +57,14 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Fun.logColor(color: Colores.yellow, body: "------- BUILD -------");
-    final partidaProvider = context.read<PartidasProvider>();
-    getPartida(partidaProvider, context);
+    final PartidasProvider partidaProvider = context.read<PartidasProvider>();
 
     return FutureBuilder(
       future: partidaProvider.getPartidas(),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (!snapshot.hasData) {
           return const Center(
-            child: CircularProgressIndicator(
-              color: AppThemes.colorPrimero,
-            ),
+            child: CircularProgressIndicator(color: AppThemes.colorPrimero),
           );
         } else {
           return const ListPartidas();
@@ -81,9 +78,7 @@ class _Body extends StatelessWidget {
 
     if (partida == null) {
       Fun.toast(type: ToasType.error, context: context, message: "Partida buscada no existe");
-    } else {
-      Fun.logColor(color: Colores.magenta, body: "partida: $partida");
-    }
+    } else {}
   }
 }
 
@@ -113,13 +108,8 @@ class ListPartidas extends StatelessWidget {
           itemBuilder: (_, index) {
             return PartidaCard(
               partida: partidas[index],
-              function: () async {
-                // final res = await Partida.newPartida(tempPartidas[index]);
-                // // final res = await tempPartidas[index].deleteOne(1);
-                // Fun.logColor(color: Colores.yellow, body: "res: $res");
-
-                partidas.remove(partidas[index]);
-              },
+              functionBorrar: () async => partidas.remove(partidas[index]),
+              functionEditar: () async => partidaProvider.newPartida(partidas[index]),
               index: index,
             );
           });

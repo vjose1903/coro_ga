@@ -3,10 +3,9 @@ import 'package:game_score/models/models.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/utils/utils.dart';
 
-class Partida {
-  Partida({this.nombre, this.jugadores, this.id, this.activo, this.createdAt, this.key});
+class Partida extends DynamicClass {
+  Partida({this.nombre, this.jugadores, this.id, this.activo = true, this.createdAt});
 
-  dynamic key;
   int? id;
   String? nombre;
   bool? activo;
@@ -72,12 +71,11 @@ class Partida {
         id: json["id"],
         nombre: json["nombre"],
         activo: Fun.toBoolean(json["activo"]),
-        // createdAt: DateTime.parse(json["created_at"]),
         createdAt: json["created_at"],
-        // jugadores: List<Jugador>.from(json["jugadores"].map((x) => Jugador.fromMap(x))),
-        jugadores: null,
+        jugadores: json["jugadores"] != null ? List<Jugador>.from(json["jugadores"].map((x) => Jugador.fromMap(x))) : null,
       );
 
+  @override
   Map<String, dynamic> toMap() => {
         "id": id,
         "nombre": nombre,
@@ -88,7 +86,7 @@ class Partida {
 
   @override
   String toString() {
-    return "id: $id, nombre: $nombre, activo: $activo, jugadores: $jugadores, key: $key";
+    return '{"id": $id, "nombre": "$nombre", "activo": $activo, "jugadores": $jugadores}';
   }
 
   // ==================================================================================================================================
@@ -104,11 +102,10 @@ class Partida {
       for (var partida in partidasParsed) {
         await findJugadores(partida);
       }
-
       return partidasParsed;
     } else {
       response.addMsg('No existen partidas registradas.');
-      return null;
+      return List<Partida>.from([]);
     }
   }
 

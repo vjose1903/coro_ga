@@ -10,14 +10,6 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // return MaterialApp(
-    //   debugShowCheckedModeBanner: false,
-    //   title: 'Games Score',
-    //   initialRoute: AppRoutes.initialRoute,
-    //   routes: AppRoutes.getAppRoutes(),
-    //   // theme: AppThemes.lightTheme,
-    //   theme: AppThemes.currentTheme == 'light' ? AppThemes.lightTheme : AppThemes.darkTheme,
-    // );
     return MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => PartidasProvider()),
@@ -28,7 +20,7 @@ class MyApp extends StatelessWidget {
           title: 'Games Score',
           initialRoute: AppRoutes.initialRoute,
           routes: AppRoutes.getAppRoutes(),
-          theme: AppThemes.lightTheme,
+          theme: AppThemes.currentTheme == 'light' ? AppThemes.lightTheme : AppThemes.darkTheme,
         ));
   }
 }

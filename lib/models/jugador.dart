@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'package:game_score/helpers/helpers.dart';
+import 'package:game_score/utils/utils.dart';
 
-class Jugador {
+class Jugador extends DynamicClass {
   Jugador({this.id, this.nombre, this.puntucacion = 0, this.partidaId});
 
   int? id;
@@ -34,6 +34,6 @@ class Jugador {
 
   @override
   String toString() {
-    return "nombre: $nombre, puntucacion:$puntucacion, partidaId:$partidaId";
+    return '{"nombre": "$nombre", "puntucacion": $puntucacion, "partidaId": $partidaId}';
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CustomInputField extends StatelessWidget {
+class CustomInputField<T> extends StatelessWidget {
   final String? hintText;
   final String? labelText;
   final String? helperText;
@@ -8,8 +8,10 @@ class CustomInputField extends StatelessWidget {
   final IconData? suffixIcon;
   final TextInputType? inputType;
   final bool obscureText;
-  final String formProperty;
-  final Map<String, dynamic> formValues;
+
+  final Function? validators;
+  final Function initialValueFn;
+  final Function onChanged;
 
   const CustomInputField({
     Key? key,
@@ -20,29 +22,22 @@ class CustomInputField extends StatelessWidget {
     this.suffixIcon,
     this.inputType,
     this.obscureText = false,
-    required this.formProperty,
-    required this.formValues,
+    this.validators,
+    required this.initialValueFn,
+    required this.onChanged,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      key: key,
       autofocus: false,
-      // initialValue: 'Victor Vasquez',
-
+      initialValue: initialValueFn(),
       textCapitalization: TextCapitalization.words,
       keyboardType: inputType,
       obscureText: obscureText,
-      // onChanged: (value) {
-      //   print('CAMBIANDO ');
-      //   formValues[formProperty] = value;
-      // },
-      // validator: (value) {
-      //   print('VALIDANDO');
-      //   if (value == null) return 'Este campo es requerido';
-      //   return value.length < 3 ? 'Mínimo de 3 letras' : null;
-      // },
-      
+      onChanged: (value) => onChanged(value),
+      validator: (value) => validators != null ? validators!(value) : null,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: InputDecoration(
         hintText: hintText,

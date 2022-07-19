@@ -54,11 +54,8 @@ class CrudHelper {
 
     final List<dynamic> decodedRes = res.isNotEmpty ? res : [];
 
-    if (res.isNotEmpty) {
-      response.data = res;
-    } else {
-      response.hasError = true;
-    }
+    response.data = decodedRes;
+    if (res.isEmpty) response.hasError = true;
 
     return response;
   }

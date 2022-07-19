@@ -42,7 +42,7 @@ class DatabaseHelper {
           nombre TEXT,
           activo TEXT DEFAULT true,
 
-          createdAt timestamp DEFAULT current_timestamp,
+          createdAt timestamp DEFAULT current_timestamp
         );
       ''');
 

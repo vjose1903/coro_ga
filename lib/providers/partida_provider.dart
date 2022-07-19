@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/utils/utils.dart';
@@ -8,41 +9,43 @@ class PartidasProvider extends ChangeNotifier {
   // final partidaClass = Partida();
   // final jugadorClass = Jugador();
 
-  // Future<SqlResponse> newPartida(Partida partida) async {
-  //   final SqlResponse response = SqlResponse();
-  //   List<Jugador>? jugadores = partida.jugadores;
+  Future<SqlResponse> newPartida(Partida partida) async {
+    final SqlResponse response = SqlResponse();
+    List<Jugador>? jugadores = partida.jugadores;
 
-  //   if (jugadores == null) {
-  //     response.addMsg('Debe de agregar almenos 2 jugadores a la partida');
-  //     response.hasError = true;
-  //     return response;
-  //   }
+    if (jugadores == null) {
+      response.addMsg('Debe de agregar almenos 2 jugadores a la partida');
+      response.hasError = true;
+      return response;
+    }
 
-  //   Map<String, dynamic> tempPartidaMap = partida.toMap();
+    Map<String, dynamic> tempPartidaMap = partida.toMap();
 
-  //   Fun.removeKeys(tempPartidaMap, ['id', 'jugadores']);
+    Fun.removeKeys(tempPartidaMap, ['id', 'jugadores', 'created_at']);
+    print("tempPartidaMap: $tempPartidaMap ");
 
-  //   final partidaId = await partida.insert(body: tempPartidaMap);
+    final SqlResponse partidaRes = await CrudHelper.insert(tableName: 'Partida', body: tempPartidaMap);
 
-  //   for (var jugador in jugadores) {
-  //     //
-  //     jugador.partidaId = partidaId;
+    for (var jugador in jugadores) {
+      //
+      jugador.partidaId = partidaRes.data;
 
-  //     Map<String, dynamic> tempJugadorMap = jugador.toMap();
-  //     Fun.removeKeys(tempJugadorMap, ['id']);
+      Map<String, dynamic> tempJugadorMap = jugador.toMap();
+      Fun.removeKeys(tempJugadorMap, ['id']);
 
-  //     final int jugadorId = await jugador.insert(body: tempJugadorMap);
-  //     jugador.id = jugadorId;
-  //   }
+      final SqlResponse jugadorRes = await CrudHelper.insert(tableName: 'Jugador', body: tempJugadorMap);
+      jugador.id = jugadorRes.data;
+    }
 
-  //   partida.id = partidaId;
+    partida.id = partidaRes.data;
 
-  //   response.data = partida;
-  //   partidas.add(partida);
-  //   notifyListeners();
+    response.data = partida;
 
-  //   return response;
-  // }
+    partidas.add(partida);
+    notifyListeners();
+
+    return response;
+  }
 
   getPartidas() async {
     final partidasFuture = Partida.getPartidas();

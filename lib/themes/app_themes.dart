@@ -20,6 +20,7 @@ class AppThemes {
           final Color? color = states.contains(MaterialState.error) ? Colors.red[900] : colorSegundo;
           return TextStyle(color: color, fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Poppins');
         }),
+        // fillColor: Colors.blueGrey.withOpacity(0.2),
         fillColor: Colors.blueGrey.withOpacity(0.2),
         filled: true,
         labelStyle: TextStyle(color: Colors.blueGrey[600], fontFamily: 'Poppins'),

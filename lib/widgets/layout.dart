@@ -42,28 +42,29 @@ class _AppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 55),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              if (leading != null) leading! else Container(),
-              if (trailing != null) trailing!,
-            ],
-          ),
-          const SizedBox(height: 5),
-          if (title != null)
-            Container(
-              margin: const EdgeInsets.only(left: 10),
-              child: Text(
-                title!,
-                style: const TextStyle(color: Colors.white, fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 25),
-              ),
-            )
-        ],
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (leading != null) leading! else Container(),
+                if (trailing != null) trailing!,
+              ],
+            ),
+            if (title != null)
+              Container(
+                margin: const EdgeInsets.only(left: 10),
+                child: Text(
+                  title!,
+                  style: const TextStyle(color: Colors.white, fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 22),
+                ),
+              )
+          ],
+        ),
       ),
     );
   }
@@ -77,7 +78,7 @@ class _Body extends StatelessWidget {
     return Column(
       // mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        const SizedBox(height: 180),
+        const SizedBox(height: 150),
         Expanded(
           child: ClipRRect(
             borderRadius: const BorderRadius.only(topLeft: Radius.circular(80)),
