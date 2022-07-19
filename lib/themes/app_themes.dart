@@ -18,7 +18,7 @@ class AppThemes {
         // const TextStyle(color: primary),
         floatingLabelStyle: MaterialStateTextStyle.resolveWith((Set<MaterialState> states) {
           final Color? color = states.contains(MaterialState.error) ? Colors.red[900] : colorSegundo;
-          return TextStyle(color: color, fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Poppins');
+          return TextStyle(color: color, fontSize: 15, fontWeight: FontWeight.bold, fontFamily: 'Poppins');
         }),
         // fillColor: Colors.blueGrey.withOpacity(0.2),
         fillColor: Colors.blueGrey.withOpacity(0.2),
@@ -35,12 +35,16 @@ class AppThemes {
   static final ThemeData darkTheme = ThemeData.dark().copyWith(
     primaryColor: colorSegundo,
     floatingActionButtonTheme: const FloatingActionButtonThemeData(backgroundColor: colorPrimero, elevation: 8),
-    elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(primary: colorPrimero, )),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+      primary: colorPrimero,
+    )),
     inputDecorationTheme: InputDecorationTheme(
         // const TextStyle(color: primary),
+        isDense: true,
         floatingLabelStyle: MaterialStateTextStyle.resolveWith((Set<MaterialState> states) {
           final Color? color = states.contains(MaterialState.error) ? Colors.red[900] : colorTercero;
-          return TextStyle(color: color, fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Poppins');
+          return TextStyle(color: color, fontSize: 15, fontWeight: FontWeight.bold, fontFamily: 'Poppins');
         }),
         fillColor: Colors.white.withOpacity(0.3),
         filled: true,

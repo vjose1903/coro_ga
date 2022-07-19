@@ -7,6 +7,10 @@ import 'package:provider/provider.dart';
 class FormPartidaProvider extends ChangeNotifier {
   Partida? partida;
 
+  get jugadores {
+    return partida != null ? partida!.jugadores : [];
+  }
+
   Future getPartida(int? id, BuildContext context) async {
     final formPartidaProvider = Provider.of<PartidasProvider>(context, listen: false);
 
@@ -26,10 +30,7 @@ class FormPartidaProvider extends ChangeNotifier {
 
   void removeJugadorToList(Jugador jugador) {
     if (partida == null) return;
-    Fun.logColor(color: Colores.magenta, body: jugador.toString(), pretty: true);
-
     partida!.jugadores!.remove(jugador);
-    Fun.logColor(color: Colores.green, body: partida!.jugadores.toString(), pretty: true);
 
     notifyListeners();
   }

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:motion_toast/motion_toast.dart';
 import 'package:palestine_console/palestine_console.dart';
 
-enum ToasType { error, success, warning }
+enum ToasType { error, success, warning, info }
 
 class Colores {
   static String red = 'red';
@@ -58,6 +58,10 @@ class Fun {
     dynamic nextToast;
 
     switch (type) {
+      case ToasType.info:
+        nextToast = MotionToast.info;
+
+        break;
       case ToasType.error:
         nextToast = MotionToast.error;
         break;

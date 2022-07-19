@@ -4,8 +4,8 @@ class CustomInputField<T> extends StatelessWidget {
   final String? hintText;
   final String? labelText;
   final String? helperText;
-  final IconData? icon;
-  final IconData? suffixIcon;
+  final IconData? innerLeft;
+  final IconData? innerRight;
   final TextInputType? inputType;
   final bool obscureText;
 
@@ -18,8 +18,8 @@ class CustomInputField<T> extends StatelessWidget {
     this.hintText,
     this.labelText,
     this.helperText,
-    this.icon,
-    this.suffixIcon,
+    this.innerLeft,
+    this.innerRight,
     this.inputType,
     this.obscureText = false,
     this.validators,
@@ -43,9 +43,9 @@ class CustomInputField<T> extends StatelessWidget {
         hintText: hintText,
         labelText: labelText,
         helperText: helperText,
-        suffixIcon: suffixIcon == null ? null : Icon(suffixIcon),
+        suffixIcon: innerRight == null ? null : Icon(innerRight),
         // prefixIcon: Icon(Icons.verified_user_outlined),
-        icon: icon == null ? null : Icon(icon),
+        icon: innerLeft == null ? null : Icon(innerLeft),
       ),
     );
   }
