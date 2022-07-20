@@ -38,7 +38,7 @@ class LabelWithIcon extends StatelessWidget {
       children: [
         if (orden == Orden.primeroIcono)
           Container(
-              margin: const EdgeInsets.only(right: 3),
+              margin: const EdgeInsets.only(right: 5),
               child: _Icon(icon: icon, iconSize: iconSize!, iconColor: iconColor, backgroundColor: iconBackgroundColor)),
 
         //

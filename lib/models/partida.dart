@@ -17,6 +17,11 @@ class Partida extends DynamicClass {
     return jugadores!.length;
   }
 
+  get isSinIniciar {
+    bool inicida = jugadores!.every((jugador) => jugador.puntucacion == 0);
+    return inicida;
+  }
+
   get isEmpate {
     bool estado = true;
     if (cantJugadores > 2) estado = jugadores!.every((jugador) => jugador.puntucacion == jugadores!.first.puntucacion);
@@ -30,20 +35,35 @@ class Partida extends DynamicClass {
     return jugadores;
   }
 
-  getGandorOrPerdedor(String tipo) {
+  String getJugadorEstatus(Jugador jugador) {
+    String estado = "";
+
+    if (jugador.nombre == getGandorOrPerdedor(tipo: Estado.ganador)) {
+      estado = Estado.ganador;
+    } else if (jugador.nombre == getGandorOrPerdedor(tipo: Estado.perdedor)) {
+      estado = Estado.perdedor;
+    } else {
+      List<Jugador> empatados = jugadores!.where((judadorEnTurno) => judadorEnTurno.puntucacion == jugador.puntucacion).toList();
+
+      estado = empatados.length > 1 ? Estado.empate : Estado.not;
+    }
+    return estado;
+  }
+
+  getGandorOrPerdedor({required String tipo, bool isEstado = true}) {
     List<Jugador> sortedArray = ordenarPorPuntuacion();
     Jugador selected = tipo == Estado.ganador ? sortedArray.last : sortedArray.first;
 
     List<Jugador> empatados = jugadores!.where((judador) {
       return judador.id != selected.id && judador.puntucacion == selected.puntucacion;
     }).toList();
+    String? empate = isEstado ? Estado.empate : selected.nombre;
 
-    return empatados.isNotEmpty ? "Empate" : selected.nombre;
+    return empatados.isNotEmpty ? empate : selected.nombre;
   }
 
   addJugador(Jugador jugador) {
     jugadores ??= [];
-
     jugadores!.add(jugador);
   }
 

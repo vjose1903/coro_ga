@@ -41,6 +41,9 @@ dependencies:
   path_provider: ^2.0.11
   sqflite: ^2.0.3
   motion_toast: ^2.2.3
+  scroll_shadow_container: ^2.1.1
+  scrollable_positioned_list: ^0.3.2
+  we_slide: ^2.3.0
 
 dev_dependencies:
   flutter_test:

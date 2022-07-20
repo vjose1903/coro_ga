@@ -5,8 +5,6 @@ import 'package:game_score/providers/providers.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
-import 'package:motion_toast/motion_toast.dart';
-import 'package:motion_toast/resources/arrays.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -20,6 +18,7 @@ class HomeScreen extends StatelessWidget {
         appBarTitle: 'Mis Partidas',
         appBarTrailing: CustomIconButtom(
           iconSize: 25,
+          iconColor: Colors.white,
           icon: Icons.menu,
           onTap: () => print('algo'),
         ),
@@ -108,6 +107,7 @@ class ListPartidas extends StatelessWidget {
           itemBuilder: (_, index) {
             return PartidaCard(
               partida: partidas[index],
+              onTap: () => partidaProvider.navigateToPartida(context: context, partida: partidas[index]),
               functionBorrar: () async => partidas.remove(partidas[index]),
               functionEditar: () async => partidaProvider.newPartida(partidas[index]),
               index: index,

@@ -26,6 +26,7 @@ class FormularioScreen extends StatelessWidget {
         appBarTitle: pantallas[tipo]["title"],
         appBarLeading: CustomIconButtom(
           iconSize: 25,
+          iconColor: Colors.white,
           icon: Icons.arrow_back_ios_new,
           onTap: () => Navigator.pop(context),
         ),
@@ -53,18 +54,6 @@ class _Body extends StatelessWidget {
             child: CircularProgressIndicator(color: AppThemes.colorPrimero),
           );
         } else {
-          // return LayoutBuilder(
-          //   builder: (context, constraint) {
-          //     return SingleChildScrollView(
-          //       child: ConstrainedBox(
-          //         constraints: BoxConstraints(minHeight: constraint.maxHeight),
-          //         child: IntrinsicHeight(
-          //           child: Formulario(pantallas: pantallas, tipo: tipo),
-          //         ),
-          //       ),
-          //     );
-          //   },
-          // );
           return Formulario(pantallas: pantallas, tipo: tipo);
         }
       },
@@ -126,7 +115,7 @@ class Formulario extends StatelessWidget {
                     final PartidasProvider partidaProvider = context.read<PartidasProvider>();
                     if (tipo == 'crear') {
                       partidaProvider.newPartida(partida);
-                      Navigator.pop(context);
+                      partidaProvider.navigateToPartida(context: context, partida: partida);
                     } else {}
                   }
                 },
@@ -177,6 +166,7 @@ class Titulo extends StatelessWidget {
                 formPartidaProvider.jugadores.length.toString(),
                 maxLines: 1,
                 softWrap: false,
+                style: const TextStyle(color: Colors.white),
               )),
             )
           ],
@@ -254,7 +244,7 @@ class _JugadorInput extends StatelessWidget {
                   maxLines: 1,
                   softWrap: false,
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontFamily: 'Poppins', color: Colors.grey.withOpacity(0.5)),
+                  style: TextStyle(fontFamily: 'Poppins', color: Colors.grey.withOpacity(0.6)),
                 ))),
         const SizedBox(width: 5),
         Flexible(

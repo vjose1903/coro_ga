@@ -1,13 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
-import 'package:game_score/providers/providers.dart';
 import 'package:game_score/utils/utils.dart';
+import 'package:we_slide/we_slide.dart';
 
 class PartidasProvider extends ChangeNotifier {
   List<Partida> partidas = [];
-  // final partidaClass = Partida();
-  // final jugadorClass = Jugador();
+  Partida? partidaEnTurno;
+  final WeSlideController weSlideController = WeSlideController();
+
+  void openWeSlide() {
+    weSlideController.show();
+    notifyListeners();
+  }
+
+  void closeWeSlide() {
+    weSlideController.hide();
+    notifyListeners();
+  }
+
+  void navigateToPartida({required Partida partida, required BuildContext context}) {
+    partidaEnTurno = partida;
+    Navigator.pushNamed(context, 'partida');
+    notifyListeners();
+  }
+
+  void changePartidaEnTurno(Partida partida) {
+    partidaEnTurno = partida;
+    notifyListeners();
+  }
 
   Future<SqlResponse> newPartida(Partida partida) async {
     final SqlResponse response = SqlResponse();
