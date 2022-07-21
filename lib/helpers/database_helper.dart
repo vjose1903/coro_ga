@@ -22,7 +22,6 @@ class DatabaseHelper {
   
   static Future<Database> get database async {
     _database ??= await initializeDatabase();
-
     return _database!;
   }
 
@@ -64,5 +63,13 @@ class DatabaseHelper {
           puntucacion INTEGER
         );
       ''');
+
+    await db.execute('''
+      CREATE TABLE HistorialJugadas(
+        id INTEGER PRIMARY KEY,
+        jugador_id INTEGER NOT NULL,
+        puntucacion INTEGER
+      );
+    ''');
   }
 }

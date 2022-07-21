@@ -1,7 +1,8 @@
-import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/material.dart';
+import 'package:game_score/providers/providers.dart';
 import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/widgets/widgets.dart';
+import 'package:provider/provider.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class Layout extends StatelessWidget {
   Layout({Key? key, required this.bodyContent, this.appBarTitle, this.appBarLeading, this.appBarTrailing}) : super(key: key);
@@ -27,8 +28,36 @@ class Layout extends StatelessWidget {
       children: [
         Container(decoration: boxDecoration),
         _AppBar(title: appBarTitle, leading: appBarLeading, trailing: appBarTrailing),
-        _Body(child: bodyContent)
+        _Body(child: bodyContent),
+        const _Loading(),
       ],
+    );
+  }
+}
+
+class _Loading extends StatelessWidget {
+  const _Loading({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final LoadingProvider loadingProvider = context.watch<LoadingProvider>();
+    Size size = MediaQuery.of(context).size;
+    return Visibility(
+      visible: loadingProvider.isLoading,
+      child: Positioned(
+          top: 0,
+          child: Container(
+            height: size.height,
+            width: size.width,
+            color: Colors.black.withOpacity(0.7),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(child: LoadingAnimationWidget.staggeredDotsWave(color: AppThemes.colorPrimero, size: 150)),
+                const Text('Cargando...', style: TextStyle(fontFamily: "Poppins", fontSize: 25))
+              ],
+            ),
+          )),
     );
   }
 }
@@ -86,7 +115,7 @@ class _Body extends StatelessWidget {
               width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.only(topLeft: Radius.circular(80)),
-                color: AppThemes.fondos[AppThemes.currentTheme],
+                color: AppThemes.themeColor_1,
               ),
               child: child,
             ),

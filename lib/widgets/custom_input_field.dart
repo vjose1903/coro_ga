@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_score/themes/app_themes.dart';
 
 class CustomInputField<T> extends StatelessWidget {
   final String? hintText;
@@ -8,13 +9,18 @@ class CustomInputField<T> extends StatelessWidget {
   final IconData? innerRight;
   final TextInputType? inputType;
   final bool obscureText;
+  final bool enabled;
 
   final Function? validators;
   final Function initialValueFn;
   final Function onChanged;
 
+  final TextEditingController? controller;
+
   const CustomInputField({
     Key? key,
+    required this.initialValueFn,
+    required this.onChanged,
     this.hintText,
     this.labelText,
     this.helperText,
@@ -23,14 +29,16 @@ class CustomInputField<T> extends StatelessWidget {
     this.inputType,
     this.obscureText = false,
     this.validators,
-    required this.initialValueFn,
-    required this.onChanged,
+    this.controller,
+    this.enabled = true,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       key: key,
+      enabled: enabled,
+      controller: controller,
       autofocus: false,
       initialValue: initialValueFn(),
       textCapitalization: TextCapitalization.words,
@@ -44,8 +52,18 @@ class CustomInputField<T> extends StatelessWidget {
         labelText: labelText,
         helperText: helperText,
         suffixIcon: innerRight == null ? null : Icon(innerRight),
-        // prefixIcon: Icon(Icons.verified_user_outlined),
         icon: innerLeft == null ? null : Icon(innerLeft),
+
+        // FillColor --------
+        fillColor: enabled ? AppThemes.inputColor : AppThemes.inputDisabledColor,
+
+        // Labels -----------
+        labelStyle: TextStyle(color: enabled ? AppThemes.labelInputColor : AppThemes.labelInputDisabledColor, fontFamily: 'Poppins'),
+        floatingLabelStyle: MaterialStateTextStyle.resolveWith((Set<MaterialState> states) {
+          final Color? color = states.contains(MaterialState.error) ? enabled ? Colors.red[900] : Colors.red[900]!.withOpacity(0.6) : enabled ? AppThemes.colorTercero : AppThemes.colorTercero.withOpacity(0.6);
+          return TextStyle(color: color, fontSize: 15, fontWeight: FontWeight.bold, fontFamily: 'Poppins');
+          
+        }),
       ),
     );
   }

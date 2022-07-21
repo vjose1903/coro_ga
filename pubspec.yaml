@@ -44,6 +44,7 @@ dependencies:
   scroll_shadow_container: ^2.1.1
   scrollable_positioned_list: ^0.3.2
   we_slide: ^2.3.0
+  loading_animation_widget: ^1.2.0+2
 
 dev_dependencies:
   flutter_test:

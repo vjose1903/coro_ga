@@ -1,23 +1,13 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/utils/utils.dart';
-import 'package:we_slide/we_slide.dart';
 
 class PartidasProvider extends ChangeNotifier {
   List<Partida> partidas = [];
   Partida? partidaEnTurno;
-  final WeSlideController weSlideController = WeSlideController();
-
-  void openWeSlide() {
-    weSlideController.show();
-    notifyListeners();
-  }
-
-  void closeWeSlide() {
-    weSlideController.hide();
-    notifyListeners();
-  }
 
   void navigateToPartida({required Partida partida, required BuildContext context}) {
     partidaEnTurno = partida;
@@ -30,7 +20,7 @@ class PartidasProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<SqlResponse> newPartida(Partida partida) async {
+  Future<SqlResponse> newPartida(Partida partida, BuildContext context) async {
     final SqlResponse response = SqlResponse();
     List<Jugador>? jugadores = partida.jugadores;
 
@@ -45,7 +35,7 @@ class PartidasProvider extends ChangeNotifier {
     Fun.removeKeys(tempPartidaMap, ['id', 'jugadores', 'created_at']);
     print("tempPartidaMap: $tempPartidaMap ");
 
-    final SqlResponse partidaRes = await CrudHelper.insert(tableName: 'Partida', body: tempPartidaMap);
+    final SqlResponse partidaRes = await CrudHelper.insert(tableName: 'Partida', body: tempPartidaMap, context: context);
 
     for (var jugador in jugadores) {
       //
@@ -54,7 +44,7 @@ class PartidasProvider extends ChangeNotifier {
       Map<String, dynamic> tempJugadorMap = jugador.toMap();
       Fun.removeKeys(tempJugadorMap, ['id']);
 
-      final SqlResponse jugadorRes = await CrudHelper.insert(tableName: 'Jugador', body: tempJugadorMap);
+      final SqlResponse jugadorRes = await CrudHelper.insert(tableName: 'Jugador', body: tempJugadorMap, context: context);
       jugador.id = jugadorRes.data;
     }
 
@@ -68,8 +58,10 @@ class PartidasProvider extends ChangeNotifier {
     return response;
   }
 
-  getPartidas() async {
-    final partidasFuture = Partida.getPartidas();
+  getPartidas(BuildContext context, {required bool isLoading}) async {
+    await Future.delayed(const Duration(microseconds: 100));
+
+    final partidasFuture = Partida.getPartidas(context, isLoading: isLoading);
 
     partidas = await partidasFuture;
 
@@ -77,7 +69,7 @@ class PartidasProvider extends ChangeNotifier {
     return partidasFuture;
   }
 
-  Future<Partida?> getPartidaById(int? id) async {
+  Future<Partida?> getPartidaById(int? id, BuildContext context) async {
     await Future.delayed(const Duration(seconds: 1));
 
     late Partida? partida;
@@ -85,7 +77,7 @@ class PartidasProvider extends ChangeNotifier {
     if (id == null) {
       partida = Partida(nombre: '', jugadores: [Jugador(nombre: ''), Jugador(nombre: '')]);
     } else {
-      partida = await Partida.getPartidaById(id);
+      partida = await Partida.getPartidaById(id, context: context, isLoading: false);
     }
 
     return partida;

@@ -1,9 +1,14 @@
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
-import 'package:game_score/utils/utils.dart';
+import 'package:game_score/providers/providers.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
 
 class CrudHelper {
-  static Future<SqlResponse> insert({required String tableName, required dynamic body}) async {
+  static Future<SqlResponse> insert({required String tableName, required dynamic body, required BuildContext context, bool isLoading = true}) async {
+    final LoadingProvider loadingProvider = context.read<LoadingProvider>();
+    if (isLoading) loadingProvider.changeIsLoading(true);
+
     final response = SqlResponse();
     // obtener instancia de la base de datos
     final db = await DatabaseHelper.database;
@@ -16,11 +21,20 @@ class CrudHelper {
       response.hasError = true;
       response.addMsg('Error ingresando registro');
     }
-
+    await Future.delayed(const Duration(milliseconds: 200));
+    if (isLoading) loadingProvider.changeIsLoading(false);
     return response;
   }
 
-  static Future<SqlResponse> getOne({required String tableName, required int? id, List? whereArgs_, String? where_ = 'id = ?'}) async {
+  static Future<SqlResponse> getOne(
+      {required String tableName,
+      required int? id,
+      List? whereArgs_,
+      String? where_ = 'id = ?',
+      required BuildContext context,
+      bool isLoading = true}) async {
+    final LoadingProvider loadingProvider = context.read<LoadingProvider>();
+    if (isLoading) loadingProvider.changeIsLoading(true);
     final response = SqlResponse();
 
     whereArgs_ ??= [id];
@@ -35,11 +49,16 @@ class CrudHelper {
     } else {
       response.hasError = true;
     }
-
+    await Future.delayed(const Duration(milliseconds: 200));
+    if (isLoading) loadingProvider.changeIsLoading(false);
     return response;
   }
 
-  static Future<SqlResponse> getAll({required String tableName, List? whereArgs_, String? where_}) async {
+  static Future<SqlResponse> getAll(
+      {required String tableName, List? whereArgs_, String? where_, required BuildContext context, bool isLoading = true}) async {
+    final LoadingProvider loadingProvider = context.read<LoadingProvider>();
+    if (isLoading) loadingProvider.changeIsLoading(true);
+
     final response = SqlResponse();
     response.data = [];
 
@@ -56,12 +75,22 @@ class CrudHelper {
 
     response.data = decodedRes;
     if (res.isEmpty) response.hasError = true;
-
+    await Future.delayed(const Duration(milliseconds: 200));
+    if (isLoading) loadingProvider.changeIsLoading(false);
     return response;
   }
 
   static Future<SqlResponse> updateOne(
-      {required String tableName, required int id, required dynamic newData, List? whereArgs_, String? where_ = 'id = ?'}) async {
+      {required String tableName,
+      required int id,
+      required dynamic newData,
+      List? whereArgs_,
+      String? where_ = 'id = ?',
+      required BuildContext context,
+      bool isLoading = true}) async {
+    final LoadingProvider loadingProvider = context.read<LoadingProvider>();
+    if (isLoading) loadingProvider.changeIsLoading(true);
+
     final response = SqlResponse();
 
     whereArgs_ ??= [id];
@@ -74,11 +103,21 @@ class CrudHelper {
     } else {
       response.hasError = true;
     }
-
+    await Future.delayed(const Duration(milliseconds: 200));
+    if (isLoading) loadingProvider.changeIsLoading(false);
     return response;
   }
 
-  static Future<SqlResponse> deleteOne({required String tableName, required int id, List? whereArgs_, String? where_ = 'id = ?'}) async {
+  static Future<SqlResponse> deleteOne(
+      {required String tableName,
+      required int id,
+      List? whereArgs_,
+      String? where_ = 'id = ?',
+      required BuildContext context,
+      bool isLoading = true}) async {
+    final LoadingProvider loadingProvider = context.read<LoadingProvider>();
+    if (isLoading) loadingProvider.changeIsLoading(true);
+
     final response = SqlResponse();
 
     whereArgs_ ??= [id];
@@ -91,7 +130,8 @@ class CrudHelper {
     } else {
       response.hasError = true;
     }
-
+    await Future.delayed(const Duration(milliseconds: 200));
+    if (isLoading) loadingProvider.changeIsLoading(false);
     return response;
   }
 }

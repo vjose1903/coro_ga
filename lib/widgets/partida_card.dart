@@ -26,7 +26,7 @@ class PartidaCard extends StatelessWidget {
     final size = MediaQuery.of(context).size;
 
     return Material(
-      color: AppThemes.Cards[AppThemes.currentTheme],
+      color: AppThemes.themeColor_2,
       borderRadius: BorderRadius.circular(12),
       shadowColor: AppThemes.colorSegundo.withOpacity(0.3),
       elevation: 7,

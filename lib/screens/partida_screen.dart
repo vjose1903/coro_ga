@@ -13,30 +13,35 @@ class PartidaScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PartidasProvider partidaProvider = context.watch<PartidasProvider>();
+    print('------ PartidaScreen ------');
+    final PartidasProvider partidaProvider = context.read<PartidasProvider>();
+    final WeSlideProvider weSlideProvider = context.watch<WeSlideProvider>();
     final Partida partida = partidaProvider.partidaEnTurno!;
-    partidaProvider.getPartidas();
+
+    // MyWeSlide.controller = WeSlideController();
+
+    weSlideProvider.initController(WeSlideController());
+    partidaProvider.getPartidas(context, isLoading: false);
 
     const double panelMinSize = 0;
-    final double panelMaxSize = MediaQuery.of(context).size.height * 0.6;
+    final double panelMaxSize = MediaQuery.of(context).size.height * 0.75;
 
     return Scaffold(
         body: WeSlide(
-          controller: partidaProvider.weSlideController,
+          controller: weSlideProvider.controller,
           panelMinSize: panelMinSize,
           panelMaxSize: panelMaxSize,
-          isDismissible: true,
-          body: _Body(partida: partida),
-          panelHeader: const Text("header"),
-          panel: const WeSlideContent(),
+          isDismissible: false,
           overlay: true,
           overlayOpacity: 0.5,
           footerHeight: 75,
+          body: _Body(partida: partida),
+          panel: const WeSlideContent(),
           footer: const NavigationBar(),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         floatingActionButton: Visibility(
-          visible: !partidaProvider.weSlideController.isOpened,
+          visible: !weSlideProvider.controller!.isOpened,
           child: FloatingActionButton(
             onPressed: () => Navigator.pushNamed(context, 'formulario', arguments: {"tipo": "crear"}),
             child: const Icon(Icons.add, size: 30),
@@ -57,7 +62,10 @@ class _Body extends StatelessWidget {
           iconSize: 25,
           iconColor: Colors.white,
           icon: Icons.arrow_back_ios_new,
-          onTap: () => Navigator.pop(context),
+          onTap: () {
+            print('VOLVIENDO');
+            Navigator.pop(context);
+          },
         ),
         bodyContent: Container(
             margin: const EdgeInsets.only(top: 40, bottom: 70),
@@ -77,7 +85,7 @@ class JugadoresCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
         child: Material(
-      color: AppThemes.Cards[AppThemes.currentTheme],
+      color: AppThemes.themeColor_2,
       borderRadius: BorderRadius.circular(12),
       shadowColor: AppThemes.colorTercero.withOpacity(0.3),
       elevation: 7,
@@ -138,6 +146,7 @@ class JugadorInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final PartidasProvider partidaProvider = context.read<PartidasProvider>();
+    final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
 
     Color fontNombreColor = AppThemes.currentTheme == "dark" ? const Color(0xD26776E6) : const Color(0xE30B4DBF);
     Color? fontPuntuacionColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.8) : const Color(0xDF062864);
@@ -151,7 +160,13 @@ class JugadorInfo extends StatelessWidget {
     };
 
     return _CardBackGround(
-        function: () => partidaProvider.openWeSlide(),
+        // function: () => MyWeSlide.controller!.show(),
+        function: () {
+          final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
+          jugadorProvider.changeJugadorEnTurno(jugador);
+
+          weSlideProvider.openWeSlide();
+        },
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(
@@ -250,7 +265,7 @@ class _NavigationBarState extends State<NavigationBar> {
 
   @override
   Widget build(BuildContext context) {
-    Color backgroundColor = AppThemes.currentTheme == "dark" ? const Color(0xEB333333) : const Color(0x4D325696);
+    Color backgroundColor = AppThemes.currentTheme == "dark" ? const Color(0xEB333333) : const Color(0xFFC4D0E5);
     final PartidasProvider partidaProvider = context.watch<PartidasProvider>();
     List<Partida> partidas = partidaProvider.partidas;
 
@@ -322,14 +337,98 @@ class WeSlideContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String? puntuacion;
+    TextEditingController puntuacionController = TextEditingController();
+    // final PartidasProvider partidaProvider = context.watch<PartidasProvider>();
+    final JugadorProvider jugadorProvider = context.watch<JugadorProvider>();
+    final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
+
+    final Color titleColor = AppThemes.currentTheme == "dark" ? Colors.grey.withOpacity(0.9) : AppThemes.colorTercero.withOpacity(0.7);
+    final Color subTitleColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.8) : AppThemes.colorTercero.withOpacity(0.9);
+
     return Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-          color: AppThemes.Cards[AppThemes.currentTheme],
+          borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+          color: AppThemes.themeColor_2,
         ),
-        child: Column(
-          children: [Text("_", style: TextStyle(fontSize: 65, height: 0.2, color: Colors.grey.withOpacity(0.7)))],
+        child: Padding(
+          padding: const EdgeInsets.only(right: 20, left: 20, bottom: 20),
+          child: Column(
+            children: [
+              const SizedBox(height: 10),
+              Align(
+                alignment: Alignment.centerRight,
+                child: CustomIconButtom(onTap: () => weSlideProvider.closeWeSlide(), icon: Icons.close, size: IconSize.min, iconSize: 25),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Text("Jugador:", style: TextStyle(fontSize: 18, color: titleColor)),
+                  const SizedBox(width: 5),
+                  Text(jugadorProvider.nombreJugador, style: TextStyle(fontSize: 17, color: subTitleColor, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              const SizedBox(height: 10),
+              CustomInputField(
+                key: UniqueKey(),
+                enabled: false,
+                controller: puntuacionController,
+                initialValueFn: () => puntuacion,
+                onChanged: (value) => puntuacion = value,
+                inputType: TextInputType.number,
+                labelText: 'Puntuación',
+              ),
+              const SizedBox(height: 5),
+              Expanded(flex: 2, child: Container(decoration: BoxDecoration(color: AppThemes.themeColor_1, borderRadius: BorderRadius.circular(10)))),
+              const SizedBox(height: 5),
+              _Keyboard(puntuacionController: puntuacionController),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // AUMENTAR ==========================================
+                  ExpandedButtom(backgroundColor: Colors.green[400], label: "Aumentar", textColor: Colors.white, onTap: () {}),
+
+                  const SizedBox(width: 10),
+                  // REDUCIR ==========================================
+                  ExpandedButtom(backgroundColor: Colors.red[400], label: "Reducir", textColor: Colors.white, onTap: () {}),
+                ],
+              ),
+              const SizedBox(height: 30),
+            ],
+          ),
         ));
+  }
+}
+
+class _Keyboard extends StatelessWidget {
+  const _Keyboard({Key? key, required this.puntuacionController}) : super(key: key);
+
+  final TextEditingController puntuacionController;
+
+  void changePuntuacionValue(String value) {
+    if (value != "DEL") {
+      if (puntuacionController.text == "0" && value == "0") return;
+      if (puntuacionController.text == "0" && value != "0") {
+        puntuacionController.text = value;
+      } else {
+        puntuacionController.text = puntuacionController.text += value;
+      }
+    } else {
+      if (puntuacionController.text.isNotEmpty) {
+        String texto = puntuacionController.text;
+        texto = texto.substring(0, texto.length - 1);
+        puntuacionController.text = texto;
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Color backgroundColor = AppThemes.currentTheme == "dark" ? AppThemes.themeColor_4.withOpacity(0.2) : AppThemes.themeColor_4.withOpacity(0.9);
+    return Container(
+        decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(10)),
+        child: CustomKeyboard(onChanged: (value) => changePuntuacionValue(value), tipo: KeyboardType.number));
   }
 }

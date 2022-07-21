@@ -99,7 +99,7 @@ class Formulario extends StatelessWidget {
             const SizedBox(height: 10),
             Expanded(
                 child: Material(
-              color: AppThemes.Cards[AppThemes.currentTheme],
+              color: AppThemes.themeColor_2,
               borderRadius: BorderRadius.circular(12),
               shadowColor: AppThemes.colorTercero.withOpacity(0.3),
               elevation: 7,
@@ -109,12 +109,14 @@ class Formulario extends StatelessWidget {
             const SizedBox(height: 15),
             Center(
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (validateAndSave()) {
-                    Fun.logColor(color: Colores.red, body: partida.toString(), pretty: true);
                     final PartidasProvider partidaProvider = context.read<PartidasProvider>();
+
                     if (tipo == 'crear') {
-                      partidaProvider.newPartida(partida);
+                      await partidaProvider.newPartida(partida, context);
+                      await Future.delayed(const Duration(milliseconds: 500));
+
                       partidaProvider.navigateToPartida(context: context, partida: partida);
                     } else {}
                   }

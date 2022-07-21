@@ -1,4 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/utils/utils.dart';
@@ -113,14 +116,14 @@ class Partida extends DynamicClass {
   // ==================================================================================================================================
   // ==================================================================================================================================
 
-  static getPartidas() async {
-    final response = await CrudHelper.getAll(tableName: "Partida");
+  static getPartidas(BuildContext context, {required bool isLoading}) async {
+    final response = await CrudHelper.getAll(tableName: "Partida", context: context, isLoading: isLoading);
 
     if (!response.hasError!) {
       final partidasParsed = List<Partida>.from(response.data.map((x) => Partida.fromMap(x)));
 
       for (var partida in partidasParsed) {
-        await findJugadores(partida);
+        await findJugadores(partida: partida, context: context, isLoading: isLoading);
       }
       return partidasParsed;
     } else {
@@ -129,13 +132,13 @@ class Partida extends DynamicClass {
     }
   }
 
-  static Future<Partida?> getPartidaById(int id) async {
-    final response = await CrudHelper.getOne(tableName: "Partida", id: id);
+  static Future<Partida?> getPartidaById(int id, {required BuildContext context, required bool isLoading}) async {
+    final response = await CrudHelper.getOne(tableName: "Partida", id: id, context: context);
 
     if (!response.hasError!) {
       final partidaParsed = Partida.fromMap(response.data);
 
-      await findJugadores(partidaParsed);
+      await findJugadores(partida: partidaParsed, context: context, isLoading: isLoading);
       return partidaParsed;
     } else {
       response.addMsg('Partida buscada no existe.');
@@ -143,8 +146,9 @@ class Partida extends DynamicClass {
     }
   }
 
-  static findJugadores(Partida partida) async {
-    final response = await CrudHelper.getAll(tableName: "Jugador", where_: "partida_id = ?", whereArgs_: [partida.id]);
+  static findJugadores({required Partida partida, required BuildContext context, required bool isLoading}) async {
+    final response =
+        await CrudHelper.getAll(tableName: "Jugador", where_: "partida_id = ?", whereArgs_: [partida.id], context: context, isLoading: isLoading);
     if (!response.hasError!) {
       final jugadoresParsed = List<Jugador>.from(response.data.map((x) => Jugador.fromMap(x)));
       partida.addJugadores(jugadoresParsed);

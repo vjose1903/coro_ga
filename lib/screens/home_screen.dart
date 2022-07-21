@@ -13,6 +13,9 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('====== build ======');
+    final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
+    print(" ===> ${weSlideProvider.controller}");
     return Scaffold(
       body: Layout(
         appBarTitle: 'Mis Partidas',
@@ -22,7 +25,7 @@ class HomeScreen extends StatelessWidget {
           icon: Icons.menu,
           onTap: () => print('algo'),
         ),
-        bodyContent: _Body(),
+        bodyContent: const _Body(),
       ),
       floatingActionButton: FloatingActionButton(
           onPressed: () => Navigator.pushNamed(context, 'formulario', arguments: {"tipo": "crear"}), child: const Icon(Icons.add, size: 30)),
@@ -59,7 +62,7 @@ class _Body extends StatelessWidget {
     final PartidasProvider partidaProvider = context.read<PartidasProvider>();
 
     return FutureBuilder(
-      future: partidaProvider.getPartidas(),
+      future: partidaProvider.getPartidas(context, isLoading: false),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (!snapshot.hasData) {
           return const Center(
@@ -73,7 +76,7 @@ class _Body extends StatelessWidget {
   }
 
   getPartida(PartidasProvider partidaProvider, context) async {
-    final partida = await partidaProvider.getPartidaById(5);
+    final partida = await partidaProvider.getPartidaById(5, context);
 
     if (partida == null) {
       Fun.toast(type: ToasType.error, context: context, message: "Partida buscada no existe");
@@ -109,7 +112,7 @@ class ListPartidas extends StatelessWidget {
               partida: partidas[index],
               onTap: () => partidaProvider.navigateToPartida(context: context, partida: partidas[index]),
               functionBorrar: () async => partidas.remove(partidas[index]),
-              functionEditar: () async => partidaProvider.newPartida(partidas[index]),
+              functionEditar: () async => partidaProvider.newPartida(partidas[index], context),
               index: index,
             );
           });

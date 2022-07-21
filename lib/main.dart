@@ -14,6 +14,9 @@ class MyApp extends StatelessWidget {
         providers: [
           ChangeNotifierProvider(create: (_) => PartidasProvider()),
           ChangeNotifierProvider(create: (_) => FormPartidaProvider()),
+          ChangeNotifierProvider(create: (_) => WeSlideProvider()),
+          ChangeNotifierProvider(create: (_) => JugadorProvider()),
+          ChangeNotifierProvider(create: (_) => LoadingProvider()),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
