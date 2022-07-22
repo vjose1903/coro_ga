@@ -7,10 +7,13 @@ import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/utils/utils.dart';
 
 class Partida extends DynamicClass {
-  Partida({this.nombre, this.jugadores, this.id, this.activo = true, this.createdAt});
+  Partida({this.nombre, this.jugadores, this.id, this.activo = true, this.createdAt, this.tipo});
+
+  static String tableName = "Partida";
 
   int? id;
   String? nombre;
+  String? tipo;
   bool? activo;
   List<Jugador>? jugadores;
   DateTime? createdAt;
@@ -21,20 +24,20 @@ class Partida extends DynamicClass {
   }
 
   get isSinIniciar {
-    bool inicida = jugadores!.every((jugador) => jugador.puntucacion == 0);
+    bool inicida = jugadores!.every((jugador) => jugador.puntuacion == 0);
     return inicida;
   }
 
   get isEmpate {
     bool estado = true;
-    if (cantJugadores > 2) estado = jugadores!.every((jugador) => jugador.puntucacion == jugadores!.first.puntucacion);
-    if (cantJugadores == 2) estado = jugadores![0].puntucacion == jugadores![1].puntucacion;
+    if (cantJugadores > 2) estado = jugadores!.every((jugador) => jugador.puntuacion == jugadores!.first.puntuacion);
+    if (cantJugadores == 2) estado = jugadores![0].puntuacion == jugadores![1].puntuacion;
     return estado;
   }
 
   ordenarPorPuntuacion() {
     if (jugadores!.isEmpty) return [];
-    jugadores!.sort((a, b) => a.puntucacion!.compareTo(b.puntucacion!));
+    jugadores!.sort((a, b) => a.puntuacion!.compareTo(b.puntuacion!));
     return jugadores;
   }
 
@@ -46,7 +49,7 @@ class Partida extends DynamicClass {
     } else if (jugador.nombre == getGandorOrPerdedor(tipo: Estado.perdedor)) {
       estado = Estado.perdedor;
     } else {
-      List<Jugador> empatados = jugadores!.where((judadorEnTurno) => judadorEnTurno.puntucacion == jugador.puntucacion).toList();
+      List<Jugador> empatados = jugadores!.where((judadorEnTurno) => judadorEnTurno.puntuacion == jugador.puntuacion).toList();
 
       estado = empatados.length > 1 ? Estado.empate : Estado.not;
     }
@@ -58,7 +61,7 @@ class Partida extends DynamicClass {
     Jugador selected = tipo == Estado.ganador ? sortedArray.last : sortedArray.first;
 
     List<Jugador> empatados = jugadores!.where((judador) {
-      return judador.id != selected.id && judador.puntucacion == selected.puntucacion;
+      return judador.id != selected.id && judador.puntuacion == selected.puntuacion;
     }).toList();
     String? empate = isEstado ? Estado.empate : selected.nombre;
 
@@ -93,6 +96,7 @@ class Partida extends DynamicClass {
   factory Partida.fromMap(Map<String, dynamic> json) => Partida(
         id: json["id"],
         nombre: json["nombre"],
+        tipo: json["tipo"],
         activo: Fun.toBoolean(json["activo"]),
         createdAt: json["created_at"],
         jugadores: json["jugadores"] != null ? List<Jugador>.from(json["jugadores"].map((x) => Jugador.fromMap(x))) : null,
@@ -102,6 +106,7 @@ class Partida extends DynamicClass {
   Map<String, dynamic> toMap() => {
         "id": id,
         "nombre": nombre,
+        "tipo": tipo,
         "created_at": createdAt != null ? createdAt!.toIso8601String() : null,
         "activo": "$activo",
         "jugadores": jugadores != null ? List<dynamic>.from(jugadores!.map((x) => x.toMap())) : [],
@@ -109,7 +114,7 @@ class Partida extends DynamicClass {
 
   @override
   String toString() {
-    return '{"id": $id, "nombre": "$nombre", "activo": $activo, "jugadores": $jugadores}';
+    return '{"id": $id, "nombre": "$nombre", "activo": $activo, "tipo": "$tipo", "jugadores": $jugadores}';
   }
 
   // ==================================================================================================================================
@@ -117,7 +122,7 @@ class Partida extends DynamicClass {
   // ==================================================================================================================================
 
   static getPartidas(BuildContext context, {required bool isLoading}) async {
-    final response = await CrudHelper.getAll(tableName: "Partida", context: context, isLoading: isLoading);
+    final response = await CrudHelper.getAll(tableName: Partida.tableName, context: context, isLoading: isLoading);
 
     if (!response.hasError!) {
       final partidasParsed = List<Partida>.from(response.data.map((x) => Partida.fromMap(x)));
@@ -133,7 +138,7 @@ class Partida extends DynamicClass {
   }
 
   static Future<Partida?> getPartidaById(int id, {required BuildContext context, required bool isLoading}) async {
-    final response = await CrudHelper.getOne(tableName: "Partida", id: id, context: context);
+    final response = await CrudHelper.getOne(tableName: Partida.tableName, id: id, context: context);
 
     if (!response.hasError!) {
       final partidaParsed = Partida.fromMap(response.data);
@@ -147,10 +152,16 @@ class Partida extends DynamicClass {
   }
 
   static findJugadores({required Partida partida, required BuildContext context, required bool isLoading}) async {
-    final response =
-        await CrudHelper.getAll(tableName: "Jugador", where_: "partida_id = ?", whereArgs_: [partida.id], context: context, isLoading: isLoading);
+    final response = await CrudHelper.getAll(
+        tableName: Jugador.tableName, where_: "partida_id = ?", whereArgs_: [partida.id], context: context, isLoading: isLoading);
+
     if (!response.hasError!) {
       final jugadoresParsed = List<Jugador>.from(response.data.map((x) => Jugador.fromMap(x)));
+
+      for (var jugador in jugadoresParsed) {
+        await Jugador.findHistorial(jugador: jugador, context: context, isLoading: isLoading);
+      }
+
       partida.addJugadores(jugadoresParsed);
     } else {
       response.addMsg('Partida ingresada no tiene jugadores.');

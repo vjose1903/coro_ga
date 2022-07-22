@@ -6,7 +6,7 @@ class JugadorProvider extends ChangeNotifier {
 
   String get nombreJugador {
     if (jugadorEnTurno == null) return "";
-    
+
     return jugadorEnTurno!.nombre!;
   }
 

@@ -2,7 +2,7 @@ class SqlResponse {
   SqlResponse({this.messages, this.data, this.hasError = false});
 
   bool? hasError;
-  List? messages;
+  List<String>? messages;
   dynamic data;
 
   void addMsg(String arg) {
@@ -10,7 +10,8 @@ class SqlResponse {
     messages!.add(arg);
   }
 
-  void addMsgs(List<String> args) {
+  void addMsgs(List<String>? args) {
+    if (args == null) return;
     messages ??= [];
 
     for (String arg in args) {

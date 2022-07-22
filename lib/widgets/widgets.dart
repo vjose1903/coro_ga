@@ -1,3 +1,4 @@
+export 'package:game_score/widgets/puntuacion_form.dart';
 export 'package:game_score/widgets/expanded_buttom.dart';
 export 'package:game_score/widgets/custom_keyboard.dart';
 export 'package:game_score/widgets/custom_estado_partida.dart';

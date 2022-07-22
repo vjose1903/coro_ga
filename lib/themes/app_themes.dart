@@ -7,6 +7,7 @@ class AppThemes {
   static const Color colorPrimero = Color(0xFF0F309C);
   static const Color colorSegundo = Color(0xFF0B129F);
   static const Color colorTercero = Color(0xFF0E1265);
+  static const Color colorCuarto = Color(0xFF0E1265);
 
   static Color themeColor_1 = AppThemes.currentTheme == "dark" ? const Color(0xFF27292B) : const Color(0xFFE6EBED);
   static Color? themeColor_2 = AppThemes.currentTheme == "dark" ? Colors.grey[800] : Colors.white;

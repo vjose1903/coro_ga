@@ -39,21 +39,21 @@ class _Body extends StatelessWidget {
   // getPartidas
   // List<Partida> tempPartidas = [
   //   Partida(id: 1, activo: true, nombre: "Domino", jugadores: [
-  //     Jugador(nombre: "Victor", puntucacion: 20),
-  //     Jugador(nombre: "Juan", puntucacion: 20),
+  //     Jugador(nombre: "Victor", puntuacion: 20),
+  //     Jugador(nombre: "Juan", puntuacion: 20),
   //   ]),
   //   Partida(id: 2, activo: true, nombre: "Uno", jugadores: [
-  //     Jugador(id: 1, nombre: "Victor", puntucacion: 1),
-  //     Jugador(id: 1, nombre: "Manuel", puntucacion: 6),
-  //     Jugador(id: 4, nombre: "Alex", puntucacion: 2),
-  //     Jugador(id: 5, nombre: "Ropert", puntucacion: 3),
+  //     Jugador(id: 1, nombre: "Victor", puntuacion: 1),
+  //     Jugador(id: 1, nombre: "Manuel", puntuacion: 6),
+  //     Jugador(id: 4, nombre: "Alex", puntuacion: 2),
+  //     Jugador(id: 5, nombre: "Ropert", puntuacion: 3),
   //   ]),
   //   Partida(id: 2, activo: true, nombre: "Coño no voy", jugadores: [
-  //     Jugador(id: 1, nombre: "Victor", puntucacion: 5),
-  //     Jugador(id: 2, nombre: "Jean Marcos", puntucacion: 2),
-  //     Jugador(id: 3, nombre: "Saul", puntucacion: 4),
-  //     Jugador(id: 4, nombre: "Alex", puntucacion: 2),
-  //     Jugador(id: 5, nombre: "Ropert", puntucacion: 3),
+  //     Jugador(id: 1, nombre: "Victor", puntuacion: 5),
+  //     Jugador(id: 2, nombre: "Jean Marcos", puntuacion: 2),
+  //     Jugador(id: 3, nombre: "Saul", puntuacion: 4),
+  //     Jugador(id: 4, nombre: "Alex", puntuacion: 2),
+  //     Jugador(id: 5, nombre: "Ropert", puntuacion: 3),
   //   ]),
   // ];
 

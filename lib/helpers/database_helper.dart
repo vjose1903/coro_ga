@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:game_score/models/models.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -11,7 +12,6 @@ class DatabaseHelper {
 
   static final DatabaseHelper db = DatabaseHelper._();
 
-
   factory DatabaseHelper() {
     return db;
   }
@@ -19,7 +19,7 @@ class DatabaseHelper {
   DatabaseHelper._();
 
   static Database? _database;
-  
+
   static Future<Database> get database async {
     _database ??= await initializeDatabase();
     return _database!;
@@ -36,9 +36,10 @@ class DatabaseHelper {
 
   static void _createDb(Database db, int newVersion) async {
     await db.execute(''' 
-        CREATE TABLE Partida(
+        CREATE TABLE ${Partida.tableName}(
           id INTEGER PRIMARY KEY,
           nombre TEXT,
+          tipo TEXT,
           activo TEXT DEFAULT true,
 
           createdAt timestamp DEFAULT current_timestamp
@@ -48,7 +49,7 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TRIGGER tg_somethings_updated_at
         AFTER UPDATE
-        ON Partida FOR EACH ROW
+        ON ${Partida.tableName} FOR EACH ROW
         BEGIN
           UPDATE somethings SET updated_at = current_timestamp
             WHERE id = old.id;
@@ -56,19 +57,20 @@ class DatabaseHelper {
       ''');
 
     await db.execute('''
-        CREATE TABLE Jugador(
+        CREATE TABLE ${Jugador.tableName}(
           id INTEGER PRIMARY KEY,
           partida_id INTEGER NOT NULL,
           nombre TEXT,
-          puntucacion INTEGER
+          puntuacion INTEGER
         );
       ''');
 
     await db.execute('''
-      CREATE TABLE HistorialJugadas(
+      CREATE TABLE ${HistorialJugada.tableName}(
         id INTEGER PRIMARY KEY,
         jugador_id INTEGER NOT NULL,
-        puntucacion INTEGER
+        tipo TEXT,
+        puntuacion INTEGER
       );
     ''');
   }

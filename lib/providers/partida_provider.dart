@@ -15,6 +15,10 @@ class PartidasProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void refresh() {
+    notifyListeners();
+  }
+
   void changePartidaEnTurno(Partida partida) {
     partidaEnTurno = partida;
     notifyListeners();
@@ -33,9 +37,8 @@ class PartidasProvider extends ChangeNotifier {
     Map<String, dynamic> tempPartidaMap = partida.toMap();
 
     Fun.removeKeys(tempPartidaMap, ['id', 'jugadores', 'created_at']);
-    print("tempPartidaMap: $tempPartidaMap ");
 
-    final SqlResponse partidaRes = await CrudHelper.insert(tableName: 'Partida', body: tempPartidaMap, context: context);
+    final SqlResponse partidaRes = await CrudHelper.insert(tableName: Partida.tableName, body: tempPartidaMap, context: context);
 
     for (var jugador in jugadores) {
       //
@@ -44,7 +47,7 @@ class PartidasProvider extends ChangeNotifier {
       Map<String, dynamic> tempJugadorMap = jugador.toMap();
       Fun.removeKeys(tempJugadorMap, ['id']);
 
-      final SqlResponse jugadorRes = await CrudHelper.insert(tableName: 'Jugador', body: tempJugadorMap, context: context);
+      final SqlResponse jugadorRes = await CrudHelper.insert(tableName: Jugador.tableName, body: tempJugadorMap, context: context);
       jugador.id = jugadorRes.data;
     }
 
