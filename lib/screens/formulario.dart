@@ -28,7 +28,7 @@ class FormularioScreen extends StatelessWidget {
           iconSize: 25,
           iconColor: Colors.white,
           icon: Icons.arrow_back_ios_new,
-          onTap: () => Navigator.pop(context),
+          onTap: () => Navigator.pop(context, 'home'),
         ),
         bodyContent: _Body(id: id, pantallas: pantallas, tipo: tipo),
       ),

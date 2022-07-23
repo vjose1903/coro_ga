@@ -9,13 +9,11 @@ import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
-// final Movie movie = ModalRoute.of(context)!.settings.arguments as Movie;
 
   @override
   Widget build(BuildContext context) {
-    print('====== build ======');
-    final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
-    print(" ===> ${weSlideProvider.controller}");
+    print("----- HomeScreen -----");
+
     return Scaffold(
       body: Layout(
         appBarTitle: 'Mis Partidas',
@@ -56,10 +54,11 @@ class _Body extends StatelessWidget {
   //     Jugador(id: 5, nombre: "Ropert", puntuacion: 3),
   //   ]),
   // ];
-
   @override
   Widget build(BuildContext context) {
     final PartidasProvider partidaProvider = context.read<PartidasProvider>();
+    print(">>>>> HomeScreen _Body <<<<<");
+    print(" ");
 
     return FutureBuilder(
       future: partidaProvider.getPartidas(context, isLoading: false),

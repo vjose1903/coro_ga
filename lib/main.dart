@@ -3,6 +3,7 @@ import 'package:game_score/providers/providers.dart';
 
 import 'package:game_score/routes/app_routes.dart';
 import 'package:game_score/themes/app_themes.dart';
+import 'package:game_score/utils/utils.dart';
 import 'package:provider/provider.dart';
 
 void main() => runApp(MyApp());
@@ -10,6 +11,7 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    MyWeSlide.initialize();
     return MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => PartidasProvider()),

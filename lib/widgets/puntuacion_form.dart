@@ -21,87 +21,66 @@ class PuntuacionForm extends StatelessWidget {
     final Color titleColor = AppThemes.currentTheme == "dark" ? Colors.grey.withOpacity(0.9) : AppThemes.colorTercero.withOpacity(0.7);
     final Color subTitleColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.8) : AppThemes.colorTercero.withOpacity(0.9);
 
-    return Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-          color: AppThemes.themeColor_2,
+    return Column(
+      children: [
+        Row(
+          children: [
+            Text("Jugador:", style: TextStyle(fontFamily: "Poppins", fontSize: 18, color: titleColor)),
+            const SizedBox(width: 5),
+            Text(jugadorProvider.nombreJugador,
+                style: TextStyle(fontFamily: "Poppins", fontSize: 17, color: subTitleColor, fontWeight: FontWeight.bold)),
+          ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.only(right: 20, left: 20, bottom: 20),
-          child: Column(
-            children: [
-              const SizedBox(height: 10),
-              Align(
-                alignment: Alignment.centerRight,
-                child: CustomIconButtom(
-                    onTap: () {
-                      partidaProvider.refresh();
-                      weSlideProvider.closeWeSlide();
-                    },
-                    icon: Icons.close,
-                    size: IconSize.min,
-                    iconSize: 25),
-              ),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Text("Jugador:", style: TextStyle(fontSize: 18, color: titleColor)),
-                  const SizedBox(width: 5),
-                  Text(jugadorProvider.nombreJugador, style: TextStyle(fontSize: 17, color: subTitleColor, fontWeight: FontWeight.bold)),
-                ],
-              ),
-              const SizedBox(height: 10),
-              CustomInputField(
-                key: UniqueKey(),
-                enabled: false,
-                controller: puntuacionController,
-                initialValueFn: () => puntuacion,
-                onChanged: (value) => puntuacion = value,
-                inputType: TextInputType.number,
-                labelText: 'Puntuación',
-              ),
-              const SizedBox(height: 10),
-              Expanded(
-                flex: 2,
-                child: Material(
-                  borderRadius: BorderRadius.circular(10),
-                  shadowColor: AppThemes.colorTercero.withOpacity(0.3),
-                  elevation: 7,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(color: AppThemes.themeColor_1, child: const ListHistorial()),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              _Keyboard(puntuacionController: puntuacionController),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  // AUMENTAR ==========================================
-                  ExpandedButtom(
-                      backgroundColor: Colors.green[400],
-                      label: "Aumentar",
-                      textColor: Colors.white,
-                      onTap: () => changePuntuacion(
-                          jugadorProvider: jugadorProvider, puntuacion: puntuacionController.text, tipo: "aumentar", context: context)),
-
-                  const SizedBox(width: 10),
-                  // REDUCIR ==========================================
-                  ExpandedButtom(
-                      backgroundColor: Colors.red[400],
-                      label: "Reducir",
-                      textColor: Colors.white,
-                      onTap: () => changePuntuacion(
-                          jugadorProvider: jugadorProvider, puntuacion: puntuacionController.text, tipo: "reducir", context: context)),
-                ],
-              ),
-              const SizedBox(height: 30),
-            ],
+        const SizedBox(height: 10),
+        CustomInputField(
+          key: UniqueKey(),
+          enabled: false,
+          controller: puntuacionController,
+          initialValueFn: () => puntuacion,
+          onChanged: (value) => puntuacion = value,
+          inputType: TextInputType.number,
+          labelText: 'Puntuación',
+        ),
+        const SizedBox(height: 10),
+        Expanded(
+          flex: 2,
+          child: Material(
+            borderRadius: BorderRadius.circular(10),
+            shadowColor: AppThemes.colorTercero.withOpacity(0.3),
+            elevation: 7,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Container(color: AppThemes.themeColor_1, child: const ListHistorial()),
+            ),
           ),
-        ));
+        ),
+        const SizedBox(height: 10),
+        _Keyboard(puntuacionController: puntuacionController),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            // AUMENTAR ==========================================
+            ExpandedButtom(
+                backgroundColor: Colors.green[400],
+                label: "Aumentar",
+                textColor: Colors.white,
+                onTap: () =>
+                    changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacionController.text, tipo: "aumentar", context: context)),
+
+            const SizedBox(width: 10),
+            // REDUCIR ==========================================
+            ExpandedButtom(
+                backgroundColor: Colors.red[400],
+                label: "Reducir",
+                textColor: Colors.white,
+                onTap: () =>
+                    changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacionController.text, tipo: "reducir", context: context)),
+          ],
+        ),
+        const SizedBox(height: 30),
+      ],
+    );
   }
 
   changePuntuacion(
@@ -127,12 +106,12 @@ class ListHistorial extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final JugadorProvider jugadorProvider = context.watch<JugadorProvider>();
-    final Jugador? jugador = jugadorProvider.jugadorEnTurno;
+    final JugadorProvider? jugadorProvider = context.watch<JugadorProvider?>();
+    final Jugador? jugador = jugadorProvider?.jugadorEnTurno;
 
     if (jugador == null) return Container();
 
-    if (jugador.historialJugadas!.isEmpty) {
+    if (jugador.historialJugadas != null && jugador.historialJugadas!.isEmpty) {
       return Center(
           child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

@@ -3,7 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
+import 'package:game_score/providers/providers.dart';
 import 'package:game_score/utils/utils.dart';
+import 'package:provider/provider.dart';
 
 class PartidasProvider extends ChangeNotifier {
   List<Partida> partidas = [];
@@ -11,7 +13,10 @@ class PartidasProvider extends ChangeNotifier {
 
   void navigateToPartida({required Partida partida, required BuildContext context}) {
     partidaEnTurno = partida;
-    Navigator.pushNamed(context, 'partida');
+    Navigator.pushNamed(context, 'partida').then((value) {
+      final WeSlideProvider WeSliderProvider = context.read<WeSlideProvider>();
+      WeSliderProvider.refresh();
+    });
     notifyListeners();
   }
 
