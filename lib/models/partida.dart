@@ -121,6 +121,54 @@ class Partida extends DynamicClass {
   // ==================================================================================================================================
   // ==================================================================================================================================
 
+  static createPartida(BuildContext context, {required Partida partida}) async {
+    final SqlResponse response = SqlResponse();
+    List<Jugador>? jugadores = partida.jugadores;
+
+    if (jugadores == null) {
+      response.addMsg('Debe de agregar almenos 2 jugadores a la partida');
+      response.hasError = true;
+      return response;
+    }
+
+    Map<String, dynamic> tempPartidaMap = partida.toMap();
+
+    Fun.removeKeys(tempPartidaMap, ['id', 'jugadores', 'created_at']);
+
+    final SqlResponse partidaRes = await CrudHelper.insert(tableName: Partida.tableName, body: tempPartidaMap, context: context);
+
+    for (var jugador in jugadores) {
+      //
+      jugador.partidaId = partidaRes.data;
+
+      Map<String, dynamic> tempJugadorMap = jugador.toMap();
+      Fun.removeKeys(tempJugadorMap, ['id']);
+
+      final SqlResponse jugadorRes = await CrudHelper.insert(tableName: Jugador.tableName, body: tempJugadorMap, context: context);
+      jugador.id = jugadorRes.data;
+    }
+
+    partida.id = partidaRes.data;
+
+    response.data = partida;
+
+    return response;
+  }
+
+  static Future<SqlResponse> addNewJugador(BuildContext context, {required Partida partida, required Jugador jugador}) async {
+    jugador.partidaId = partida.id;
+
+    Map<String, dynamic> tempJugadorMap = jugador.toMap();
+    Fun.removeKeys(tempJugadorMap, ['id']);
+
+    final SqlResponse response = await CrudHelper.insert(tableName: Jugador.tableName, body: tempJugadorMap, context: context);
+    jugador.id = response.data;
+
+    partida.addJugador(jugador);
+    response.data = partida;
+    return response;
+  }
+
   static getPartidas(BuildContext context, {required bool isLoading}) async {
     final response = await CrudHelper.getAll(tableName: Partida.tableName, context: context, isLoading: isLoading);
 

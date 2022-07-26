@@ -8,39 +8,25 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:we_slide/we_slide.dart';
 
 class Layout extends StatelessWidget {
-  Layout({Key? key, required this.bodyContent, this.appBarTitle, this.appBarLeading, this.appBarTrailing, this.weSlideContent, this.weSlideFooter})
-      : super(key: key);
+  Layout({
+    Key? key,
+    required this.bodyContent,
+    required this.weSlideController,
+    this.appBarTitle,
+    this.appBarLeading,
+    this.appBarTrailing,
+    this.hasFooter = false,
+    this.initialWeSlideWidgets,
+  }) : super(key: key);
 
   final Widget bodyContent;
   final String? appBarTitle;
   final Widget? appBarLeading;
   final Widget? appBarTrailing;
-  final Widget? weSlideContent;
-  final Widget? weSlideFooter;
+  final bool? hasFooter;
+  final Map<String, Widget?>? initialWeSlideWidgets;
 
-  @override
-  Widget build(BuildContext context) {
-    final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
-
-    configureWeSlide(weSlideProvider: weSlideProvider, weSlideContent: weSlideContent, weSlideFooter: weSlideFooter);
-
-    Fun.logColor(color: Colores.yellow, body: "BUILD LAYOUT");
-    return MainLayout(appBarTitle: appBarTitle, appBarLeading: appBarLeading, appBarTrailing: appBarTrailing, bodyContent: bodyContent);
-  }
-
-  configureWeSlide({required WeSlideProvider weSlideProvider, Widget? weSlideContent, Widget? weSlideFooter}) {
-    weSlideProvider.configureWeSlide(weSlideFooter: weSlideFooter, weSlidecontent: weSlideContent);
-  }
-}
-
-class MainLayout extends StatelessWidget {
-  const MainLayout({Key? key, required this.appBarTitle, required this.appBarLeading, required this.appBarTrailing, required this.bodyContent})
-      : super(key: key);
-
-  final String? appBarTitle;
-  final Widget? appBarLeading;
-  final Widget? appBarTrailing;
-  final Widget bodyContent;
+  final WeSlideController weSlideController;
 
   final boxDecoration = const BoxDecoration(
     gradient: LinearGradient(
@@ -54,18 +40,21 @@ class MainLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final WeSlideProvider weSlideProvider = context.watch<WeSlideProvider>();
-    Fun.logColor(color: Colores.red, body: "MainLayout");
+    final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
+
+    configureWeSlide(weSlideProvider: weSlideProvider, initialWeSlideWidgets: initialWeSlideWidgets);
+
+    Fun.logColor(color: Colores.yellow, body: "BUILD LAYOUT");
     return Stack(
       children: [
         WeSlide(
-          controller: MyWeSlide.controller,
+          controller: weSlideController,
           panelMinSize: 0,
           panelMaxSize: MediaQuery.of(context).size.height * 0.75,
           isDismissible: false,
           overlay: true,
           overlayOpacity: 0.5,
-          footerHeight: MyWeSlide.footer != null ? 75 : 0,
+          footerHeight: hasFooter! ? 75 : 0,
           body: Stack(
             children: [
               Container(decoration: boxDecoration),
@@ -73,12 +62,17 @@ class MainLayout extends StatelessWidget {
               _Body(child: bodyContent),
             ],
           ),
-          panel: const _WeSlideContent(),
+          panel: _WeSlideContent(weSlideController: weSlideController),
           footer: const _WeSlideFooter(),
         ),
         const _Loading(),
       ],
     );
+  }
+
+  configureWeSlide({dynamic initialWeSlideWidgets, required WeSlideProvider weSlideProvider}) {
+    if (initialWeSlideWidgets != null && initialWeSlideWidgets["footer"] != null) weSlideProvider.footer = initialWeSlideWidgets["footer"];
+    if (initialWeSlideWidgets != null && initialWeSlideWidgets["body"] != null) weSlideProvider.body = initialWeSlideWidgets["body"];
   }
 }
 
@@ -135,11 +129,7 @@ class _AppBar extends StatelessWidget {
             if (title != null)
               Container(
                 margin: const EdgeInsets.only(left: 10),
-                child: Text(
-                  // "${title!} ${MyWeSlide.footer == null ? "NO FOOT" : "SI FOOT"}",
-                  "${title!} ",
-                  style: const TextStyle(color: Colors.white, fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 22),
-                ),
+                child: Text(title!, style: const TextStyle(color: Colors.white, fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 22)),
               )
           ],
         ),
@@ -176,11 +166,14 @@ class _Body extends StatelessWidget {
 }
 
 class _WeSlideContent extends StatelessWidget {
-  const _WeSlideContent({Key? key}) : super(key: key);
+  const _WeSlideContent({Key? key, required this.weSlideController}) : super(key: key);
+
+  final WeSlideController weSlideController;
 
   @override
   Widget build(BuildContext context) {
     WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
+
     return Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -194,10 +187,11 @@ class _WeSlideContent extends StatelessWidget {
                 const SizedBox(height: 10),
                 Align(
                   alignment: Alignment.centerRight,
-                  child: CustomIconButtom(onTap: () => weSlideProvider.closeWeSlide(), icon: Icons.close, size: IconSize.min, iconSize: 25),
+                  child: CustomIconButtom(
+                      onTap: () => weSlideProvider.closeWeSlide(controller: weSlideController), icon: Icons.close, size: IconSize.min, iconSize: 25),
                 ),
                 const SizedBox(height: 10),
-                Expanded(child: MyWeSlide.body ?? Container())
+                Expanded(child: weSlideProvider.Body ?? Container())
               ],
             )));
   }
@@ -205,16 +199,17 @@ class _WeSlideContent extends StatelessWidget {
 
 class _WeSlideFooter extends StatelessWidget {
   const _WeSlideFooter({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
+    final WeSlideProvider weSlideProvider = context.watch<WeSlideProvider>();
+
     Color backgroundColor = AppThemes.currentTheme == "dark" ? const Color(0xEB333333) : const Color(0xFFC4D0E5);
     return Container(
       width: double.infinity,
       color: backgroundColor,
       child: Padding(
         padding: const EdgeInsets.all(1),
-        child: MyWeSlide.footer ?? Container(),
+        child: weSlideProvider.Footer ?? Container(),
       ),
     );
   }

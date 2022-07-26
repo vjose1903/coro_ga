@@ -16,7 +16,6 @@ class PuntuacionForm extends StatelessWidget {
 
     final PartidasProvider partidaProvider = context.watch<PartidasProvider>();
     final JugadorProvider jugadorProvider = context.watch<JugadorProvider>();
-    final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
 
     final Color titleColor = AppThemes.currentTheme == "dark" ? Colors.grey.withOpacity(0.9) : AppThemes.colorTercero.withOpacity(0.7);
     final Color subTitleColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.8) : AppThemes.colorTercero.withOpacity(0.9);
@@ -24,11 +23,30 @@ class PuntuacionForm extends StatelessWidget {
     return Column(
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("Jugador:", style: TextStyle(fontFamily: "Poppins", fontSize: 18, color: titleColor)),
-            const SizedBox(width: 5),
-            Text(jugadorProvider.nombreJugador,
-                style: TextStyle(fontFamily: "Poppins", fontSize: 17, color: subTitleColor, fontWeight: FontWeight.bold)),
+            Row(
+              children: [
+                Text("Jugador:", style: TextStyle(fontFamily: "Poppins", fontSize: 18, color: titleColor)),
+                const SizedBox(width: 7),
+                Row(
+                  children: [
+                    Text(jugadorProvider.nombreJugador,
+                        style: TextStyle(fontFamily: "Poppins", fontSize: 17, color: subTitleColor, fontWeight: FontWeight.bold)),
+                    CustomIconButtom(
+                      onTap: () {},
+                      icon: Icons.edit_outlined,
+                      size: IconSize.min,
+                      iconSize: 20,
+                      iconColor: titleColor,
+                      splashColor: AppThemes.colorSegundo,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            CustomIconButtom(
+                onTap: () {}, icon: Icons.delete_forever, size: IconSize.min, iconSize: 20, iconColor: titleColor, splashColor: Colors.red[900])
           ],
         ),
         const SizedBox(height: 10),
@@ -50,7 +68,7 @@ class PuntuacionForm extends StatelessWidget {
             elevation: 7,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Container(color: AppThemes.themeColor_1, child: const ListHistorial()),
+              child: Container(color: AppThemes.themeColor_1, child: const _ListHistorial()),
             ),
           ),
         ),
@@ -101,8 +119,8 @@ class PuntuacionForm extends StatelessWidget {
   }
 }
 
-class ListHistorial extends StatelessWidget {
-  const ListHistorial({Key? key}) : super(key: key);
+class _ListHistorial extends StatelessWidget {
+  const _ListHistorial({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

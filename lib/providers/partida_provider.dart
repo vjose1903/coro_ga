@@ -1,22 +1,20 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
-import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
-import 'package:game_score/providers/providers.dart';
-import 'package:game_score/utils/utils.dart';
-import 'package:provider/provider.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 
 class PartidasProvider extends ChangeNotifier {
   List<Partida> partidas = [];
   Partida? partidaEnTurno;
+  FormGroup? formPartida;
+
+  FormGroup formAddJugador = fb.group({
+    'nombre': ['', Validators.required]
+  });
 
   void navigateToPartida({required Partida partida, required BuildContext context}) {
     partidaEnTurno = partida;
-    Navigator.pushNamed(context, 'partida').then((value) {
-      final WeSlideProvider WeSliderProvider = context.read<WeSlideProvider>();
-      WeSliderProvider.refresh();
-    });
+    Navigator.pushNamed(context, 'partida');
     notifyListeners();
   }
 
@@ -30,40 +28,21 @@ class PartidasProvider extends ChangeNotifier {
   }
 
   Future<SqlResponse> newPartida(Partida partida, BuildContext context) async {
-    final SqlResponse response = SqlResponse();
-    List<Jugador>? jugadores = partida.jugadores;
+    final response = await Partida.createPartida(context, partida: partida);
+    Partida newPartida = response.data;
 
-    if (jugadores == null) {
-      response.addMsg('Debe de agregar almenos 2 jugadores a la partida');
-      response.hasError = true;
-      return response;
-    }
-
-    Map<String, dynamic> tempPartidaMap = partida.toMap();
-
-    Fun.removeKeys(tempPartidaMap, ['id', 'jugadores', 'created_at']);
-
-    final SqlResponse partidaRes = await CrudHelper.insert(tableName: Partida.tableName, body: tempPartidaMap, context: context);
-
-    for (var jugador in jugadores) {
-      //
-      jugador.partidaId = partidaRes.data;
-
-      Map<String, dynamic> tempJugadorMap = jugador.toMap();
-      Fun.removeKeys(tempJugadorMap, ['id']);
-
-      final SqlResponse jugadorRes = await CrudHelper.insert(tableName: Jugador.tableName, body: tempJugadorMap, context: context);
-      jugador.id = jugadorRes.data;
-    }
-
-    partida.id = partidaRes.data;
-
-    response.data = partida;
-
-    partidas.add(partida);
+    partidas.add(newPartida);
     notifyListeners();
 
     return response;
+  }
+
+  Future<Partida> addJugadorToPartida(BuildContext context, {required Partida partida, required Jugador jugador}) async {
+    final response = await Partida.addNewJugador(context, partida: partida, jugador: jugador);
+
+    notifyListeners();
+
+    return response.data;
   }
 
   getPartidas(BuildContext context, {required bool isLoading}) async {

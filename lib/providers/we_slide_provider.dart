@@ -1,35 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:game_score/utils/utils.dart';
 
 import 'package:we_slide/we_slide.dart';
 
 class WeSlideProvider extends ChangeNotifier {
-  refresh() async {
-    await Future.delayed(const Duration(milliseconds: 500));
+  Widget? Body;
+  Widget? Footer;
+
+  set body(Widget? widget) {
+    Body = widget;
+  }
+
+  set footer(Widget? widget) {
+    Footer = widget;
+  }
+
+  openWeSlide({required WeSlideController controller, Widget? body, Widget? footer}) async {
+    if (body != null) Body = body;
+    if (footer != null) Footer = footer;
+
+    controller.show();
     notifyListeners();
   }
 
-  configureWeSlide({Widget? weSlidecontent, Widget? weSlideFooter}) async {
-    MyWeSlide.configureWeSlide(weSlidecontent: weSlidecontent, weSlideFooter: weSlideFooter);
-
-    // await Future.delayed(const Duration(milliseconds: 500));
-    // notifyListeners();
-  }
-
-  openWeSlide() async {
-    if (MyWeSlide.controller == null) return;
-    print("ABRIENDO");
-
-    MyWeSlide.open();
+  closeWeSlide({required WeSlideController controller}) async {
+    controller.hide();
     notifyListeners();
-  }
-
-  closeWeSlide() async {
-    notifyListeners();
-    if (MyWeSlide.controller == null) return;
-    print("CERRANDO");
-    MyWeSlide.close();
-
-    await Future.delayed(const Duration(milliseconds: 250));
   }
 }

@@ -56,6 +56,7 @@ class CrudHelper {
 
   static Future<SqlResponse> getAll(
       {required String tableName, List? whereArgs_, String? where_, required BuildContext context, bool isLoading = true}) async {
+        
     final LoadingProvider loadingProvider = context.read<LoadingProvider>();
     if (isLoading) loadingProvider.changeIsLoading(true);
 

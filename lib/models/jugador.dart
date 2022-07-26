@@ -32,7 +32,7 @@ class Jugador extends DynamicClass {
         id: json["id"],
         partidaId: json["partida_id"],
         nombre: json["nombre"],
-        puntuacion: json["puntuacion"],
+        puntuacion: json["puntuacion"] ?? 0,
         historialJugadas:
             json["historial_jugadas"] != null ? List<HistorialJugada>.from(json["historial_jugadas"].map((x) => HistorialJugada.fromMap(x))) : [],
       );

@@ -5,8 +5,10 @@ import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 import 'package:scroll_shadow_container/scroll_shadow_container.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:we_slide/we_slide.dart';
 
 class PartidaScreen extends StatelessWidget {
   const PartidaScreen({Key? key}) : super(key: key);
@@ -31,32 +33,41 @@ class Main extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final WeSlideProvider weSlideProvider = context.watch<WeSlideProvider>();
     Fun.logColor(color: Colores.magenta, body: "Partida SCREEN");
-    return Scaffold(
-        body: _Body(partida: partida),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        floatingActionButton: Visibility(
-          visible: !MyWeSlide.controller!.isOpened,
-          child: FloatingActionButton(
-            onPressed: () {
-              Navigator.pushNamed(context, 'formulario', arguments: {"tipo": "crear"});
-            },
-            child: const Icon(Icons.add, size: 30),
-          ),
-        ));
+    WeSlideController weSlideController = WeSlideController();
+
+    return Consumer(
+      builder: (BuildContext context, value, Widget? child) {
+        Fun.logColor(color: Colores.red, body: "Consumer");
+        final WeSlideProvider weSlideProvider = context.watch<WeSlideProvider>();
+        return Scaffold(
+            body: _Body(partida: partida, weSlideController: weSlideController),
+            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+            floatingActionButton: Visibility(
+              visible: !weSlideController.isOpened,
+              child: FloatingActionButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, 'formulario', arguments: {"tipo": "crear"});
+                },
+                child: const Icon(Icons.add, size: 30),
+              ),
+            ));
+      },
+    );
   }
 }
 
 class _Body extends StatelessWidget {
-  const _Body({Key? key, required this.partida}) : super(key: key);
-  final Partida partida;
+  const _Body({Key? key, required this.partida, required this.weSlideController}) : super(key: key);
 
+  final Partida partida;
+  final WeSlideController weSlideController;
   @override
   Widget build(BuildContext context) {
     return Layout(
-        weSlideContent: const PuntuacionForm(),
-        weSlideFooter: const NavigationBar(),
+        weSlideController: weSlideController,
+        hasFooter: true,
+        initialWeSlideWidgets: const {"footer": NavigationBar()},
         appBarTitle: partida.nombre,
         appBarLeading: CustomIconButtom(
           iconSize: 25,
@@ -70,16 +81,23 @@ class _Body extends StatelessWidget {
             child: Column(children: [
               CustomEstadoPartida(),
               const SizedBox(height: 20),
-              const JugadoresCard(),
+              JugadoresCard(weSlideController: weSlideController),
             ])));
   }
 }
 
 class JugadoresCard extends StatelessWidget {
-  const JugadoresCard({Key? key}) : super(key: key);
+  const JugadoresCard({Key? key, required this.weSlideController}) : super(key: key);
+  final WeSlideController weSlideController;
 
   @override
   Widget build(BuildContext context) {
+    openWeSlide() {
+      final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
+
+      weSlideProvider.openWeSlide(controller: weSlideController, body: const AddJugador());
+    }
+
     return Expanded(
         child: Material(
       color: AppThemes.themeColor_2,
@@ -88,20 +106,16 @@ class JugadoresCard extends StatelessWidget {
       elevation: 7,
       child: Column(
         children: [
-          const Padding(
-            padding: EdgeInsets.all(10),
+          Padding(
+            padding: const EdgeInsets.all(10),
             child: Align(
                 alignment: Alignment.topRight,
-                child: CustomIconButtom(
-                  icon: Icons.add,
-                  iconSize: 25,
-                  size: IconSize.min,
-                )),
+                child: CustomIconButtom(onTap: () => openWeSlide(), icon: Icons.add, iconSize: 25, size: IconSize.min)),
           ),
           Expanded(
               child: Container(
             decoration: const BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12), bottomRight: Radius.circular(12))),
-            child: const JugadoresList(),
+            child: JugadoresList(weSlideController: weSlideController),
           ))
         ],
       ),
@@ -110,7 +124,8 @@ class JugadoresCard extends StatelessWidget {
 }
 
 class JugadoresList extends StatelessWidget {
-  const JugadoresList({Key? key}) : super(key: key);
+  const JugadoresList({Key? key, required this.weSlideController}) : super(key: key);
+  final WeSlideController weSlideController;
 
   @override
   Widget build(BuildContext context) {
@@ -129,20 +144,22 @@ class JugadoresList extends StatelessWidget {
                 child: Wrap(
                   runSpacing: 20,
                   spacing: 20,
-                  children: getJugadores(partida.jugadores!),
+                  children: getJugadores(partida.jugadores!, weSlideController),
                 ),
               ))),
     );
   }
 
-  List<Widget> getJugadores(List<Jugador> jugadores) {
-    return jugadores.map((jugador) => JugadorInfo(jugador: jugador)).toList();
+  List<Widget> getJugadores(List<Jugador> jugadores, WeSlideController weSlideController) {
+    jugadores.sort((a, b) => a.id!.compareTo(b.id!));
+    return jugadores.map((jugador) => JugadorInfo(jugador: jugador, weSlideController: weSlideController)).toList();
   }
 }
 
 class JugadorInfo extends StatelessWidget {
-  const JugadorInfo({Key? key, required this.jugador}) : super(key: key);
+  const JugadorInfo({Key? key, required this.jugador, required this.weSlideController}) : super(key: key);
   final Jugador jugador;
+  final WeSlideController weSlideController;
 
   @override
   Widget build(BuildContext context) {
@@ -164,8 +181,7 @@ class JugadorInfo extends StatelessWidget {
           final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
           final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
           jugadorProvider.changeJugadorEnTurno(jugador);
-
-          weSlideProvider.openWeSlide();
+          weSlideProvider.openWeSlide(controller: weSlideController, body: const PuntuacionForm(), footer: const NavigationBar());
         },
         child: Padding(
           padding: const EdgeInsets.all(10),
@@ -255,7 +271,7 @@ class _NavigationBarState extends State<NavigationBar> {
 
     final int selectedIndex = partidaProvider.partidas.indexWhere((partida) => partida.id == partidaProvider.partidaEnTurno!.id);
     await Future.delayed(const Duration(milliseconds: 200));
-    if ((selectedIndex <= visibleIndeces.first) || (selectedIndex >= visibleIndeces.last)) {
+    if (partidaProvider.partidas.length > 3 && (selectedIndex <= visibleIndeces.first) || (selectedIndex >= visibleIndeces.last)) {
       itemScrollController.scrollTo(index: selectedIndex, duration: const Duration(milliseconds: 700), curve: Curves.easeInOutCubic, alignment: 0.5);
     }
   }
@@ -320,5 +336,130 @@ class _Chip extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class AddJugador extends StatelessWidget {
+  const AddJugador({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final PartidasProvider partidaProvider = context.read<PartidasProvider>();
+    FormGroup form = partidaProvider.formAddJugador;
+
+    final Color titleColor = AppThemes.currentTheme == "dark" ? Colors.grey.withOpacity(0.9) : AppThemes.colorTercero.withOpacity(0.7);
+
+    return Container(
+      padding: const EdgeInsets.only(bottom: 30),
+      child: Column(
+        children: [
+          // Titulo
+          Align(alignment: Alignment.topLeft, child: Text("Nuevo jugador", style: TextStyle(fontFamily: "Poppins", fontSize: 18, color: titleColor))),
+          const SizedBox(height: 5),
+          //
+          // Input Nombre
+          ReactiveForm(
+            formGroup: form,
+            child: Column(children: const <Widget>[
+              CustomReactiveInput(formControlName: 'nombre', labelText: "nombre", textCapitalization: TextCapitalization.words)
+            ]),
+          ),
+          const SizedBox(height: 10),
+          Align(
+              alignment: Alignment.topLeft,
+              child: Text("Jugadores actuales", style: TextStyle(fontFamily: "Poppins", fontSize: 15, color: titleColor))),
+          const SizedBox(height: 5),
+          // Jugadores Actuales
+          //
+          const JugadoresActuales(),
+          const SizedBox(height: 20),
+          // Boton
+          //
+          ElevatedButton(
+            onPressed: () async {
+              if (form.valid) {
+                final PartidasProvider partidaProvider = context.read<PartidasProvider>();
+
+                Jugador nuevoJugador = Jugador.fromMap(form.value);
+                print(nuevoJugador);
+                partidaProvider.addJugadorToPartida(context, jugador: nuevoJugador, partida: partidaProvider.partidaEnTurno!);
+              } else {
+                Fun.toast(type: ToasType.error, context: context, message: "Debe de introducir el nombre del nuevo jugador");
+              }
+            },
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Text("Agregar", style: TextStyle(fontSize: 20, fontFamily: 'Poppins')),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class JugadoresActuales extends StatelessWidget {
+  const JugadoresActuales({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      flex: 2,
+      child: Material(
+        borderRadius: BorderRadius.circular(10),
+        shadowColor: AppThemes.colorTercero.withOpacity(0.3),
+        elevation: 7,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Container(color: AppThemes.themeColor_1, child: const ListJugadores()),
+        ),
+      ),
+    );
+  }
+}
+
+class ListJugadores extends StatelessWidget {
+  const ListJugadores({Key? key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    final PartidasProvider partidaProvider = context.watch<PartidasProvider>();
+    List<Jugador> jugadores = partidaProvider.partidaEnTurno!.jugadores!;
+    jugadores.sort((a, b) => a.id!.compareTo(b.id!));
+
+    Color nombreColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.8) : AppThemes.colorTercero.withOpacity(0.7);
+    final Color iconsColor = AppThemes.currentTheme == "dark" ? Colors.grey.withOpacity(0.9) : AppThemes.colorTercero.withOpacity(0.7);
+
+    return ListView.separated(
+        controller: ScrollController(),
+        padding: const EdgeInsets.all(5),
+        separatorBuilder: (_, __) => const Divider(),
+        itemCount: jugadores.length,
+        itemBuilder: (context, index) {
+          Jugador jugador = jugadores[index];
+
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(margin: const EdgeInsets.only(left: 10), child: Text(jugador.nombre!, style: TextStyle(color: nombreColor))),
+                  const SizedBox(width: 5),
+                  CustomIconButtom(
+                    onTap: () {},
+                    icon: Icons.edit_outlined,
+                    size: IconSize.min,
+                    iconSize: 20,
+                    iconColor: iconsColor,
+                    splashColor: AppThemes.colorSegundo,
+                  ),
+                ],
+              ),
+              CustomIconButtom(
+                  onTap: () {}, icon: Icons.delete_forever, size: IconSize.min, iconSize: 20, iconColor: iconsColor, splashColor: Colors.red[900])
+            ],
+          );
+        });
   }
 }

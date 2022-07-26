@@ -6,6 +6,7 @@ import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:we_slide/we_slide.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -13,7 +14,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print("----- HomeScreen -----");
-
     return Scaffold(
       body: Layout(
         appBarTitle: 'Mis Partidas',
@@ -24,6 +24,7 @@ class HomeScreen extends StatelessWidget {
           onTap: () => print('algo'),
         ),
         bodyContent: const _Body(),
+        weSlideController: WeSlideController(),
       ),
       floatingActionButton: FloatingActionButton(
           onPressed: () => Navigator.pushNamed(context, 'formulario', arguments: {"tipo": "crear"}), child: const Icon(Icons.add, size: 30)),

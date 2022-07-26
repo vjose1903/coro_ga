@@ -5,6 +5,7 @@ import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:game_score/models/models.dart';
 import 'package:provider/provider.dart';
+import 'package:we_slide/we_slide.dart';
 
 class FormularioScreen extends StatelessWidget {
   const FormularioScreen({Key? key}) : super(key: key);
@@ -23,6 +24,7 @@ class FormularioScreen extends StatelessWidget {
     return Scaffold(
       // resizeToAvoidBottomInset: false,
       body: Layout(
+        weSlideController: WeSlideController(),
         appBarTitle: pantallas[tipo]["title"],
         appBarLeading: CustomIconButtom(
           iconSize: 25,
