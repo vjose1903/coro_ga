@@ -116,10 +116,15 @@ class Formulario extends StatelessWidget {
                     final PartidasProvider partidaProvider = context.read<PartidasProvider>();
 
                     if (tipo == 'crear') {
-                      await partidaProvider.newPartida(partida, context);
-                      await Future.delayed(const Duration(milliseconds: 500));
+                      final response = await partidaProvider.newPartida(partida, context);
 
-                      partidaProvider.navigateToPartida(context: context, partida: partida);
+                      if (!response.hasError!) {
+                        final newPartida = response.data;
+                        await Future.delayed(const Duration(milliseconds: 500));
+                        partidaProvider.navigateToPartida(context: context, partida: newPartida);
+                      } else {
+                        Fun.toast(type: ToasType.error, context: context, message: "Error registrando jugada.");
+                      }
                     } else {}
                   }
                 },

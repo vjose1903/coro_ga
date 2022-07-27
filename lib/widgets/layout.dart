@@ -44,7 +44,6 @@ class Layout extends StatelessWidget {
 
     configureWeSlide(weSlideProvider: weSlideProvider, initialWeSlideWidgets: initialWeSlideWidgets);
 
-    Fun.logColor(color: Colores.yellow, body: "BUILD LAYOUT");
     return Stack(
       children: [
         WeSlide(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
@@ -13,7 +14,6 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("----- HomeScreen -----");
     return Scaffold(
       body: Layout(
         appBarTitle: 'Mis Partidas',
@@ -58,8 +58,6 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final PartidasProvider partidaProvider = context.read<PartidasProvider>();
-    print(">>>>> HomeScreen _Body <<<<<");
-    print(" ");
 
     return FutureBuilder(
       future: partidaProvider.getPartidas(context, isLoading: false),
@@ -111,11 +109,28 @@ class ListPartidas extends StatelessWidget {
             return PartidaCard(
               partida: partidas[index],
               onTap: () => partidaProvider.navigateToPartida(context: context, partida: partidas[index]),
-              functionBorrar: () async => partidas.remove(partidas[index]),
+              // functionBorrar: () async => partidas.remove(partidas[index]),
+              functionBorrar: (handler) async => CustomAlertDialog.show(context,
+                  menssage: "Seguro que desea eliminar la partida: ${partidas[index].nombre}",
+                  title: "Confirmar",
+                  dialogType: DialogType.error,
+                  buttonsList: [
+                    CustomActionsButtons.cancelButton({"onTap": () => Navigator.pop(context)}),
+                    CustomActionsButtons.aceptarButton({"onTap": () => removePartida(context, handler, partidas, index)})
+                  ]),
               functionEditar: () async => partidaProvider.newPartida(partidas[index], context),
               index: index,
             );
           });
     }
+  }
+
+  // removePartida(CompletionHandler handler, Partida partida) async {
+  Future removePartida(BuildContext context, CompletionHandler handler, List<Partida> partidas, int index) async {
+    Navigator.pop(context);
+    final partidaProvider = context.read<PartidasProvider>();
+    final responseFuture = partidaProvider.deletePartida(context, partida: partidas[index], handler: handler);
+
+    return responseFuture;
   }
 }

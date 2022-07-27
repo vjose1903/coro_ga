@@ -29,13 +29,12 @@ class DatabaseHelper {
     Directory applicationDocumentDirectory = await getApplicationDocumentsDirectory();
 
     String path = join(applicationDocumentDirectory.path, dbFileName);
-    Fun.logColor(color: Colores.green, body: 'path: $path');
-    var myDatabase = await openDatabase(path, version: sbCurrentVersion, onCreate: _createDb);
-    return myDatabase;
-  }
 
-  static void _createDb(Database db, int newVersion) async {
-    await db.execute(''' 
+    Fun.logColor(color: Colores.green, body: 'path: $path');
+
+    var myDatabase =
+        await openDatabase(path, version: sbCurrentVersion, onOpen: (db) {}, onConfigure: _onConfigure, onCreate: (Database db, int version) async {
+      await db.execute(''' 
         CREATE TABLE ${Partida.tableName}(
           id INTEGER PRIMARY KEY,
           nombre TEXT,
@@ -46,17 +45,7 @@ class DatabaseHelper {
         );
       ''');
 
-    await db.execute('''
-      CREATE TRIGGER tg_somethings_updated_at
-        AFTER UPDATE
-        ON ${Partida.tableName} FOR EACH ROW
-        BEGIN
-          UPDATE somethings SET updated_at = current_timestamp
-            WHERE id = old.id;
-        END;
-      ''');
-
-    await db.execute('''
+      await db.execute('''
         CREATE TABLE ${Jugador.tableName}(
           id INTEGER PRIMARY KEY,
           partida_id INTEGER NOT NULL,
@@ -65,7 +54,7 @@ class DatabaseHelper {
         );
       ''');
 
-    await db.execute('''
+      await db.execute('''
       CREATE TABLE ${HistorialJugada.tableName}(
         id INTEGER PRIMARY KEY,
         jugador_id INTEGER NOT NULL,
@@ -73,5 +62,11 @@ class DatabaseHelper {
         puntuacion INTEGER
       );
     ''');
+    });
+    return myDatabase;
+  }
+
+  static Future _onConfigure(Database db) async {
+    await db.execute('PRAGMA foreign_keys = ON');
   }
 }

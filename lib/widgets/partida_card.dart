@@ -40,8 +40,7 @@ class PartidaCard extends StatelessWidget {
                 nestedAction: SwipeNestedAction(title: "Confirmar"),
                 title: "Borrar",
                 onTap: (CompletionHandler handler) async {
-                  await handler(true);
-                  functionBorrar();
+                  functionBorrar(handler);
                 },
                 color: Colors.red),
             SwipeAction(

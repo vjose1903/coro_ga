@@ -50,6 +50,9 @@ class PuntuacionForm extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 10),
+
+        // CAMPO PUNTUACION
+        //
         CustomInputField(
           key: UniqueKey(),
           enabled: false,
@@ -60,6 +63,8 @@ class PuntuacionForm extends StatelessWidget {
           labelText: 'Puntuación',
         ),
         const SizedBox(height: 10),
+        // CUADRO OSCURO
+        //
         Expanded(
           flex: 2,
           child: Material(
@@ -73,6 +78,8 @@ class PuntuacionForm extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
+        // TECLADO
+        //
         _Keyboard(puntuacionController: puntuacionController),
         const SizedBox(height: 10),
         Row(

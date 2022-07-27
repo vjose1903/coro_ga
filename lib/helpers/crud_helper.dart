@@ -1,8 +1,10 @@
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
+import 'package:game_score/utils/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart';
 
 class CrudHelper {
   static Future<SqlResponse> insert({required String tableName, required dynamic body, required BuildContext context, bool isLoading = true}) async {
@@ -14,7 +16,7 @@ class CrudHelper {
     final db = await DatabaseHelper.database;
 
     // Inserta en la base de datos
-    final res = await db.insert(tableName, body);
+    final res = await db.insert(tableName, body, conflictAlgorithm: ConflictAlgorithm.replace);
     if (res > 0) {
       response.data = res;
     } else {
@@ -56,7 +58,6 @@ class CrudHelper {
 
   static Future<SqlResponse> getAll(
       {required String tableName, List? whereArgs_, String? where_, required BuildContext context, bool isLoading = true}) async {
-        
     final LoadingProvider loadingProvider = context.read<LoadingProvider>();
     if (isLoading) loadingProvider.changeIsLoading(true);
 
@@ -83,12 +84,13 @@ class CrudHelper {
 
   static Future<SqlResponse> updateOne(
       {required String tableName,
-      required int id,
+      required BuildContext context,
       required dynamic newData,
+      int? id,
       List? whereArgs_,
       String? where_ = 'id = ?',
-      required BuildContext context,
       bool isLoading = true}) async {
+    //
     final LoadingProvider loadingProvider = context.read<LoadingProvider>();
     if (isLoading) loadingProvider.changeIsLoading(true);
 
@@ -97,16 +99,22 @@ class CrudHelper {
     whereArgs_ ??= [id];
     final db = await DatabaseHelper.database;
 
-    final int res = await db.update(tableName, newData, where: where_, whereArgs: whereArgs_);
-
-    if (res > 0) {
-      response.data = res;
-    } else {
+    try {
+      final dynamic res = await db.update(tableName, newData, where: where_, whereArgs: whereArgs_);
+      if (res > 0) {
+        response.data = res;
+      } else {
+        response.hasError = true;
+      }
+      await Future.delayed(const Duration(milliseconds: 200));
+      if (isLoading) loadingProvider.changeIsLoading(false);
+      return response;
+      //
+    } catch (e) {
+      if (isLoading) loadingProvider.changeIsLoading(false);
       response.hasError = true;
+      return response;
     }
-    await Future.delayed(const Duration(milliseconds: 200));
-    if (isLoading) loadingProvider.changeIsLoading(false);
-    return response;
   }
 
   static Future<SqlResponse> deleteOne(

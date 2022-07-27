@@ -107,9 +107,16 @@ class Partida extends DynamicClass {
         "id": id,
         "nombre": nombre,
         "tipo": tipo,
-        "created_at": createdAt != null ? createdAt!.toIso8601String() : null,
+        "createdAt": createdAt != null ? createdAt!.toIso8601String() : null,
         "activo": "$activo",
         "jugadores": jugadores != null ? List<dynamic>.from(jugadores!.map((x) => x.toMap())) : [],
+      };
+
+  Map<String, dynamic> toUpdateMap() => {
+        "id": id,
+        "nombre": nombre,
+        // "tipo": tipo,
+        "activo": "$activo",
       };
 
   @override
@@ -133,7 +140,7 @@ class Partida extends DynamicClass {
 
     Map<String, dynamic> tempPartidaMap = partida.toMap();
 
-    Fun.removeKeys(tempPartidaMap, ['id', 'jugadores', 'created_at']);
+    Fun.removeKeys(tempPartidaMap, ['id', 'jugadores', 'createdAt']);
 
     final SqlResponse partidaRes = await CrudHelper.insert(tableName: Partida.tableName, body: tempPartidaMap, context: context);
 
@@ -170,7 +177,8 @@ class Partida extends DynamicClass {
   }
 
   static getPartidas(BuildContext context, {required bool isLoading}) async {
-    final response = await CrudHelper.getAll(tableName: Partida.tableName, context: context, isLoading: isLoading);
+    final response =
+        await CrudHelper.getAll(tableName: Partida.tableName, context: context, where_: "activo = ?", whereArgs_: ["true"], isLoading: isLoading);
 
     if (!response.hasError!) {
       final partidasParsed = List<Partida>.from(response.data.map((x) => Partida.fromMap(x)));
@@ -197,6 +205,18 @@ class Partida extends DynamicClass {
       response.addMsg('Partida buscada no existe.');
       return null;
     }
+  }
+
+  static Future<SqlResponse> delete(BuildContext context, {required Partida partida, required bool isLoading}) async {
+    Map<String, dynamic> tempPartidaMap = partida.toUpdateMap();
+    tempPartidaMap["activo"] = "false";
+
+    final response =
+        await CrudHelper.updateOne(tableName: Partida.tableName, id: partida.id, newData: tempPartidaMap, context: context, isLoading: isLoading);
+
+    if (response.hasError!) response.addMsg('No se pudo borrar la partida seleccionada.');
+
+    return response;
   }
 
   static findJugadores({required Partida partida, required BuildContext context, required bool isLoading}) async {

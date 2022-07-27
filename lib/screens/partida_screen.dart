@@ -15,7 +15,6 @@ class PartidaScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('------ PartidaScreen ------');
     final PartidasProvider partidaProvider = context.read<PartidasProvider>();
 
     final Partida partida = partidaProvider.partidaEnTurno!;
@@ -33,12 +32,10 @@ class Main extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Fun.logColor(color: Colores.magenta, body: "Partida SCREEN");
     WeSlideController weSlideController = WeSlideController();
 
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
-        Fun.logColor(color: Colores.red, body: "Consumer");
         final WeSlideProvider weSlideProvider = context.watch<WeSlideProvider>();
         return Scaffold(
             body: _Body(partida: partida, weSlideController: weSlideController),
@@ -381,7 +378,7 @@ class AddJugador extends StatelessWidget {
                 final PartidasProvider partidaProvider = context.read<PartidasProvider>();
 
                 Jugador nuevoJugador = Jugador.fromMap(form.value);
-                print(nuevoJugador);
+
                 partidaProvider.addJugadorToPartida(context, jugador: nuevoJugador, partida: partidaProvider.partidaEnTurno!);
               } else {
                 Fun.toast(type: ToasType.error, context: context, message: "Debe de introducir el nombre del nuevo jugador");
@@ -444,7 +441,6 @@ class ListJugadores extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Container(margin: const EdgeInsets.only(left: 10), child: Text(jugador.nombre!, style: TextStyle(color: nombreColor))),
                   const SizedBox(width: 5),
                   CustomIconButtom(
                     onTap: () {},
@@ -454,6 +450,8 @@ class ListJugadores extends StatelessWidget {
                     iconColor: iconsColor,
                     splashColor: AppThemes.colorSegundo,
                   ),
+                  const SizedBox(width: 10),
+                  Text(jugador.nombre!, style: TextStyle(color: nombreColor)),
                 ],
               ),
               CustomIconButtom(
