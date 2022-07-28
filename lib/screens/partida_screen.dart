@@ -178,7 +178,8 @@ class JugadorInfo extends StatelessWidget {
           final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
           final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
           jugadorProvider.changeJugadorEnTurno(jugador);
-          weSlideProvider.openWeSlide(controller: weSlideController, body: const PuntuacionForm(), footer: const NavigationBar());
+          weSlideProvider.openWeSlide(
+              controller: weSlideController, body: PuntuacionForm(weSlideController: weSlideController), footer: const NavigationBar());
         },
         child: Padding(
           padding: const EdgeInsets.all(10),

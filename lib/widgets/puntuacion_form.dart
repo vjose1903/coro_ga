@@ -5,10 +5,11 @@ import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:provider/provider.dart';
+import 'package:we_slide/we_slide.dart';
 
 class PuntuacionForm extends StatelessWidget {
-  const PuntuacionForm({Key? key}) : super(key: key);
-
+  const PuntuacionForm({Key? key, required this.weSlideController}) : super(key: key);
+  final WeSlideController weSlideController;
   @override
   Widget build(BuildContext context) {
     String? puntuacion;
@@ -46,7 +47,41 @@ class PuntuacionForm extends StatelessWidget {
               ],
             ),
             CustomIconButtom(
-                onTap: () {}, icon: Icons.delete_forever, size: IconSize.min, iconSize: 20, iconColor: titleColor, splashColor: Colors.red[900])
+                onTap: () {
+                  Jugador jugador = jugadorProvider.jugadorEnTurno!;
+                  CustomAlertDialog.show(context,
+                      menssage: "Seguro que desea eliminar el jugador: ${jugador.nombre}",
+                      title: "Confirmar",
+                      dialogType: DialogType.error,
+                      buttonsList: [
+                        CustomActionsButtons.cancelButton({"onTap": () => Navigator.pop(context)}),
+                        CustomActionsButtons.aceptarButton({
+                          "onTap": () {
+                            Navigator.pop(context);
+
+                            jugadorProvider.deleteJugador(context, jugador: jugador).then((response) {
+                              if (!response.hasError!) {
+                                final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
+                                weSlideProvider.closeWeSlide(controller: weSlideController);
+
+                                partidaProvider.removeJugador(jugador);
+                                Fun.logColor(color: Colores.yellow, body: "$response");
+                                if (response.messages!.isNotEmpty) {
+                                  Fun.toast(type: ToasType.warning, context: context, message: response.messages!.first);
+                                }
+                              } else {
+                                Fun.toast(type: ToasType.error, context: context, message: response.messages!.first);
+                              }
+                            });
+                          }
+                        })
+                      ]);
+                },
+                icon: Icons.delete_forever,
+                size: IconSize.min,
+                iconSize: 20,
+                iconColor: titleColor,
+                splashColor: Colors.red[900])
           ],
         ),
         const SizedBox(height: 10),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_score/widgets/widgets.dart';
 
 class Orden {
   static const String primeroIcono = 'primeroIcono';
@@ -37,21 +38,17 @@ class LabelWithIcon extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         if (orden == Orden.primeroIcono)
-          Container(
-              margin: const EdgeInsets.only(right: 5),
-              child: _Icon(icon: icon, iconSize: iconSize!, iconColor: iconColor, backgroundColor: iconBackgroundColor)),
+          _Icon(icon: icon, iconSize: iconSize!, iconColor: iconColor, backgroundColor: iconBackgroundColor, orden: orden),
 
         //
-        if (maxSize != null)
+        if (maxSize != 0)
           ConstrainedBox(constraints: BoxConstraints(maxWidth: maxSize!), child: _Label(label: label, labelColor: labelColor, labelSize: labelSize))
         else
           _Label(label: label, labelColor: labelColor, labelSize: labelSize),
         //
 
         if (orden == Orden.primeroLabel)
-          Container(
-              margin: const EdgeInsets.only(left: 15),
-              child: _Icon(icon: icon, iconSize: iconSize!, iconColor: iconColor, backgroundColor: iconBackgroundColor))
+          _Icon(icon: icon, iconSize: iconSize!, iconColor: iconColor, backgroundColor: iconBackgroundColor, orden: orden)
       ],
     );
   }
@@ -72,17 +69,26 @@ class _Label extends StatelessWidget {
 }
 
 class _Icon extends StatelessWidget {
-  const _Icon({Key? key, required this.icon, required this.iconColor, required this.iconSize, this.backgroundColor}) : super(key: key);
+  const _Icon({Key? key, required this.icon, required this.iconColor, required this.iconSize, this.backgroundColor, this.orden}) : super(key: key);
+
   final IconData icon;
   final Color? iconColor;
   final Color? backgroundColor;
   final double? iconSize;
+  final String? orden;
+
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-        borderRadius: BorderRadius.circular(50),
-        child: Container(
-            color: backgroundColor,
-            child: Padding(padding: const EdgeInsets.all(3), child: Center(child: Icon(icon, size: iconSize!, color: iconColor)))));
+    final double _right = orden == Orden.primeroIcono ? 5 : 0;
+    final double _left = orden == Orden.primeroLabel ? 5 : 0;
+
+    return Container(
+      margin: EdgeInsets.only(left: _left, right: _right),
+      child: ClipRRect(
+          borderRadius: BorderRadius.circular(50),
+          child: Container(
+              color: backgroundColor,
+              child: Padding(padding: const EdgeInsets.all(3), child: Center(child: Icon(icon, size: iconSize!, color: iconColor))))),
+    );
   }
 }

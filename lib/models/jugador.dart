@@ -95,4 +95,26 @@ class Jugador extends DynamicClass {
       response.addMsg('Partida ingresada no tiene historiales.');
     }
   }
+
+  Future<SqlResponse> delete(BuildContext context, {required bool isLoading}) async {
+    SqlResponse response = SqlResponse();
+
+    response = await CrudHelper.deleteOne(tableName: Jugador.tableName, id: id!, context: context, isLoading: isLoading);
+    if (!response.hasError!) {
+      if (historialJugadas != null && historialJugadas!.isNotEmpty) {
+        for (var historial in historialJugadas!) {
+          final responseHistorial =
+              await CrudHelper.deleteOne(tableName: HistorialJugada.tableName, id: historial.id!, context: context, isLoading: isLoading);
+
+          if (responseHistorial.hasError! && response.messages == null) {
+            response.addMsg('Algunos historiales de jugadas, no pudieron ser eliminados');
+          }
+        }
+      }
+    } else {
+      response.addMsg("Error eliminando al jugador: $nombre");
+    }
+
+    return response;
+  }
 }

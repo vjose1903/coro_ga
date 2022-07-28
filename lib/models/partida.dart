@@ -20,6 +20,7 @@ class Partida extends DynamicClass {
 
   get cantJugadores {
     if (jugadores == null) return 0;
+
     return jugadores!.length;
   }
 

@@ -110,14 +110,16 @@ class ListPartidas extends StatelessWidget {
               partida: partidas[index],
               onTap: () => partidaProvider.navigateToPartida(context: context, partida: partidas[index]),
               // functionBorrar: () async => partidas.remove(partidas[index]),
-              functionBorrar: (handler) async => CustomAlertDialog.show(context,
-                  menssage: "Seguro que desea eliminar la partida: ${partidas[index].nombre}",
-                  title: "Confirmar",
-                  dialogType: DialogType.error,
-                  buttonsList: [
-                    CustomActionsButtons.cancelButton({"onTap": () => Navigator.pop(context)}),
-                    CustomActionsButtons.aceptarButton({"onTap": () => removePartida(context, handler, partidas, index)})
-                  ]),
+              functionBorrar: (handler) async {
+                CustomAlertDialog.show(context,
+                    menssage: "Seguro que desea eliminar la partida: ${partidas[index].nombre}",
+                    title: "Confirmar",
+                    dialogType: DialogType.error,
+                    buttonsList: [
+                      CustomActionsButtons.cancelButton({"onTap": () => Navigator.pop(context)}),
+                      CustomActionsButtons.aceptarButton({"onTap": () => removePartida(context, handler, partidas, index)})
+                    ]);
+              },
               functionEditar: () async => partidaProvider.newPartida(partidas[index], context),
               index: index,
             );

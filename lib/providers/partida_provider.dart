@@ -29,6 +29,12 @@ class PartidasProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void removeJugador(Jugador jugador) {
+    int index = partidaEnTurno!.jugadores!.indexWhere((item) => item.id == jugador.id);
+    partidaEnTurno!.jugadores!.removeAt(index);
+    notifyListeners();
+  }
+
   Future<SqlResponse> newPartida(Partida partida, BuildContext context) async {
     final response = await Partida.createPartida(context, partida: partida);
     Partida newPartida = response.data;
@@ -68,7 +74,6 @@ class PartidasProvider extends ChangeNotifier {
       notifyListeners();
       return response;
     } else {
-      Fun.logColor(color: Colores.red, body: "response:  $response");
       Fun.toast(type: ToasType.error, context: context, message: response.messages!.first);
       await handler(false);
       return response;
