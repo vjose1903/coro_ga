@@ -14,63 +14,66 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Layout(
-        appBarTitle: 'Mis Partidas',
-        appBarTrailing: CustomIconButtom(
-          iconSize: 25,
-          iconColor: Colors.white,
-          icon: Icons.menu,
-          onTap: () => print('algo'),
-        ),
-        bodyContent: const _Body(),
-        weSlideController: WeSlideController(),
-      ),
-      floatingActionButton: FloatingActionButton(
-          onPressed: () => Navigator.pushNamed(context, 'formulario', arguments: {"tipo": "crear"}), child: const Icon(Icons.add, size: 30)),
+    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+    partidaProvider.getPartidas(context, isLoading: true);
+    return const MainHome();
+  }
+}
+
+class MainHome extends StatelessWidget {
+  const MainHome({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    WeSlideController weSlideController = WeSlideController();
+    return Consumer(
+      builder: (BuildContext context, value, Widget? child) {
+        final WeSlideProvider weSlideProvider = context.watch<WeSlideProvider>();
+
+        return Scaffold(
+          body: Layout(
+            appBarTitle: 'Mis Partidas',
+            appBarTrailing: CustomIconButtom(
+              iconSize: 25,
+              iconColor: Colors.white,
+              icon: Icons.menu,
+              onTap: () => print('algo'),
+            ),
+            bodyContent: _Body(weSlideController: weSlideController),
+            weSlideController: weSlideController,
+          ),
+          floatingActionButton: Visibility(
+            visible: !weSlideController.isOpened,
+            child: FloatingActionButton(
+                onPressed: () => Navigator.pushNamed(context, 'formulario', arguments: {"tipo": "crear"}), child: const Icon(Icons.add, size: 30)),
+          ),
+        );
+      },
     );
   }
 }
 
 class _Body extends StatelessWidget {
-  const _Body({Key? key}) : super(key: key);
+  const _Body({Key? key, required this.weSlideController}) : super(key: key);
+  final WeSlideController weSlideController;
 
-  // getPartidas
-  // List<Partida> tempPartidas = [
-  //   Partida(id: 1, activo: true, nombre: "Domino", jugadores: [
-  //     Jugador(nombre: "Victor", puntuacion: 20),
-  //     Jugador(nombre: "Juan", puntuacion: 20),
-  //   ]),
-  //   Partida(id: 2, activo: true, nombre: "Uno", jugadores: [
-  //     Jugador(id: 1, nombre: "Victor", puntuacion: 1),
-  //     Jugador(id: 1, nombre: "Manuel", puntuacion: 6),
-  //     Jugador(id: 4, nombre: "Alex", puntuacion: 2),
-  //     Jugador(id: 5, nombre: "Ropert", puntuacion: 3),
-  //   ]),
-  //   Partida(id: 2, activo: true, nombre: "Coño no voy", jugadores: [
-  //     Jugador(id: 1, nombre: "Victor", puntuacion: 5),
-  //     Jugador(id: 2, nombre: "Jean Marcos", puntuacion: 2),
-  //     Jugador(id: 3, nombre: "Saul", puntuacion: 4),
-  //     Jugador(id: 4, nombre: "Alex", puntuacion: 2),
-  //     Jugador(id: 5, nombre: "Ropert", puntuacion: 3),
-  //   ]),
-  // ];
   @override
   Widget build(BuildContext context) {
-    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-
-    return FutureBuilder(
-      future: partidaProvider.getPartidas(context, isLoading: false),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(
-            child: CircularProgressIndicator(color: AppThemes.colorSegundo),
-          );
-        } else {
-          return const ListPartidas();
-        }
-      },
-    );
+    // final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+    Fun.logColor(color: Colores.yellow, body: "BUILD FUTURE BUILDER");
+    return ListPartidas(weSlideController: weSlideController);
+    // return FutureBuilder(
+    //   future: partidaProvider.getPartidas(context, isLoading: true),
+    //   builder: (BuildContext context, AsyncSnapshot snapshot) {
+    //     if (!snapshot.hasData) {
+    //       return const Center(
+    //         child: CircularProgressIndicator(color: AppThemes.colorSegundo),
+    //       );
+    //     } else {
+    //       return ListPartidas(weSlideController: weSlideController);
+    //     }
+    //   },
+    // );
   }
 
   getPartida(PartidaProvider partidaProvider, context) async {
@@ -83,22 +86,30 @@ class _Body extends StatelessWidget {
 }
 
 class ListPartidas extends StatelessWidget {
-  const ListPartidas({Key? key}) : super(key: key);
-
+  const ListPartidas({Key? key, required this.weSlideController}) : super(key: key);
+  final WeSlideController weSlideController;
   @override
   Widget build(BuildContext context) {
-    final partidaProvider = context.watch<PartidaProvider>();
+    final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
+    final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
+
     final List<Partida> partidas = partidaProvider.partidas;
 
     if (partidas.isEmpty) {
-      return Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          FaIcon(FontAwesomeIcons.gamepad, size: 50, color: Colors.grey.withOpacity(0.7)),
-          Text('No hay partidas iniciadas', style: TextStyle(fontFamily: 'Poppins', fontSize: 20, color: Colors.grey[500]))
-        ],
-      ));
+      if (partidaProvider.firstSearch) {
+        return Center(
+            child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FaIcon(FontAwesomeIcons.gamepad, size: 50, color: Colors.grey.withOpacity(0.7)),
+            Text('No hay partidas iniciadas', style: TextStyle(fontFamily: 'Poppins', fontSize: 20, color: Colors.grey[500]))
+          ],
+        ));
+      } else {
+        return const Center(
+          child: CircularProgressIndicator(color: AppThemes.colorSegundo),
+        );
+      }
     } else {
       return ListView.separated(
           separatorBuilder: (_, __) => const SizedBox(height: 30),
@@ -109,7 +120,7 @@ class ListPartidas extends StatelessWidget {
             return PartidaCard(
               partida: partidas[index],
               onTap: () => partidaProvider.navigateToPartida(context: context, partida: partidas[index]),
-              // functionBorrar: () async => partidas.remove(partidas[index]),
+
               functionBorrar: (handler) async {
                 CustomAlertDialog.show(context,
                     menssage: "Seguro que desea eliminar la partida: ${partidas[index].nombre}",
@@ -120,7 +131,12 @@ class ListPartidas extends StatelessWidget {
                       CustomActionsButtons.aceptarButton({"onTap": () => removePartida(context, handler, partidas, index)})
                     ]);
               },
-              functionEditar: () async => partidaProvider.newPartida(partidas[index], context),
+              // functionEditar: () async => partidaProvider.newPartida(partidas[index], context),
+              functionEditar: () {
+                partidaProvider.partidaEditar = partidas[index];
+                weSlideProvider.openWeSlide(controller: weSlideController, body: EditarEntidad(weSlideController: weSlideController));
+              },
+
               index: index,
             );
           });

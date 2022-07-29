@@ -15,30 +15,14 @@ class PartidaScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-
-    final Partida partida = partidaProvider.partidaEnTurno!;
-
-    partidaProvider.getPartidas(context, isLoading: false);
-
-    return Main(partida: partida);
-  }
-}
-
-class Main extends StatelessWidget {
-  const Main({Key? key, required this.partida}) : super(key: key);
-
-  final Partida partida;
-
-  @override
-  Widget build(BuildContext context) {
     WeSlideController weSlideController = WeSlideController();
 
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
         final WeSlideProvider weSlideProvider = context.watch<WeSlideProvider>();
+
         return Scaffold(
-            body: _Body(partida: partida, weSlideController: weSlideController),
+            body: _Body(weSlideController: weSlideController),
             floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             floatingActionButton: Visibility(
               visible: !weSlideController.isOpened,
@@ -55,12 +39,13 @@ class Main extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({Key? key, required this.partida, required this.weSlideController}) : super(key: key);
+  const _Body({Key? key, required this.weSlideController}) : super(key: key);
 
-  final Partida partida;
   final WeSlideController weSlideController;
   @override
   Widget build(BuildContext context) {
+    final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
+    Partida partida = partidaProvider.partidaEnTurno!;
     return Layout(
         weSlideController: weSlideController,
         hasFooter: true,
@@ -91,7 +76,6 @@ class JugadoresCard extends StatelessWidget {
   Widget build(BuildContext context) {
     openWeSlide() {
       final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
-
       weSlideProvider.openWeSlide(controller: weSlideController, body: const AddJugadorPartida());
     }
 
@@ -336,4 +320,3 @@ class _Chip extends StatelessWidget {
     );
   }
 }
-

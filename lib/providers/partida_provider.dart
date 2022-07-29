@@ -6,6 +6,8 @@ import 'package:reactive_forms/reactive_forms.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 
 class PartidaProvider extends ChangeNotifier {
+  bool firstSearch = false;
+
   List<Partida> partidas = [];
   Partida? partidaEnTurno;
   Partida? _partidaEditar;
@@ -41,6 +43,11 @@ class PartidaProvider extends ChangeNotifier {
   void removeJugador(Jugador jugador) {
     int index = partidaEnTurno!.jugadores!.indexWhere((item) => item.id == jugador.id);
     partidaEnTurno!.jugadores!.removeAt(index);
+
+    if (partidaEnTurno != null) {
+      int indexPartida = partidas.indexWhere((item) => item.id == partidaEnTurno!.id);
+      partidas[indexPartida] = partidaEnTurno!;
+    }
     notifyListeners();
   }
 
@@ -57,6 +64,10 @@ class PartidaProvider extends ChangeNotifier {
   Future<Partida> addJugadorToPartida(BuildContext context, {required Partida partida, required Jugador jugador}) async {
     final response = await Partida.addNewJugador(context, partida: partida, jugador: jugador);
 
+    int index = partidas.indexWhere((item) => item.id == partida.id);
+    partidas[index] = response.data;
+    
+
     notifyListeners();
 
     return response.data;
@@ -68,7 +79,7 @@ class PartidaProvider extends ChangeNotifier {
     final partidasFuture = Partida.getPartidas(context, isLoading: isLoading);
 
     partidas = await partidasFuture;
-
+    firstSearch = true;
     notifyListeners();
     return partidasFuture;
   }
@@ -99,5 +110,18 @@ class PartidaProvider extends ChangeNotifier {
     }
 
     return partida;
+  }
+
+  Future<SqlResponse> editPartida(BuildContext context, {required Partida partida, required String newNombrePartida}) async {
+    final responseFuture = Partida.edit(context, partida: partida, newNombrePartida: newNombrePartida);
+    final response = await responseFuture;
+
+    if (!response.hasError!) {
+      notifyListeners();
+      return responseFuture;
+    } else {
+      Fun.toast(type: ToasType.error, context: context, message: response.messages!.first);
+      return responseFuture;
+    }
   }
 }

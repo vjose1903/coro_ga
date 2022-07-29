@@ -65,9 +65,10 @@ class AddJugador extends StatelessWidget {
 
                 Jugador nuevoJugador = Jugador.fromMap(form.value);
 
-                partidaProvider
-                    .addJugadorToPartida(context, jugador: nuevoJugador, partida: partidaProvider.partidaEnTurno!)
-                    .then((value) => form.reset());
+                partidaProvider.addJugadorToPartida(context, jugador: nuevoJugador, partida: partidaProvider.partidaEnTurno!).then((value) {
+                  partidaProvider.changePartidaEnTurno(value);
+                  form.reset();
+                });
               } else {
                 Fun.toast(type: ToasType.error, context: context, message: "Debe de introducir el nombre del nuevo jugador");
               }

@@ -170,7 +170,6 @@ class Partida extends DynamicClass {
 
     final SqlResponse response = await CrudHelper.insert(tableName: Jugador.tableName, body: tempJugadorMap, context: context);
     jugador.id = response.data;
-
     partida.addJugador(jugador);
     response.data = partida;
     return response;
@@ -215,6 +214,18 @@ class Partida extends DynamicClass {
         await CrudHelper.updateOne(tableName: Partida.tableName, id: partida.id, newData: tempPartidaMap, context: context, isLoading: isLoading);
 
     if (response.hasError!) response.addMsg('No se pudo borrar la partida seleccionada.');
+
+    return response;
+  }
+
+  static Future<SqlResponse> edit(BuildContext context, {required Partida partida, required String newNombrePartida}) async {
+    Map<String, dynamic> tempPartidaMap = partida.toUpdateMap();
+    tempPartidaMap["nombre"] = newNombrePartida;
+
+    final response =
+        await CrudHelper.updateOne(tableName: Partida.tableName, id: partida.id, newData: tempPartidaMap, context: context, isLoading: true);
+
+    if (response.hasError!) response.addMsg('No se pudo editar la partida seleccionada.');
 
     return response;
   }
