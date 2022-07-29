@@ -61,8 +61,8 @@ class CustomReactiveInput extends StatelessWidget {
                     ? Colors.red[900]
                     : Colors.red[900]!.withOpacity(0.6)
                 : enabled
-                    ? AppThemes.colorTercero
-                    : AppThemes.colorTercero.withOpacity(0.6);
+                    ? AppThemes.colorCuarto
+                    : AppThemes.colorCuarto.withOpacity(0.6);
             return TextStyle(color: color, fontSize: 15, fontWeight: FontWeight.bold, fontFamily: 'Poppins');
           }),
         ),

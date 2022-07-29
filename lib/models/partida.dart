@@ -57,16 +57,15 @@ class Partida extends DynamicClass {
     return estado;
   }
 
-  getGandorOrPerdedor({required String tipo, bool isEstado = true}) {
+  getGandorOrPerdedor({required String tipo}) {
     List<Jugador> sortedArray = ordenarPorPuntuacion();
     Jugador selected = tipo == Estado.ganador ? sortedArray.last : sortedArray.first;
 
     List<Jugador> empatados = jugadores!.where((judador) {
       return judador.id != selected.id && judador.puntuacion == selected.puntuacion;
     }).toList();
-    String? empate = isEstado ? Estado.empate : selected.nombre;
 
-    return empatados.isNotEmpty ? empate : selected.nombre;
+    return empatados.isNotEmpty ? Estado.empate : selected.nombre;
   }
 
   addJugador(Jugador jugador) {

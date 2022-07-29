@@ -1,3 +1,4 @@
+export 'package:game_score/widgets/editar_entidad.dart';
 export 'package:game_score/widgets/custom_reactive_input.dart';
 export 'package:game_score/widgets/puntuacion_form.dart';
 export 'package:game_score/widgets/expanded_buttom.dart';

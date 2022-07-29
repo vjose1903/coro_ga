@@ -76,7 +76,7 @@ class _Body extends StatelessWidget {
             margin: const EdgeInsets.only(top: 40, bottom: 70),
             padding: const EdgeInsets.symmetric(horizontal: 25),
             child: Column(children: [
-              CustomEstadoPartida(),
+              const CustomEstadoPartida(),
               const SizedBox(height: 20),
               JugadoresCard(weSlideController: weSlideController),
             ])));
@@ -99,7 +99,7 @@ class JugadoresCard extends StatelessWidget {
         child: Material(
       color: AppThemes.themeColor_2,
       borderRadius: BorderRadius.circular(12),
-      shadowColor: AppThemes.colorTercero.withOpacity(0.3),
+      shadowColor: AppThemes.colorCuarto.withOpacity(0.3),
       elevation: 7,
       child: Column(
         children: [
@@ -164,13 +164,13 @@ class JugadorInfo extends StatelessWidget {
 
     Color fontNombreColor = AppThemes.currentTheme == "dark" ? const Color(0xD26776E6) : const Color(0xE30B4DBF);
     Color? fontPuntuacionColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.8) : const Color(0xDF062864);
-    Color? iconEstadoColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.2) : AppThemes.colorSegundo.withOpacity(0.3);
+    Color? iconEstadoColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.2) : AppThemes.colorTercero.withOpacity(0.3);
 
     Map iconEstado = {
       Estado.ganador: Icons.arrow_upward,
       Estado.perdedor: Icons.arrow_downward,
       Estado.empate: Icons.swap_horiz_outlined,
-      Estado.not: Icons.remove
+      Estado.not: Icons.compare_arrows_rounded
     };
 
     return _CardBackGround(
@@ -298,7 +298,7 @@ class _Chip extends StatelessWidget {
   final int index;
   final Function scrollToGame;
   Color getChipColor(Partida partida, PartidasProvider partidaProvider) {
-    Color colorChipSelected = AppThemes.currentTheme == "dark" ? AppThemes.colorSegundo : AppThemes.colorPrimero;
+    Color colorChipSelected = AppThemes.currentTheme == "dark" ? AppThemes.colorTercero : AppThemes.colorSegundo;
     Color colorChip = AppThemes.currentTheme == "dark" ? const Color(0xE1494949) : const Color(0xDF787A84);
 
     Color color = colorChipSelected;
@@ -345,7 +345,7 @@ class AddJugador extends StatelessWidget {
     final PartidasProvider partidaProvider = context.read<PartidasProvider>();
     FormGroup form = partidaProvider.formAddJugador;
 
-    final Color titleColor = AppThemes.currentTheme == "dark" ? Colors.grey.withOpacity(0.9) : AppThemes.colorTercero.withOpacity(0.7);
+    final Color titleColor = AppThemes.currentTheme == "dark" ? Colors.grey.withOpacity(0.9) : AppThemes.colorCuarto.withOpacity(0.7);
 
     return Container(
       padding: const EdgeInsets.only(bottom: 30),
@@ -380,7 +380,9 @@ class AddJugador extends StatelessWidget {
 
                 Jugador nuevoJugador = Jugador.fromMap(form.value);
 
-                partidaProvider.addJugadorToPartida(context, jugador: nuevoJugador, partida: partidaProvider.partidaEnTurno!);
+                partidaProvider
+                    .addJugadorToPartida(context, jugador: nuevoJugador, partida: partidaProvider.partidaEnTurno!)
+                    .then((value) => form.reset());
               } else {
                 Fun.toast(type: ToasType.error, context: context, message: "Debe de introducir el nombre del nuevo jugador");
               }
@@ -407,7 +409,7 @@ class JugadoresActuales extends StatelessWidget {
       flex: 2,
       child: Material(
         borderRadius: BorderRadius.circular(10),
-        shadowColor: AppThemes.colorTercero.withOpacity(0.3),
+        shadowColor: AppThemes.colorCuarto.withOpacity(0.3),
         elevation: 7,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(10),
@@ -423,11 +425,13 @@ class ListJugadores extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final PartidasProvider partidaProvider = context.watch<PartidasProvider>();
+    final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
     List<Jugador> jugadores = partidaProvider.partidaEnTurno!.jugadores!;
     jugadores.sort((a, b) => a.id!.compareTo(b.id!));
 
-    Color nombreColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.8) : AppThemes.colorTercero.withOpacity(0.7);
-    final Color iconsColor = AppThemes.currentTheme == "dark" ? Colors.grey.withOpacity(0.9) : AppThemes.colorTercero.withOpacity(0.7);
+    Color nombreColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.8) : AppThemes.colorCuarto.withOpacity(0.7);
+    Color puntuacionColor = AppThemes.currentTheme == "dark" ? AppThemes.colorPrimero : AppThemes.colorCuarto.withOpacity(0.7);
+    final Color iconsColor = AppThemes.currentTheme == "dark" ? Colors.grey.withOpacity(0.9) : AppThemes.colorCuarto.withOpacity(0.7);
 
     return ListView.separated(
         controller: ScrollController(),
@@ -449,14 +453,21 @@ class ListJugadores extends StatelessWidget {
                     size: IconSize.min,
                     iconSize: 20,
                     iconColor: iconsColor,
-                    splashColor: AppThemes.colorSegundo,
+                    splashColor: AppThemes.colorTercero,
                   ),
+                  const SizedBox(width: 10),
+                  Text(jugador.puntuacion.toString(), style: TextStyle(color: puntuacionColor, fontWeight: FontWeight.bold)),
                   const SizedBox(width: 10),
                   Text(jugador.nombre!, style: TextStyle(color: nombreColor)),
                 ],
               ),
               CustomIconButtom(
-                  onTap: () {}, icon: Icons.delete_forever, size: IconSize.min, iconSize: 20, iconColor: iconsColor, splashColor: Colors.red[900])
+                  onTap: () => jugadorProvider.deleteJugador(context, jugador: jugador),
+                  icon: Icons.delete_forever,
+                  size: IconSize.min,
+                  iconSize: 20,
+                  iconColor: iconsColor,
+                  splashColor: Colors.red[900])
             ],
           );
         });

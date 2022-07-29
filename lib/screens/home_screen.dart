@@ -64,7 +64,7 @@ class _Body extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (!snapshot.hasData) {
           return const Center(
-            child: CircularProgressIndicator(color: AppThemes.colorPrimero),
+            child: CircularProgressIndicator(color: AppThemes.colorSegundo),
           );
         } else {
           return const ListPartidas();

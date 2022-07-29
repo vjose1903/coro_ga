@@ -6,7 +6,7 @@ import 'package:game_score/utils/utils.dart';
 import 'package:provider/provider.dart';
 
 class CustomEstadoPartida extends StatelessWidget {
-  CustomEstadoPartida({Key? key, required}) : super(key: key);
+  const CustomEstadoPartida({Key? key, required}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -76,10 +76,13 @@ class _GanadorPerdedor extends StatelessWidget {
                   children: [
                     Icon(ganadorPerdedor[estados[index]]["icono"], color: Colors.black.withOpacity(0.8)),
                     const SizedBox(width: 10),
-                    Text(
+                    Flexible(
+                        child: Text(
                       ganadorPerdedor[estados[index]]["label"],
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontFamily: "Poppins", fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black.withOpacity(0.8)),
-                    )
+                    ))
                   ],
                 ),
               ),
@@ -93,7 +96,7 @@ BoxDecoration getDecoration(Color backgroundColor) {
   return BoxDecoration(
     color: backgroundColor,
     borderRadius: BorderRadius.circular(10),
-    boxShadow: [BoxShadow(blurRadius: 5, spreadRadius: -1, offset: Offset(0, 5), color: AppThemes.colorTercero.withOpacity(0.3))],
+    boxShadow: [BoxShadow(blurRadius: 5, spreadRadius: -1, offset: Offset(0, 5), color: AppThemes.colorCuarto.withOpacity(0.3))],
   );
 }
 

@@ -53,7 +53,7 @@ class _Body extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (!snapshot.hasData) {
           return const Center(
-            child: CircularProgressIndicator(color: AppThemes.colorPrimero),
+            child: CircularProgressIndicator(color: AppThemes.colorSegundo),
           );
         } else {
           return Formulario(pantallas: pantallas, tipo: tipo);
@@ -103,7 +103,7 @@ class Formulario extends StatelessWidget {
                 child: Material(
               color: AppThemes.themeColor_2,
               borderRadius: BorderRadius.circular(12),
-              shadowColor: AppThemes.colorTercero.withOpacity(0.3),
+              shadowColor: AppThemes.colorCuarto.withOpacity(0.3),
               elevation: 7,
               // child: Container(),
               child: _Inputs(jugadoresController: jugadoresController),
@@ -169,7 +169,7 @@ class Titulo extends StatelessWidget {
               width: 26,
               margin: const EdgeInsets.only(left: 8),
               padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(color: AppThemes.colorPrimero, borderRadius: BorderRadius.circular(50)),
+              decoration: BoxDecoration(color: AppThemes.colorSegundo, borderRadius: BorderRadius.circular(50)),
               child: Center(
                   child: Text(
                 formPartidaProvider.jugadores.length.toString(),

@@ -4,10 +4,11 @@ class AppThemes {
   static const String currentTheme = "dark";
   // static const String currentTheme = "light";
 
-  static const Color colorPrimero = Color(0xFF0F309C);
-  static const Color colorSegundo = Color(0xFF0B129F);
-  static const Color colorTercero = Color(0xFF0E1265);
+  static const Color colorPrimero = Color(0xFF2D57E2);
+  static const Color colorSegundo = Color(0xFF0F309C);
+  static const Color colorTercero = Color(0xFF0B129F);
   static const Color colorCuarto = Color(0xFF0E1265);
+  static const Color colorQuinto = Color(0xFF0E1265);
 
   static Color themeColor_1 = AppThemes.currentTheme == "dark" ? const Color(0xFF27292B) : const Color(0xFFE6EBED);
   static Color? themeColor_2 = AppThemes.currentTheme == "dark" ? Colors.grey[800] : Colors.white;
@@ -21,9 +22,9 @@ class AppThemes {
   static Color labelInputDisabledColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.3) : Colors.blueGrey.withOpacity(0.6);
 
   static final ThemeData lightTheme = ThemeData.light().copyWith(
-    primaryColor: colorSegundo,
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(backgroundColor: colorSegundo, elevation: 8),
-    elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(primary: colorSegundo)),
+    primaryColor: colorTercero,
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(backgroundColor: colorTercero, elevation: 8),
+    elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(primary: colorTercero)),
     inputDecorationTheme: InputDecorationTheme(
         filled: true,
         border: UnderlineInputBorder(borderSide: const BorderSide(color: Colors.transparent), borderRadius: BorderRadius.circular(15)),
@@ -31,15 +32,15 @@ class AppThemes {
         focusedBorder: UnderlineInputBorder(borderSide: const BorderSide(color: Colors.transparent), borderRadius: BorderRadius.circular(15)),
         errorBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.red), borderRadius: BorderRadius.circular(15))),
     textSelectionTheme:
-        const TextSelectionThemeData(cursorColor: colorSegundo, selectionColor: Color(0x5E0C249C), selectionHandleColor: Color(0x5E0C249C)),
+        const TextSelectionThemeData(cursorColor: colorTercero, selectionColor: Color(0x5E0C249C), selectionHandleColor: Color(0x5E0C249C)),
   );
 
   static final ThemeData darkTheme = ThemeData.dark().copyWith(
-    primaryColor: colorSegundo,
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(backgroundColor: colorPrimero, elevation: 8),
+    primaryColor: colorTercero,
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(backgroundColor: colorSegundo, elevation: 8),
     elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-      primary: colorPrimero,
+      primary: colorSegundo,
     )),
     inputDecorationTheme: InputDecorationTheme(
         isDense: true,
@@ -49,6 +50,6 @@ class AppThemes {
         focusedBorder: UnderlineInputBorder(borderSide: const BorderSide(color: Colors.transparent), borderRadius: BorderRadius.circular(15)),
         errorBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.red), borderRadius: BorderRadius.circular(15))),
     textSelectionTheme:
-        const TextSelectionThemeData(cursorColor: colorSegundo, selectionColor: Color(0x5E0C249C), selectionHandleColor: Color(0x5E0C249C)),
+        const TextSelectionThemeData(cursorColor: colorTercero, selectionColor: Color(0x5E0C249C), selectionHandleColor: Color(0x5E0C249C)),
   );
 }

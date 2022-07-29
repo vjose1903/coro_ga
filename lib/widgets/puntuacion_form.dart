@@ -12,14 +12,35 @@ class PuntuacionForm extends StatelessWidget {
   final WeSlideController weSlideController;
   @override
   Widget build(BuildContext context) {
+    Fun.logColor(color: Colores.yellow, body: "build PuntuacionForm");
+    final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
+    final PageController pageController = PageController();
+    return PageView.builder(
+        controller: pageController,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: 2,
+        itemBuilder: (context, index) {
+          return index == 0
+              ? PuntuacionPage(weSlideController: weSlideController, pageController: pageController)
+              : EditarEntidad(pageController: pageController, jugador: jugadorProvider.jugadorEnTurno);
+        });
+  }
+}
+
+class PuntuacionPage extends StatelessWidget {
+  const PuntuacionPage({Key? key, required this.weSlideController, required this.pageController}) : super(key: key);
+  final WeSlideController weSlideController;
+  final PageController pageController;
+  @override
+  Widget build(BuildContext context) {
     String? puntuacion;
     TextEditingController puntuacionController = TextEditingController();
 
     final PartidasProvider partidaProvider = context.watch<PartidasProvider>();
     final JugadorProvider jugadorProvider = context.watch<JugadorProvider>();
 
-    final Color titleColor = AppThemes.currentTheme == "dark" ? Colors.grey.withOpacity(0.9) : AppThemes.colorTercero.withOpacity(0.7);
-    final Color subTitleColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.8) : AppThemes.colorTercero.withOpacity(0.9);
+    final Color titleColor = AppThemes.currentTheme == "dark" ? Colors.grey.withOpacity(0.9) : AppThemes.colorCuarto.withOpacity(0.7);
+    final Color subTitleColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.8) : AppThemes.colorCuarto.withOpacity(0.9);
 
     return Column(
       children: [
@@ -35,12 +56,12 @@ class PuntuacionForm extends StatelessWidget {
                     Text(jugadorProvider.nombreJugador,
                         style: TextStyle(fontFamily: "Poppins", fontSize: 17, color: subTitleColor, fontWeight: FontWeight.bold)),
                     CustomIconButtom(
-                      onTap: () {},
+                      onTap: () => nextPage(),
                       icon: Icons.edit_outlined,
                       size: IconSize.min,
                       iconSize: 20,
                       iconColor: titleColor,
-                      splashColor: AppThemes.colorSegundo,
+                      splashColor: AppThemes.colorTercero,
                     ),
                   ],
                 ),
@@ -49,33 +70,7 @@ class PuntuacionForm extends StatelessWidget {
             CustomIconButtom(
                 onTap: () {
                   Jugador jugador = jugadorProvider.jugadorEnTurno!;
-                  CustomAlertDialog.show(context,
-                      menssage: "Seguro que desea eliminar el jugador: ${jugador.nombre}",
-                      title: "Confirmar",
-                      dialogType: DialogType.error,
-                      buttonsList: [
-                        CustomActionsButtons.cancelButton({"onTap": () => Navigator.pop(context)}),
-                        CustomActionsButtons.aceptarButton({
-                          "onTap": () {
-                            Navigator.pop(context);
-
-                            jugadorProvider.deleteJugador(context, jugador: jugador).then((response) {
-                              if (!response.hasError!) {
-                                final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
-                                weSlideProvider.closeWeSlide(controller: weSlideController);
-
-                                partidaProvider.removeJugador(jugador);
-                                Fun.logColor(color: Colores.yellow, body: "$response");
-                                if (response.messages!.isNotEmpty) {
-                                  Fun.toast(type: ToasType.warning, context: context, message: response.messages!.first);
-                                }
-                              } else {
-                                Fun.toast(type: ToasType.error, context: context, message: response.messages!.first);
-                              }
-                            });
-                          }
-                        })
-                      ]);
+                  jugadorProvider.deleteJugador(context, jugador: jugador, weSlideController: weSlideController);
                 },
                 icon: Icons.delete_forever,
                 size: IconSize.min,
@@ -104,7 +99,7 @@ class PuntuacionForm extends StatelessWidget {
           flex: 2,
           child: Material(
             borderRadius: BorderRadius.circular(10),
-            shadowColor: AppThemes.colorTercero.withOpacity(0.3),
+            shadowColor: AppThemes.colorCuarto.withOpacity(0.3),
             elevation: 7,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
@@ -143,15 +138,20 @@ class PuntuacionForm extends StatelessWidget {
     );
   }
 
+  nextPage() {
+    pageController.nextPage(duration: const Duration(milliseconds: 500), curve: Curves.easeInOutQuart);
+  }
+
   changePuntuacion(
       {required String puntuacion, required String tipo, required JugadorProvider jugadorProvider, required BuildContext context}) async {
+    final PartidasProvider partidaProvider = context.read<PartidasProvider>();
     if (puntuacion.isNotEmpty && puntuacion != "0") {
       int puntuacionInt = int.parse(puntuacion);
 
       Jugador jugador = jugadorProvider.jugadorEnTurno!;
       SqlResponse response =
           await Jugador.changePuntuacion(jugador: jugador, newPuntuacion: puntuacionInt, tipo: tipo, context: context, isLoading: true);
-
+      partidaProvider.refresh();
       jugadorProvider.changeJugadorEnTurno(response.data);
     } else {
       String msg = puntuacion == "0" ? "Puntuación debe de ser mayor a 0" : "Debe introducir una puntutación para continuar";
@@ -186,10 +186,10 @@ class _ListHistorial extends StatelessWidget {
         "reducir": {"icon": Icons.arrow_downward_rounded, "color": Colors.red[400]}
       };
 
-      Color historialColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.8) : AppThemes.colorTercero.withOpacity(0.7);
+      Color historialColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.8) : AppThemes.colorCuarto.withOpacity(0.7);
       Color tipoColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.2) : Colors.blueGrey.withOpacity(0.5);
 
-      Color totalLabelColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.7) : AppThemes.colorTercero.withOpacity(0.7);
+      Color totalLabelColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.7) : AppThemes.colorCuarto.withOpacity(0.7);
       Color totalContainerColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.25) : Colors.blueGrey.withOpacity(0.3);
 
       return Column(
@@ -270,7 +270,7 @@ class _Keyboard extends StatelessWidget {
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(10),
-          boxShadow: [BoxShadow(blurRadius: 10, spreadRadius: 1, color: AppThemes.colorTercero.withOpacity(0.2), offset: const Offset(0, 4))],
+          boxShadow: [BoxShadow(blurRadius: 10, spreadRadius: 1, color: AppThemes.colorCuarto.withOpacity(0.2), offset: const Offset(0, 4))],
         ),
         child: CustomKeyboard(onChanged: (value) => changePuntuacionValue(value), tipo: KeyboardType.number));
   }

@@ -93,7 +93,7 @@ class _Loading extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Center(child: LoadingAnimationWidget.staggeredDotsWave(color: AppThemes.colorPrimero, size: 150)),
+                Center(child: LoadingAnimationWidget.staggeredDotsWave(color: AppThemes.colorSegundo, size: 150)),
                 const Text('Cargando...', style: TextStyle(fontFamily: "Poppins", fontSize: 25))
               ],
             ),
