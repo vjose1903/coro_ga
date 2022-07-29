@@ -113,7 +113,7 @@ class Formulario extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () async {
                   if (validateAndSave()) {
-                    final PartidasProvider partidaProvider = context.read<PartidasProvider>();
+                    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
 
                     if (tipo == 'crear') {
                       final response = await partidaProvider.newPartida(partida, context);

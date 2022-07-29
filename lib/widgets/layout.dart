@@ -44,13 +44,17 @@ class Layout extends StatelessWidget {
 
     configureWeSlide(weSlideProvider: weSlideProvider, initialWeSlideWidgets: initialWeSlideWidgets);
 
+    weSlideController.addListener(() async {
+      if (weSlideController.isOpened == false) weSlideProvider.closeWeSlide(controller: weSlideController, isListener: true);
+    });
+
     return Stack(
       children: [
         WeSlide(
           controller: weSlideController,
           panelMinSize: 0,
           panelMaxSize: MediaQuery.of(context).size.height * 0.75,
-          isDismissible: false,
+          isDismissible: true,
           overlay: true,
           overlayOpacity: 0.5,
           footerHeight: hasFooter! ? 75 : 0,
@@ -93,7 +97,7 @@ class _Loading extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Center(child: LoadingAnimationWidget.staggeredDotsWave(color: AppThemes.colorSegundo, size: 150)),
+                Center(child: LoadingAnimationWidget.staggeredDotsWave(color: AppThemes.colorPrimero, size: 150)),
                 const Text('Cargando...', style: TextStyle(fontFamily: "Poppins", fontSize: 25))
               ],
             ),

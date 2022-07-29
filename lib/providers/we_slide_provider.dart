@@ -22,8 +22,8 @@ class WeSlideProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  closeWeSlide({required WeSlideController controller}) async {
-    controller.hide();
+  closeWeSlide({required WeSlideController controller, bool isListener = false}) async {
+    if (!isListener) controller.hide();
     notifyListeners();
   }
 }

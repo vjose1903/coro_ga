@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     
     return MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (_) => PartidasProvider()),
+          ChangeNotifierProvider(create: (_) => PartidaProvider()),
           ChangeNotifierProvider(create: (_) => FormPartidaProvider()),
           ChangeNotifierProvider(create: (_) => WeSlideProvider()),
           ChangeNotifierProvider(create: (_) => JugadorProvider()),

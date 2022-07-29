@@ -10,7 +10,7 @@ class CustomEstadoPartida extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PartidasProvider partidaProvider = context.watch<PartidasProvider>();
+    final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final partida = partidaProvider.partidaEnTurno!;
 
     Map<String, dynamic> estadoPartida = {

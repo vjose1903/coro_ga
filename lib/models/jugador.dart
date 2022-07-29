@@ -39,6 +39,8 @@ class Jugador extends DynamicClass {
 
   Map<String, dynamic> toMap() => {"id": id, "nombre": nombre, "puntuacion": puntuacion, "partida_id": partidaId};
 
+  Map<String, dynamic> toUpdateMap() => {"nombre": nombre};
+
   @override
   String toString() {
     return '{"nombre": "$nombre", "puntuacion": $puntuacion, "partidaId": $partidaId, "historialJugadas": $historialJugadas}';
@@ -53,6 +55,18 @@ class Jugador extends DynamicClass {
     for (var historial in historiales) {
       addHistorial(historial!);
     }
+  }
+
+  static Future<SqlResponse> edit(BuildContext context, {required Jugador jugador, required String newNombreJugador}) async {
+    Map<String, dynamic> tempJugadorMap = jugador.toUpdateMap();
+    tempJugadorMap["nombre"] = newNombreJugador;
+
+    final response =
+        await CrudHelper.updateOne(tableName: Jugador.tableName, id: jugador.id, newData: tempJugadorMap, context: context, isLoading: true);
+
+    if (response.hasError!) response.addMsg('No se pudo editar el jugador seleccionado.');
+
+    return response;
   }
 
   static Future<SqlResponse> changePuntuacion(

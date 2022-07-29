@@ -12,7 +12,7 @@ class FormPartidaProvider extends ChangeNotifier {
   }
 
   Future getPartida(int? id, BuildContext context) async {
-    final formPartidaProvider = Provider.of<PartidasProvider>(context, listen: false);
+    final formPartidaProvider = Provider.of<PartidaProvider>(context, listen: false);
 
     final Future<Partida?> partidaFuture = formPartidaProvider.getPartidaById(id, context);
     partida = await partidaFuture;

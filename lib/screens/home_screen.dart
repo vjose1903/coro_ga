@@ -57,7 +57,7 @@ class _Body extends StatelessWidget {
   // ];
   @override
   Widget build(BuildContext context) {
-    final PartidasProvider partidaProvider = context.read<PartidasProvider>();
+    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
 
     return FutureBuilder(
       future: partidaProvider.getPartidas(context, isLoading: false),
@@ -73,7 +73,7 @@ class _Body extends StatelessWidget {
     );
   }
 
-  getPartida(PartidasProvider partidaProvider, context) async {
+  getPartida(PartidaProvider partidaProvider, context) async {
     final partida = await partidaProvider.getPartidaById(5, context);
 
     if (partida == null) {
@@ -87,7 +87,7 @@ class ListPartidas extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final partidaProvider = context.watch<PartidasProvider>();
+    final partidaProvider = context.watch<PartidaProvider>();
     final List<Partida> partidas = partidaProvider.partidas;
 
     if (partidas.isEmpty) {
@@ -130,7 +130,7 @@ class ListPartidas extends StatelessWidget {
   // removePartida(CompletionHandler handler, Partida partida) async {
   Future removePartida(BuildContext context, CompletionHandler handler, List<Partida> partidas, int index) async {
     Navigator.pop(context);
-    final partidaProvider = context.read<PartidasProvider>();
+    final partidaProvider = context.read<PartidaProvider>();
     final responseFuture = partidaProvider.deletePartida(context, partida: partidas[index], handler: handler);
 
     return responseFuture;

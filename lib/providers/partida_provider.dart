@@ -5,12 +5,21 @@ import 'package:game_score/utils/utils.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 
-class PartidasProvider extends ChangeNotifier {
+class PartidaProvider extends ChangeNotifier {
   List<Partida> partidas = [];
   Partida? partidaEnTurno;
-  FormGroup? formPartida;
+  Partida? _partidaEditar;
 
-  FormGroup formAddJugador = fb.group({
+  set partidaEditar(Partida? jugador) {
+    _partidaEditar = jugador;
+    notifyListeners();
+  }
+
+  Partida? get partidaEditar {
+    return _partidaEditar;
+  }
+
+  FormGroup formPartida = fb.group({
     'nombre': ['', Validators.required]
   });
 

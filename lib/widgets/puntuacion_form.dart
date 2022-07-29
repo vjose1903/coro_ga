@@ -12,9 +12,8 @@ class PuntuacionForm extends StatelessWidget {
   final WeSlideController weSlideController;
   @override
   Widget build(BuildContext context) {
-    Fun.logColor(color: Colores.yellow, body: "build PuntuacionForm");
-    final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
     final PageController pageController = PageController();
+
     return PageView.builder(
         controller: pageController,
         physics: const NeverScrollableScrollPhysics(),
@@ -22,7 +21,7 @@ class PuntuacionForm extends StatelessWidget {
         itemBuilder: (context, index) {
           return index == 0
               ? PuntuacionPage(weSlideController: weSlideController, pageController: pageController)
-              : EditarEntidad(pageController: pageController, jugador: jugadorProvider.jugadorEnTurno);
+              : EditarEntidad(pageController: pageController);
         });
   }
 }
@@ -36,7 +35,7 @@ class PuntuacionPage extends StatelessWidget {
     String? puntuacion;
     TextEditingController puntuacionController = TextEditingController();
 
-    final PartidasProvider partidaProvider = context.watch<PartidasProvider>();
+    final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final JugadorProvider jugadorProvider = context.watch<JugadorProvider>();
 
     final Color titleColor = AppThemes.currentTheme == "dark" ? Colors.grey.withOpacity(0.9) : AppThemes.colorCuarto.withOpacity(0.7);
@@ -56,7 +55,10 @@ class PuntuacionPage extends StatelessWidget {
                     Text(jugadorProvider.nombreJugador,
                         style: TextStyle(fontFamily: "Poppins", fontSize: 17, color: subTitleColor, fontWeight: FontWeight.bold)),
                     CustomIconButtom(
-                      onTap: () => nextPage(),
+                      onTap: () {
+                        jugadorProvider.jugadorEditar = jugadorProvider.jugadorEnTurno;
+                        nextPage();
+                      },
                       icon: Icons.edit_outlined,
                       size: IconSize.min,
                       iconSize: 20,
@@ -144,7 +146,7 @@ class PuntuacionPage extends StatelessWidget {
 
   changePuntuacion(
       {required String puntuacion, required String tipo, required JugadorProvider jugadorProvider, required BuildContext context}) async {
-    final PartidasProvider partidaProvider = context.read<PartidasProvider>();
+    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     if (puntuacion.isNotEmpty && puntuacion != "0") {
       int puntuacionInt = int.parse(puntuacion);
 

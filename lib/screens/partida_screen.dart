@@ -15,7 +15,7 @@ class PartidaScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PartidasProvider partidaProvider = context.read<PartidasProvider>();
+    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
 
     final Partida partida = partidaProvider.partidaEnTurno!;
 
@@ -92,7 +92,7 @@ class JugadoresCard extends StatelessWidget {
     openWeSlide() {
       final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
 
-      weSlideProvider.openWeSlide(controller: weSlideController, body: const AddJugador());
+      weSlideProvider.openWeSlide(controller: weSlideController, body: const AddJugadorPartida());
     }
 
     return Expanded(
@@ -126,7 +126,7 @@ class JugadoresList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PartidasProvider partidaProvider = context.watch<PartidasProvider>();
+    final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final partida = partidaProvider.partidaEnTurno!;
     Color shadowColor = AppThemes.currentTheme == "dark" ? const Color(0x7B050924) : const Color(0x67325796);
 
@@ -160,7 +160,7 @@ class JugadorInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PartidasProvider partidaProvider = context.read<PartidasProvider>();
+    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
 
     Color fontNombreColor = AppThemes.currentTheme == "dark" ? const Color(0xD26776E6) : const Color(0xE30B4DBF);
     Color? fontPuntuacionColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.8) : const Color(0xDF062864);
@@ -265,7 +265,7 @@ class _NavigationBarState extends State<NavigationBar> {
   }
 
   void scrollToGame(BuildContext context) async {
-    final PartidasProvider partidaProvider = context.read<PartidasProvider>();
+    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
 
     final int selectedIndex = partidaProvider.partidas.indexWhere((partida) => partida.id == partidaProvider.partidaEnTurno!.id);
     await Future.delayed(const Duration(milliseconds: 200));
@@ -276,7 +276,7 @@ class _NavigationBarState extends State<NavigationBar> {
 
   @override
   Widget build(BuildContext context) {
-    final PartidasProvider partidaProvider = context.watch<PartidasProvider>();
+    final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     List<Partida> partidas = partidaProvider.partidas;
 
     return Container(
@@ -297,7 +297,7 @@ class _Chip extends StatelessWidget {
   const _Chip({Key? key, required this.index, required this.scrollToGame}) : super(key: key);
   final int index;
   final Function scrollToGame;
-  Color getChipColor(Partida partida, PartidasProvider partidaProvider) {
+  Color getChipColor(Partida partida, PartidaProvider partidaProvider) {
     Color colorChipSelected = AppThemes.currentTheme == "dark" ? AppThemes.colorTercero : AppThemes.colorSegundo;
     Color colorChip = AppThemes.currentTheme == "dark" ? const Color(0xE1494949) : const Color(0xDF787A84);
 
@@ -309,7 +309,7 @@ class _Chip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PartidasProvider partidaProvider = context.watch<PartidasProvider>();
+    final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     List<Partida> partidas = partidaProvider.partidas;
     return Center(
       child: Material(
@@ -337,139 +337,3 @@ class _Chip extends StatelessWidget {
   }
 }
 
-class AddJugador extends StatelessWidget {
-  const AddJugador({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final PartidasProvider partidaProvider = context.read<PartidasProvider>();
-    FormGroup form = partidaProvider.formAddJugador;
-
-    final Color titleColor = AppThemes.currentTheme == "dark" ? Colors.grey.withOpacity(0.9) : AppThemes.colorCuarto.withOpacity(0.7);
-
-    return Container(
-      padding: const EdgeInsets.only(bottom: 30),
-      child: Column(
-        children: [
-          // Titulo
-          Align(alignment: Alignment.topLeft, child: Text("Nuevo jugador", style: TextStyle(fontFamily: "Poppins", fontSize: 18, color: titleColor))),
-          const SizedBox(height: 5),
-          //
-          // Input Nombre
-          ReactiveForm(
-            formGroup: form,
-            child: Column(children: const <Widget>[
-              CustomReactiveInput(formControlName: 'nombre', labelText: "nombre", textCapitalization: TextCapitalization.words)
-            ]),
-          ),
-          const SizedBox(height: 10),
-          Align(
-              alignment: Alignment.topLeft,
-              child: Text("Jugadores actuales", style: TextStyle(fontFamily: "Poppins", fontSize: 15, color: titleColor))),
-          const SizedBox(height: 5),
-          // Jugadores Actuales
-          //
-          const JugadoresActuales(),
-          const SizedBox(height: 20),
-          // Boton
-          //
-          ElevatedButton(
-            onPressed: () async {
-              if (form.valid) {
-                final PartidasProvider partidaProvider = context.read<PartidasProvider>();
-
-                Jugador nuevoJugador = Jugador.fromMap(form.value);
-
-                partidaProvider
-                    .addJugadorToPartida(context, jugador: nuevoJugador, partida: partidaProvider.partidaEnTurno!)
-                    .then((value) => form.reset());
-              } else {
-                Fun.toast(type: ToasType.error, context: context, message: "Debe de introducir el nombre del nuevo jugador");
-              }
-            },
-            child: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Text("Agregar", style: TextStyle(fontSize: 20, fontFamily: 'Poppins')),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class JugadoresActuales extends StatelessWidget {
-  const JugadoresActuales({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      flex: 2,
-      child: Material(
-        borderRadius: BorderRadius.circular(10),
-        shadowColor: AppThemes.colorCuarto.withOpacity(0.3),
-        elevation: 7,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: Container(color: AppThemes.themeColor_1, child: const ListJugadores()),
-        ),
-      ),
-    );
-  }
-}
-
-class ListJugadores extends StatelessWidget {
-  const ListJugadores({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    final PartidasProvider partidaProvider = context.watch<PartidasProvider>();
-    final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
-    List<Jugador> jugadores = partidaProvider.partidaEnTurno!.jugadores!;
-    jugadores.sort((a, b) => a.id!.compareTo(b.id!));
-
-    Color nombreColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.8) : AppThemes.colorCuarto.withOpacity(0.7);
-    Color puntuacionColor = AppThemes.currentTheme == "dark" ? AppThemes.colorPrimero : AppThemes.colorCuarto.withOpacity(0.7);
-    final Color iconsColor = AppThemes.currentTheme == "dark" ? Colors.grey.withOpacity(0.9) : AppThemes.colorCuarto.withOpacity(0.7);
-
-    return ListView.separated(
-        controller: ScrollController(),
-        padding: const EdgeInsets.all(5),
-        separatorBuilder: (_, __) => const Divider(),
-        itemCount: jugadores.length,
-        itemBuilder: (context, index) {
-          Jugador jugador = jugadores[index];
-
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  const SizedBox(width: 5),
-                  CustomIconButtom(
-                    onTap: () {},
-                    icon: Icons.edit_outlined,
-                    size: IconSize.min,
-                    iconSize: 20,
-                    iconColor: iconsColor,
-                    splashColor: AppThemes.colorTercero,
-                  ),
-                  const SizedBox(width: 10),
-                  Text(jugador.puntuacion.toString(), style: TextStyle(color: puntuacionColor, fontWeight: FontWeight.bold)),
-                  const SizedBox(width: 10),
-                  Text(jugador.nombre!, style: TextStyle(color: nombreColor)),
-                ],
-              ),
-              CustomIconButtom(
-                  onTap: () => jugadorProvider.deleteJugador(context, jugador: jugador),
-                  icon: Icons.delete_forever,
-                  size: IconSize.min,
-                  iconSize: 20,
-                  iconColor: iconsColor,
-                  splashColor: Colors.red[900])
-            ],
-          );
-        });
-  }
-}
