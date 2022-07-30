@@ -160,7 +160,6 @@ aceptarFunction(BuildContext context, dynamic entidad,
       Fun.toast(type: ToasType.error, context: context, message: "El nombre de la partida no puede estar vacio.");
     }
   } else {
-    Fun.logColor(color: Colores.magenta, body: "EDITANDO JUGADOR");
     if (form.valid) {
       jugadorProvider.editJugador(context, jugador: entidad, newNombreJugador: form.value["nombre"].toString()).then((value) {
         entidad.nombre = form.value["nombre"].toString();

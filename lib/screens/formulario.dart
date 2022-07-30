@@ -187,11 +187,8 @@ class Titulo extends StatelessWidget {
               formPartidaProvider.addJugadorToList(Jugador());
               await Future.delayed(const Duration(milliseconds: 20));
 
-              jugadoresController.animateTo(
-                jugadoresController.position.maxScrollExtent,
-                duration: const Duration(seconds: 1, milliseconds: 500),
-                curve: Curves.elasticOut,
-              );
+              jugadoresController.animateTo(jugadoresController.position.maxScrollExtent,
+                  duration: const Duration(seconds: 1, milliseconds: 500), curve: Curves.elasticOut);
 
               if (formPartidaProvider.jugadores.length == 20) {
                 Fun.toast(type: ToasType.info, context: context, message: "Máximo de jugadores alcanzados");

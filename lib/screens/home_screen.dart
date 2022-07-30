@@ -60,7 +60,6 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-    Fun.logColor(color: Colores.yellow, body: "BUILD FUTURE BUILDER");
     return ListPartidas(weSlideController: weSlideController);
     // return FutureBuilder(
     //   future: partidaProvider.getPartidas(context, isLoading: true),

@@ -25,8 +25,11 @@ class AddJugadorPartida extends StatelessWidget {
 }
 
 class AddJugador extends StatelessWidget {
-  const AddJugador({Key? key, required this.pageController}) : super(key: key);
+  AddJugador({Key? key, required this.pageController}) : super(key: key);
+
   final PageController pageController;
+  final ScrollController jugadoresController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
@@ -54,7 +57,7 @@ class AddJugador extends StatelessWidget {
           const SizedBox(height: 5),
           // Jugadores Actuales
           //
-          JugadoresActuales(pageController: pageController),
+          JugadoresActuales(pageController: pageController, jugadoresController: jugadoresController),
           const SizedBox(height: 20),
           // Boton
           //
@@ -65,9 +68,13 @@ class AddJugador extends StatelessWidget {
 
                 Jugador nuevoJugador = Jugador.fromMap(form.value);
 
-                partidaProvider.addJugadorToPartida(context, jugador: nuevoJugador, partida: partidaProvider.partidaEnTurno!).then((value) {
+                partidaProvider.addJugadorToPartida(context, jugador: nuevoJugador, partida: partidaProvider.partidaEnTurno!).then((value) async {
                   partidaProvider.changePartidaEnTurno(value);
                   form.reset();
+
+                  await Future.delayed(const Duration(milliseconds: 20));
+                  jugadoresController.animateTo(jugadoresController.position.maxScrollExtent,
+                      duration: const Duration(seconds: 1, milliseconds: 500), curve: Curves.elasticOut);
                 });
               } else {
                 Fun.toast(type: ToasType.error, context: context, message: "Debe de introducir el nombre del nuevo jugador");
@@ -85,8 +92,10 @@ class AddJugador extends StatelessWidget {
 }
 
 class JugadoresActuales extends StatelessWidget {
-  const JugadoresActuales({Key? key, required this.pageController}) : super(key: key);
+  const JugadoresActuales({Key? key, required this.pageController, required this.jugadoresController}) : super(key: key);
   final PageController pageController;
+  final ScrollController jugadoresController;
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -97,7 +106,8 @@ class JugadoresActuales extends StatelessWidget {
         elevation: 7,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(10),
-          child: Container(color: AppThemes.themeColor_1, child: ListJugadores(pageController: pageController)),
+          child: Container(
+              color: AppThemes.themeColor_1, child: ListJugadores(pageController: pageController, jugadoresController: jugadoresController)),
         ),
       ),
     );
@@ -105,12 +115,15 @@ class JugadoresActuales extends StatelessWidget {
 }
 
 class ListJugadores extends StatelessWidget {
-  const ListJugadores({Key? key, required this.pageController}) : super(key: key);
+  const ListJugadores({Key? key, required this.pageController, required this.jugadoresController}) : super(key: key);
   final PageController pageController;
+  final ScrollController jugadoresController;
+
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
+
     List<Jugador> jugadores = partidaProvider.partidaEnTurno!.jugadores!;
     jugadores.sort((a, b) => a.id!.compareTo(b.id!));
 
@@ -119,7 +132,7 @@ class ListJugadores extends StatelessWidget {
     final Color iconsColor = AppThemes.currentTheme == "dark" ? Colors.grey.withOpacity(0.9) : AppThemes.colorCuarto.withOpacity(0.7);
 
     return ListView.separated(
-        controller: ScrollController(),
+        controller: jugadoresController,
         padding: const EdgeInsets.all(5),
         separatorBuilder: (_, __) => const Divider(),
         itemCount: jugadores.length,
