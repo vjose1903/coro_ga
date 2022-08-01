@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
@@ -133,7 +134,12 @@ class JugadoresList extends StatelessWidget {
 
   List<Widget> getJugadores(List<Jugador> jugadores, WeSlideController weSlideController) {
     jugadores.sort((a, b) => a.id!.compareTo(b.id!));
-    return jugadores.map((jugador) => JugadorInfo(jugador: jugador, weSlideController: weSlideController)).toList();
+    return jugadores.asMap().entries.map((entry) {
+      int index = entry.key;
+      Jugador jugador = entry.value;
+
+      return FadeInDown(delay: Duration(milliseconds: 100 * index), child: JugadorInfo(jugador: jugador, weSlideController: weSlideController));
+    }).toList();
   }
 }
 
@@ -311,7 +317,7 @@ class _Chip extends StatelessWidget {
               height: 35,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Center(child: Text(partidas[index].nombre!, style: const TextStyle(fontFamily: "Poppins", color: Colors.white, fontSize: 17))),
+                child: Center(child: Text(partidas[index].nombre!, style: const TextStyle(fontFamily: "Poppins", color: Colors.white, fontSize: 15))),
               ),
             ),
           ),

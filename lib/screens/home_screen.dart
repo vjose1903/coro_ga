@@ -1,4 +1,6 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_score/models/models.dart';
@@ -111,32 +113,35 @@ class ListPartidas extends StatelessWidget {
       }
     } else {
       return ListView.separated(
+          itemCount: partidas.length,
           separatorBuilder: (_, __) => const SizedBox(height: 30),
           padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
           physics: const BouncingScrollPhysics(),
-          itemCount: partidas.length,
           itemBuilder: (_, index) {
-            return PartidaCard(
-              partida: partidas[index],
-              onTap: () => partidaProvider.navigateToPartida(context: context, partida: partidas[index]),
+            return BounceInLeft(
+              delay: Duration(milliseconds: 100 * index),
+              child: PartidaCard(
+                partida: partidas[index],
+                onTap: () => partidaProvider.navigateToPartida(context: context, partida: partidas[index]),
 
-              functionBorrar: (handler) async {
-                CustomAlertDialog.show(context,
-                    menssage: "Seguro que desea eliminar la partida: ${partidas[index].nombre}",
-                    title: "Confirmar",
-                    dialogType: DialogType.error,
-                    buttonsList: [
-                      CustomActionsButtons.cancelButton({"onTap": () => Navigator.pop(context)}),
-                      CustomActionsButtons.aceptarButton({"onTap": () => removePartida(context, handler, partidas, index)})
-                    ]);
-              },
-              // functionEditar: () async => partidaProvider.newPartida(partidas[index], context),
-              functionEditar: () {
-                partidaProvider.partidaEditar = partidas[index];
-                weSlideProvider.openWeSlide(controller: weSlideController, body: EditarEntidad(weSlideController: weSlideController));
-              },
+                functionBorrar: (handler) async {
+                  CustomAlertDialog.show(context,
+                      menssage: "Seguro que desea eliminar la partida: ${partidas[index].nombre}",
+                      title: "Confirmar",
+                      dialogType: DialogType.error,
+                      buttonsList: [
+                        CustomActionsButtons.cancelButton({"onTap": () => Navigator.pop(context)}),
+                        CustomActionsButtons.aceptarButton({"onTap": () => removePartida(context, handler, partidas, index)})
+                      ]);
+                },
+                // functionEditar: () async => partidaProvider.newPartida(partidas[index], context),
+                functionEditar: () {
+                  partidaProvider.partidaEditar = partidas[index];
+                  weSlideProvider.openWeSlide(controller: weSlideController, body: EditarEntidad(weSlideController: weSlideController));
+                },
 
-              index: index,
+                index: index,
+              ),
             );
           });
     }
