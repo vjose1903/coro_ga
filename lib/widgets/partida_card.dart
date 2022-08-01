@@ -54,36 +54,44 @@ class PartidaCard extends StatelessWidget {
           child: InkWell(
             onTap: () => onTap(),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ConstrainedBox(
-                        constraints: BoxConstraints(maxWidth: size.width - 160),
-                        child: Text(
+                  Flexible(
+                    flex: 9,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
                           partida.nombre!,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 17, color: AppThemes.colorTercero),
+                          style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 16, color: AppThemes.colorTercero),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          LabelWithIcon(icon: FontAwesomeIcons.users, label: "${partida.cantJugadores}"),
-                          const SizedBox(width: 30),
-                          EstadoPartida(partida: partida)
-                        ],
-                      )
-                    ],
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Flexible(
+                                flex: 2,
+                                child: Row(
+                                  children: [
+                                    Text(partida.cantJugadores.toString(),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: const TextStyle(color: Colors.grey, fontSize: 15, fontFamily: 'Poppins')),
+                                    const IconRounded(icon: FontAwesomeIcons.users, marginLeft: 5)
+                                  ],
+                                )),
+                            Flexible(flex: 8, child: EstadoPartida(partida: partida))
+
+                            // Expanded(child: EstadoPartida(partida: partida))
+                          ],
+                        )
+                      ],
+                    ),
                   ),
-                  const Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    color: Colors.grey,
-                  )
+                  const Flexible(flex: 1, child: Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey, size: 18)),
                 ],
               ),
             ),
@@ -110,13 +118,19 @@ class EstadoPartida extends StatelessWidget {
     String partidaIs = partida.isSinIniciar ? "sinIniciar" : "empate";
 
     if (partida.isSinIniciar || partida.isEmpate) {
-      return LabelWithIcon(
-          orden: Orden.primeroIcono,
-          maxSize: size.width - 335,
-          icon: estadoPartida[partidaIs]["icono"],
-          label: estadoPartida[partidaIs]["label"],
-          iconColor: estadoPartida[partidaIs]["iconColor"],
-          iconBackgroundColor: estadoPartida[partidaIs]["color"]);
+      return Row(
+        children: [
+          IconRounded(
+            icon: estadoPartida[partidaIs]["icono"],
+            marginLeft: 5,
+            backgroundColor: estadoPartida[partidaIs]["color"],
+            iconColor: estadoPartida[partidaIs]["iconColor"],
+            marginRight: 5,
+          ),
+          Text(estadoPartida[partidaIs]["label"],
+              overflow: TextOverflow.ellipsis, maxLines: 1, style: const TextStyle(color: Colors.grey, fontSize: 15, fontFamily: 'Poppins')),
+        ],
+      );
     } else {
       return _GanadorPerdedor(partida: partida);
     }
@@ -132,23 +146,44 @@ class _GanadorPerdedor extends StatelessWidget {
     return Row(
       children: [
         //
-        LabelWithIcon(
-            orden: Orden.primeroIcono,
-            maxSize: size.width - 335,
-            icon: Icons.arrow_upward,
-            label: partida.getGandorOrPerdedor(tipo: Estado.ganador),
-            iconColor: Colors.green[500],
-            iconBackgroundColor: const Color(0xFFDDF2DE)),
+        Flexible(
+            flex: 5,
+            child: Row(
+              children: [
+                IconRounded(
+                  icon: Icons.arrow_upward,
+                  marginLeft: 5,
+                  backgroundColor: const Color(0xFFDDF2DE),
+                  iconColor: Colors.green[500]!,
+                  marginRight: 5,
+                ),
+                Expanded(
+                  child: Text(partida.getGandorOrPerdedor(tipo: Estado.ganador),
+                      overflow: TextOverflow.ellipsis, maxLines: 1, style: const TextStyle(color: Colors.grey, fontSize: 15, fontFamily: 'Poppins')),
+                ),
+              ],
+            )),
         //
         const SizedBox(width: 10),
         //
-        LabelWithIcon(
-            orden: Orden.primeroIcono,
-            maxSize: size.width - 335,
-            icon: Icons.arrow_downward,
-            label: partida.getGandorOrPerdedor(tipo: Estado.perdedor),
-            iconColor: Colors.red[300],
-            iconBackgroundColor: const Color(0xFFF2DDDD)),
+
+        Flexible(
+            flex: 5,
+            child: Row(
+              children: [
+                IconRounded(
+                  icon: Icons.arrow_downward,
+                  marginLeft: 5,
+                  backgroundColor: const Color(0xFFF2DDDD),
+                  iconColor: Colors.red[300]!,
+                  marginRight: 5,
+                ),
+                Expanded(
+                  child: Text(partida.getGandorOrPerdedor(tipo: Estado.perdedor),
+                      overflow: TextOverflow.ellipsis, maxLines: 1, style: const TextStyle(color: Colors.grey, fontSize: 15, fontFamily: 'Poppins')),
+                ),
+              ],
+            )),
       ],
     );
   }

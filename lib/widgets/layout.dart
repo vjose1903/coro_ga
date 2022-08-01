@@ -45,7 +45,10 @@ class Layout extends StatelessWidget {
     configureWeSlide(weSlideProvider: weSlideProvider, initialWeSlideWidgets: initialWeSlideWidgets);
 
     weSlideController.addListener(() async {
-      if (weSlideController.isOpened == false) weSlideProvider.closeWeSlide(controller: weSlideController, isListener: true);
+      if (weSlideController.isOpened == false) {
+        FocusManager.instance.primaryFocus?.unfocus();
+        weSlideProvider.closeWeSlide(controller: weSlideController, isListener: true);
+      }
     });
 
     return Stack(
@@ -53,10 +56,10 @@ class Layout extends StatelessWidget {
         WeSlide(
           controller: weSlideController,
           panelMinSize: 0,
-          panelMaxSize: MediaQuery.of(context).size.height * 0.75,
+          panelMaxSize: MediaQuery.of(context).size.height * 0.83,
           isDismissible: true,
           overlay: true,
-          overlayOpacity: 0.5,
+          overlayOpacity: 0.7,
           footerHeight: hasFooter! ? 75 : 0,
           body: Stack(
             children: [
@@ -115,25 +118,21 @@ class _AppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final WeSlideProvider weSlideProvider = context.watch<WeSlideProvider>();
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.all(10),
+        child: Row(
+          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (leading != null) leading! else Container(),
-                if (trailing != null) trailing!,
-              ],
-            ),
+            if (leading != null) Container(margin: const EdgeInsets.only(right: 5), child: leading!),
             if (title != null)
-              Container(
-                margin: const EdgeInsets.only(left: 10),
-                child: Text(title!, style: const TextStyle(color: Colors.white, fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 22)),
-              )
+              Expanded(
+                child: Text(title!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white, fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 20, letterSpacing: 2)),
+              ),
+            if (trailing != null) trailing!
           ],
         ),
       ),
@@ -147,16 +146,15 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      // mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        const SizedBox(height: 150),
+        const SizedBox(height: 100),
         Expanded(
           child: ClipRRect(
-            borderRadius: const BorderRadius.only(topLeft: Radius.circular(80)),
+            borderRadius: const BorderRadius.only(topLeft: Radius.circular(70)),
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(topLeft: Radius.circular(80)),
+                borderRadius: const BorderRadius.only(topLeft: Radius.circular(70)),
                 color: AppThemes.themeColor_1,
               ),
               child: child,
@@ -184,17 +182,20 @@ class _WeSlideContent extends StatelessWidget {
           color: AppThemes.themeColor_2,
         ),
         child: Padding(
-            padding: const EdgeInsets.only(right: 20, left: 20, bottom: 20),
-            child: Column(
+            padding: const EdgeInsets.only(right: 10, left: 10, bottom: 20),
+            child: Stack(
+              alignment: AlignmentDirectional.topCenter,
               children: [
-                const SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: CustomIconButtom(
-                      onTap: () => weSlideProvider.closeWeSlide(controller: weSlideController), icon: Icons.close, size: IconSize.min, iconSize: 25),
-                ),
-                const SizedBox(height: 10),
-                Expanded(child: weSlideProvider.Body ?? Container())
+                Positioned(
+                    top: -17,
+                    child: Icon(
+                      Icons.remove_rounded,
+                      size: 60,
+                      color: Colors.grey.withOpacity(0.5),
+                    )),
+                Column(
+                  children: [Container(height: 25), Expanded(child: weSlideProvider.Body ?? Container())],
+                )
               ],
             )));
   }

@@ -60,8 +60,8 @@ class CustomAlertDialog {
               actions: _makeActionsButtons(buttonsList),
               content: Row(mainAxisSize: MainAxisSize.min, children: [
                 if (dialogType != null) _getIcon(dialogType)!,
-                const SizedBox(height: 10),
-                Text(menssage),
+                const SizedBox(width: 10),
+                Flexible(child: Text(menssage)),
               ]));
         });
   }

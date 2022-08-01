@@ -115,7 +115,7 @@ class JugadoresList extends StatelessWidget {
     Color shadowColor = AppThemes.currentTheme == "dark" ? const Color(0x7B050924) : const Color(0x67325796);
 
     return Padding(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(8),
       child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: ScrollShadowContainer.custom(
@@ -123,8 +123,8 @@ class JugadoresList extends StatelessWidget {
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 child: Wrap(
-                  runSpacing: 20,
-                  spacing: 20,
+                  runSpacing: 8,
+                  spacing: 8,
                   children: getJugadores(partida.jugadores!, weSlideController),
                 ),
               ))),
@@ -166,7 +166,7 @@ class JugadorInfo extends StatelessWidget {
               controller: weSlideController, body: PuntuacionForm(weSlideController: weSlideController), footer: const NavigationBar());
         },
         child: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -175,18 +175,18 @@ class JugadorInfo extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.start,
-                style: TextStyle(fontFamily: "Poppins", fontSize: 17, color: fontNombreColor),
+                style: TextStyle(fontFamily: "Poppins", fontSize: 15, color: fontNombreColor),
               ),
               Expanded(
                   child: Center(
                       child: Text(
                 jugador.puntuacion.toString(),
                 textAlign: TextAlign.start,
-                style: TextStyle(fontFamily: "Poppins", fontSize: 50, color: fontPuntuacionColor, fontWeight: FontWeight.bold),
+                style: TextStyle(fontFamily: "Poppins", fontSize: 40, color: fontPuntuacionColor, fontWeight: FontWeight.bold),
               ))),
               Align(
                   alignment: Alignment.centerRight,
-                  child: Icon(iconEstado[partidaProvider.partidaEnTurno!.getJugadorEstatus(jugador)], color: iconEstadoColor))
+                  child: Icon(iconEstado[partidaProvider.partidaEnTurno!.getJugadorEstatus(jugador)], color: iconEstadoColor, size: 18))
             ],
           ),
         ));
@@ -213,7 +213,7 @@ class _CardBackGround extends StatelessWidget {
             onTap: () => function != null ? function!() : null,
             child: Container(
               height: 130,
-              width: screenSize.width * 0.393,
+              width: screenSize.width * 0.4,
               decoration: boxDecoration,
               child: child,
             ),

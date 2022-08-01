@@ -48,12 +48,12 @@ class PuntuacionPage extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text("Jugador:", style: TextStyle(fontFamily: "Poppins", fontSize: 18, color: titleColor)),
+                Text("Jugador:", style: TextStyle(fontFamily: "Poppins", fontSize: 16, color: titleColor)),
                 const SizedBox(width: 7),
                 Row(
                   children: [
                     Text(jugadorProvider.nombreJugador,
-                        style: TextStyle(fontFamily: "Poppins", fontSize: 17, color: subTitleColor, fontWeight: FontWeight.bold)),
+                        style: TextStyle(fontFamily: "Poppins", fontSize: 15, color: subTitleColor, fontWeight: FontWeight.bold)),
                     CustomIconButtom(
                       onTap: () {
                         jugadorProvider.jugadorEditar = jugadorProvider.jugadorEnTurno;
@@ -69,16 +69,19 @@ class PuntuacionPage extends StatelessWidget {
                 ),
               ],
             ),
-            CustomIconButtom(
-                onTap: () {
-                  Jugador jugador = jugadorProvider.jugadorEnTurno!;
-                  jugadorProvider.deleteJugador(context, jugador: jugador, weSlideController: weSlideController);
-                },
-                icon: Icons.delete_forever,
-                size: IconSize.min,
-                iconSize: 20,
-                iconColor: titleColor,
-                splashColor: Colors.red[900])
+            Visibility(
+              visible: partidaProvider.partidaEnTurno!.jugadores!.length > 2,
+              child: CustomIconButtom(
+                  onTap: () {
+                    Jugador jugador = jugadorProvider.jugadorEnTurno!;
+                    jugadorProvider.deleteJugador(context, jugador: jugador, weSlideController: weSlideController);
+                  },
+                  icon: Icons.delete_forever,
+                  size: IconSize.min,
+                  iconSize: 20,
+                  iconColor: titleColor,
+                  splashColor: Colors.red[900]),
+            )
           ],
         ),
         const SizedBox(height: 10),
@@ -178,8 +181,9 @@ class _ListHistorial extends StatelessWidget {
           child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.history, size: 50, color: Colors.grey.withOpacity(0.3)),
-          Text('No hay puntuaciónes registradas', style: TextStyle(fontFamily: 'Poppins', fontSize: 20, color: Colors.grey[500]!.withOpacity(0.4)))
+          Icon(Icons.history, size: 40, color: Colors.grey.withOpacity(0.3)),
+          const SizedBox(height: 10),
+          Text('No hay puntuaciónes registradas', style: TextStyle(fontFamily: 'Poppins', fontSize: 15, color: Colors.grey[500]!.withOpacity(0.4)))
         ],
       ));
     } else {

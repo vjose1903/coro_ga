@@ -22,11 +22,11 @@ class CustomEstadoPartida extends StatelessWidget {
 
     if (partida.isSinIniciar || partida.isEmpate) {
       return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 50),
+        padding: const EdgeInsets.symmetric(horizontal: 50),
         child: Container(
           decoration: getDecoration(estadoPartida[partidaIs]["backgroundColor"]),
           child: Padding(
-            padding: const EdgeInsets.all(15),
+            padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -34,7 +34,7 @@ class CustomEstadoPartida extends StatelessWidget {
                 const SizedBox(width: 10),
                 Text(
                   estadoPartida[partidaIs]["label"],
-                  style: TextStyle(fontFamily: "Poppins", fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black.withOpacity(0.8)),
+                  style: TextStyle(fontFamily: "Poppins", fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black.withOpacity(0.8)),
                 )
               ],
             ),
@@ -57,9 +57,9 @@ class _GanadorPerdedor extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
 
     return SizedBox(
-      height: 60,
+      height: 40,
       child: ListView.separated(
-          separatorBuilder: (_, __) => const SizedBox(width: 20),
+          separatorBuilder: (_, __) => const SizedBox(width: 10),
           shrinkWrap: true,
           scrollDirection: Axis.horizontal,
           itemCount: ganadorPerdedor.length,
@@ -70,18 +70,18 @@ class _GanadorPerdedor extends StatelessWidget {
               width: screenSize.width * 0.4,
               decoration: getDecoration(ganadorPerdedor[estados[index]]["backgroundColor"]),
               child: Padding(
-                padding: const EdgeInsets.all(15),
+                padding: const EdgeInsets.all(5),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(ganadorPerdedor[estados[index]]["icono"], color: Colors.black.withOpacity(0.8)),
-                    const SizedBox(width: 10),
+                    Icon(ganadorPerdedor[estados[index]]["icono"], color: Colors.black.withOpacity(0.8), size: 18),
+                    const SizedBox(width: 5),
                     Flexible(
                         child: Text(
                       ganadorPerdedor[estados[index]]["label"],
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontFamily: "Poppins", fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black.withOpacity(0.8)),
+                      style: TextStyle(fontFamily: "Poppins", fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black.withOpacity(0.8)),
                     ))
                   ],
                 ),

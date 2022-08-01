@@ -45,9 +45,9 @@ class EditarEntidad extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text("Editar $tipo:", style: TextStyle(fontFamily: "Poppins", fontSize: 18, color: titleColor)),
+              Text("Editar $tipo:", style: TextStyle(fontFamily: "Poppins", fontSize: 16, color: titleColor)),
               const SizedBox(width: 7),
-              Text(entidad?.nombre ?? "", style: TextStyle(fontFamily: "Poppins", fontSize: 17, color: subTitleColor, fontWeight: FontWeight.bold)),
+              Text(entidad?.nombre ?? "", style: TextStyle(fontFamily: "Poppins", fontSize: 15, color: subTitleColor, fontWeight: FontWeight.bold)),
             ],
           ),
           const SizedBox(height: 10),
@@ -62,6 +62,7 @@ class EditarEntidad extends StatelessWidget {
                   label: "Cancelar",
                   textColor: Colors.white,
                   onTap: () async {
+                    FocusManager.instance.primaryFocus?.unfocus();
                     if (weSlideController != null) weSlideProvider.closeWeSlide(controller: weSlideController!);
                     if (pageController != null) previusPage(pageController);
                     resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
@@ -148,6 +149,7 @@ aceptarFunction(BuildContext context, dynamic entidad,
   if (tipo == "Partida") {
     final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
     if (form.valid) {
+      FocusManager.instance.primaryFocus?.unfocus();
       partidaProvider.editPartida(context, partida: entidad, newNombrePartida: form.value["nombre"].toString()).then((value) async {
         entidad.nombre = form.value["nombre"].toString();
         partidaProvider.refresh();
@@ -161,6 +163,7 @@ aceptarFunction(BuildContext context, dynamic entidad,
     }
   } else {
     if (form.valid) {
+      FocusManager.instance.primaryFocus?.unfocus();
       jugadorProvider.editJugador(context, jugador: entidad, newNombreJugador: form.value["nombre"].toString()).then((value) {
         entidad.nombre = form.value["nombre"].toString();
         partidaProvider.refresh();

@@ -7,7 +7,7 @@ class ExpandedButtom extends StatelessWidget {
     this.onTap,
     required this.backgroundColor,
     required this.textColor,
-    this.fontSize = 18,
+    this.fontSize = 15,
   }) : super(key: key);
 
   final String label;
@@ -26,7 +26,7 @@ class ExpandedButtom extends StatelessWidget {
         child: InkWell(
           onTap: () => onTap != null ? onTap!() : null,
           child: Padding(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(7),
             child: Text(label, style: TextStyle(fontFamily: "Poppins", fontSize: fontSize, color: textColor), textAlign: TextAlign.center),
           ),
         ),

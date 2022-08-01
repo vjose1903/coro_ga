@@ -54,7 +54,7 @@ class _Tecla extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(5),
         child: SizedBox(
-          height: 45,
+          height: 35,
           child: Material(
             color: backColor,
             child: InkWell(
@@ -80,7 +80,7 @@ class _Simbolo extends StatelessWidget {
     if (icon != null) {
       return Icon(icon, size: 20, color: color);
     } else {
-      return Text(label!, style: TextStyle(fontFamily: 'Poppins', fontSize: 20, color: color));
+      return Text(label!, style: TextStyle(fontFamily: 'Poppins', fontSize: 17, color: color));
     }
   }
 }

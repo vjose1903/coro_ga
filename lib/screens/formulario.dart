@@ -16,33 +16,28 @@ class FormularioScreen extends StatelessWidget {
     final tipo = routeArgs['tipo'];
     final id = routeArgs['id'];
 
-    final Map<String, dynamic> pantallas = {
-      "crear": {"title": "Crear nueva partida", "btnLabel": "Crear"},
-      "editar": {"title": "Editar partida", "btnLabel": "Editar"}
-    };
-
     return Scaffold(
       // resizeToAvoidBottomInset: false,
       body: Layout(
         weSlideController: WeSlideController(),
-        appBarTitle: pantallas[tipo]["title"],
+        appBarTitle: "Crear nueva partida",
         appBarLeading: CustomIconButtom(
           iconSize: 25,
           iconColor: Colors.white,
           icon: Icons.arrow_back_ios_new,
           onTap: () => Navigator.pop(context, 'home'),
         ),
-        bodyContent: _Body(id: id, pantallas: pantallas, tipo: tipo),
+        bodyContent: _Body(id: id, tipo: tipo),
       ),
     );
   }
 }
 
 class _Body extends StatelessWidget {
-  const _Body({Key? key, this.id, required this.pantallas, this.tipo}) : super(key: key);
+  const _Body({Key? key, this.id, this.tipo}) : super(key: key);
 
   final int? id;
-  final Map<String, dynamic> pantallas;
+
   final dynamic tipo;
 
   @override
@@ -56,7 +51,7 @@ class _Body extends StatelessWidget {
             child: CircularProgressIndicator(color: AppThemes.colorSegundo),
           );
         } else {
-          return Formulario(pantallas: pantallas, tipo: tipo);
+          return Formulario(tipo: tipo);
         }
       },
     );
@@ -64,13 +59,13 @@ class _Body extends StatelessWidget {
 }
 
 class Formulario extends StatelessWidget {
-  Formulario({Key? key, this.id, required this.pantallas, this.tipo}) : super(key: key) {
+  Formulario({Key? key, this.id, this.tipo}) : super(key: key) {
     myFormKey = GlobalKey<FormState>();
   }
 
   final int? id;
   late GlobalKey<FormState> myFormKey;
-  final Map<String, dynamic> pantallas;
+
   final dynamic tipo;
   final ScrollController jugadoresController = ScrollController();
 
@@ -115,22 +110,20 @@ class Formulario extends StatelessWidget {
                   if (validateAndSave()) {
                     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
 
-                    if (tipo == 'crear') {
-                      final response = await partidaProvider.newPartida(partida, context);
+                    final response = await partidaProvider.newPartida(partida, context);
 
-                      if (!response.hasError!) {
-                        final newPartida = response.data;
-                        await Future.delayed(const Duration(milliseconds: 500));
-                        partidaProvider.navigateToPartida(context: context, partida: newPartida);
-                      } else {
-                        Fun.toast(type: ToasType.error, context: context, message: "Error registrando jugada.");
-                      }
-                    } else {}
+                    if (!response.hasError!) {
+                      final newPartida = response.data;
+                      await Future.delayed(const Duration(milliseconds: 500));
+                      partidaProvider.navigateToPartida(context: context, partida: newPartida);
+                    } else {
+                      Fun.toast(type: ToasType.error, context: context, message: "Error registrando partida.");
+                    }
                   }
                 },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: Text(pantallas[tipo]["btnLabel"], style: const TextStyle(fontSize: 20, fontFamily: 'Poppins')),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Text("Crear", style: TextStyle(fontSize: 15, fontFamily: 'Poppins')),
                 ),
               ),
             )
@@ -164,7 +157,7 @@ class Titulo extends StatelessWidget {
       children: [
         Row(
           children: [
-            const Text('Jugadores', style: TextStyle(fontFamily: 'Poppins', fontSize: 20, fontWeight: FontWeight.w100)),
+            const Text('Jugadores', style: TextStyle(fontFamily: 'Poppins', fontSize: 18, fontWeight: FontWeight.w100)),
             Container(
               width: 26,
               margin: const EdgeInsets.only(left: 8),

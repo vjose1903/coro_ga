@@ -45,6 +45,7 @@ class AppThemes {
     inputDecorationTheme: InputDecorationTheme(
         isDense: true,
         filled: true,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         border: UnderlineInputBorder(borderSide: const BorderSide(color: Colors.transparent), borderRadius: BorderRadius.circular(15)),
         enabledBorder: UnderlineInputBorder(borderSide: const BorderSide(color: Colors.transparent), borderRadius: BorderRadius.circular(15)),
         focusedBorder: UnderlineInputBorder(borderSide: const BorderSide(color: Colors.transparent), borderRadius: BorderRadius.circular(15)),

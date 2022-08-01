@@ -40,7 +40,7 @@ class AddJugador extends StatelessWidget {
       child: Column(
         children: [
           // Titulo
-          Align(alignment: Alignment.topLeft, child: Text("Nuevo jugador", style: TextStyle(fontFamily: "Poppins", fontSize: 18, color: titleColor))),
+          Align(alignment: Alignment.topLeft, child: Text("Nuevo jugador", style: TextStyle(fontFamily: "Poppins", fontSize: 16, color: titleColor))),
           const SizedBox(height: 5),
           //
           // Input Nombre
@@ -53,7 +53,7 @@ class AddJugador extends StatelessWidget {
           const SizedBox(height: 10),
           Align(
               alignment: Alignment.topLeft,
-              child: Text("Jugadores actuales", style: TextStyle(fontFamily: "Poppins", fontSize: 15, color: titleColor))),
+              child: Text("Jugadores actuales", style: TextStyle(fontFamily: "Poppins", fontSize: 12, color: titleColor))),
           const SizedBox(height: 5),
           // Jugadores Actuales
           //
@@ -82,7 +82,7 @@ class AddJugador extends StatelessWidget {
             },
             child: const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Text("Agregar", style: TextStyle(fontSize: 20, fontFamily: 'Poppins')),
+              child: Text("Agregar", style: TextStyle(fontSize: 15, fontFamily: 'Poppins')),
             ),
           ),
         ],
@@ -162,13 +162,16 @@ class ListJugadores extends StatelessWidget {
                   Text(jugador.nombre!, style: TextStyle(color: nombreColor)),
                 ],
               ),
-              CustomIconButtom(
-                  onTap: () => jugadorProvider.deleteJugador(context, jugador: jugador),
-                  icon: Icons.delete_forever,
-                  size: IconSize.min,
-                  iconSize: 20,
-                  iconColor: iconsColor,
-                  splashColor: Colors.red[900])
+              Visibility(
+                visible: partidaProvider.partidaEnTurno!.jugadores!.length > 2,
+                child: CustomIconButtom(
+                    onTap: () => jugadorProvider.deleteJugador(context, jugador: jugador),
+                    icon: Icons.delete_forever,
+                    size: IconSize.min,
+                    iconSize: 20,
+                    iconColor: iconsColor,
+                    splashColor: Colors.red[900]),
+              )
             ],
           );
         });

@@ -1,3 +1,4 @@
+export 'package:game_score/widgets/icon_rounded.dart';
 export 'package:game_score/widgets/add_jugador_partida.dart';
 export 'package:game_score/widgets/editar_entidad.dart';
 export 'package:game_score/widgets/custom_reactive_input.dart';
@@ -9,4 +10,3 @@ export 'package:game_score/widgets/custom_input_field.dart';
 export 'package:game_score/widgets/partida_card.dart';
 export 'package:game_score/widgets/custom_icon_buttom.dart';
 export 'package:game_score/widgets/layout.dart';
-export 'package:game_score/widgets/label_with_icon.dart';
