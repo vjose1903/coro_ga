@@ -114,31 +114,38 @@ class JugadoresList extends StatelessWidget {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final partida = partidaProvider.partidaEnTurno!;
     Color shadowColor = AppThemes.currentTheme == "dark" ? const Color(0x7B050924) : const Color(0x67325796);
-
+    Fun.logColor(color: Colores.yellow, body: "BUILD LIST");
     return Padding(
       padding: const EdgeInsets.all(8),
       child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: ScrollShadowContainer.custom(
-              boxShadow: BoxShadow(blurRadius: 15, spreadRadius: 10, color: shadowColor),
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Wrap(
-                  runSpacing: 8,
-                  spacing: 8,
-                  children: getJugadores(partida.jugadores!, weSlideController),
-                ),
-              ))),
+            boxShadow: BoxShadow(blurRadius: 15, spreadRadius: 10, color: shadowColor),
+            child: FutureBuilder(
+              future: getJugadores(partida.jugadores!, weSlideController),
+              initialData: List<Widget>.from([]),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator(color: AppThemes.colorSegundo));
+                } else {
+                  return SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(), child: Wrap(runSpacing: 8, spacing: 8, children: snapshot.data));
+                }
+              },
+            ),
+          )),
     );
   }
 
-  List<Widget> getJugadores(List<Jugador> jugadores, WeSlideController weSlideController) {
+  Future<List<Widget>> getJugadores(List<Jugador> jugadores, WeSlideController weSlideController) async {
+    await Future.delayed(const Duration(milliseconds: 10));
+
     jugadores.sort((a, b) => a.id!.compareTo(b.id!));
     return jugadores.asMap().entries.map((entry) {
       int index = entry.key;
       Jugador jugador = entry.value;
 
-      return FadeInDown(delay: Duration(milliseconds: 100 * index), child: JugadorInfo(jugador: jugador, weSlideController: weSlideController));
+      return ElasticIn(delay: Duration(milliseconds: 100 * index), child: JugadorInfo(jugador: jugador, weSlideController: weSlideController));
     }).toList();
   }
 }
@@ -260,7 +267,7 @@ class _NavigationBarState extends State<NavigationBar> {
     final int selectedIndex = partidaProvider.partidas.indexWhere((partida) => partida.id == partidaProvider.partidaEnTurno!.id);
     await Future.delayed(const Duration(milliseconds: 200));
     if (partidaProvider.partidas.length > 3 && (selectedIndex <= visibleIndeces.first) || (selectedIndex >= visibleIndeces.last)) {
-      itemScrollController.scrollTo(index: selectedIndex, duration: const Duration(milliseconds: 700), curve: Curves.easeInOutCubic, alignment: 0.5);
+      itemScrollController.scrollTo(index: selectedIndex, duration: const Duration(milliseconds: 700), curve: Curves.easeInOutCubic, alignment: 0.4);
     }
   }
 
@@ -277,7 +284,7 @@ class _NavigationBarState extends State<NavigationBar> {
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
           itemCount: partidas.length,
-          padding: const EdgeInsets.only(left: 20),
+          padding: const EdgeInsets.only(left: 20, right: 150),
           itemBuilder: (context, index) => _Chip(index: index, scrollToGame: scrollToGame)),
     );
   }

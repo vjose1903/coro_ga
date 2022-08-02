@@ -145,9 +145,11 @@ class _Body extends StatelessWidget {
   final Widget child;
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
     return Column(
       children: [
-        const SizedBox(height: 100),
+        SizedBox(height: screenSize.height * 0.125),
+        // SizedBox(height: 110),
         Expanded(
           child: ClipRRect(
             borderRadius: const BorderRadius.only(topLeft: Radius.circular(70)),
