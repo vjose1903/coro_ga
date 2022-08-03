@@ -34,16 +34,18 @@ class FormPartidaProvider extends ChangeNotifier {
     return partidaFuture;
   }
 
-  void addJugadorToList(Jugador jugador) {
+  void addJugadorToList() {
     if (partida == null) return;
-
-    partida!.jugadores!.add(jugador);
+    final formJugadoresArray = formPartida.control('jugadores') as FormArray<dynamic>;
+    final newFormGroup = createItem(1).first;
+    formJugadoresArray.add(newFormGroup);
     notifyListeners();
   }
 
-  void removeJugadorToList(Jugador jugador) {
+  void removeJugadorToList(int index) {
     if (partida == null) return;
-    partida!.jugadores!.remove(jugador);
+    final formJugadoresArray = formPartida.control('jugadores') as FormArray<dynamic>;
+    formJugadoresArray.removeAt(index);
 
     notifyListeners();
   }

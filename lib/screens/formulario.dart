@@ -263,7 +263,7 @@ class Titulo extends StatelessWidget {
           visible: formPartidaProvider.jugadores.length < 20,
           child: CustomIconButtom(
             onTap: () async {
-              formPartidaProvider.addJugadorToList(Jugador());
+              formPartidaProvider.addJugadorToList();
               await Future.delayed(const Duration(milliseconds: 20));
 
               jugadoresController.animateTo(jugadoresController.position.maxScrollExtent,
@@ -300,92 +300,94 @@ class _Inputs extends StatelessWidget {
       child: ReactiveFormArray(
           formArrayName: 'jugadores',
           builder: (context, formArray, child) {
-
-            
             print("child: $child");
             print(" ");
-            final jugadorControl = formJugadoresArray.controls.map((control) => control as FormGroup).map((currentform) {
-              return ReactiveForm(
-                  formGroup: currentform,
-                  child: Column(
-                    children: const [
-                      CustomReactiveInput(formControlName: 'nombre', labelText: "Nombre"),
-                    ],
-                  ));
-            });
+            final jugadoresInputs = [];
+            final Iterable<FormGroup> jugadoresControls = formJugadoresArray.controls.map((control) => control as FormGroup);
 
-            return Wrap(
-              runSpacing: 15,
-              children: jugadorControl.toList(),
+            for (var index = 0; index < jugadoresControls.length; index++) {
+              final currentform = jugadoresControls.toList()[index];
+              jugadoresInputs.add(_JugadorInput(formGroup: currentform, index: index)
+
+                  // ReactiveForm(
+                  //   formGroup: currentform,
+                  //   child: Column(
+                  //     children: const [
+                  //       _JugadorInput(formGroup: formGroup, index: index)
+                  //       // CustomReactiveInput(formControlName: 'nombre', labelText: "Nombre"),
+                  //     ],
+                  //   ))
+                  );
+            }
+
+            // return Wrap(
+            //   runSpacing: 15,
+            //   children: jugadoresControls.toList(),
+            // );
+            final jugadores = jugadoresInputs.toList();
+
+            return ListView.separated(
+              controller: jugadoresController,
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+              separatorBuilder: (_, __) => const SizedBox(height: 15),
+              itemCount: jugadores.length,
+              itemBuilder: (BuildContext context, int index) {
+                // return _JugadorInput(jugador: jugadores[index], index: index);
+                return jugadores[index];
+              },
             );
           }),
     );
-
-    // return ListView.separated(
-    //   controller: jugadoresController,
-    //   physics: const BouncingScrollPhysics(),
-    //   padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-    //   separatorBuilder: (_, __) => const SizedBox(height: 15),
-    //   itemCount: jugadores.length,
-    //   itemBuilder: (BuildContext context, int index) {
-    //     return _JugadorInput(jugador: jugadores[index], index: index);
-    //   },
-    // );
   }
 }
 
 class _JugadorInput extends StatelessWidget {
-  const _JugadorInput({Key? key, required this.jugador, required this.index}) : super(key: key);
+  const _JugadorInput({Key? key, required this.formGroup, required this.index}) : super(key: key);
 
-  final Jugador jugador;
+  final FormGroup formGroup;
 
   final int index;
 
   @override
   Widget build(BuildContext context) {
     final FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
-    return Row(
-      children: [
-        Flexible(
-            flex: 1,
-            fit: FlexFit.loose,
-            child: SizedBox(
-                width: 20,
-                child: Text(
-                  (index + 1).toString(),
-                  maxLines: 1,
-                  softWrap: false,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontFamily: 'Poppins', color: Colors.grey.withOpacity(0.6)),
-                ))),
-        const SizedBox(width: 5),
-        Flexible(
-            flex: 10,
-            fit: FlexFit.tight,
-            child: CustomInputField(
-              key: UniqueKey(),
-              initialValueFn: () => jugador.nombre,
-              onChanged: (value) => jugador.nombre = value,
-              labelText: 'Nombre',
-              validators: (value) {
-                if (value == null) return 'Este campo es requerido';
-                return value.length < 3 ? 'Mínimo de 3 letras' : null;
-              },
-            )),
-        const SizedBox(width: 10),
-        Flexible(
-            flex: 1,
-            child: Visibility(
-              visible: index >= 2,
-              child: CustomIconButtom(
-                  onTap: () => formPartidaProvider.removeJugadorToList(jugador),
-                  icon: Icons.remove,
-                  size: IconSize.min,
-                  iconSize: 25,
-                  backgroundColor: const Color(0xFFAF4C4C),
-                  splashColor: const Color(0xFF7A2E2E)),
-            ))
-      ],
-    );
+    return ReactiveForm(
+        formGroup: formGroup,
+        child: Row(
+          children: [
+            Flexible(
+                flex: 1,
+                fit: FlexFit.loose,
+                child: SizedBox(
+                    width: 20,
+                    child: Text(
+                      (index + 1).toString(),
+                      maxLines: 1,
+                      softWrap: false,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontFamily: 'Poppins', color: Colors.grey.withOpacity(0.6)),
+                    ))),
+            const SizedBox(width: 5),
+            Flexible(
+              flex: 10,
+              fit: FlexFit.tight,
+              child: CustomReactiveInput(key: UniqueKey(), formControlName: 'nombre', labelText: "Nombre"),
+            ),
+            const SizedBox(width: 10),
+            Flexible(
+                flex: 1,
+                child: Visibility(
+                  visible: index >= 2,
+                  child: CustomIconButtom(
+                      onTap: () => formPartidaProvider.removeJugadorToList(index),
+                      icon: Icons.remove,
+                      size: IconSize.min,
+                      iconSize: 25,
+                      backgroundColor: const Color(0xFFAF4C4C),
+                      splashColor: const Color(0xFF7A2E2E)),
+                ))
+          ],
+        ));
   }
 }
