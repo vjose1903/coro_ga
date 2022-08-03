@@ -78,9 +78,6 @@ class Formulario extends StatelessWidget {
       final Partida partida = formPartidaProvider.partida!;
       final dynamic tipoPartida = formPartidaProvider.formPartida.control('tipo').value;
 
-      print('tipoPartida: ($tipoPartida)');
-      print('width: ${tipoPartida == "Rondas" || tipoPartida == '' ? double.infinity : screenSize.width * 0.4}');
-
       return Container(
           margin: const EdgeInsets.only(top: 40, bottom: 40),
           padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -91,7 +88,7 @@ class Formulario extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const CustomReactiveInput(formControlName: 'nombre', labelText: "Nombre", textCapitalization: TextCapitalization.words),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -100,10 +97,10 @@ class Formulario extends StatelessWidget {
                         alignment: Alignment.centerLeft,
                         fit: BoxFit.none,
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 500),
+                          duration: const Duration(milliseconds: 300),
                           curve: Curves.easeOut,
-                          height: 50,
-                          width: tipoPartida == "Rondas" || tipoPartida == '' ? screenSize.width - 52 : screenSize.width * 0.42,
+                          // height: 45,
+                          width: tipoPartida == "Rondas" || tipoPartida == '' ? screenSize.width - 52 : screenSize.width * 0.43,
                           child: CustomReactiveDropDown(
                             formControlName: 'tipo',
                             labelText: "Tipo",
@@ -116,9 +113,49 @@ class Formulario extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (tipoPartida != null && tipoPartida == 'Puntuación')
-                      const Flexible(child: CustomReactiveInput(formControlName: 'maxPuntuacion', labelText: "Puntuación Maxima")),
+                    Flexible(
+                      child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeOut,
+                          width: tipoPartida == "Rondas" || tipoPartida == '' ? 0.01 : screenSize.width * 0.43,
+                          child: const CustomReactiveInput(formControlName: 'maxPuntuacion', labelText: "Puntuación Maxima")),
+                    ),
                   ],
+                ),
+                const SizedBox(height: 20),
+                Titulo(jugadoresController: jugadoresController),
+                const SizedBox(height: 10),
+                Expanded(
+                    child: Material(
+                  color: AppThemes.themeColor_2,
+                  borderRadius: BorderRadius.circular(12),
+                  shadowColor: AppThemes.colorQuinto.withOpacity(0.3),
+                  elevation: 7,
+                  child: _Inputs(jugadoresController: jugadoresController),
+                )),
+                const SizedBox(height: 15),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (validateAndSave()) {
+                        final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+
+                        final response = await partidaProvider.newPartida(partida, context);
+
+                        if (!response.hasError!) {
+                          final newPartida = response.data;
+                          await Future.delayed(const Duration(milliseconds: 500));
+                          partidaProvider.navigateToPartida(context: context, partida: newPartida);
+                        } else {
+                          Fun.toast(type: ToasType.error, context: context, message: "Error registrando partida.");
+                        }
+                      }
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      child: Text("Crear", style: TextStyle(fontSize: 15, fontFamily: 'Poppins')),
+                    ),
+                  ),
                 )
               ],
             ),
@@ -255,18 +292,45 @@ class _Inputs extends StatelessWidget {
   Widget build(BuildContext context) {
     final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
 
-    List<Jugador> jugadores = formPartidaProvider.jugadores;
+    final formJugadoresArray = formPartidaProvider.formPartida.control('jugadores') as FormArray<dynamic>;
 
-    return ListView.separated(
-      controller: jugadoresController,
-      physics: const BouncingScrollPhysics(),
+    // return Container();
+    return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-      separatorBuilder: (_, __) => const SizedBox(height: 15),
-      itemCount: jugadores.length,
-      itemBuilder: (BuildContext context, int index) {
-        return _JugadorInput(jugador: jugadores[index], index: index);
-      },
+      child: ReactiveFormArray(
+          formArrayName: 'jugadores',
+          builder: (context, formArray, child) {
+
+            
+            print("child: $child");
+            print(" ");
+            final jugadorControl = formJugadoresArray.controls.map((control) => control as FormGroup).map((currentform) {
+              return ReactiveForm(
+                  formGroup: currentform,
+                  child: Column(
+                    children: const [
+                      CustomReactiveInput(formControlName: 'nombre', labelText: "Nombre"),
+                    ],
+                  ));
+            });
+
+            return Wrap(
+              runSpacing: 15,
+              children: jugadorControl.toList(),
+            );
+          }),
     );
+
+    // return ListView.separated(
+    //   controller: jugadoresController,
+    //   physics: const BouncingScrollPhysics(),
+    //   padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+    //   separatorBuilder: (_, __) => const SizedBox(height: 15),
+    //   itemCount: jugadores.length,
+    //   itemBuilder: (BuildContext context, int index) {
+    //     return _JugadorInput(jugador: jugadores[index], index: index);
+    //   },
+    // );
   }
 }
 
