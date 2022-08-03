@@ -5,6 +5,7 @@ import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:game_score/models/models.dart';
 import 'package:provider/provider.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 import 'package:we_slide/we_slide.dart';
 
 class FormularioScreen extends StatelessWidget {
@@ -71,66 +72,114 @@ class Formulario extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
-    final Partida partida = formPartidaProvider.partida!;
-    return Container(
-      margin: const EdgeInsets.only(top: 40, bottom: 40),
-      padding: const EdgeInsets.symmetric(horizontal: 25),
-      child: Form(
-        key: myFormKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CustomInputField(
-              key: UniqueKey(),
-              initialValueFn: () => partida.nombre,
-              onChanged: (value) => partida.nombre = value,
-              labelText: 'Nombre',
-              validators: (value) {
-                if (value == null) return 'Este campo es requerido';
-                return value.length < 3 ? 'Mínimo de 3 letras' : null;
-              },
+    final screenSize = MediaQuery.of(context).size;
+    return Consumer(builder: (BuildContext context, value, Widget? child) {
+      final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
+      final Partida partida = formPartidaProvider.partida!;
+      final dynamic tipoPartida = formPartidaProvider.formPartida.control('tipo').value;
+
+      print('tipoPartida: ($tipoPartida)');
+      print('width: ${tipoPartida == "Rondas" || tipoPartida == '' ? double.infinity : screenSize.width * 0.4}');
+
+      return Container(
+          margin: const EdgeInsets.only(top: 40, bottom: 40),
+          padding: const EdgeInsets.symmetric(horizontal: 25),
+          child: ReactiveForm(
+            key: myFormKey,
+            formGroup: formPartidaProvider.formPartida,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const CustomReactiveInput(formControlName: 'nombre', labelText: "Nombre", textCapitalization: TextCapitalization.words),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: FittedBox(
+                        alignment: Alignment.centerLeft,
+                        fit: BoxFit.none,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.easeOut,
+                          height: 50,
+                          width: tipoPartida == "Rondas" || tipoPartida == '' ? screenSize.width - 52 : screenSize.width * 0.42,
+                          child: CustomReactiveDropDown(
+                            formControlName: 'tipo',
+                            labelText: "Tipo",
+                            items: const [
+                              DropdownMenuItem(value: "Rondas", child: Text("Rondas")),
+                              DropdownMenuItem(value: "Puntuación", child: Text("Puntuación"))
+                            ],
+                            onChanged: (value) => formPartidaProvider.changeTipo(value),
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (tipoPartida != null && tipoPartida == 'Puntuación')
+                      const Flexible(child: CustomReactiveInput(formControlName: 'maxPuntuacion', labelText: "Puntuación Maxima")),
+                  ],
+                )
+              ],
             ),
-            const SizedBox(height: 20),
-            Titulo(jugadoresController: jugadoresController),
-            const SizedBox(height: 10),
-            Expanded(
-                child: Material(
-              color: AppThemes.themeColor_2,
-              borderRadius: BorderRadius.circular(12),
-              shadowColor: AppThemes.colorQuinto.withOpacity(0.3),
-              elevation: 7,
-              // child: Container(),
-              child: _Inputs(jugadoresController: jugadoresController),
-            )),
-            const SizedBox(height: 15),
-            Center(
-              child: ElevatedButton(
-                onPressed: () async {
-                  if (validateAndSave()) {
-                    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+          )
 
-                    final response = await partidaProvider.newPartida(partida, context);
+          // child: Form(
+          //   key: myFormKey,
+          //   child: Column(
+          //     crossAxisAlignment: CrossAxisAlignment.start,
+          //     children: [
+          //       CustomInputField(
+          //         key: UniqueKey(),
+          //         initialValueFn: () => partida.nombre,
+          //         onChanged: (value) => partida.nombre = value,
+          //         labelText: 'Nombre',
+          //         validators: (value) {
+          //           if (value == null) return 'Este campo es requerido';
+          //           return value.length < 3 ? 'Mínimo de 3 letras' : null;
+          //         },
+          //       ),
+          //       const SizedBox(height: 20),
+          //       Titulo(jugadoresController: jugadoresController),
+          //       const SizedBox(height: 10),
+          //       Expanded(
+          //           child: Material(
+          //         color: AppThemes.themeColor_2,
+          //         borderRadius: BorderRadius.circular(12),
+          //         shadowColor: AppThemes.colorQuinto.withOpacity(0.3),
+          //         elevation: 7,
+          //         // child: Container(),
+          //         child: _Inputs(jugadoresController: jugadoresController),
+          //       )),
+          //       const SizedBox(height: 15),
+          //       Center(
+          //         child: ElevatedButton(
+          //           onPressed: () async {
+          //             if (validateAndSave()) {
+          //               final PartidaProvider partidaProvider = context.read<PartidaProvider>();
 
-                    if (!response.hasError!) {
-                      final newPartida = response.data;
-                      await Future.delayed(const Duration(milliseconds: 500));
-                      partidaProvider.navigateToPartida(context: context, partida: newPartida);
-                    } else {
-                      Fun.toast(type: ToasType.error, context: context, message: "Error registrando partida.");
-                    }
-                  }
-                },
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: Text("Crear", style: TextStyle(fontSize: 15, fontFamily: 'Poppins')),
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
+          //               final response = await partidaProvider.newPartida(partida, context);
+
+          //               if (!response.hasError!) {
+          //                 final newPartida = response.data;
+          //                 await Future.delayed(const Duration(milliseconds: 500));
+          //                 partidaProvider.navigateToPartida(context: context, partida: newPartida);
+          //               } else {
+          //                 Fun.toast(type: ToasType.error, context: context, message: "Error registrando partida.");
+          //               }
+          //             }
+          //           },
+          //           child: const Padding(
+          //             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          //             child: Text("Crear", style: TextStyle(fontSize: 15, fontFamily: 'Poppins')),
+          //           ),
+          //         ),
+          //       )
+          //     ],
+          //   ),
+          // ),
+          );
+    });
   }
 
   bool validateAndSave() {

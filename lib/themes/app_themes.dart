@@ -56,6 +56,4 @@ class AppThemes {
     textSelectionTheme:
         const TextSelectionThemeData(cursorColor: colorCuarto, selectionColor: Color(0x5E0C249C), selectionHandleColor: Color(0x5E0C249C)),
   );
-
-
 }

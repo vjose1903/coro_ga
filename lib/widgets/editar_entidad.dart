@@ -16,6 +16,7 @@ class EditarEntidad extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final JugadorProvider jugadorProvider = context.watch<JugadorProvider>();
+    final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
 
@@ -36,7 +37,7 @@ class EditarEntidad extends StatelessWidget {
     final Color titleColor = AppThemes.currentTheme == Themes.dark ? Colors.grey.withOpacity(0.9) : AppThemes.colorQuinto.withOpacity(0.7);
     final Color subTitleColor = AppThemes.currentTheme == Themes.dark ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.9);
 
-    FormGroup form = tipo == "Partida" ? partidaProvider.formPartida : jugadorProvider.formJugador;
+    FormGroup form = tipo == "Partida" ? formPartidaProvider.formPartida : jugadorProvider.formJugador;
 
     return Container(
       height: double.infinity,

@@ -3,8 +3,21 @@ import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:provider/provider.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 
 class FormPartidaProvider extends ChangeNotifier {
+  FormGroup formPartida = fb.group({
+    'nombre': ['', Validators.required],
+    'jugadores': fb.array(createItem(2)),
+    'tipo': ['', Validators.required],
+    'maxPuntuacion': [0, Validators.min(0)]
+  });
+
+  void changeTipo(value) {
+    print(value);
+    notifyListeners();
+  }
+
   Partida? partida;
 
   get jugadores {
@@ -33,5 +46,18 @@ class FormPartidaProvider extends ChangeNotifier {
     partida!.jugadores!.remove(jugador);
 
     notifyListeners();
+  }
+
+  static List<FormGroup> createItem(count) {
+    List<FormGroup> jugadoresForm = List<FormGroup>.from([]);
+
+    FormGroup moldeForm = fb.group({
+      'nombre': ['', Validators.required]
+    });
+
+    for (var i = 0; i < count; i++) {
+      jugadoresForm.add(moldeForm);
+    }
+    return jugadoresForm;
   }
 }

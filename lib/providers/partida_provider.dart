@@ -21,9 +21,7 @@ class PartidaProvider extends ChangeNotifier {
     return _partidaEditar;
   }
 
-  FormGroup formPartida = fb.group({
-    'nombre': ['', Validators.required]
-  });
+  
 
   void navigateToPartida({required Partida partida, required BuildContext context}) {
     partidaEnTurno = partida;

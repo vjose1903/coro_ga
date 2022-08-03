@@ -63,7 +63,7 @@ class PuntuacionPage extends StatelessWidget {
                       size: IconSize.min,
                       iconSize: 20,
                       iconColor: titleColor,
-                      splashColor: AppThemes.colorCuarto,
+                      splashColor: AppThemes.colorTercero,
                     ),
                   ],
                 ),

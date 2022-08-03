@@ -6,8 +6,9 @@ import 'package:game_score/models/models.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/utils/utils.dart';
 
+
 class Partida extends DynamicClass {
-  Partida({this.nombre, this.jugadores, this.id, this.activo = true, this.createdAt, this.tipo});
+  Partida({this.nombre, this.jugadores, this.id, this.activo = true, this.createdAt, this.tipo, this.maxPuntuacion});
 
   static String tableName = "Partida";
 
@@ -17,6 +18,7 @@ class Partida extends DynamicClass {
   bool? activo;
   List<Jugador>? jugadores;
   DateTime? createdAt;
+  int? maxPuntuacion;
 
   get cantJugadores {
     if (jugadores == null) return 0;
@@ -97,6 +99,7 @@ class Partida extends DynamicClass {
         id: json["id"],
         nombre: json["nombre"],
         tipo: json["tipo"],
+        maxPuntuacion: json["maxPuntuacion"],
         activo: Fun.toBoolean(json["activo"]),
         createdAt: json["created_at"],
         jugadores: json["jugadores"] != null ? List<Jugador>.from(json["jugadores"].map((x) => Jugador.fromMap(x))) : null,
@@ -107,6 +110,7 @@ class Partida extends DynamicClass {
         "id": id,
         "nombre": nombre,
         "tipo": tipo,
+        "maxPuntuacion": maxPuntuacion,
         "createdAt": createdAt != null ? createdAt!.toIso8601String() : null,
         "activo": "$activo",
         "jugadores": jugadores != null ? List<dynamic>.from(jugadores!.map((x) => x.toMap())) : [],
@@ -121,7 +125,7 @@ class Partida extends DynamicClass {
 
   @override
   String toString() {
-    return '{"id": $id, "nombre": "$nombre", "activo": $activo, "tipo": "$tipo", "jugadores": $jugadores}';
+    return '{"id": $id, "nombre": "$nombre", "activo": $activo, "tipo": "$tipo", "jugadores": $jugadores. "maxPuntuacion": $maxPuntuacion}';
   }
 
   // ==================================================================================================================================

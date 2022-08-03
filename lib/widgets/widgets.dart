@@ -1,3 +1,4 @@
+export 'package:game_score/widgets/custom_reactive_dropDown.dart';
 export 'package:game_score/widgets/icon_rounded.dart';
 export 'package:game_score/widgets/add_jugador_partida.dart';
 export 'package:game_score/widgets/editar_entidad.dart';
