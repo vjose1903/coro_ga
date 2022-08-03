@@ -28,7 +28,7 @@ class PartidaCard extends StatelessWidget {
     return Material(
       color: AppThemes.themeColor_2,
       borderRadius: BorderRadius.circular(12),
-      shadowColor: AppThemes.colorTercero.withOpacity(0.3),
+      shadowColor: AppThemes.colorCuarto.withOpacity(0.3),
       elevation: 7,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
@@ -67,7 +67,7 @@ class PartidaCard extends StatelessWidget {
                           partida.nombre!,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 16, color: AppThemes.colorTercero),
+                          style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 16, color: AppThemes.colorCuarto),
                         ),
                         const SizedBox(height: 10),
                         Row(

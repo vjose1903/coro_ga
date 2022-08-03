@@ -51,28 +51,33 @@ class Layout extends StatelessWidget {
       }
     });
 
-    return Stack(
-      children: [
-        WeSlide(
-          controller: weSlideController,
-          panelMinSize: 0,
-          panelMaxSize: MediaQuery.of(context).size.height * 0.83,
-          isDismissible: true,
-          overlay: true,
-          overlayOpacity: 0.7,
-          footerHeight: hasFooter! ? 75 : 0,
-          body: Stack(
-            children: [
-              Container(decoration: boxDecoration),
-              _AppBar(title: appBarTitle, leading: appBarLeading, trailing: appBarTrailing),
-              _Body(child: bodyContent),
-            ],
-          ),
-          panel: _WeSlideContent(weSlideController: weSlideController),
-          footer: const _WeSlideFooter(),
-        ),
-        const _Loading(),
-      ],
+    return Consumer(
+      builder: (BuildContext context, value, Widget? child) {
+        ThemeProvider themeProvider = context.watch<ThemeProvider>();
+        return Stack(
+          children: [
+            WeSlide(
+              controller: weSlideController,
+              panelMinSize: 0,
+              panelMaxSize: MediaQuery.of(context).size.height * 0.83,
+              isDismissible: true,
+              overlay: true,
+              overlayOpacity: 0.7,
+              footerHeight: hasFooter! ? 75 : 0,
+              body: Stack(
+                children: [
+                  Container(decoration: boxDecoration),
+                  _AppBar(title: appBarTitle, leading: appBarLeading, trailing: appBarTrailing),
+                  _Body(child: bodyContent),
+                ],
+              ),
+              panel: _WeSlideContent(weSlideController: weSlideController),
+              footer: const _WeSlideFooter(),
+            ),
+            const _Loading(),
+          ],
+        );
+      },
     );
   }
 
@@ -100,7 +105,7 @@ class _Loading extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Center(child: LoadingAnimationWidget.staggeredDotsWave(color: AppThemes.colorPrimero, size: 150)),
+                Center(child: LoadingAnimationWidget.staggeredDotsWave(color: AppThemes.colorSegundo, size: 150)),
                 const Text('Cargando...', style: TextStyle(fontFamily: "Poppins", fontSize: 25))
               ],
             ),
@@ -209,7 +214,7 @@ class _WeSlideFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     final WeSlideProvider weSlideProvider = context.watch<WeSlideProvider>();
 
-    Color backgroundColor = AppThemes.currentTheme == "dark" ? const Color(0xEB333333) : const Color(0xFFC4D0E5);
+    Color backgroundColor = AppThemes.currentTheme == Themes.dark ? const Color(0xEB333333) : const Color(0xFFC4D0E5);
     return Container(
       width: double.infinity,
       color: backgroundColor,

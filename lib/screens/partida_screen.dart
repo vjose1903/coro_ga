@@ -84,7 +84,7 @@ class JugadoresCard extends StatelessWidget {
         child: Material(
       color: AppThemes.themeColor_2,
       borderRadius: BorderRadius.circular(12),
-      shadowColor: AppThemes.colorCuarto.withOpacity(0.3),
+      shadowColor: AppThemes.colorQuinto.withOpacity(0.3),
       elevation: 7,
       child: Column(
         children: [
@@ -113,7 +113,7 @@ class JugadoresList extends StatelessWidget {
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final partida = partidaProvider.partidaEnTurno!;
-    Color shadowColor = AppThemes.currentTheme == "dark" ? const Color(0x7B050924) : const Color(0x67325796);
+    Color shadowColor = AppThemes.currentTheme == Themes.dark ? const Color(0x7B050924) : const Color(0x67325796);
     Fun.logColor(color: Colores.yellow, body: "BUILD LIST");
     return Padding(
       padding: const EdgeInsets.all(8),
@@ -126,7 +126,7 @@ class JugadoresList extends StatelessWidget {
               initialData: List<Widget>.from([]),
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: AppThemes.colorSegundo));
+                  return const Center(child: CircularProgressIndicator(color: AppThemes.colorTercero));
                 } else {
                   return SingleChildScrollView(
                       physics: const BouncingScrollPhysics(), child: Wrap(runSpacing: 8, spacing: 8, children: snapshot.data));
@@ -159,9 +159,9 @@ class JugadorInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
 
-    Color fontNombreColor = AppThemes.currentTheme == "dark" ? const Color(0xD26776E6) : const Color(0xE30B4DBF);
-    Color? fontPuntuacionColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.8) : const Color(0xDF062864);
-    Color? iconEstadoColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.2) : AppThemes.colorTercero.withOpacity(0.3);
+    Color fontNombreColor = AppThemes.currentTheme == Themes.dark ? const Color(0xD26776E6) : const Color(0xE30B4DBF);
+    Color? fontPuntuacionColor = AppThemes.currentTheme == Themes.dark ? Colors.white.withOpacity(0.8) : const Color(0xDF062864);
+    Color? iconEstadoColor = AppThemes.currentTheme == Themes.dark ? Colors.white.withOpacity(0.2) : AppThemes.colorCuarto.withOpacity(0.3);
 
     Map iconEstado = {
       Estado.ganador: Icons.arrow_upward,
@@ -209,7 +209,7 @@ class JugadorInfo extends StatelessWidget {
 class _CardBackGround extends StatelessWidget {
   _CardBackGround({Key? key, required this.child, this.function}) : super(key: key);
   final boxDecoration = BoxDecoration(
-      color: AppThemes.currentTheme == "dark" ? const Color(0x7921233C) : const Color(0x7BA1A6DE), borderRadius: BorderRadius.circular(15));
+      color: AppThemes.currentTheme == Themes.dark ? const Color(0x7921233C) : const Color(0x7BA1A6DE), borderRadius: BorderRadius.circular(15));
   final Widget child;
   final Function? function;
 
@@ -252,9 +252,7 @@ class _NavigationBarState extends State<NavigationBar> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      scrollToGame(context);
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => scrollToGame(context));
 
     itemPositionsListener.itemPositions.addListener(() {
       visibleIndeces = itemPositionsListener.itemPositions.value.map((item) => item.index).toList();
@@ -295,8 +293,8 @@ class _Chip extends StatelessWidget {
   final int index;
   final Function scrollToGame;
   Color getChipColor(Partida partida, PartidaProvider partidaProvider) {
-    Color colorChipSelected = AppThemes.currentTheme == "dark" ? AppThemes.colorTercero : AppThemes.colorSegundo;
-    Color colorChip = AppThemes.currentTheme == "dark" ? const Color(0xE1494949) : const Color(0xDF787A84);
+    Color colorChipSelected = AppThemes.currentTheme == Themes.dark ? AppThemes.colorCuarto : AppThemes.colorTercero;
+    Color colorChip = AppThemes.currentTheme == Themes.dark ? const Color(0xE1494949) : const Color(0xDF787A84);
 
     Color color = colorChipSelected;
     if (partida.id != partidaProvider.partidaEnTurno!.id) color = colorChip;

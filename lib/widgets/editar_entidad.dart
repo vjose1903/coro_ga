@@ -33,8 +33,8 @@ class EditarEntidad extends StatelessWidget {
       entidad = jugador;
     }
 
-    final Color titleColor = AppThemes.currentTheme == "dark" ? Colors.grey.withOpacity(0.9) : AppThemes.colorCuarto.withOpacity(0.7);
-    final Color subTitleColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.8) : AppThemes.colorCuarto.withOpacity(0.9);
+    final Color titleColor = AppThemes.currentTheme == Themes.dark ? Colors.grey.withOpacity(0.9) : AppThemes.colorQuinto.withOpacity(0.7);
+    final Color subTitleColor = AppThemes.currentTheme == Themes.dark ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.9);
 
     FormGroup form = tipo == "Partida" ? partidaProvider.formPartida : jugadorProvider.formJugador;
 

@@ -34,7 +34,7 @@ class AddJugador extends StatelessWidget {
   Widget build(BuildContext context) {
     final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
     FormGroup form = jugadorProvider.formJugador;
-    final Color titleColor = AppThemes.currentTheme == "dark" ? Colors.grey.withOpacity(0.9) : AppThemes.colorCuarto.withOpacity(0.7);
+    final Color titleColor = AppThemes.currentTheme == Themes.dark ? Colors.grey.withOpacity(0.9) : AppThemes.colorQuinto.withOpacity(0.7);
     return Container(
       padding: const EdgeInsets.only(bottom: 30),
       child: Column(
@@ -102,7 +102,7 @@ class JugadoresActuales extends StatelessWidget {
       flex: 2,
       child: Material(
         borderRadius: BorderRadius.circular(10),
-        shadowColor: AppThemes.colorCuarto.withOpacity(0.3),
+        shadowColor: AppThemes.colorQuinto.withOpacity(0.3),
         elevation: 7,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(10),
@@ -127,9 +127,9 @@ class ListJugadores extends StatelessWidget {
     List<Jugador> jugadores = partidaProvider.partidaEnTurno!.jugadores!;
     jugadores.sort((a, b) => a.id!.compareTo(b.id!));
 
-    Color nombreColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.8) : AppThemes.colorCuarto.withOpacity(0.7);
-    Color puntuacionColor = AppThemes.currentTheme == "dark" ? AppThemes.colorPrimero : AppThemes.colorCuarto.withOpacity(0.7);
-    final Color iconsColor = AppThemes.currentTheme == "dark" ? Colors.grey.withOpacity(0.9) : AppThemes.colorCuarto.withOpacity(0.7);
+    Color nombreColor = AppThemes.currentTheme == Themes.dark ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.7);
+    Color puntuacionColor = AppThemes.currentTheme == Themes.dark ? AppThemes.colorSegundo : AppThemes.colorQuinto.withOpacity(0.7);
+    final Color iconsColor = AppThemes.currentTheme == Themes.dark ? Colors.grey.withOpacity(0.9) : AppThemes.colorQuinto.withOpacity(0.7);
 
     return ListView.separated(
         controller: jugadoresController,
@@ -154,7 +154,7 @@ class ListJugadores extends StatelessWidget {
                     size: IconSize.min,
                     iconSize: 20,
                     iconColor: iconsColor,
-                    splashColor: AppThemes.colorTercero,
+                    splashColor: AppThemes.colorCuarto,
                   ),
                   const SizedBox(width: 10),
                   Text(jugador.puntuacion.toString(), style: TextStyle(color: puntuacionColor, fontWeight: FontWeight.bold)),

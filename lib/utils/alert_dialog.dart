@@ -13,7 +13,7 @@ class CustomActionsButtons {
   final Function? onTap;
   final Color? textColor;
 
-  static Color? defaultTextColor = AppThemes.currentTheme == "dark" ? Colors.white.withOpacity(0.7) : Colors.blueGrey[600]!.withOpacity(0.7);
+  static Color? defaultTextColor = AppThemes.currentTheme == Themes.dark ? Colors.white.withOpacity(0.7) : Colors.blueGrey[600]!.withOpacity(0.7);
 
   factory CustomActionsButtons.cancelButton(Map<String, dynamic> json) => CustomActionsButtons(
         label: json["label"] ?? "Cancelar",

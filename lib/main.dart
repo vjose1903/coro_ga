@@ -11,7 +11,7 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    
+    // ThemeProvider themeProvider = context.watch<ThemeProvider>();
     return MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => PartidaProvider()),
@@ -19,13 +19,14 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => WeSlideProvider()),
           ChangeNotifierProvider(create: (_) => JugadorProvider()),
           ChangeNotifierProvider(create: (_) => LoadingProvider()),
+          ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Games Score',
           initialRoute: AppRoutes.initialRoute,
           routes: AppRoutes.getAppRoutes(),
-          theme: AppThemes.currentTheme == 'light' ? AppThemes.lightTheme : AppThemes.darkTheme,
+          theme: AppThemes.currentTheme == Themes.light ? AppThemes.lightTheme : AppThemes.darkTheme,
         ));
   }
 }

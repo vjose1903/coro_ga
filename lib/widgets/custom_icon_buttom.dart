@@ -28,7 +28,7 @@ class CustomIconButtom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color myIconColor = iconColor ?? (AppThemes.currentTheme == "dark" ? Colors.white : Colors.black);
+    Color myIconColor = iconColor ?? (AppThemes.currentTheme == Themes.dark ? Colors.white : Colors.black);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(50),
