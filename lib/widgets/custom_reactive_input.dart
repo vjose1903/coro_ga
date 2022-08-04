@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/themes/app_themes.dart';
+import 'package:game_score/utils/utils.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 class CustomReactiveInput extends StatelessWidget {
@@ -67,8 +68,19 @@ class CustomReactiveInput extends StatelessWidget {
           }),
         ),
         showErrors: (control) => control.invalid && (control.touched || control.dirty),
-        validationMessages: (control) => {
-              'required': "Campo requerido.",
-            });
+        validationMessages: (control) => handleErrorsMsg(control));
+  }
+
+  Map<String, String> handleErrorsMsg(control) {
+    Map<String, String> errors = {};
+
+    if (control.errors.containsKey("required")) errors["required"] = "Campo requerido.";
+
+    if (control.errors.containsKey("min")) {
+      final minValue = control.errors["min"] as Map;
+      errors["min"] = "Valor minimo es: ${minValue["min"]}";
+    }
+
+    return errors;
   }
 }

@@ -10,7 +10,7 @@ class FormPartidaProvider extends ChangeNotifier {
     'nombre': ['', Validators.required],
     'jugadores': fb.array(createItem(2)),
     'tipo': ['', Validators.required],
-    'maxPuntuacion': [0, Validators.min(0)]
+    'maxPuntuacion': [1, Validators.min(1)]
   });
 
   void changeTipo(value) {

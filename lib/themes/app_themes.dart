@@ -46,13 +46,13 @@ class AppThemes {
       primary: colorTercero,
     )),
     inputDecorationTheme: InputDecorationTheme(
-        isDense: true,
-        filled: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        border: UnderlineInputBorder(borderSide: const BorderSide(color: Colors.transparent), borderRadius: BorderRadius.circular(15)),
-        enabledBorder: UnderlineInputBorder(borderSide: const BorderSide(color: Colors.transparent), borderRadius: BorderRadius.circular(15)),
-        focusedBorder: UnderlineInputBorder(borderSide: const BorderSide(color: Colors.transparent), borderRadius: BorderRadius.circular(15)),
-        errorBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.red), borderRadius: BorderRadius.circular(15))),
+      filled: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      border: UnderlineInputBorder(borderSide: const BorderSide(color: Colors.transparent), borderRadius: BorderRadius.circular(15)),
+      enabledBorder: UnderlineInputBorder(borderSide: const BorderSide(color: Colors.transparent), borderRadius: BorderRadius.circular(15)),
+      focusedBorder: UnderlineInputBorder(borderSide: const BorderSide(color: Colors.transparent), borderRadius: BorderRadius.circular(15)),
+      errorBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.red), borderRadius: BorderRadius.circular(15)),
+    ),
     textSelectionTheme:
         const TextSelectionThemeData(cursorColor: colorCuarto, selectionColor: Color(0x5E0C249C), selectionHandleColor: Color(0x5E0C249C)),
   );

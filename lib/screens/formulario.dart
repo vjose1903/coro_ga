@@ -118,7 +118,8 @@ class Formulario extends StatelessWidget {
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeOut,
                           width: tipoPartida == "Rondas" || tipoPartida == '' ? 0.01 : screenSize.width * 0.43,
-                          child: const CustomReactiveInput(formControlName: 'maxPuntuacion', labelText: "Puntuación Maxima")),
+                          child: const CustomReactiveInput(
+                              formControlName: 'maxPuntuacion', labelText: "Puntuación Máxima", inputType: TextInputType.number)),
                     ),
                   ],
                 ),
@@ -137,19 +138,21 @@ class Formulario extends StatelessWidget {
                 Center(
                   child: ElevatedButton(
                     onPressed: () async {
-                      if (validateAndSave()) {
-                        final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+                      print("isValid: ${formPartidaProvider.formPartida.valid}");
+                      formPartidaProvider.formPartida.markAllAsTouched();
+                      // if (validateAndSave()) {
+                      //   final PartidaProvider partidaProvider = context.read<PartidaProvider>();
 
-                        final response = await partidaProvider.newPartida(partida, context);
+                      //   final response = await partidaProvider.newPartida(partida, context);
 
-                        if (!response.hasError!) {
-                          final newPartida = response.data;
-                          await Future.delayed(const Duration(milliseconds: 500));
-                          partidaProvider.navigateToPartida(context: context, partida: newPartida);
-                        } else {
-                          Fun.toast(type: ToasType.error, context: context, message: "Error registrando partida.");
-                        }
-                      }
+                      //   if (!response.hasError!) {
+                      //     final newPartida = response.data;
+                      //     await Future.delayed(const Duration(milliseconds: 500));
+                      //     partidaProvider.navigateToPartida(context: context, partida: newPartida);
+                      //   } else {
+                      //     Fun.toast(type: ToasType.error, context: context, message: "Error registrando partida.");
+                      //   }
+                      // }
                     },
                     child: const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
