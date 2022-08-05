@@ -1,3 +1,4 @@
+export 'package:game_score/widgets/lottie_animation.dart';
 export 'package:game_score/widgets/jugadores_actuales.dart';
 export 'package:game_score/widgets/custom_reactive_dropDown.dart';
 export 'package:game_score/widgets/icon_rounded.dart';

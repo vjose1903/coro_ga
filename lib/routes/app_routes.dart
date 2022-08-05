@@ -3,12 +3,13 @@ import 'package:game_score/screens/screens.dart';
 import '../models/menu_option.dart';
 
 class AppRoutes {
-  static const initialRoute = 'home';
+  static const initialRoute = 'ganador';
 
   static final menuOptions = <MenuOption>[
-    MenuOption(route: 'home', screen: HomeScreen()),
+    MenuOption(route: 'home', screen: const HomeScreen()),
     MenuOption(route: 'partida', screen: const PartidaScreen()),
     MenuOption(route: 'formulario', screen: const FormularioScreen()),
+    MenuOption(route: 'ganador', screen: const GanadorScreen()),
   ];
 
   static Map<String, Widget Function(BuildContext)> getAppRoutes() {
@@ -20,6 +21,4 @@ class AppRoutes {
 
     return appRoutes;
   }
-
-  
 }
