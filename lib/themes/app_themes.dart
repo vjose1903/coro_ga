@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 enum Themes { dark, light }
 
 class AppThemes {
-  // static Themes currentTheme = Themes.dark;
-  static Themes currentTheme = Themes.light;
+  static Themes currentTheme = Themes.dark;
+  // static Themes currentTheme = Themes.light;
 
   static const Color colorPrimero = Color(0xFF4D73EF);
   static const Color colorSegundo = Color(0xFF2D57E2);

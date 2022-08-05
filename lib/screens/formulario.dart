@@ -116,15 +116,15 @@ class _Body extends StatelessWidget {
 
                       if (form.valid) {
                         final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+                        Fun.logColor(color: Colores.yellow, body: "${form.value}");
                         final Partida partida = Partida.fromMap(form.value);
-                        Fun.logColor(color: Colores.red, body: partida.toString(), pretty: true);
                         final response = await partidaProvider.newPartida(partida, context);
 
                         if (!response.hasError!) {
                           final newPartida = response.data;
                           formPartidaProvider.resetForm();
-                          await Future.delayed(const Duration(milliseconds: 500));
-                          partidaProvider.navigateToPartida(context: context, partida: newPartida);
+
+                          partidaProvider.navigateToPartida(context: context, partida: newPartida, tipo: "replacement");
                         } else {
                           Fun.toast(type: ToasType.error, context: context, message: "Error registrando partida.");
                         }

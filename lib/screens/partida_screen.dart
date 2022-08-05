@@ -1,11 +1,13 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 import 'package:scroll_shadow_container/scroll_shadow_container.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:we_slide/we_slide.dart';
@@ -16,6 +18,7 @@ class PartidaScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     WeSlideController weSlideController = WeSlideController();
+    Fun.logColor(color: Colores.green, body: "PARTIDA SCREEN");
 
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
@@ -49,7 +52,7 @@ class _Body extends StatelessWidget {
     return Layout(
         weSlideController: weSlideController,
         hasFooter: true,
-        initialWeSlideWidgets: const {"footer": NavigationBar()},
+        initialWeSlideWidgets: {"footer": partidaProvider.partidas.isNotEmpty ? const NavigationBar() : Container()},
         appBarTitle: partida.nombre,
         appBarLeading: CustomIconButtom(
           iconSize: 25,
@@ -246,25 +249,35 @@ class NavigationBar extends StatefulWidget {
 }
 
 class _NavigationBarState extends State<NavigationBar> {
-  final ItemScrollController itemScrollController = ItemScrollController();
-  final ItemPositionsListener itemPositionsListener = ItemPositionsListener.create();
+  late ItemScrollController itemScrollController;
+  late ItemPositionsListener itemPositionsListener;
   late List<int> visibleIndeces = [];
+
   @override
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => scrollToGame(context));
+    itemScrollController = ItemScrollController();
+    itemPositionsListener = ItemPositionsListener.create();
+
+    // SchedulerBinding.instance.addPostFrameCallback((_) => scrollToGame(context));
 
     itemPositionsListener.itemPositions.addListener(() {
       visibleIndeces = itemPositionsListener.itemPositions.value.map((item) => item.index).toList();
     });
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   void scrollToGame(BuildContext context) async {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
 
     final int selectedIndex = partidaProvider.partidas.indexWhere((partida) => partida.id == partidaProvider.partidaEnTurno!.id);
-    await Future.delayed(const Duration(milliseconds: 150));
+    await Future.delayed(const Duration(milliseconds: 200));
+
     if (partidaProvider.partidas.length > 3 && (selectedIndex <= visibleIndeces.first) || (selectedIndex >= visibleIndeces.last)) {
       itemScrollController.scrollTo(index: selectedIndex, duration: const Duration(milliseconds: 700), curve: Curves.easeInOutCubic, alignment: 0.4);
     }
@@ -275,8 +288,8 @@ class _NavigationBarState extends State<NavigationBar> {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     List<Partida> partidas = partidaProvider.partidas;
 
-    return Container(
-      child: ScrollablePositionedList.separated(
+    if (partidas.isNotEmpty) {
+      return ScrollablePositionedList.separated(
           separatorBuilder: (_, __) => const SizedBox(width: 10),
           itemScrollController: itemScrollController,
           itemPositionsListener: itemPositionsListener,
@@ -284,14 +297,16 @@ class _NavigationBarState extends State<NavigationBar> {
           physics: const BouncingScrollPhysics(),
           itemCount: partidas.length,
           padding: const EdgeInsets.only(left: 20, right: 150),
-          itemBuilder: (context, index) => _Chip(index: index, scrollToGame: scrollToGame)),
-    );
+          itemBuilder: (context, index) => _Chip(partida: partidas[index], scrollToGame: scrollToGame));
+    } else {
+      return Container();
+    }
   }
 }
 
 class _Chip extends StatelessWidget {
-  const _Chip({Key? key, required this.index, required this.scrollToGame}) : super(key: key);
-  final int index;
+  const _Chip({Key? key, required this.partida, required this.scrollToGame}) : super(key: key);
+  final Partida? partida;
   final Function scrollToGame;
   Color getChipColor(Partida partida, PartidaProvider partidaProvider) {
     Color colorChipSelected = AppThemes.currentTheme == Themes.dark ? AppThemes.colorCuarto : AppThemes.colorTercero;
@@ -305,25 +320,24 @@ class _Chip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
-    List<Partida> partidas = partidaProvider.partidas;
+    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     return Center(
       child: Material(
         borderRadius: BorderRadius.circular(20),
-        color: getChipColor(partidas[index], partidaProvider),
+        color: getChipColor(partida!, partidaProvider),
         elevation: 5,
         child: ClipRRect(
           child: InkWell(
             borderRadius: BorderRadius.circular(20),
             onTap: () {
-              partidaProvider.changePartidaEnTurno(partidas[index]);
+              partidaProvider.changePartidaEnTurno(partida!);
               scrollToGame(context);
             },
             child: SizedBox(
               height: 35,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Center(child: Text(partidas[index].nombre!, style: const TextStyle(fontFamily: "Poppins", color: Colors.white, fontSize: 15))),
+                child: Center(child: Text(partida!.nombre!, style: const TextStyle(fontFamily: "Poppins", color: Colors.white, fontSize: 15))),
               ),
             ),
           ),

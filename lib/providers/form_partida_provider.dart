@@ -18,18 +18,16 @@ class FormPartidaProvider extends ChangeNotifier {
     formPartida.reset();
 
     final jugadoresArray = formPartida.control('jugadores') as FormArray<dynamic>;
-    print("jugadoresArray.value: ${jugadoresArray.value}");
     if (jugadoresArray.value != []) {
       for (var index = 0; index <= jugadoresArray.value!.length; index++) {
-        print("");
-        print("index: $index");
         jugadoresArray.removeAt(0);
       }
     }
+
     for (var i = 0; i < List.from([1, 2]).length; i++) {
       addJugadorToList();
     }
-    // jugadoresArray.value = createItem(2);
+    formPartida.control("activo").value = "true";
 
     notifyListeners();
   }
@@ -43,7 +41,6 @@ class FormPartidaProvider extends ChangeNotifier {
     final jugadoresArray = formPartida.control('jugadores') as FormArray<dynamic>;
     final newFormGroup = createItem(1).first;
     jugadoresArray.add(newFormGroup);
-    print(jugadoresArray.value);
     notifyListeners();
   }
 

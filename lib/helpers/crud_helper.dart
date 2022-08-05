@@ -23,7 +23,7 @@ class CrudHelper {
       response.hasError = true;
       response.addMsg('Error ingresando registro');
     }
-    await Future.delayed(const Duration(milliseconds: 150));
+    await Future.delayed(const Duration(milliseconds: 200));
     if (isLoading) loadingProvider.changeIsLoading(false);
     return response;
   }
@@ -51,7 +51,7 @@ class CrudHelper {
     } else {
       response.hasError = true;
     }
-    await Future.delayed(const Duration(milliseconds: 150));
+    await Future.delayed(const Duration(milliseconds: 200));
     if (isLoading) loadingProvider.changeIsLoading(false);
     return response;
   }
@@ -77,7 +77,7 @@ class CrudHelper {
 
     response.data = decodedRes;
     if (res.isEmpty) response.hasError = true;
-    await Future.delayed(const Duration(milliseconds: 150));
+    await Future.delayed(const Duration(milliseconds: 200));
     if (isLoading) loadingProvider.changeIsLoading(false);
     return response;
   }
@@ -106,7 +106,7 @@ class CrudHelper {
       } else {
         response.hasError = true;
       }
-      await Future.delayed(const Duration(milliseconds: 150));
+      await Future.delayed(const Duration(milliseconds: 200));
       if (isLoading) loadingProvider.changeIsLoading(false);
       return response;
       //
@@ -139,7 +139,7 @@ class CrudHelper {
     } else {
       response.hasError = true;
     }
-    await Future.delayed(const Duration(milliseconds: 150));
+    await Future.delayed(const Duration(milliseconds: 200));
     if (isLoading) loadingProvider.changeIsLoading(false);
     return response;
   }

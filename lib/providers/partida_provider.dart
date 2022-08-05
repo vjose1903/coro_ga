@@ -21,11 +21,13 @@ class PartidaProvider extends ChangeNotifier {
     return _partidaEditar;
   }
 
-  
-
-  void navigateToPartida({required Partida partida, required BuildContext context}) {
+  void navigateToPartida({required Partida partida, required BuildContext context, String? tipo}) {
     partidaEnTurno = partida;
-    Navigator.pushNamed(context, 'partida');
+    if (tipo == null || tipo == 'push') {
+      Navigator.pushNamed(context, 'partida');
+    } else {
+      Navigator.pushReplacementNamed(context, 'partida');
+    }
     notifyListeners();
   }
 
@@ -64,7 +66,6 @@ class PartidaProvider extends ChangeNotifier {
 
     int index = partidas.indexWhere((item) => item.id == partida.id);
     partidas[index] = response.data;
-    
 
     notifyListeners();
 
@@ -82,32 +83,20 @@ class PartidaProvider extends ChangeNotifier {
     return partidasFuture;
   }
 
-  Future<SqlResponse> deletePartida(BuildContext context, {required Partida partida, required CompletionHandler handler}) async {
+  Future<SqlResponse> deletePartida(BuildContext context, {required Partida partida, CompletionHandler? handler}) async {
     final response = await Partida.delete(context, partida: partida, isLoading: true);
 
     if (!response.hasError!) {
-      await handler(true);
+      if (handler != null) await handler(true);
 
       partidas.remove(partida);
       notifyListeners();
       return response;
     } else {
       Fun.toast(type: ToasType.error, context: context, message: response.messages!.first);
-      await handler(false);
+      if (handler != null) await handler(false);
       return response;
     }
-  }
-
-  Future<Partida?> getPartidaById(int? id, BuildContext context) async {
-    late Partida? partida;
-
-    if (id == null) {
-      partida = Partida(nombre: '', jugadores: [Jugador(nombre: '', historialJugadas: []), Jugador(nombre: '', historialJugadas: [])]);
-    } else {
-      partida = await Partida.getPartidaById(id, context: context, isLoading: false);
-    }
-
-    return partida;
   }
 
   Future<SqlResponse> editPartida(BuildContext context, {required Partida partida, required String newNombrePartida}) async {

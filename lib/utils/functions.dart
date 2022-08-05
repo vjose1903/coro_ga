@@ -43,7 +43,7 @@ class Fun {
   }
 
   static bool toBoolean(dynamic arg) {
-    if (arg.runtimeType != String || (arg.runtimeType == bool)) return arg;
+    if (arg.runtimeType != String || arg.runtimeType == bool || arg == null) return arg;
 
     return arg == "true" ? true : false;
   }

@@ -63,7 +63,7 @@ class ListJugadores extends StatelessWidget {
                     onTap: () async {
                       jugadorProvider.jugadorEditar = jugador;
                       nextPage();
-                      await Future.delayed(const Duration(milliseconds: 150));
+                      await Future.delayed(const Duration(milliseconds: 200));
                       jugadorProvider.formJugador.patchValue(jugadorProvider.jugadorEditar!.toMap());
                     },
                     icon: Icons.edit_outlined,

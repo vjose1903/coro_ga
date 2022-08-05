@@ -88,14 +88,6 @@ class _Body extends StatelessWidget {
     //   },
     // );
   }
-
-  getPartida(PartidaProvider partidaProvider, context) async {
-    final partida = await partidaProvider.getPartidaById(5, context);
-
-    if (partida == null) {
-      Fun.toast(type: ToasType.error, context: context, message: "Partida buscada no existe");
-    } else {}
-  }
 }
 
 class ListPartidas extends StatelessWidget {
@@ -161,10 +153,9 @@ class ListPartidas extends StatelessWidget {
     }
   }
 
-  // removePartida(CompletionHandler handler, Partida partida) async {
   Future removePartida(BuildContext context, CompletionHandler handler, List<Partida> partidas, int index) async {
     Navigator.pop(context);
-    final partidaProvider = context.read<PartidaProvider>();
+    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     final responseFuture = partidaProvider.deletePartida(context, partida: partidas[index], handler: handler);
 
     return responseFuture;

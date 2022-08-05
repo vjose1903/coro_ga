@@ -196,19 +196,6 @@ class Partida extends DynamicClass {
     }
   }
 
-  static Future<Partida?> getPartidaById(int id, {required BuildContext context, required bool isLoading}) async {
-    final response = await CrudHelper.getOne(tableName: Partida.tableName, id: id, context: context);
-
-    if (!response.hasError!) {
-      final partidaParsed = Partida.fromMap(response.data);
-
-      await findJugadores(partida: partidaParsed, context: context, isLoading: isLoading);
-      return partidaParsed;
-    } else {
-      response.addMsg('Partida buscada no existe.');
-      return null;
-    }
-  }
 
   static Future<SqlResponse> delete(BuildContext context, {required Partida partida, required bool isLoading}) async {
     Map<String, dynamic> tempPartidaMap = partida.toUpdateMap();

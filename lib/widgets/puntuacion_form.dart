@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
+import 'package:game_score/screens/ganador.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:game_score/utils/utils.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:we_slide/we_slide.dart';
 
@@ -58,7 +60,7 @@ class PuntuacionPage extends StatelessWidget {
                       onTap: () {
                         jugadorProvider.jugadorEditar = jugadorProvider.jugadorEnTurno;
                         jugadorProvider.formJugador.patchValue(jugadorProvider.jugadorEnTurno!.toMap());
-                        
+
                         nextPage();
                       },
                       icon: Icons.edit_outlined,
@@ -127,8 +129,26 @@ class PuntuacionPage extends StatelessWidget {
                 backgroundColor: Colors.green[400],
                 label: "Aumentar",
                 textColor: Colors.white,
-                onTap: () =>
-                    changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacionController.text, tipo: "aumentar", context: context)),
+                onTap: () {
+                  changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacionController.text, tipo: "aumentar", context: context)
+                      .then((newPuntuacion) {
+                    if (newPuntuacion != 0) {
+                      if (newPuntuacion >= partidaProvider.partidaEnTurno!.maxPuntuacion!.toInt()) {
+                        Navigator.pushReplacement(
+                            context,
+                            PageTransition(
+                                type: PageTransitionType.fade,
+                                settings: RouteSettings(arguments: {
+                                  "partida": partidaProvider.partidaEnTurno!.nombre,
+                                  "jugador": jugadorProvider.jugadorEnTurno!.nombre,
+                                }),
+                                child: const GanadorScreen(),
+                                alignment: Alignment.center,
+                                duration: const Duration(milliseconds: 500)));
+                      }
+                    }
+                  });
+                }),
 
             const SizedBox(width: 10),
             // REDUCIR ==========================================
@@ -149,9 +169,10 @@ class PuntuacionPage extends StatelessWidget {
     pageController.nextPage(duration: const Duration(milliseconds: 500), curve: Curves.easeInOutQuart);
   }
 
-  changePuntuacion(
+  Future<int> changePuntuacion(
       {required String puntuacion, required String tipo, required JugadorProvider jugadorProvider, required BuildContext context}) async {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+
     if (puntuacion.isNotEmpty && puntuacion != "0") {
       int puntuacionInt = int.parse(puntuacion);
 
@@ -160,11 +181,12 @@ class PuntuacionPage extends StatelessWidget {
           await Jugador.changePuntuacion(jugador: jugador, newPuntuacion: puntuacionInt, tipo: tipo, context: context, isLoading: true);
       partidaProvider.refresh();
       jugadorProvider.changeJugadorEnTurno(response.data);
-      
+      return response.data.puntuacion;
     } else {
       String msg = puntuacion == "0" ? "Puntuación debe de ser mayor a 0" : "Debe introducir una puntutación para continuar";
 
       Fun.toast(type: ToasType.warning, context: context, title: "AVISO", message: msg);
+      return 0;
     }
   }
 }

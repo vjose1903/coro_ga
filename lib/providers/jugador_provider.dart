@@ -49,7 +49,7 @@ class JugadorProvider extends ChangeNotifier {
   }
 
   void deleteJugador(BuildContext context, {required Jugador jugador, WeSlideController? weSlideController}) {
-    final partidaProvider = context.read<PartidaProvider>();
+    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
 
     CustomAlertDialog.show(context,

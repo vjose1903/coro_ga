@@ -53,6 +53,7 @@ dependencies:
   flutter_staggered_animations: ^1.0.0
   animate_do: ^2.1.0
   lottie: ^1.4.1
+  page_transition: ^2.0.9
 
 dev_dependencies:
   flutter_test:

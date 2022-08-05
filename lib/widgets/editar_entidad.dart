@@ -67,7 +67,7 @@ class EditarEntidad extends StatelessWidget {
                     if (weSlideController != null) weSlideProvider.closeWeSlide(controller: weSlideController!);
                     if (pageController != null) previusPage(pageController);
                     resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
-                    await Future.delayed(const Duration(milliseconds: 150));
+                    await Future.delayed(const Duration(milliseconds: 200));
                     form.reset();
                   }),
 
