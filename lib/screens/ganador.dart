@@ -6,6 +6,7 @@ import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
+import 'package:widget_and_text_animator/widget_and_text_animator.dart';
 
 class GanadorScreen extends StatelessWidget {
   const GanadorScreen({Key? key}) : super(key: key);
@@ -58,9 +59,13 @@ class GanadorScreen extends StatelessWidget {
               width: double.infinity,
               child: Column(
                 children: [
-                  Text("GANADOR",
+                  TextAnimator("GANADOR",
+                      incomingEffect: WidgetTransitionEffects.incomingOffsetThenScaleAndStep(duration: const Duration(milliseconds: 800)),
                       style: TextStyle(color: ganadorColor, fontFamily: 'Poppins', fontSize: 30, fontWeight: FontWeight.bold, letterSpacing: 3)),
-                  Text(partida, style: TextStyle(color: partidaColor, fontFamily: 'Poppins', fontSize: 20)),
+                  TextAnimator(partida,
+                      incomingEffect: WidgetTransitionEffects.incomingScaleDown(duration: const Duration(seconds: 1)),
+                      style: TextStyle(color: partidaColor, fontFamily: 'Poppins', fontSize: 20)),
+                  //
                   const SizedBox(height: 30),
                   SizedBox(
                     height: 300,
@@ -70,7 +75,8 @@ class GanadorScreen extends StatelessWidget {
                         child: const LottieAnimation(animationJson: 'assets/animations/trophy.json')),
                   ),
                   const SizedBox(height: 10),
-                  Text(jugador,
+                  TextAnimator(jugador,
+                      atRestEffect: WidgetRestingEffects.wave(duration: const Duration(seconds: 1)),
                       style: TextStyle(color: ganadorColor, fontFamily: 'Poppins', fontSize: 30, fontWeight: FontWeight.bold, letterSpacing: 3)),
                 ],
               )),
