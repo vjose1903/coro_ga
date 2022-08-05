@@ -40,6 +40,7 @@ class DatabaseHelper {
           nombre TEXT,
           tipo TEXT,
           activo TEXT DEFAULT true,
+          maxPuntuacion INTEGER
 
           createdAt timestamp DEFAULT current_timestamp
         );

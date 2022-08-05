@@ -67,6 +67,8 @@ class EditarEntidad extends StatelessWidget {
                     if (weSlideController != null) weSlideProvider.closeWeSlide(controller: weSlideController!);
                     if (pageController != null) previusPage(pageController);
                     resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
+                    await Future.delayed(const Duration(milliseconds: 150));
+                    form.reset();
                   }),
 
               const SizedBox(width: 10),
@@ -128,13 +130,59 @@ class EditPartida extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-        child: ReactiveForm(
-      formGroup: form,
-      child: Column(children: const <Widget>[
-        CustomReactiveInput(formControlName: 'nombre', labelText: "nombre", textCapitalization: TextCapitalization.words)
-      ]),
-    ));
+    final screenSize = MediaQuery.of(context).size;
+
+    return Consumer(
+      builder: (BuildContext context, value, Widget? child) {
+        final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
+        final dynamic tipoPartida = formPartidaProvider.formPartida.control('tipo').value;
+        return Expanded(
+            child: ReactiveForm(
+          formGroup: form,
+          child: Column(children: <Widget>[
+            const CustomReactiveInput(formControlName: 'nombre', labelText: "nombre", textCapitalization: TextCapitalization.words),
+            SizedBox(height: tipoPartida == '' ? 25 : 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Flexible(
+                  child: FittedBox(
+                    alignment: Alignment.centerLeft,
+                    fit: BoxFit.none,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOut,
+                      // height: 45,
+                      width: tipoPartida == '' ? screenSize.width - 20 : screenSize.width * 0.465,
+                      child: CustomReactiveDropDown(
+                        formControlName: 'tipo',
+                        labelText: "Tipo",
+                        items: const [
+                          DropdownMenuItem(value: "Rondas", child: Text("Rondas")),
+                          DropdownMenuItem(value: "Puntuación", child: Text("Puntuación"))
+                        ],
+                        onChanged: (value) => formPartidaProvider.changeTipo(value),
+                      ),
+                    ),
+                  ),
+                ),
+                Flexible(
+                  child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOut,
+                      width: tipoPartida == '' ? 0.01 : screenSize.width * 0.465,
+                      child: CustomReactiveInput(
+                          formControlName: 'maxPuntuacion',
+                          labelText: tipoPartida == "Rondas" ? "Cant. rondas" : "Puntuación Máxima",
+                          inputType: TextInputType.number)),
+                ),
+              ],
+            ),
+          ]),
+        ));
+      },
+    );
   }
 }
 
@@ -168,8 +216,8 @@ aceptarFunction(BuildContext context, dynamic entidad,
       jugadorProvider.editJugador(context, jugador: entidad, newNombreJugador: form.value["nombre"].toString()).then((value) {
         entidad.nombre = form.value["nombre"].toString();
         partidaProvider.refresh();
+
         form.reset();
-        print(previusPage);
         previusPage(pageController);
         resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
       });

@@ -29,7 +29,7 @@ class PartidaScreen extends StatelessWidget {
               visible: !weSlideController.isOpened,
               child: FloatingActionButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, 'formulario', arguments: {"tipo": "crear"});
+                  Navigator.pushNamed(context, 'formulario');
                 },
                 child: const Icon(Icons.add, size: 30),
               ),
@@ -77,6 +77,8 @@ class JugadoresCard extends StatelessWidget {
   Widget build(BuildContext context) {
     openWeSlide() {
       final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
+      final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
+      jugadorProvider.formJugador.reset();
       weSlideProvider.openWeSlide(controller: weSlideController, body: const AddJugadorPartida());
     }
 
@@ -263,7 +265,7 @@ class _NavigationBarState extends State<NavigationBar> {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
 
     final int selectedIndex = partidaProvider.partidas.indexWhere((partida) => partida.id == partidaProvider.partidaEnTurno!.id);
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future.delayed(const Duration(milliseconds: 150));
     if (partidaProvider.partidas.length > 3 && (selectedIndex <= visibleIndeces.first) || (selectedIndex >= visibleIndeces.last)) {
       itemScrollController.scrollTo(index: selectedIndex, duration: const Duration(milliseconds: 700), curve: Curves.easeInOutCubic, alignment: 0.4);
     }

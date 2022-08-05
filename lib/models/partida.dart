@@ -6,7 +6,6 @@ import 'package:game_score/models/models.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/utils/utils.dart';
 
-
 class Partida extends DynamicClass {
   Partida({this.nombre, this.jugadores, this.id, this.activo = true, this.createdAt, this.tipo, this.maxPuntuacion});
 
@@ -119,13 +118,14 @@ class Partida extends DynamicClass {
   Map<String, dynamic> toUpdateMap() => {
         "id": id,
         "nombre": nombre,
-        // "tipo": tipo,
+        "tipo": tipo,
+        "maxPuntuacion": maxPuntuacion,
         "activo": "$activo",
       };
 
   @override
   String toString() {
-    return '{"id": $id, "nombre": "$nombre", "activo": $activo, "tipo": "$tipo", "jugadores": $jugadores. "maxPuntuacion": $maxPuntuacion}';
+    return '{"id": $id, "nombre": "$nombre", "activo": $activo, "tipo": "$tipo", "jugadores": $jugadores, "maxPuntuacion": $maxPuntuacion}';
   }
 
   // ==================================================================================================================================

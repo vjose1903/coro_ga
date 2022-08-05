@@ -57,6 +57,8 @@ class PuntuacionPage extends StatelessWidget {
                     CustomIconButtom(
                       onTap: () {
                         jugadorProvider.jugadorEditar = jugadorProvider.jugadorEnTurno;
+                        jugadorProvider.formJugador.patchValue(jugadorProvider.jugadorEnTurno!.toMap());
+                        
                         nextPage();
                       },
                       icon: Icons.edit_outlined,
@@ -158,6 +160,7 @@ class PuntuacionPage extends StatelessWidget {
           await Jugador.changePuntuacion(jugador: jugador, newPuntuacion: puntuacionInt, tipo: tipo, context: context, isLoading: true);
       partidaProvider.refresh();
       jugadorProvider.changeJugadorEnTurno(response.data);
+      
     } else {
       String msg = puntuacion == "0" ? "Puntuación debe de ser mayor a 0" : "Debe introducir una puntutación para continuar";
 

@@ -67,7 +67,18 @@ class PartidaCard extends StatelessWidget {
                           partida.nombre!,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 16, color: AppThemes.colorCuarto),
+                          style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 16, color: AppThemes.colorPrimero),
+                        ),
+                        Text(
+                          partida.tipo!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                              letterSpacing: 2,
+                              color: AppThemes.currentTheme == Themes.dark ? Colors.grey[600]!.withOpacity(0.4) : Colors.grey.withOpacity(0.5)),
                         ),
                         const SizedBox(height: 10),
                         Row(

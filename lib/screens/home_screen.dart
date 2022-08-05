@@ -53,7 +53,13 @@ class MainHome extends StatelessWidget {
           floatingActionButton: Visibility(
             visible: !weSlideController.isOpened,
             child: FloatingActionButton(
-                onPressed: () => Navigator.pushNamed(context, 'formulario', arguments: {"tipo": "crear"}), child: const Icon(Icons.add, size: 30)),
+                onPressed: () {
+                  FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
+                  formPartidaProvider.resetForm();
+
+                  Navigator.pushNamed(context, 'formulario');
+                },
+                child: const Icon(Icons.add, size: 30)),
           ),
         );
       },
@@ -142,6 +148,8 @@ class ListPartidas extends StatelessWidget {
                 },
                 // functionEditar: () async => partidaProvider.newPartida(partidas[index], context),
                 functionEditar: () {
+                  FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
+                  formPartidaProvider.formPartida.patchValue(partidas[index].toMap());
                   partidaProvider.partidaEditar = partidas[index];
                   weSlideProvider.openWeSlide(controller: weSlideController, body: EditarEntidad(weSlideController: weSlideController));
                 },

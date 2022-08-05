@@ -4,7 +4,7 @@ enum Themes { dark, light }
 
 class AppThemes {
   static Themes currentTheme = Themes.dark;
-  // static const String currentTheme = "light";
+  // static Themes currentTheme = Themes.light;
 
   static const Color colorPrimero = Color(0xFF4D73EF);
   static const Color colorSegundo = Color(0xFF2D57E2);
@@ -51,7 +51,7 @@ class AppThemes {
       border: UnderlineInputBorder(borderSide: const BorderSide(color: Colors.transparent), borderRadius: BorderRadius.circular(15)),
       enabledBorder: UnderlineInputBorder(borderSide: const BorderSide(color: Colors.transparent), borderRadius: BorderRadius.circular(15)),
       focusedBorder: UnderlineInputBorder(borderSide: const BorderSide(color: Colors.transparent), borderRadius: BorderRadius.circular(15)),
-      errorBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.red), borderRadius: BorderRadius.circular(15)),
+      errorBorder: UnderlineInputBorder(borderSide: const BorderSide(color: Colors.red), borderRadius: BorderRadius.circular(15)),
     ),
     textSelectionTheme:
         const TextSelectionThemeData(cursorColor: colorCuarto, selectionColor: Color(0x5E0C249C), selectionHandleColor: Color(0x5E0C249C)),
