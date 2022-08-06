@@ -55,11 +55,40 @@ class Layout extends StatelessWidget {
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
         ThemeProvider themeProvider = context.watch<ThemeProvider>();
+
+        // return Stack(
+        //   children: [
+        //     Container(decoration: boxDecoration),
+        //     _AppBar(title: appBarTitle, leading: appBarLeading, trailing: appBarTrailing),
+        //     _Body(child: bodyContent),
+        //   ],
+        // );
+
+        // return WeSlide(
+        //   controller: weSlideController,
+        //   panelMinSize: 0,
+        //   panelMaxSize: MediaQuery.of(context).size.height * 0.83,
+        //   isDismissible: true,
+        //   overlay: true,
+        //   overlayOpacity: 0.7,
+        //   footerHeight: hasFooter! ? 75 : 0,
+        //   body: Stack(
+        //     children: [
+        //       Container(decoration: boxDecoration),
+        //       _AppBar(title: appBarTitle, leading: appBarLeading, trailing: appBarTrailing),
+        //       _Body(child: bodyContent),
+        //     ],
+        //   ),
+        //   panel: _WeSlideContent(weSlideController: weSlideController),
+        //   footer: const _WeSlideFooter(),
+        // );
+
         return Stack(
           children: [
             WeSlide(
               controller: weSlideController,
               panelMinSize: 0,
+              
               panelMaxSize: MediaQuery.of(context).size.height * 0.83,
               isDismissible: true,
               overlay: true,
@@ -78,6 +107,7 @@ class Layout extends StatelessWidget {
             const _Loading(),
           ],
         );
+
       },
     );
   }
@@ -182,7 +212,6 @@ class _WeSlideContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
-    
 
     return Container(
         width: double.infinity,

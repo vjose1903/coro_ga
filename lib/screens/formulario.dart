@@ -14,7 +14,7 @@ class FormularioScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // resizeToAvoidBottomInset: false,
+      // resizeToAvoidBottomInset: true,
       body: Layout(
         weSlideController: WeSlideController(),
         appBarTitle: "Crear nueva partida",
@@ -30,7 +30,8 @@ class FormularioScreen extends StatelessWidget {
             Navigator.pop(context, 'home');
           },
         ),
-        bodyContent: _Body(),
+        bodyContent: SingleChildScrollView(physics: const ClampingScrollPhysics(), child: _Body()),
+        // bodyContent: _Body(),
       ),
     );
   }
@@ -51,94 +52,99 @@ class _Body extends StatelessWidget {
       final form = formPartidaProvider.formPartida;
 
       return Container(
+          height: ((screenSize.height - (screenSize.height * 0.125)) - 80),
+          // height: screenSize.height - 600,
           margin: const EdgeInsets.only(top: 40, bottom: 40),
           padding: const EdgeInsets.symmetric(horizontal: 25),
           child: ReactiveForm(
             formGroup: form,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const CustomReactiveInput(formControlName: 'nombre', labelText: "Nombre", textCapitalization: TextCapitalization.words),
-                SizedBox(height: tipoPartida == '' || tipoPartida == null ? 25 : 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Flexible(
-                      child: FittedBox(
-                        alignment: Alignment.centerLeft,
-                        fit: BoxFit.none,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeOut,
-                          // height: 45,
-                          width: tipoPartida == '' || tipoPartida == null ? screenSize.width - 52 : screenSize.width * 0.43,
-                          child: CustomReactiveDropDown(
-                            formControlName: 'tipo',
-                            labelText: "Tipo",
-                            items: const [
-                              DropdownMenuItem(value: "Rondas", child: Text("Rondas")),
-                              DropdownMenuItem(value: "Puntuación", child: Text("Puntuación"))
-                            ],
-                            onChanged: (value) => formPartidaProvider.changeTipo(value),
+            child: IntrinsicHeight(
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const CustomReactiveInput(formControlName: 'nombre', labelText: "Nombre", textCapitalization: TextCapitalization.words),
+                  SizedBox(height: tipoPartida == '' || tipoPartida == null ? 25 : 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Flexible(
+                        child: FittedBox(
+                          alignment: Alignment.centerLeft,
+                          fit: BoxFit.none,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeOut,
+                            // height: 45,
+                            width: tipoPartida == '' || tipoPartida == null ? screenSize.width - 52 : screenSize.width * 0.43,
+                            child: CustomReactiveDropDown(
+                              formControlName: 'tipo',
+                              labelText: "Tipo",
+                              items: const [
+                                DropdownMenuItem(value: "Rondas", child: Text("Rondas")),
+                                DropdownMenuItem(value: "Puntuación", child: Text("Puntuación"))
+                              ],
+                              onChanged: (value) => formPartidaProvider.changeTipo(value),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    Flexible(
-                      child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeOut,
-                          width: tipoPartida == '' || tipoPartida == null ? 0.01 : screenSize.width * 0.43,
-                          child: CustomReactiveInput(
-                              formControlName: 'maxPuntuacion',
-                              labelText: tipoPartida == "Rondas" ? "Cant. rondas" : "Puntuación Máxima",
-                              inputType: TextInputType.number)),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Titulo(jugadoresController: jugadoresController),
-                const SizedBox(height: 10),
-                Expanded(
-                    child: Material(
-                  color: AppThemes.themeColor_2,
-                  borderRadius: BorderRadius.circular(12),
-                  shadowColor: AppThemes.colorQuinto.withOpacity(0.3),
-                  elevation: 7,
-                  child: _Inputs(jugadoresController: jugadoresController),
-                )),
-                const SizedBox(height: 15),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      form.markAllAsTouched();
-
-                      if (form.valid) {
-                        final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-                        Fun.logColor(color: Colores.yellow, body: "${form.value}");
-                        final Partida partida = Partida.fromMap(form.value);
-                        final response = await partidaProvider.newPartida(partida, context);
-
-                        if (!response.hasError!) {
-                          final newPartida = response.data;
-                          formPartidaProvider.resetForm();
-
-                          partidaProvider.navigateToPartida(context: context, partida: newPartida, tipo: "replacement");
-                        } else {
-                          Fun.toast(type: ToasType.error, context: context, message: "Error registrando partida.");
-                        }
-                      } else {
-                        Fun.toast(type: ToasType.warning, context: context, message: "Revisar todos los campos de texto.");
-                      }
-                    },
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      child: Text("Crear", style: TextStyle(fontSize: 15, fontFamily: 'Poppins')),
-                    ),
+                      Flexible(
+                        child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeOut,
+                            width: tipoPartida == '' || tipoPartida == null ? 0.01 : screenSize.width * 0.43,
+                            child: CustomReactiveInput(
+                                formControlName: 'maxPuntuacion',
+                                labelText: tipoPartida == "Rondas" ? "Cant. rondas" : "Puntuación Máxima",
+                                inputType: TextInputType.number)),
+                      ),
+                    ],
                   ),
-                )
-              ],
+                  const SizedBox(height: 20),
+                  Titulo(jugadoresController: jugadoresController),
+                  const SizedBox(height: 10),
+                  Expanded(
+                      child: Material(
+                    color: AppThemes.themeColor_2,
+                    borderRadius: BorderRadius.circular(12),
+                    shadowColor: AppThemes.colorQuinto.withOpacity(0.3),
+                    elevation: 7,
+                    child: _Inputs(jugadoresController: jugadoresController),
+                  )),
+                  const SizedBox(height: 15),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        form.markAllAsTouched();
+
+                        if (form.valid) {
+                          final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+                          Fun.logColor(color: Colores.yellow, body: "${form.value}");
+                          final Partida partida = Partida.fromMap(form.value);
+                          final response = await partidaProvider.newPartida(partida, context);
+
+                          if (!response.hasError!) {
+                            final newPartida = response.data;
+                            formPartidaProvider.resetForm();
+
+                            partidaProvider.navigateToPartida(context: context, partida: newPartida, tipo: "replacement");
+                          } else {
+                            Fun.toast(type: ToasType.error, context: context, message: "Error registrando partida.");
+                          }
+                        } else {
+                          Fun.toast(type: ToasType.warning, context: context, message: "Revisar todos los campos de texto.");
+                        }
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        child: Text("Crear", style: TextStyle(fontSize: 15, fontFamily: 'Poppins')),
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
           ));
     });
@@ -266,24 +272,22 @@ class _JugadorInput extends StatelessWidget {
                     ))),
             const SizedBox(width: 5),
             Flexible(
-              flex: 10,
+              flex: 12,
               fit: FlexFit.tight,
               child:
                   CustomReactiveInput(key: UniqueKey(), formControlName: 'nombre', labelText: "Nombre", textCapitalization: TextCapitalization.words),
             ),
             const SizedBox(width: 10),
-            Flexible(
-                flex: 1,
-                child: Visibility(
-                  visible: index >= 2,
-                  child: CustomIconButtom(
-                      onTap: () => formPartidaProvider.removeJugadorToList(index),
-                      icon: Icons.remove,
-                      size: IconSize.min,
-                      iconSize: 25,
-                      backgroundColor: const Color(0xFFAF4C4C),
-                      splashColor: const Color(0xFF7A2E2E)),
-                ))
+            Visibility(
+              visible: index >= 2,
+              child: CustomIconButtom(
+                  onTap: () => formPartidaProvider.removeJugadorToList(index),
+                  icon: Icons.remove,
+                  size: IconSize.min,
+                  iconSize: 25,
+                  backgroundColor: const Color(0xFFAF4C4C),
+                  splashColor: const Color(0xFF7A2E2E)),
+            )
           ],
         ));
   }

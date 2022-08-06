@@ -107,8 +107,8 @@ class ListPartidas extends StatelessWidget {
             child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            FaIcon(FontAwesomeIcons.gamepad, size: 50, color: Colors.grey.withOpacity(0.7)),
-            Text('No hay partidas iniciadas', style: TextStyle(fontFamily: 'Poppins', fontSize: 20, color: Colors.grey[500]))
+            FaIcon(FontAwesomeIcons.gamepad, size: 40, color: Colors.grey.withOpacity(0.7)),
+            Text('No hay partidas iniciadas', style: TextStyle(fontFamily: 'Poppins', fontSize: 18, color: Colors.grey[500]))
           ],
         ));
       } else {
@@ -202,22 +202,22 @@ class _MenuState extends State<_Menu> {
                           fontWeight: FontWeight.w800,
                           fontSize: 18)),
                   const SizedBox(height: 5),
-                  Container(
-                    alignment: Alignment.centerRight,
-                    child: SwitchListTile.adaptive(
-                        contentPadding: EdgeInsets.zero,
-                        activeColor: AppThemes.colorTercero,
-                        title: Text('Tema del sistema',
-                            style: TextStyle(
-                              color: Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : Colors.grey[800]!.withOpacity(0.9),
-                              fontFamily: 'Poppins',
-                            )),
-                        value: Preferences.isSystemMode,
-                        onChanged: (value) {
-                          Preferences.isSystemMode = value;
-                          setState(() {});
-                        }),
-                  ),
+                  // Container(
+                  //   alignment: Alignment.centerRight,
+                  //   child: SwitchListTile.adaptive(
+                  //       contentPadding: EdgeInsets.zero,
+                  //       activeColor: AppThemes.colorTercero,
+                  //       title: Text('Tema del sistema',
+                  //           style: TextStyle(
+                  //             color: Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : Colors.grey[800]!.withOpacity(0.9),
+                  //             fontFamily: 'Poppins',
+                  //           )),
+                  //       value: Preferences.isSystemMode,
+                  //       onChanged: (value) {
+                  //         Preferences.isSystemMode = value;
+                  //         setState(() {});
+                  //       }),
+                  // ),
                   Container(
                     alignment: Alignment.centerRight,
                     child: Row(
