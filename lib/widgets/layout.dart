@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
 import 'package:game_score/providers/providers.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/utils/utils.dart';
-import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:we_slide/we_slide.dart';
@@ -12,12 +10,12 @@ class Layout extends StatelessWidget {
   Layout({
     Key? key,
     required this.bodyContent,
-    required this.weSlideController,
+    required this.panelController,
     this.appBarTitle,
     this.appBarLeading,
     this.appBarTrailing,
     this.hasFooter = false,
-    this.initialWeSlideWidgets,
+    this.initialSlideUpWidgets,
   }) : super(key: key);
 
   final Widget bodyContent;
@@ -25,9 +23,9 @@ class Layout extends StatelessWidget {
   final Widget? appBarLeading;
   final Widget? appBarTrailing;
   final bool? hasFooter;
-  final Map<String, Widget?>? initialWeSlideWidgets;
+  final Map<String, Widget?>? initialSlideUpWidgets;
 
-  final WeSlideController weSlideController;
+  final SlidingUpPanelController panelController;
 
   final boxDecoration = const BoxDecoration(
     gradient: LinearGradient(
@@ -41,80 +39,70 @@ class Layout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
+    final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
 
-    configureWeSlide(weSlideProvider: weSlideProvider, initialWeSlideWidgets: initialWeSlideWidgets);
-
-    weSlideController.addListener(() async {
-      if (weSlideController.isOpened == false) {
-        FocusManager.instance.primaryFocus?.unfocus();
-        weSlideProvider.closeWeSlide(controller: weSlideController, isListener: true);
-      }
-    });
+    configureSlideUp(slideUpProvider: slideUpProvider, initialSlideUpWidgets: initialSlideUpWidgets);
 
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
         ThemeProvider themeProvider = context.watch<ThemeProvider>();
 
-        // return Stack(
-        //   children: [
-        //     Container(decoration: boxDecoration),
-        //     _AppBar(title: appBarTitle, leading: appBarLeading, trailing: appBarTrailing),
-        //     _Body(child: bodyContent),
-        //   ],
-        // );
-
-        // return WeSlide(
-        //   controller: weSlideController,
-        //   panelMinSize: 0,
-        //   panelMaxSize: MediaQuery.of(context).size.height * 0.83,
-        //   isDismissible: true,
-        //   overlay: true,
-        //   overlayOpacity: 0.7,
-        //   footerHeight: hasFooter! ? 75 : 0,
-        //   body: Stack(
-        //     children: [
-        //       Container(decoration: boxDecoration),
-        //       _AppBar(title: appBarTitle, leading: appBarLeading, trailing: appBarTrailing),
-        //       _Body(child: bodyContent),
-        //     ],
-        //   ),
-        //   panel: _WeSlideContent(weSlideController: weSlideController),
-        //   footer: const _WeSlideFooter(),
-        // );
-
         return Stack(
           children: [
-            WeSlide(
-              controller: weSlideController,
-              panelMinSize: 0,
-              
-              panelMaxSize: MediaQuery.of(context).size.height * 0.83,
-              isDismissible: true,
-              overlay: true,
-              overlayOpacity: 0.7,
-              footerHeight: hasFooter! ? 75 : 0,
-              body: Stack(
-                children: [
-                  Container(decoration: boxDecoration),
-                  _AppBar(title: appBarTitle, leading: appBarLeading, trailing: appBarTrailing),
-                  _Body(child: bodyContent),
-                ],
+            Container(decoration: boxDecoration),
+            _AppBar(title: appBarTitle, leading: appBarLeading, trailing: appBarTrailing),
+            _Body(child: bodyContent),
+            SlidingUpPanelWidget(
+              child: Container(
+                margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.19),
+                decoration: ShapeDecoration(
+                  shadows: [
+                    if (panelController.status == SlidingUpPanelStatus.expanded)
+                      BoxShadow(blurRadius: 0, spreadRadius: (MediaQuery.of(context).size.height + 200), color: Colors.black.withOpacity(0.6)),
+                    if (panelController.status == SlidingUpPanelStatus.expanded)
+                      BoxShadow(blurRadius: 7, spreadRadius: 1, color: Colors.black.withOpacity(0.4))
+                  ],
+                  color: AppThemes.themeColor_2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                  ),
+                ),
+                child: _WeSlideContent(panelController: panelController),
               ),
-              panel: _WeSlideContent(weSlideController: weSlideController),
-              footer: const _WeSlideFooter(),
+              controlHeight: 0,
+              panelController: panelController,
+              dragDown: (details) {
+                // print('dragDown');
+                // FocusManager.instance.primaryFocus?.unfocus();
+              },
+              dragStart: (details) {
+                // print('dragStart');
+              },
+              dragCancel: () {
+                // print('dragCancel');
+              },
+              dragUpdate: (details) {
+                // print('dragUpdate,${panelController.status == SlidingUpPanelStatus.dragging ? 'dragging' : ''}');
+              },
+              dragEnd: (details) {
+                // print('dragEnd');
+
+                if (panelController.status == SlidingUpPanelStatus.collapsed) {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  slideUpProvider.closeSlideUp(controller: panelController, isListener: true);
+                }
+              },
             ),
             const _Loading(),
           ],
         );
-
       },
     );
   }
 
-  configureWeSlide({dynamic initialWeSlideWidgets, required WeSlideProvider weSlideProvider}) {
-    if (initialWeSlideWidgets != null && initialWeSlideWidgets["footer"] != null) weSlideProvider.footer = initialWeSlideWidgets["footer"];
-    if (initialWeSlideWidgets != null && initialWeSlideWidgets["body"] != null) weSlideProvider.body = initialWeSlideWidgets["body"];
+  configureSlideUp({dynamic initialSlideUpWidgets, required SlideUpProvider slideUpProvider}) {
+    if (initialSlideUpWidgets != null && initialSlideUpWidgets["footer"] != null) slideUpProvider.footer = initialSlideUpWidgets["footer"];
+    if (initialSlideUpWidgets != null && initialSlideUpWidgets["body"] != null) slideUpProvider.body = initialSlideUpWidgets["body"];
   }
 }
 
@@ -205,13 +193,13 @@ class _Body extends StatelessWidget {
 }
 
 class _WeSlideContent extends StatelessWidget {
-  const _WeSlideContent({Key? key, required this.weSlideController}) : super(key: key);
+  const _WeSlideContent({Key? key, required this.panelController}) : super(key: key);
 
-  final WeSlideController weSlideController;
+  final SlidingUpPanelController panelController;
 
   @override
   Widget build(BuildContext context) {
-    WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
+    SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
 
     return Container(
         width: double.infinity,
@@ -232,27 +220,9 @@ class _WeSlideContent extends StatelessWidget {
                       color: Colors.grey.withOpacity(0.5),
                     )),
                 Column(
-                  children: [Container(height: 25), Expanded(child: weSlideProvider.Body ?? Container())],
+                  children: [Container(height: 25), Expanded(child: slideUpProvider.Body ?? Container())],
                 )
               ],
             )));
-  }
-}
-
-class _WeSlideFooter extends StatelessWidget {
-  const _WeSlideFooter({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    final WeSlideProvider weSlideProvider = context.watch<WeSlideProvider>();
-
-    Color backgroundColor = Preferences.isDarkMode ? const Color(0xEB333333) : const Color(0xFFC4D0E5);
-    return Container(
-      width: double.infinity,
-      color: backgroundColor,
-      child: Padding(
-        padding: const EdgeInsets.all(1),
-        child: weSlideProvider.Footer ?? Container(),
-      ),
-    );
   }
 }

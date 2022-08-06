@@ -1,5 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -28,16 +29,16 @@ class MainHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    WeSlideController weSlideController = WeSlideController();
+    SlidingUpPanelController panelController = SlidingUpPanelController();
 
-    openMenuWeSlide() {
-      final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
-      weSlideProvider.openWeSlide(controller: weSlideController, body: const _Menu());
+    openMenuSlideUp() {
+      final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
+      slideUpProvider.openSlideUp(controller: panelController, body: const _Menu());
     }
 
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
-        final WeSlideProvider weSlideProvider = context.watch<WeSlideProvider>();
+        final SlideUpProvider slideUpProvider = context.watch<SlideUpProvider>();
 
         return Scaffold(
           body: Layout(
@@ -46,13 +47,13 @@ class MainHome extends StatelessWidget {
               iconSize: 25,
               iconColor: Colors.white,
               icon: Icons.menu,
-              onTap: () => openMenuWeSlide(),
+              onTap: () => openMenuSlideUp(),
             ),
-            bodyContent: _Body(weSlideController: weSlideController),
-            weSlideController: weSlideController,
+            bodyContent: _Body(panelController: panelController),
+            panelController: panelController,
           ),
           floatingActionButton: Visibility(
-            visible: !weSlideController.isOpened,
+            visible: panelController.status == SlidingUpPanelStatus.collapsed,
             child: FloatingActionButton(
                 onPressed: () {
                   FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
@@ -69,13 +70,13 @@ class MainHome extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({Key? key, required this.weSlideController}) : super(key: key);
-  final WeSlideController weSlideController;
+  const _Body({Key? key, required this.panelController}) : super(key: key);
+  final SlidingUpPanelController panelController;
 
   @override
   Widget build(BuildContext context) {
     // final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-    return ListPartidas(weSlideController: weSlideController);
+    return ListPartidas(panelController: panelController);
     // return FutureBuilder(
     //   future: partidaProvider.getPartidas(context, isLoading: true),
     //   builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -84,7 +85,7 @@ class _Body extends StatelessWidget {
     //         child: CircularProgressIndicator(color: AppThemes.colorSegundo),
     //       );
     //     } else {
-    //       return ListPartidas(weSlideController: weSlideController);
+    //       return ListPartidas(panelController: weSlideController);
     //     }
     //   },
     // );
@@ -92,12 +93,12 @@ class _Body extends StatelessWidget {
 }
 
 class ListPartidas extends StatelessWidget {
-  const ListPartidas({Key? key, required this.weSlideController}) : super(key: key);
-  final WeSlideController weSlideController;
+  const ListPartidas({Key? key, required this.panelController}) : super(key: key);
+  final SlidingUpPanelController panelController;
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
-    final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
+    final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
 
     final List<Partida> partidas = partidaProvider.partidas;
 
@@ -144,7 +145,7 @@ class ListPartidas extends StatelessWidget {
                   FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
                   formPartidaProvider.formPartida.patchValue(partidas[index].toMap());
                   partidaProvider.partidaEditar = partidas[index];
-                  weSlideProvider.openWeSlide(controller: weSlideController, body: EditarEntidad(weSlideController: weSlideController));
+                  slideUpProvider.openSlideUp(controller: panelController, body: EditarEntidad(panelController: panelController));
                 },
 
                 index: index,

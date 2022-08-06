@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -10,16 +11,16 @@ import 'package:reactive_forms/reactive_forms.dart';
 import 'package:we_slide/we_slide.dart';
 
 class EditarEntidad extends StatelessWidget {
-  const EditarEntidad({Key? key, this.pageController, this.weSlideController}) : super(key: key);
+  const EditarEntidad({Key? key, this.pageController, this.panelController}) : super(key: key);
 
   final PageController? pageController;
-  final WeSlideController? weSlideController;
+  final SlidingUpPanelController? panelController;
   @override
   Widget build(BuildContext context) {
     final JugadorProvider jugadorProvider = context.watch<JugadorProvider>();
     final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
-    final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
+    final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
 
     Jugador? jugador = jugadorProvider.jugadorEditar;
     Partida? partida = partidaProvider.partidaEditar;
@@ -65,7 +66,7 @@ class EditarEntidad extends StatelessWidget {
                   textColor: Colors.white,
                   onTap: () async {
                     FocusManager.instance.primaryFocus?.unfocus();
-                    if (weSlideController != null) weSlideProvider.closeWeSlide(controller: weSlideController!);
+                    if (panelController != null) slideUpProvider.closeSlideUp(controller: panelController!);
                     if (pageController != null) previusPage(pageController);
                     resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
                     await Future.delayed(const Duration(milliseconds: 200));
@@ -87,7 +88,7 @@ class EditarEntidad extends StatelessWidget {
                         resetEntidadesEditar: resetEntidadesEditar,
                         tipo: tipo,
                         pageController: pageController,
-                        weSlideController: weSlideController);
+                        panelController: panelController);
                   }),
             ],
           ),
@@ -194,10 +195,10 @@ aceptarFunction(BuildContext context, dynamic entidad,
     required PartidaProvider partidaProvider,
     required Function previusPage,
     required Function resetEntidadesEditar,
-    WeSlideController? weSlideController,
+    SlidingUpPanelController? panelController,
     PageController? pageController}) {
   if (tipo == "Partida") {
-    final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
+    final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
     if (form.valid) {
       FocusManager.instance.primaryFocus?.unfocus();
       partidaProvider.editPartida(context, partida: entidad, newNombrePartida: form.value["nombre"].toString()).then((value) async {
@@ -206,7 +207,7 @@ aceptarFunction(BuildContext context, dynamic entidad,
         form.reset();
         resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
 
-        if (weSlideController != null) weSlideProvider.closeWeSlide(controller: weSlideController);
+        if (panelController != null) slideUpProvider.closeSlideUp(controller: panelController);
       });
     } else {
       Fun.toast(type: ToasType.error, context: context, message: "El nombre de la partida no puede estar vacio.");

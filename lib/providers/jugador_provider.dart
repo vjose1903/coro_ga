@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/providers/providers.dart';
@@ -48,9 +49,9 @@ class JugadorProvider extends ChangeNotifier {
     }
   }
 
-  void deleteJugador(BuildContext context, {required Jugador jugador, WeSlideController? weSlideController}) {
+  void deleteJugador(BuildContext context, {required Jugador jugador, SlidingUpPanelController? panelController}) {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-    final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
+    final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
 
     CustomAlertDialog.show(context,
         menssage: "Seguro que desea eliminar el jugador: ${jugador.nombre}",
@@ -65,7 +66,7 @@ class JugadorProvider extends ChangeNotifier {
               final response = await jugador.delete(context, isLoading: true);
 
               if (!response.hasError!) {
-                if (weSlideController != null) weSlideProvider.closeWeSlide(controller: weSlideController);
+                if (panelController != null) slideUpProvider.closeSlideUp(controller: panelController);
 
                 partidaProvider.removeJugador(jugador);
                 if (response.messages != null && response.messages!.isNotEmpty) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
@@ -11,12 +12,14 @@ import 'package:we_slide/we_slide.dart';
 class FormularioScreen extends StatelessWidget {
   const FormularioScreen({Key? key}) : super(key: key);
 
+// SlidingUpPanelController panelController = SlidingUpPanelController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       // resizeToAvoidBottomInset: true,
       body: Layout(
-        weSlideController: WeSlideController(),
+        panelController: SlidingUpPanelController(),
         appBarTitle: "Crear nueva partida",
         appBarLeading: CustomIconButtom(
           iconSize: 25,
@@ -30,7 +33,7 @@ class FormularioScreen extends StatelessWidget {
             Navigator.pop(context, 'home');
           },
         ),
-        bodyContent: SingleChildScrollView(physics: const ClampingScrollPhysics(), child: _Body()),
+        bodyContent: SingleChildScrollView(physics: const BouncingScrollPhysics(), child: _Body()),
         // bodyContent: _Body(),
       ),
     );

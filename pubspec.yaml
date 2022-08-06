@@ -56,6 +56,7 @@ dependencies:
   page_transition: ^2.0.9
   widget_and_text_animator: ^1.0.9
   shared_preferences: ^2.0.15
+  flutter_sliding_up_panel: ^2.0.1
 
 dev_dependencies:
   flutter_test:

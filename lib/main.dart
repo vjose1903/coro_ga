@@ -14,7 +14,7 @@ void main() async {
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => PartidaProvider()),
     ChangeNotifierProvider(create: (_) => FormPartidaProvider()),
-    ChangeNotifierProvider(create: (_) => WeSlideProvider()),
+    ChangeNotifierProvider(create: (_) => SlideUpProvider()),
     ChangeNotifierProvider(create: (_) => JugadorProvider()),
     ChangeNotifierProvider(create: (_) => LoadingProvider()),
     ChangeNotifierProvider(create: (_) => ThemeProvider(isDarkMode_: Preferences.isDarkMode)),

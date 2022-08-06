@@ -1,6 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -8,7 +9,6 @@ import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:reactive_forms/reactive_forms.dart';
 import 'package:scroll_shadow_container/scroll_shadow_container.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:we_slide/we_slide.dart';
@@ -18,42 +18,44 @@ class PartidaScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    WeSlideController weSlideController = WeSlideController();
+    SlidingUpPanelController panelController = SlidingUpPanelController();
     Fun.logColor(color: Colores.green, body: "PARTIDA SCREEN");
 
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
-        final WeSlideProvider weSlideProvider = context.watch<WeSlideProvider>();
+        final SlideUpProvider slideUpProvider = context.watch<SlideUpProvider>();
 
         return Scaffold(
-            body: _Body(weSlideController: weSlideController),
-            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-            floatingActionButton: Visibility(
-              visible: !weSlideController.isOpened,
-              child: FloatingActionButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, 'formulario');
-                },
-                child: const Icon(Icons.add, size: 30),
-              ),
-            ));
+          body: _Body(panelController: panelController),
+          floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+          floatingActionButton: Visibility(
+            visible: panelController.status == SlidingUpPanelStatus.collapsed,
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.pushNamed(context, 'formulario');
+              },
+              child: const Icon(Icons.add, size: 30),
+            ),
+          ),
+          bottomNavigationBar: BottomBar(child: NavigationBar(), panelController: panelController),
+        );
       },
     );
   }
 }
 
 class _Body extends StatelessWidget {
-  const _Body({Key? key, required this.weSlideController}) : super(key: key);
+  const _Body({Key? key, required this.panelController}) : super(key: key);
 
-  final WeSlideController weSlideController;
+  final SlidingUpPanelController panelController;
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     Partida partida = partidaProvider.partidaEnTurno!;
     return Layout(
-        weSlideController: weSlideController,
+        panelController: panelController,
         hasFooter: true,
-        initialWeSlideWidgets: {"footer": partidaProvider.partidas.isNotEmpty ? const NavigationBar() : Container()},
+        initialSlideUpWidgets: {"footer": partidaProvider.partidas.isNotEmpty ? const NavigationBar() : Container()},
         appBarTitle: partida.nombre,
         appBarLeading: CustomIconButtom(
           iconSize: 25,
@@ -67,22 +69,22 @@ class _Body extends StatelessWidget {
             child: Column(children: [
               const CustomEstadoPartida(),
               const SizedBox(height: 20),
-              JugadoresCard(weSlideController: weSlideController),
+              JugadoresCard(panelController: panelController),
             ])));
   }
 }
 
 class JugadoresCard extends StatelessWidget {
-  const JugadoresCard({Key? key, required this.weSlideController}) : super(key: key);
-  final WeSlideController weSlideController;
+  const JugadoresCard({Key? key, required this.panelController}) : super(key: key);
+  final SlidingUpPanelController panelController;
 
   @override
   Widget build(BuildContext context) {
-    openWeSlide() {
-      final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
+    openSlideUp() {
+      final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
       final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
       jugadorProvider.formJugador.reset();
-      weSlideProvider.openWeSlide(controller: weSlideController, body: const AddJugadorPartida());
+      slideUpProvider.openSlideUp(controller: panelController, body: const AddJugadorPartida());
     }
 
     return Expanded(
@@ -97,12 +99,12 @@ class JugadoresCard extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             child: Align(
                 alignment: Alignment.topRight,
-                child: CustomIconButtom(onTap: () => openWeSlide(), icon: Icons.add, iconSize: 25, size: IconSize.min)),
+                child: CustomIconButtom(onTap: () => openSlideUp(), icon: Icons.add, iconSize: 25, size: IconSize.min)),
           ),
           Expanded(
               child: Container(
             decoration: const BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12), bottomRight: Radius.circular(12))),
-            child: JugadoresList(weSlideController: weSlideController),
+            child: JugadoresList(panelController: panelController),
           ))
         ],
       ),
@@ -111,8 +113,8 @@ class JugadoresCard extends StatelessWidget {
 }
 
 class JugadoresList extends StatelessWidget {
-  const JugadoresList({Key? key, required this.weSlideController}) : super(key: key);
-  final WeSlideController weSlideController;
+  const JugadoresList({Key? key, required this.panelController}) : super(key: key);
+  final SlidingUpPanelController panelController;
 
   @override
   Widget build(BuildContext context) {
@@ -127,11 +129,11 @@ class JugadoresList extends StatelessWidget {
           child: ScrollShadowContainer.custom(
             boxShadow: BoxShadow(blurRadius: 15, spreadRadius: 10, color: shadowColor),
             child: FutureBuilder(
-              future: getJugadores(partida.jugadores!, weSlideController),
+              future: getJugadores(partida.jugadores!, panelController),
               initialData: List<Widget>.from([]),
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return  Center(child: CircularProgressIndicator(color: AppThemes.colorTercero));
+                  return Center(child: CircularProgressIndicator(color: AppThemes.colorTercero));
                 } else {
                   return SingleChildScrollView(
                       physics: const BouncingScrollPhysics(), child: Wrap(runSpacing: 8, spacing: 8, children: snapshot.data));
@@ -142,7 +144,7 @@ class JugadoresList extends StatelessWidget {
     );
   }
 
-  Future<List<Widget>> getJugadores(List<Jugador> jugadores, WeSlideController weSlideController) async {
+  Future<List<Widget>> getJugadores(List<Jugador> jugadores, SlidingUpPanelController panelController) async {
     await Future.delayed(const Duration(milliseconds: 10));
 
     jugadores.sort((a, b) => a.id!.compareTo(b.id!));
@@ -150,15 +152,15 @@ class JugadoresList extends StatelessWidget {
       int index = entry.key;
       Jugador jugador = entry.value;
 
-      return ElasticIn(delay: Duration(milliseconds: 100 * index), child: JugadorInfo(jugador: jugador, weSlideController: weSlideController));
+      return ElasticIn(delay: Duration(milliseconds: 100 * index), child: JugadorInfo(jugador: jugador, panelController: panelController));
     }).toList();
   }
 }
 
 class JugadorInfo extends StatelessWidget {
-  const JugadorInfo({Key? key, required this.jugador, required this.weSlideController}) : super(key: key);
+  const JugadorInfo({Key? key, required this.jugador, required this.panelController}) : super(key: key);
   final Jugador jugador;
-  final WeSlideController weSlideController;
+  final SlidingUpPanelController panelController;
 
   @override
   Widget build(BuildContext context) {
@@ -178,10 +180,9 @@ class JugadorInfo extends StatelessWidget {
     return _CardBackGround(
         function: () {
           final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
-          final WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
+          final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
           jugadorProvider.changeJugadorEnTurno(jugador);
-          weSlideProvider.openWeSlide(
-              controller: weSlideController, body: PuntuacionForm(weSlideController: weSlideController), footer: const NavigationBar());
+          slideUpProvider.openSlideUp(controller: panelController, body: PuntuacionForm(panelController: panelController));
         },
         child: Padding(
           padding: const EdgeInsets.all(8),
@@ -213,8 +214,8 @@ class JugadorInfo extends StatelessWidget {
 
 class _CardBackGround extends StatelessWidget {
   _CardBackGround({Key? key, required this.child, this.function}) : super(key: key);
-  final boxDecoration = BoxDecoration(
-      color: Preferences.isDarkMode ? const Color(0x7921233C) : const Color(0x7BA1A6DE), borderRadius: BorderRadius.circular(15));
+  final boxDecoration =
+      BoxDecoration(color: Preferences.isDarkMode ? const Color(0x7921233C) : const Color(0x7BA1A6DE), borderRadius: BorderRadius.circular(15));
   final Widget child;
   final Function? function;
 

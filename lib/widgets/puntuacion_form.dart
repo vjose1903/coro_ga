@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/screens/ganador.dart';
@@ -11,8 +12,8 @@ import 'package:provider/provider.dart';
 import 'package:we_slide/we_slide.dart';
 
 class PuntuacionForm extends StatelessWidget {
-  const PuntuacionForm({Key? key, required this.weSlideController}) : super(key: key);
-  final WeSlideController weSlideController;
+  const PuntuacionForm({Key? key, required this.panelController}) : super(key: key);
+  final SlidingUpPanelController panelController;
   @override
   Widget build(BuildContext context) {
     final PageController pageController = PageController();
@@ -23,15 +24,15 @@ class PuntuacionForm extends StatelessWidget {
         itemCount: 2,
         itemBuilder: (context, index) {
           return index == 0
-              ? PuntuacionPage(weSlideController: weSlideController, pageController: pageController)
+              ? PuntuacionPage(panelController: panelController, pageController: pageController)
               : EditarEntidad(pageController: pageController);
         });
   }
 }
 
 class PuntuacionPage extends StatelessWidget {
-  const PuntuacionPage({Key? key, required this.weSlideController, required this.pageController}) : super(key: key);
-  final WeSlideController weSlideController;
+  const PuntuacionPage({Key? key, required this.panelController, required this.pageController}) : super(key: key);
+  final SlidingUpPanelController panelController;
   final PageController pageController;
   @override
   Widget build(BuildContext context) {
@@ -79,7 +80,7 @@ class PuntuacionPage extends StatelessWidget {
               child: CustomIconButtom(
                   onTap: () {
                     Jugador jugador = jugadorProvider.jugadorEnTurno!;
-                    jugadorProvider.deleteJugador(context, jugador: jugador, weSlideController: weSlideController);
+                    jugadorProvider.deleteJugador(context, jugador: jugador, panelController: panelController);
                   },
                   icon: Icons.delete_forever,
                   size: IconSize.min,
