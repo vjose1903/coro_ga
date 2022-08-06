@@ -5,6 +5,7 @@ import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
+import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
@@ -111,7 +112,7 @@ class ListPartidas extends StatelessWidget {
           ],
         ));
       } else {
-        return const Center(
+        return Center(
           child: CircularProgressIndicator(color: AppThemes.colorTercero),
         );
       }
@@ -162,13 +163,18 @@ class ListPartidas extends StatelessWidget {
   }
 }
 
-class _Menu extends StatelessWidget {
+class _Menu extends StatefulWidget {
   const _Menu({Key? key}) : super(key: key);
 
   @override
+  State<_Menu> createState() => _MenuState();
+}
+
+class _MenuState extends State<_Menu> {
+  @override
   Widget build(BuildContext context) {
     ThemeProvider themeProvider = context.read<ThemeProvider>();
-    bool sliderEnabled_ = false;
+
     return Container(
         width: double.infinity,
         height: double.infinity,
@@ -176,8 +182,13 @@ class _Menu extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Coro Games",
-                style: TextStyle(color: Colors.white, fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 20, letterSpacing: 2)),
+            Text("Coro Games",
+                style: TextStyle(
+                    color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    letterSpacing: 2)),
             const SizedBox(height: 30),
             //
             _ConfigGroup(
@@ -186,7 +197,7 @@ class _Menu extends StatelessWidget {
                 children: [
                   Text("Tema",
                       style: TextStyle(
-                          color: AppThemes.currentTheme == Themes.dark ? AppThemes.colorPrimero : AppThemes.colorTercero,
+                          color: Preferences.isDarkMode ? AppThemes.colorPrimero : AppThemes.colorTercero,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w800,
                           fontSize: 18)),
@@ -196,16 +207,27 @@ class _Menu extends StatelessWidget {
                     child: SwitchListTile.adaptive(
                         contentPadding: EdgeInsets.zero,
                         activeColor: AppThemes.colorTercero,
-                        title: const Text('Tema del sistema'),
-                        value: sliderEnabled_,
-                        onChanged: (value) => print("Algo")),
+                        title: Text('Tema del sistema',
+                            style: TextStyle(
+                              color: Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : Colors.grey[800]!.withOpacity(0.9),
+                              fontFamily: 'Poppins',
+                            )),
+                        value: Preferences.isSystemMode,
+                        onChanged: (value) {
+                          Preferences.isSystemMode = value;
+                          setState(() {});
+                        }),
                   ),
                   Container(
                     alignment: Alignment.centerRight,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Cambiar tema a:", style: TextStyle(color: Colors.white, fontFamily: 'Poppins', fontSize: 15)),
+                        Text("Cambiar tema a:",
+                            style: TextStyle(
+                                color: Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : Colors.grey[800]!.withOpacity(0.9),
+                                fontFamily: 'Poppins',
+                                fontSize: 15)),
                         FittedBox(
                           fit: BoxFit.fitWidth,
                           child: ClipRRect(
@@ -213,17 +235,24 @@ class _Menu extends StatelessWidget {
                               child: Material(
                                   color: Colors.transparent,
                                   child: InkWell(
-                                      onTap: () => themeProvider.changeCurrentTheme(),
+                                      onTap: () {
+                                        Preferences.isDarkMode = !Preferences.isDarkMode;
+                                        themeProvider.changeCurrentTheme();
+                                        setState(() {});
+                                      },
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 10),
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.end,
                                           children: [
-                                            Text(AppThemes.currentTheme == Themes.dark ? "Claro" : "Oscuro",
-                                                style: TextStyle(color: Colors.grey.withOpacity(0.6), fontFamily: 'Poppins', fontSize: 15)),
+                                            Text(Preferences.isDarkMode ? "Claro" : "Oscuro",
+                                                style: TextStyle(
+                                                    color: Preferences.isDarkMode ? Colors.grey.withOpacity(0.7) : Colors.grey,
+                                                    fontFamily: 'Poppins',
+                                                    fontSize: 15)),
                                             const SizedBox(width: 5),
-                                            Icon(AppThemes.currentTheme == Themes.dark ? Icons.wb_sunny_outlined : Icons.nights_stay,
-                                                color: Colors.grey.withOpacity(0.7))
+                                            Icon(Preferences.isDarkMode ? Icons.wb_sunny_outlined : Icons.nights_stay,
+                                                color: Preferences.isDarkMode ? Colors.grey.withOpacity(0.7) : Colors.grey.withOpacity(0.9))
                                           ],
                                         ),
                                       )))),

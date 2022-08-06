@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 
 class IconSize {
@@ -28,7 +29,7 @@ class CustomIconButtom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color myIconColor = iconColor ?? (AppThemes.currentTheme == Themes.dark ? Colors.white : Colors.black);
+    Color myIconColor = iconColor ?? (Preferences.isDarkMode ? Colors.white : Colors.black);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(50),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/models/models.dart';
+import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/widgets/widgets.dart';
@@ -41,9 +42,9 @@ class ListJugadores extends StatelessWidget {
     List<Jugador> jugadores = partidaProvider.partidaEnTurno!.jugadores!;
     jugadores.sort((a, b) => a.id!.compareTo(b.id!));
 
-    Color nombreColor = AppThemes.currentTheme == Themes.dark ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.7);
-    Color puntuacionColor = AppThemes.currentTheme == Themes.dark ? AppThemes.colorSegundo : AppThemes.colorQuinto.withOpacity(0.7);
-    final Color iconsColor = AppThemes.currentTheme == Themes.dark ? Colors.grey.withOpacity(0.9) : AppThemes.colorQuinto.withOpacity(0.7);
+    Color nombreColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.7);
+    Color puntuacionColor = Preferences.isDarkMode ? AppThemes.colorSegundo : AppThemes.colorQuinto.withOpacity(0.7);
+    final Color iconsColor = Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : AppThemes.colorQuinto.withOpacity(0.7);
 
     return ListView.separated(
         controller: jugadoresController,

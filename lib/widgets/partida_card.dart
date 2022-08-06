@@ -2,6 +2,7 @@ import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:game_score/models/models.dart';
+import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/widgets/widgets.dart';
 
@@ -67,7 +68,7 @@ class PartidaCard extends StatelessWidget {
                           partida.nombre!,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 16, color: AppThemes.colorPrimero),
+                          style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 16, color: AppThemes.colorPrimero),
                         ),
                         Text(
                           partida.tipo!,
@@ -78,7 +79,7 @@ class PartidaCard extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                               fontSize: 10,
                               letterSpacing: 2,
-                              color: AppThemes.currentTheme == Themes.dark ? Colors.grey[600]!.withOpacity(0.4) : Colors.grey.withOpacity(0.5)),
+                              color: Preferences.isDarkMode ? Colors.grey[600]!.withOpacity(0.4) : Colors.grey.withOpacity(0.5)),
                         ),
                         const SizedBox(height: 10),
                         Row(

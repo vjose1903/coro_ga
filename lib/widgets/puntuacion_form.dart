@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/screens/ganador.dart';
+import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:game_score/utils/utils.dart';
@@ -40,8 +41,8 @@ class PuntuacionPage extends StatelessWidget {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final JugadorProvider jugadorProvider = context.watch<JugadorProvider>();
 
-    final Color titleColor = AppThemes.currentTheme == Themes.dark ? Colors.grey.withOpacity(0.9) : AppThemes.colorQuinto.withOpacity(0.7);
-    final Color subTitleColor = AppThemes.currentTheme == Themes.dark ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.9);
+    final Color titleColor = Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : AppThemes.colorQuinto.withOpacity(0.7);
+    final Color subTitleColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.9);
 
     return Column(
       children: [
@@ -217,11 +218,11 @@ class _ListHistorial extends StatelessWidget {
         "reducir": {"icon": Icons.arrow_downward_rounded, "color": Colors.red[400]}
       };
 
-      Color historialColor = AppThemes.currentTheme == Themes.dark ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.7);
-      Color tipoColor = AppThemes.currentTheme == Themes.dark ? Colors.white.withOpacity(0.2) : Colors.blueGrey.withOpacity(0.5);
+      Color historialColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.7);
+      Color tipoColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.2) : Colors.blueGrey.withOpacity(0.5);
 
-      Color totalLabelColor = AppThemes.currentTheme == Themes.dark ? Colors.white.withOpacity(0.7) : AppThemes.colorQuinto.withOpacity(0.7);
-      Color totalContainerColor = AppThemes.currentTheme == Themes.dark ? Colors.white.withOpacity(0.25) : Colors.blueGrey.withOpacity(0.3);
+      Color totalLabelColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.7) : AppThemes.colorQuinto.withOpacity(0.7);
+      Color totalContainerColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.25) : Colors.blueGrey.withOpacity(0.3);
 
       return Column(
         children: [
@@ -296,7 +297,7 @@ class _Keyboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color backgroundColor = AppThemes.currentTheme == Themes.dark ? const Color(0xff505050) : const Color(0xffF1F1F1);
+    Color backgroundColor = Preferences.isDarkMode ? const Color(0xff505050) : const Color(0xffF1F1F1);
     return Container(
         decoration: BoxDecoration(
           color: backgroundColor,

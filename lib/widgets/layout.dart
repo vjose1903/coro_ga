@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/providers/providers.dart';
+import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
@@ -181,6 +182,7 @@ class _WeSlideContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     WeSlideProvider weSlideProvider = context.read<WeSlideProvider>();
+    
 
     return Container(
         width: double.infinity,
@@ -214,7 +216,7 @@ class _WeSlideFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     final WeSlideProvider weSlideProvider = context.watch<WeSlideProvider>();
 
-    Color backgroundColor = AppThemes.currentTheme == Themes.dark ? const Color(0xEB333333) : const Color(0xFFC4D0E5);
+    Color backgroundColor = Preferences.isDarkMode ? const Color(0xEB333333) : const Color(0xFFC4D0E5);
     return Container(
       width: double.infinity,
       color: backgroundColor,

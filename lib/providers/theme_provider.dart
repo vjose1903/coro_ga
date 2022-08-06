@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:game_score/models/models.dart';
-import 'package:game_score/providers/providers.dart';
+import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
-import 'package:provider/provider.dart';
 
 class ThemeProvider extends ChangeNotifier {
-  changeCurrentTheme() {
-    AppThemes.currentTheme = AppThemes.currentTheme == Themes.dark ? Themes.light : Themes.dark;
+  bool isDarkMode;
+  ThemeProvider({required bool isDarkMode_}) : isDarkMode = isDarkMode_;
 
-    Fun.logColor(color: Colores.green, body: "AppThemes.currentTheme: ${AppThemes.currentTheme}");
+  ThemeData get getCurrentTheme {
+    print("getCurrentTheme => $isDarkMode");
+
+    return isDarkMode ? AppThemes.darkTheme : AppThemes.lightTheme;
+  }
+
+  changeCurrentTheme() {
+    isDarkMode = Preferences.isDarkMode;
+
+    Fun.logColor(color: Colores.green, body: "AppThemes.currentTheme: $isDarkMode");
     notifyListeners();
   }
 }

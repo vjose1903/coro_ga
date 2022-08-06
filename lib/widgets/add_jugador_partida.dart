@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
+import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
@@ -34,7 +35,8 @@ class AddJugador extends StatelessWidget {
   Widget build(BuildContext context) {
     final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
     FormGroup form = jugadorProvider.formJugador;
-    final Color titleColor = AppThemes.currentTheme == Themes.dark ? Colors.grey.withOpacity(0.9) : AppThemes.colorQuinto.withOpacity(0.7);
+    
+    final Color titleColor = Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : AppThemes.colorQuinto.withOpacity(0.7);
     return Container(
       padding: const EdgeInsets.only(bottom: 30),
       child: Column(

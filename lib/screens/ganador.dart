@@ -2,6 +2,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:game_score/providers/partida_provider.dart';
 import 'package:game_score/screens/screens.dart';
+import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:page_transition/page_transition.dart';
@@ -17,8 +18,8 @@ class GanadorScreen extends StatelessWidget {
     final String partida = routeArgs['partida'];
     final String jugador = routeArgs['jugador'];
 
-    final Color ganadorColor = AppThemes.currentTheme == Themes.dark ? Colors.white.withOpacity(0.7) : const Color(0xFF06187E);
-    final Color partidaColor = AppThemes.currentTheme == Themes.dark ? AppThemes.colorSegundo : Colors.grey[700]!;
+    final Color ganadorColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.7) : const Color(0xFF06187E);
+    final Color partidaColor = Preferences.isDarkMode ? AppThemes.colorSegundo : Colors.grey[700]!;
 
     final boxDecoration = BoxDecoration(
       gradient: LinearGradient(

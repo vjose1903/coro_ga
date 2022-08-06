@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 
 enum KeyboardType { number }
@@ -48,7 +49,7 @@ class _Tecla extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color backColor = backgroundColor ?? (AppThemes.currentTheme == Themes.dark ? const Color(0xff727272) : const Color(0xffFFFFFF));
+    Color backColor = backgroundColor ?? (Preferences.isDarkMode ? const Color(0xff727272) : const Color(0xffFFFFFF));
     return Container(
       margin: const EdgeInsets.all(5),
       child: ClipRRect(
@@ -76,7 +77,7 @@ class _Simbolo extends StatelessWidget {
   final Color? labelColor;
   @override
   Widget build(BuildContext context) {
-    Color color = labelColor ?? (AppThemes.currentTheme == Themes.dark ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.9));
+    Color color = labelColor ?? (Preferences.isDarkMode ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.9));
     if (icon != null) {
       return Icon(icon, size: 20, color: color);
     } else {

@@ -1,8 +1,7 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/utils/utils.dart';
+import 'package:game_score/shared_preferences/preferences.dart';
 
 enum DialogType { error, success, warning, info }
 
@@ -13,7 +12,7 @@ class CustomActionsButtons {
   final Function? onTap;
   final Color? textColor;
 
-  static Color? defaultTextColor = AppThemes.currentTheme == Themes.dark ? Colors.white.withOpacity(0.7) : Colors.blueGrey[600]!.withOpacity(0.7);
+  static Color? defaultTextColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.7) : Colors.blueGrey[600]!.withOpacity(0.7);
 
   factory CustomActionsButtons.cancelButton(Map<String, dynamic> json) => CustomActionsButtons(
         label: json["label"] ?? "Cancelar",

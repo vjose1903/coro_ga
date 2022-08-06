@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
+import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
@@ -117,7 +118,7 @@ class JugadoresList extends StatelessWidget {
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final partida = partidaProvider.partidaEnTurno!;
-    Color shadowColor = AppThemes.currentTheme == Themes.dark ? const Color(0x7B050924) : const Color(0x67325796);
+    Color shadowColor = Preferences.isDarkMode ? const Color(0x7B050924) : const Color(0x67325796);
     Fun.logColor(color: Colores.yellow, body: "BUILD LIST");
     return Padding(
       padding: const EdgeInsets.all(8),
@@ -130,7 +131,7 @@ class JugadoresList extends StatelessWidget {
               initialData: List<Widget>.from([]),
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: AppThemes.colorTercero));
+                  return  Center(child: CircularProgressIndicator(color: AppThemes.colorTercero));
                 } else {
                   return SingleChildScrollView(
                       physics: const BouncingScrollPhysics(), child: Wrap(runSpacing: 8, spacing: 8, children: snapshot.data));
@@ -163,9 +164,9 @@ class JugadorInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
 
-    Color fontNombreColor = AppThemes.currentTheme == Themes.dark ? const Color(0xD26776E6) : const Color(0xE30B4DBF);
-    Color? fontPuntuacionColor = AppThemes.currentTheme == Themes.dark ? Colors.white.withOpacity(0.8) : const Color(0xDF062864);
-    Color? iconEstadoColor = AppThemes.currentTheme == Themes.dark ? Colors.white.withOpacity(0.2) : AppThemes.colorCuarto.withOpacity(0.3);
+    Color fontNombreColor = Preferences.isDarkMode ? const Color(0xD26776E6) : const Color(0xE30B4DBF);
+    Color? fontPuntuacionColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.8) : const Color(0xDF062864);
+    Color? iconEstadoColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.2) : AppThemes.colorCuarto.withOpacity(0.3);
 
     Map iconEstado = {
       Estado.ganador: Icons.arrow_upward,
@@ -213,7 +214,7 @@ class JugadorInfo extends StatelessWidget {
 class _CardBackGround extends StatelessWidget {
   _CardBackGround({Key? key, required this.child, this.function}) : super(key: key);
   final boxDecoration = BoxDecoration(
-      color: AppThemes.currentTheme == Themes.dark ? const Color(0x7921233C) : const Color(0x7BA1A6DE), borderRadius: BorderRadius.circular(15));
+      color: Preferences.isDarkMode ? const Color(0x7921233C) : const Color(0x7BA1A6DE), borderRadius: BorderRadius.circular(15));
   final Widget child;
   final Function? function;
 
@@ -309,8 +310,8 @@ class _Chip extends StatelessWidget {
   final Partida? partida;
   final Function scrollToGame;
   Color getChipColor(Partida partida, PartidaProvider partidaProvider) {
-    Color colorChipSelected = AppThemes.currentTheme == Themes.dark ? AppThemes.colorCuarto : AppThemes.colorTercero;
-    Color colorChip = AppThemes.currentTheme == Themes.dark ? const Color(0xE1494949) : const Color(0xDF787A84);
+    Color colorChipSelected = Preferences.isDarkMode ? AppThemes.colorCuarto : AppThemes.colorTercero;
+    Color colorChip = Preferences.isDarkMode ? const Color(0xE1494949) : const Color(0xDF787A84);
 
     Color color = colorChipSelected;
     if (partida.id != partidaProvider.partidaEnTurno!.id) color = colorChip;
