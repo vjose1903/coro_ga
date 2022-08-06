@@ -60,13 +60,16 @@ class GanadorScreen extends StatelessWidget {
               child: Column(
                 children: [
                   TextAnimator("GANADOR",
+                      initialDelay: const Duration(seconds: 1),
                       incomingEffect: WidgetTransitionEffects.incomingOffsetThenScaleAndStep(duration: const Duration(milliseconds: 800)),
                       style: TextStyle(color: ganadorColor, fontFamily: 'Poppins', fontSize: 30, fontWeight: FontWeight.bold, letterSpacing: 3)),
                   TextAnimator(partida,
+                      initialDelay: const Duration(seconds: 1, milliseconds: 800),
                       incomingEffect: WidgetTransitionEffects.incomingScaleDown(duration: const Duration(seconds: 1)),
                       style: TextStyle(color: partidaColor, fontFamily: 'Poppins', fontSize: 20)),
                   //
                   const SizedBox(height: 30),
+
                   SizedBox(
                     height: 300,
                     child: Bounce(
@@ -74,9 +77,16 @@ class GanadorScreen extends StatelessWidget {
                         infinite: true,
                         child: const LottieAnimation(animationJson: 'assets/animations/trophy.json')),
                   ),
+
                   const SizedBox(height: 10),
+
                   TextAnimator(jugador,
-                      atRestEffect: WidgetRestingEffects.wave(duration: const Duration(seconds: 1)),
+                      spaceDelay: const Duration(milliseconds: 0),
+                      characterDelay: const Duration(milliseconds: 180),
+                      incomingEffect: WidgetTransitionEffects.incomingScaleUp(),
+                      atRestEffect: WidgetRestingEffects.pulse(effectStrength: 0.8),
+                      initialDelay: const Duration(seconds: 2),
+                      // atRestEffect: WidgetRestingEffects.pulse(duration: const Duration(seconds: 4)),
                       style: TextStyle(color: ganadorColor, fontFamily: 'Poppins', fontSize: 30, fontWeight: FontWeight.bold, letterSpacing: 3)),
                 ],
               )),
