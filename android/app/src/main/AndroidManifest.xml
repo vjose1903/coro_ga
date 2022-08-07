@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.game_score">
+    package="com.inSpot.coro_games">
    <application
-        android:label="game_score"
+        android:label="Coro Games"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity

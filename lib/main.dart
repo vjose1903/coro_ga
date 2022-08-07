@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:game_score/providers/providers.dart';
 
 import 'package:game_score/routes/app_routes.dart';
+import 'package:game_score/screens/screens.dart';
 import 'package:provider/provider.dart';
+import 'package:splash_screen_view/SplashScreenView.dart';
 
 import 'shared_preferences/preferences.dart';
 
@@ -28,10 +30,22 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeProvider themeProvider = context.watch<ThemeProvider>();
 
+    Widget MyAppWithSplash = SplashScreenView(
+      pageRouteTransition: PageRouteTransition.CupertinoPageRoute,
+      navigateRoute: const HomeScreen(),
+      duration: 3000,
+      imageSize: 290,
+      imageSrc: "assets/img/${Preferences.isDarkMode ? "logo_dark" : "logo_light"}.png",
+      text: "CARGANDO...",
+      textType: TextType.TyperAnimatedText,
+      textStyle: TextStyle(fontSize: 30.0, fontFamily: "Poppins"),
+      backgroundColor: Preferences.isDarkMode ? Color(0xff020036) : Color(0xFFF0F0F0),
+    );
+
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Coro Games',
-        initialRoute: AppRoutes.initialRoute,
+        home: MyAppWithSplash,
         routes: AppRoutes.getAppRoutes(),
         theme: themeProvider.getCurrentTheme);
   }

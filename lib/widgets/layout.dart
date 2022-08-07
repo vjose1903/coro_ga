@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/themes/app_themes.dart';
+import 'package:game_score/utils/functions.dart';
 import 'package:provider/provider.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:we_slide/we_slide.dart';
@@ -72,20 +73,27 @@ class Layout extends StatelessWidget {
               controlHeight: 0,
               panelController: panelController,
               dragDown: (details) {
-                // print('dragDown');
-                // FocusManager.instance.primaryFocus?.unfocus();
+                // Fun.logColor(color: Colores.cyan, body: "dragDown");
               },
               dragStart: (details) {
-                // print('dragStart');
+                // Fun.logColor(color: Colores.green, body: "dragStart");
+                FocusManager.instance.primaryFocus?.unfocus();
               },
-              dragCancel: () {
-                // print('dragCancel');
+              dragCancel: () async {
+                // Fun.logColor(color: Colores.magenta, body: "dragCancel");
+
+                await Future.delayed(const Duration(milliseconds: 100));
+
+                if (panelController.status == SlidingUpPanelStatus.collapsed) {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  slideUpProvider.closeSlideUp(controller: panelController, isListener: true);
+                }
               },
               dragUpdate: (details) {
-                // print('dragUpdate,${panelController.status == SlidingUpPanelStatus.dragging ? 'dragging' : ''}');
+                // Fun.logColor(color: Colores.red, body: "dragUpdate");
               },
               dragEnd: (details) {
-                // print('dragEnd');
+                // Fun.logColor(color: Colores.yellow, body: "dragEnd");
 
                 if (panelController.status == SlidingUpPanelStatus.collapsed) {
                   FocusManager.instance.primaryFocus?.unfocus();

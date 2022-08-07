@@ -1,4 +1,4 @@
-package com.example.game_score
+package com.inSpot.coro_games
 
 import io.flutter.embedding.android.FlutterActivity
 
