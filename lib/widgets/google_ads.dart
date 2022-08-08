@@ -67,8 +67,8 @@ class _GoogleAdsState extends State<GoogleAds> {
 
   void _loadBannerAd() {
     BannerAd(
-      adUnitId: AdHelper.getBannerAdUnitId(widget.location),
-      // adUnitId: AdHelper.getTestingId(AdType.banner),
+      // adUnitId: AdHelper.getBannerAdUnitId(widget.location),
+      adUnitId: AdHelper.getTestingId(AdType.banner),
       request: AdRequest(),
       size: AdSize.banner,
       listener: BannerAdListener(
