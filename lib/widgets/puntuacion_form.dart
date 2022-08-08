@@ -10,7 +10,6 @@ import 'package:game_score/utils/utils.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
-
 class PuntuacionForm extends StatelessWidget {
   const PuntuacionForm({Key? key, required this.panelController}) : super(key: key);
   final SlidingUpPanelController panelController;
@@ -162,7 +161,9 @@ class PuntuacionPage extends StatelessWidget {
                     changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacionController.text, tipo: "reducir", context: context)),
           ],
         ),
-        const SizedBox(height: 30),
+        const SizedBox(height: 10),
+        // ANUNCIOS ==========================================
+        const BannerAds(location: AdLocation.puntuacion)
       ],
     );
   }

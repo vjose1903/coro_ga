@@ -91,6 +91,9 @@ class AddJugador extends StatelessWidget {
                 child: Text("Agregar", style: TextStyle(fontSize: 15, fontFamily: 'Poppins')),
               ),
             ),
+            const SizedBox(height: 10),
+            // ANUNCIOS ==========================================
+            const BannerAds(location: AdLocation.agregarJugador)
           ],
         ),
       ),

@@ -1,7 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_score/models/models.dart';
@@ -10,12 +9,11 @@ import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
-
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
@@ -27,6 +25,7 @@ class HomeScreen extends StatelessWidget {
 class MainHome extends StatelessWidget {
   const MainHome({Key? key}) : super(key: key);
 
+  Future<InitializationStatus> _initGoogleMobileAds() => MobileAds.instance.initialize();
   @override
   Widget build(BuildContext context) {
     SlidingUpPanelController panelController = SlidingUpPanelController();

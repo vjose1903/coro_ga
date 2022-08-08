@@ -3,6 +3,7 @@ import 'package:game_score/providers/providers.dart';
 
 import 'package:game_score/routes/app_routes.dart';
 import 'package:game_score/screens/screens.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:splash_screen_view/SplashScreenView.dart';
 import 'package:flutter/services.dart';
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeProvider themeProvider = context.watch<ThemeProvider>();
 
-    Widget MyAppWithSplash = SplashScreenView(
+    Widget myAppWithSplash = SplashScreenView(
       pageRouteTransition: PageRouteTransition.CupertinoPageRoute,
       navigateRoute: const HomeScreen(),
       duration: 3000,
@@ -53,7 +54,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Coro Games',
-          home: MyAppWithSplash,
+          home: myAppWithSplash,
           routes: AppRoutes.getAppRoutes(),
           theme: themeProvider.getCurrentTheme),
     );

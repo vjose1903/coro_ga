@@ -46,6 +46,7 @@ class _Body extends StatelessWidget {
   const _Body({Key? key, required this.panelController}) : super(key: key);
 
   final SlidingUpPanelController panelController;
+
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
@@ -62,12 +63,14 @@ class _Body extends StatelessWidget {
           onTap: () => Navigator.pop(context),
         ),
         bodyContent: Container(
-            margin: const EdgeInsets.only(top: 40, bottom: 70),
+            margin: const EdgeInsets.only(top: 40, bottom: 40),
             padding: const EdgeInsets.symmetric(horizontal: 25),
             child: Column(children: [
               const CustomEstadoPartida(),
               const SizedBox(height: 20),
               JugadoresCard(panelController: panelController),
+              const SizedBox(height: 20),
+              const BannerAds(location: AdLocation.partida),
             ])));
   }
 }

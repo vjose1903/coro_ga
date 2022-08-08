@@ -9,7 +9,6 @@ import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
-
 class EditarEntidad extends StatelessWidget {
   const EditarEntidad({Key? key, this.pageController, this.panelController}) : super(key: key);
 
@@ -43,7 +42,7 @@ class EditarEntidad extends StatelessWidget {
 
     return Container(
       height: double.infinity,
-      padding: const EdgeInsets.only(bottom: 40),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Column(
         children: [
           Row(
@@ -92,6 +91,9 @@ class EditarEntidad extends StatelessWidget {
                   }),
             ],
           ),
+          const SizedBox(height: 10),
+          // ANUNCIOS ==========================================
+          const BannerAds(location: AdLocation.editarEntidad)
         ],
       ),
     );
