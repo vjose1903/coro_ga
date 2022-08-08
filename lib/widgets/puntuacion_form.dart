@@ -38,133 +38,138 @@ class PuntuacionPage extends StatelessWidget {
     String? puntuacion;
     TextEditingController puntuacionController = TextEditingController();
 
-    final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
-    final JugadorProvider jugadorProvider = context.watch<JugadorProvider>();
-
     final Color titleColor = Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : AppThemes.colorQuinto.withOpacity(0.7);
     final Color subTitleColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.9);
+    GoogleAds anuncio = GoogleAds(tipo: AdType.banner, location: AdLocation.puntuacion);
 
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Consumer(
+      builder: (BuildContext context, value, Widget? child) {
+        final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
+        final JugadorProvider jugadorProvider = context.watch<JugadorProvider>();
+
+        return Column(
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Jugador:", style: TextStyle(fontFamily: "Poppins", fontSize: 16, color: titleColor)),
-                const SizedBox(width: 7),
                 Row(
                   children: [
-                    Text(jugadorProvider.nombreJugador,
-                        style: TextStyle(fontFamily: "Poppins", fontSize: 15, color: subTitleColor, fontWeight: FontWeight.bold)),
-                    CustomIconButtom(
-                      onTap: () {
-                        jugadorProvider.jugadorEditar = jugadorProvider.jugadorEnTurno;
-                        jugadorProvider.formJugador.patchValue(jugadorProvider.jugadorEnTurno!.toMap());
+                    Text("Jugador:", style: TextStyle(fontFamily: "Poppins", fontSize: 16, color: titleColor)),
+                    const SizedBox(width: 7),
+                    Row(
+                      children: [
+                        Text(jugadorProvider.nombreJugador,
+                            style: TextStyle(fontFamily: "Poppins", fontSize: 15, color: subTitleColor, fontWeight: FontWeight.bold)),
+                        CustomIconButtom(
+                          onTap: () {
+                            jugadorProvider.jugadorEditar = jugadorProvider.jugadorEnTurno;
+                            jugadorProvider.formJugador.patchValue(jugadorProvider.jugadorEnTurno!.toMap());
 
-                        nextPage();
-                      },
-                      icon: Icons.edit_outlined,
-                      size: IconSize.min,
-                      iconSize: 20,
-                      iconColor: titleColor,
-                      splashColor: AppThemes.colorTercero,
+                            nextPage();
+                          },
+                          icon: Icons.edit_outlined,
+                          size: IconSize.min,
+                          iconSize: 20,
+                          iconColor: titleColor,
+                          splashColor: AppThemes.colorTercero,
+                        ),
+                      ],
                     ),
                   ],
                 ),
+                Visibility(
+                  visible: partidaProvider.partidaEnTurno!.jugadores!.length > 2,
+                  child: CustomIconButtom(
+                      onTap: () {
+                        Jugador jugador = jugadorProvider.jugadorEnTurno!;
+                        jugadorProvider.deleteJugador(context, jugador: jugador, panelController: panelController);
+                      },
+                      icon: Icons.delete_forever,
+                      size: IconSize.min,
+                      iconSize: 20,
+                      iconColor: titleColor,
+                      splashColor: Colors.red[900]),
+                )
               ],
             ),
-            Visibility(
-              visible: partidaProvider.partidaEnTurno!.jugadores!.length > 2,
-              child: CustomIconButtom(
-                  onTap: () {
-                    Jugador jugador = jugadorProvider.jugadorEnTurno!;
-                    jugadorProvider.deleteJugador(context, jugador: jugador, panelController: panelController);
-                  },
-                  icon: Icons.delete_forever,
-                  size: IconSize.min,
-                  iconSize: 20,
-                  iconColor: titleColor,
-                  splashColor: Colors.red[900]),
-            )
-          ],
-        ),
-        const SizedBox(height: 10),
+            const SizedBox(height: 10),
 
-        // CAMPO PUNTUACION
-        //
-        CustomInputField(
-          key: UniqueKey(),
-          enabled: false,
-          controller: puntuacionController,
-          initialValueFn: () => puntuacion,
-          onChanged: (value) => puntuacion = value,
-          inputType: TextInputType.number,
-          labelText: 'Puntuación',
-        ),
-        const SizedBox(height: 10),
-        // CUADRO OSCURO
-        //
-        Expanded(
-          flex: 2,
-          child: Material(
-            borderRadius: BorderRadius.circular(10),
-            shadowColor: AppThemes.colorQuinto.withOpacity(0.3),
-            elevation: 7,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Container(color: AppThemes.themeColor_1, child: const _ListHistorial()),
+            // CAMPO PUNTUACION
+            //
+            CustomInputField(
+              key: UniqueKey(),
+              enabled: false,
+              controller: puntuacionController,
+              initialValueFn: () => puntuacion,
+              onChanged: (value) => puntuacion = value,
+              inputType: TextInputType.number,
+              labelText: 'Puntuación',
             ),
-          ),
-        ),
-        const SizedBox(height: 10),
-        // TECLADO
-        //
-        _Keyboard(puntuacionController: puntuacionController),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            // AUMENTAR ==========================================
-            ExpandedButtom(
-                backgroundColor: Colors.green[400],
-                label: "Aumentar",
-                textColor: Colors.white,
-                onTap: () {
-                  changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacionController.text, tipo: "aumentar", context: context)
-                      .then((newPuntuacion) {
-                    if (newPuntuacion != 0) {
-                      if (newPuntuacion >= partidaProvider.partidaEnTurno!.maxPuntuacion!.toInt()) {
-                        Navigator.pushReplacement(
-                            context,
-                            PageTransition(
-                                type: PageTransitionType.fade,
-                                settings: RouteSettings(arguments: {
-                                  "partida": partidaProvider.partidaEnTurno!.nombre,
-                                  "jugador": jugadorProvider.jugadorEnTurno!.nombre,
-                                }),
-                                child: const GanadorScreen(),
-                                alignment: Alignment.center,
-                                duration: const Duration(milliseconds: 500)));
-                      }
-                    }
-                  });
-                }),
+            const SizedBox(height: 10),
+            // CUADRO OSCURO
+            //
+            Expanded(
+              flex: 2,
+              child: Material(
+                borderRadius: BorderRadius.circular(10),
+                shadowColor: AppThemes.colorQuinto.withOpacity(0.3),
+                elevation: 7,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(color: AppThemes.themeColor_1, child: const _ListHistorial()),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            // TECLADO
+            //
+            _Keyboard(puntuacionController: puntuacionController),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // AUMENTAR ==========================================
+                ExpandedButtom(
+                    backgroundColor: Colors.green[400],
+                    label: "Aumentar",
+                    textColor: Colors.white,
+                    onTap: () {
+                      changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacionController.text, tipo: "aumentar", context: context)
+                          .then((newPuntuacion) {
+                        if (newPuntuacion != 0) {
+                          if (newPuntuacion >= partidaProvider.partidaEnTurno!.maxPuntuacion!.toInt()) {
+                            Navigator.pushReplacement(
+                                context,
+                                PageTransition(
+                                    type: PageTransitionType.fade,
+                                    settings: RouteSettings(arguments: {
+                                      "partida": partidaProvider.partidaEnTurno!.nombre,
+                                      "jugador": jugadorProvider.jugadorEnTurno!.nombre,
+                                    }),
+                                    child: const GanadorScreen(),
+                                    alignment: Alignment.center,
+                                    duration: const Duration(milliseconds: 500)));
+                          }
+                        }
+                      });
+                    }),
 
-            const SizedBox(width: 10),
-            // REDUCIR ==========================================
-            ExpandedButtom(
-                backgroundColor: Colors.red[400],
-                label: "Reducir",
-                textColor: Colors.white,
-                onTap: () =>
-                    changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacionController.text, tipo: "reducir", context: context)),
+                const SizedBox(width: 10),
+                // REDUCIR ==========================================
+                ExpandedButtom(
+                    backgroundColor: Colors.red[400],
+                    label: "Reducir",
+                    textColor: Colors.white,
+                    onTap: () =>
+                        changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacionController.text, tipo: "reducir", context: context)),
+              ],
+            ),
+            const SizedBox(height: 10),
+            // ANUNCIOS ==========================================
+            anuncio
           ],
-        ),
-        const SizedBox(height: 10),
-        // ANUNCIOS ==========================================
-        GoogleAds(tipo: AdType.banner, location: AdLocation.puntuacion)
-      ],
+        );
+      },
     );
   }
 

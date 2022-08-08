@@ -41,7 +41,7 @@ class AddJugador extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       controller: ScrollController(),
       child: SizedBox(
-        height: (MediaQuery.of(context).size.height - (MediaQuery.of(context).size.height * 0.29)),
+        height: (MediaQuery.of(context).size.height - (MediaQuery.of(context).size.height * 0.22)),
         child: Column(
           children: [
             // Titulo

@@ -86,7 +86,7 @@ class Layout extends StatelessWidget {
                 }
               },
               child: Container(
-                margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.19),
+                margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.12),
                 decoration: ShapeDecoration(
                   shadows: [
                     if (panelController.status == SlidingUpPanelStatus.expanded)
