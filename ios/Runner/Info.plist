@@ -46,6 +46,9 @@
 			<string>UIInterfaceOrientationPortrait</string>
 			<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		</array>
+		<key>GADApplicationIdentifier</key>
+		<string>ca-app-pub-4324407503643964~2529453974</string>
+
 		<key>UISupportedInterfaceOrientations~ipad</key>
 		<array>
 			<string>UIInterfaceOrientationPortrait</string>

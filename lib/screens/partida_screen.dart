@@ -1,5 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
@@ -18,13 +19,14 @@ class PartidaScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     SlidingUpPanelController panelController = SlidingUpPanelController();
     Fun.logColor(color: Colores.green, body: "PARTIDA SCREEN");
+    GoogleAds anuncio = GoogleAds(tipo: AdType.banner, location: AdLocation.partida);
 
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
         final SlideUpProvider slideUpProvider = context.watch<SlideUpProvider>();
 
         return Scaffold(
-          body: _Body(panelController: panelController),
+          body: _Body(panelController: panelController, anuncio: anuncio),
           floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
           floatingActionButton: Visibility(
             visible: panelController.status == SlidingUpPanelStatus.collapsed,
@@ -43,10 +45,10 @@ class PartidaScreen extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({Key? key, required this.panelController}) : super(key: key);
+  const _Body({Key? key, required this.panelController, required this.anuncio}) : super(key: key);
 
   final SlidingUpPanelController panelController;
-
+  final GoogleAds anuncio;
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
@@ -70,7 +72,7 @@ class _Body extends StatelessWidget {
               const SizedBox(height: 20),
               JugadoresCard(panelController: panelController),
               const SizedBox(height: 20),
-              const BannerAds(location: AdLocation.partida),
+              anuncio
             ])));
   }
 }
@@ -269,7 +271,7 @@ class _NavigationBarState extends State<NavigationBar> {
     itemScrollController = ItemScrollController();
     itemPositionsListener = ItemPositionsListener.create();
 
-    // SchedulerBinding.instance.addPostFrameCallback((_) => scrollToGame(context));
+    SchedulerBinding.instance.addPostFrameCallback((_) => scrollToGame(context));
 
     itemPositionsListener.itemPositions.addListener(() {
       visibleIndeces = itemPositionsListener.itemPositions.value.map((item) => item.index).toList();

@@ -93,7 +93,7 @@ class EditarEntidad extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           // ANUNCIOS ==========================================
-          const BannerAds(location: AdLocation.editarEntidad)
+           GoogleAds(tipo: AdType.banner,location: AdLocation.editarEntidad)
         ],
       ),
     );

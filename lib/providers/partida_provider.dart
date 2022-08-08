@@ -21,16 +21,6 @@ class PartidaProvider extends ChangeNotifier {
     return _partidaEditar;
   }
 
-  void navigateToPartida({required Partida partida, required BuildContext context, String? tipo}) {
-    partidaEnTurno = partida;
-    if (tipo == null || tipo == 'push') {
-      Navigator.pushNamed(context, 'partida');
-    } else {
-      Navigator.pushReplacementNamed(context, 'partida');
-    }
-    notifyListeners();
-  }
-
   void refresh() {
     notifyListeners();
   }

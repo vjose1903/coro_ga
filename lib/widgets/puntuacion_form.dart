@@ -163,7 +163,7 @@ class PuntuacionPage extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         // ANUNCIOS ==========================================
-        const BannerAds(location: AdLocation.puntuacion)
+        GoogleAds(tipo: AdType.banner, location: AdLocation.puntuacion)
       ],
     );
   }

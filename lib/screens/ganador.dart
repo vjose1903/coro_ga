@@ -1,5 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:game_score/providers/partida_provider.dart';
 import 'package:game_score/screens/screens.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -9,8 +10,25 @@ import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:widget_and_text_animator/widget_and_text_animator.dart';
 
-class GanadorScreen extends StatelessWidget {
+class GanadorScreen extends StatefulWidget {
   const GanadorScreen({Key? key}) : super(key: key);
+
+  @override
+  State<GanadorScreen> createState() => _GanadorScreenState();
+}
+
+class _GanadorScreenState extends State<GanadorScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      await Future.delayed(const Duration(seconds: 1));
+      
+      final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+      partidaProvider.deletePartida(context, partida: partidaProvider.partidaEnTurno!);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,9 +69,6 @@ class GanadorScreen extends StatelessWidget {
                             child: const HomeScreen(),
                             alignment: Alignment.center,
                             duration: const Duration(milliseconds: 500)));
-
-                    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-                    partidaProvider.deletePartida(context, partida: partidaProvider.partidaEnTurno!);
                   })),
           Container(
               margin: const EdgeInsets.only(top: 200),

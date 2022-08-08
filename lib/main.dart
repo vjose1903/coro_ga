@@ -21,6 +21,7 @@ void main() async {
     ChangeNotifierProvider(create: (_) => SlideUpProvider()),
     ChangeNotifierProvider(create: (_) => JugadorProvider()),
     ChangeNotifierProvider(create: (_) => LoadingProvider()),
+    ChangeNotifierProvider(create: (_) => GoogleAdsProvider()),
     ChangeNotifierProvider(create: (_) => ThemeProvider(isDarkMode_: Preferences.isDarkMode)),
   ], child: const MyApp()));
 }

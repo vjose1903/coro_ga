@@ -8,7 +8,6 @@ import 'package:game_score/models/models.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
-
 class FormularioScreen extends StatelessWidget {
   const FormularioScreen({Key? key}) : super(key: key);
 
@@ -16,6 +15,10 @@ class FormularioScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
+
+    googleAdsProvider.loadInterstitialAd();
+
     return Scaffold(
       // resizeToAvoidBottomInset: true,
       body: Layout(
@@ -64,6 +67,7 @@ class _Body extends StatelessWidget {
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  //
                   const CustomReactiveInput(formControlName: 'nombre', labelText: "Nombre", textCapitalization: TextCapitalization.words),
                   SizedBox(height: tipoPartida == '' || tipoPartida == null ? 25 : 10),
                   Row(
@@ -122,15 +126,21 @@ class _Body extends StatelessWidget {
 
                         if (form.valid) {
                           final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+                          final GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
+
                           Fun.logColor(color: Colores.yellow, body: "${form.value}");
                           final Partida partida = Partida.fromMap(form.value);
                           final response = await partidaProvider.newPartida(partida, context);
 
                           if (!response.hasError!) {
                             final newPartida = response.data;
+
                             formPartidaProvider.resetForm();
 
-                            partidaProvider.navigateToPartida(context: context, partida: newPartida, tipo: "replacement");
+                            googleAdsProvider.showInterstitialAd(onCloseFunction: () {
+                              partidaProvider.changePartidaEnTurno(newPartida);
+                              Navigator.pushReplacementNamed(context, 'partida');
+                            });
                           } else {
                             Fun.toast(type: ToasType.error, context: context, message: "Error registrando partida.");
                           }

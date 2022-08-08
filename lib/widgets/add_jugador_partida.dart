@@ -93,7 +93,7 @@ class AddJugador extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             // ANUNCIOS ==========================================
-            const BannerAds(location: AdLocation.agregarJugador)
+             GoogleAds(tipo: AdType.banner, location: AdLocation.agregarJugador)
           ],
         ),
       ),

@@ -23,14 +23,9 @@ class FormPartidaProvider extends ChangeNotifier {
     if (jugadoresArray.value != null && jugadoresArray.value!.isNotEmpty) {
       final longitud = jugadoresArray.value!.length;
       for (var index = 0; index < longitud; index++) {
-        Fun.logColor(color: Colores.red, body: "index: $index");
-        Fun.logColor(color: Colores.yellow, body: "longitud: $longitud");
-
         jugadoresArray.removeAt(0);
       }
     }
-
-    print("=======> ${jugadoresArray.value!.length}");
 
     for (var i = 0; i < List.from([1, 2]).length; i++) {
       addJugadorToList();

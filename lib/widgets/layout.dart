@@ -53,7 +53,7 @@ class Layout extends StatelessWidget {
             _AppBar(title: appBarTitle, leading: appBarLeading, trailing: appBarTrailing),
             _Body(child: bodyContent),
             SlidingUpPanelWidget(
-              
+              anchor: 0,
               enableOnTap: false,
               controlHeight: 0,
               panelController: panelController,
@@ -69,7 +69,7 @@ class Layout extends StatelessWidget {
 
                 await Future.delayed(const Duration(milliseconds: 100));
 
-                if (panelController.status == SlidingUpPanelStatus.collapsed) {
+                if (panelController.status == SlidingUpPanelStatus.collapsed || panelController.status == SlidingUpPanelStatus.anchored) {
                   FocusManager.instance.primaryFocus?.unfocus();
                   slideUpProvider.closeSlideUp(controller: panelController, isListener: true);
                 }
@@ -80,7 +80,7 @@ class Layout extends StatelessWidget {
               dragEnd: (details) {
                 // Fun.logColor(color: Colores.yellow, body: "dragEnd");
 
-                if (panelController.status == SlidingUpPanelStatus.collapsed) {
+                if (panelController.status == SlidingUpPanelStatus.collapsed || panelController.status == SlidingUpPanelStatus.anchored) {
                   FocusManager.instance.primaryFocus?.unfocus();
                   slideUpProvider.closeSlideUp(controller: panelController, isListener: true);
                 }

@@ -3,8 +3,14 @@ import 'dart:io';
 import 'package:game_score/widgets/widgets.dart';
 
 class AdHelper {
-  static String get testing {
-    return 'ca-app-pub-3940256099942544/6300978111';
+  static String getTestingId(AdType tipo) {
+    if (tipo == AdType.banner) {
+      return 'ca-app-pub-3940256099942544/6300978111';
+    } else if (tipo == AdType.completo) {
+      return 'ca-app-pub-3940256099942544/1033173712';
+    } else {
+      return '';
+    }
   }
 
   static String getBannerAdUnitId(AdLocation location) {

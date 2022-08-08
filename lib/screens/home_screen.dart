@@ -127,7 +127,10 @@ class ListPartidas extends StatelessWidget {
               delay: Duration(milliseconds: 100 * index),
               child: PartidaCard(
                 partida: partidas[index],
-                onTap: () => partidaProvider.navigateToPartida(context: context, partida: partidas[index]),
+                onTap: () {
+                  partidaProvider.changePartidaEnTurno(partidas[index]);
+                  Navigator.pushNamed(context, 'partida');
+                },
 
                 functionBorrar: (handler) async {
                   CustomAlertDialog.show(context,
