@@ -32,7 +32,7 @@ class MainHome extends StatelessWidget {
 
     openMenuSlideUp() {
       final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
-      slideUpProvider.openSlideUp(controller: panelController, body: const _Menu());
+      slideUpProvider.openSlideUp(controller: panelController, bodyContent: const _Menu());
     }
 
     return Consumer(
@@ -147,7 +147,7 @@ class ListPartidas extends StatelessWidget {
                   FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
                   formPartidaProvider.formPartida.patchValue(partidas[index].toMap());
                   partidaProvider.partidaEditar = partidas[index];
-                  slideUpProvider.openSlideUp(controller: panelController, body: EditarEntidad(panelController: panelController));
+                  slideUpProvider.openSlideUp(controller: panelController, bodyContent: EditarEntidad(panelController: panelController));
                 },
 
                 index: index,

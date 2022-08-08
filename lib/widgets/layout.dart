@@ -15,7 +15,6 @@ class Layout extends StatelessWidget {
     this.appBarLeading,
     this.appBarTrailing,
     this.hasFooter = false,
-    this.initialSlideUpWidgets,
   }) : super(key: key);
 
   final Widget bodyContent;
@@ -23,7 +22,6 @@ class Layout extends StatelessWidget {
   final Widget? appBarLeading;
   final Widget? appBarTrailing;
   final bool? hasFooter;
-  final Map<String, Widget?>? initialSlideUpWidgets;
 
   final SlidingUpPanelController panelController;
 
@@ -40,8 +38,6 @@ class Layout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
-
-    configureSlideUp(slideUpProvider: slideUpProvider, initialSlideUpWidgets: initialSlideUpWidgets);
 
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
@@ -70,8 +66,7 @@ class Layout extends StatelessWidget {
                 await Future.delayed(const Duration(milliseconds: 100));
 
                 if (panelController.status == SlidingUpPanelStatus.collapsed || panelController.status == SlidingUpPanelStatus.anchored) {
-                  FocusManager.instance.primaryFocus?.unfocus();
-                  slideUpProvider.closeSlideUp(controller: panelController, isListener: true);
+                  cleanSlideUp(slideUpProvider, true);
                 }
               },
               dragUpdate: (details) {
@@ -81,8 +76,7 @@ class Layout extends StatelessWidget {
                 // Fun.logColor(color: Colores.yellow, body: "dragEnd");
 
                 if (panelController.status == SlidingUpPanelStatus.collapsed || panelController.status == SlidingUpPanelStatus.anchored) {
-                  FocusManager.instance.primaryFocus?.unfocus();
-                  slideUpProvider.closeSlideUp(controller: panelController, isListener: true);
+                  cleanSlideUp(slideUpProvider, true);
                 }
               },
               child: Container(
@@ -109,9 +103,10 @@ class Layout extends StatelessWidget {
     );
   }
 
-  configureSlideUp({dynamic initialSlideUpWidgets, required SlideUpProvider slideUpProvider}) {
-    if (initialSlideUpWidgets != null && initialSlideUpWidgets["footer"] != null) slideUpProvider.footer = initialSlideUpWidgets["footer"];
-    if (initialSlideUpWidgets != null && initialSlideUpWidgets["body"] != null) slideUpProvider.body = initialSlideUpWidgets["body"];
+  cleanSlideUp(SlideUpProvider slideUpProvider, [isListener = false]) {
+    if (slideUpProvider.body != null) slideUpProvider.body = null;
+    FocusManager.instance.primaryFocus?.unfocus();
+    slideUpProvider.closeSlideUp(controller: panelController, isListener: isListener);
   }
 }
 
@@ -209,7 +204,7 @@ class _WeSlideContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
-
+    print("@@@@@@@@@@@: ( ${slideUpProvider.body} ) ");
     return Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -229,7 +224,7 @@ class _WeSlideContent extends StatelessWidget {
                       color: Colors.grey.withOpacity(0.5),
                     )),
                 Column(
-                  children: [Container(height: 25), Expanded(child: slideUpProvider.Body ?? Container())],
+                  children: [Container(height: 25), Expanded(child: slideUpProvider.body ?? Container())],
                 )
               ],
             )));

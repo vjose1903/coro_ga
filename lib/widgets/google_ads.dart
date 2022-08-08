@@ -21,6 +21,11 @@ class GoogleAds extends StatefulWidget {
   State<GoogleAds> createState() => _GoogleAdsState();
 
   BannerAd? _bannerAd;
+
+  disposeBannerAd() {
+    if (_bannerAd != null) _bannerAd?.dispose();
+    if (_bannerAd != null) _bannerAd = null;
+  }
 }
 
 class _GoogleAdsState extends State<GoogleAds> {
@@ -35,8 +40,7 @@ class _GoogleAdsState extends State<GoogleAds> {
 
   @override
   void dispose() {
-    if (widget._bannerAd != null) widget._bannerAd?.dispose();
-    if (widget._bannerAd != null) widget._bannerAd = null;
+    widget.disposeBannerAd();
 
     super.dispose();
   }

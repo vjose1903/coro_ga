@@ -56,7 +56,6 @@ class _Body extends StatelessWidget {
     return Layout(
         panelController: panelController,
         hasFooter: true,
-        initialSlideUpWidgets: {"footer": partidaProvider.partidas.isNotEmpty ? const NavigationBar() : Container()},
         appBarTitle: partida.nombre,
         appBarLeading: CustomIconButtom(
           iconSize: 25,
@@ -87,7 +86,7 @@ class JugadoresCard extends StatelessWidget {
       final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
       final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
       jugadorProvider.formJugador.reset();
-      slideUpProvider.openSlideUp(controller: panelController, body: const AddJugadorPartida());
+      slideUpProvider.openSlideUp(controller: panelController, bodyContent: const AddJugadorPartida());
     }
 
     return Expanded(
@@ -191,7 +190,7 @@ class JugadorInfo extends StatelessWidget {
           final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
           final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
           jugadorProvider.changeJugadorEnTurno(jugador);
-          slideUpProvider.openSlideUp(controller: panelController, body: PuntuacionForm(panelController: panelController));
+          slideUpProvider.openSlideUp(controller: panelController, bodyContent: PuntuacionForm(panelController: panelController));
         },
         child: Padding(
           padding: const EdgeInsets.all(8),

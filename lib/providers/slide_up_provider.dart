@@ -1,23 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
 
-
 class SlideUpProvider extends ChangeNotifier {
-  Widget? Body;
-  Widget? Footer;
+  Widget? body;
 
-  set body(Widget? widget) {
-    Body = widget;
-  }
+  openSlideUp({required SlidingUpPanelController controller, Widget? bodyContent}) async {
 
-  set footer(Widget? widget) {
-    Footer = widget;
-  }
+    if (bodyContent != null) body = bodyContent;
 
-  openSlideUp({required SlidingUpPanelController controller, Widget? body, Widget? footer}) async {
-    if (body != null) Body = body;
-    if (footer != null) Footer = footer;
-
+    await Future.delayed(const Duration(milliseconds: 100));
     controller.expand();
     notifyListeners();
   }

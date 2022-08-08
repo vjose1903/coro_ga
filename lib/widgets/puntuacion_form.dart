@@ -29,10 +29,25 @@ class PuntuacionForm extends StatelessWidget {
   }
 }
 
-class PuntuacionPage extends StatelessWidget {
+class PuntuacionPage extends StatefulWidget {
   const PuntuacionPage({Key? key, required this.panelController, required this.pageController}) : super(key: key);
   final SlidingUpPanelController panelController;
   final PageController pageController;
+
+  @override
+  State<PuntuacionPage> createState() => _PuntuacionPageState();
+}
+
+class _PuntuacionPageState extends State<PuntuacionPage> {
+  final GoogleAds anuncio = GoogleAds(tipo: AdType.banner, location: AdLocation.puntuacion);
+
+  @override
+  void dispose() {
+    Fun.logColor(color: Colores.magenta, body: "CERRANDO EL SLIDE UP");
+    super.dispose();
+    anuncio.disposeBannerAd();
+  }
+
   @override
   Widget build(BuildContext context) {
     String? puntuacion;
@@ -40,7 +55,6 @@ class PuntuacionPage extends StatelessWidget {
 
     final Color titleColor = Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : AppThemes.colorQuinto.withOpacity(0.7);
     final Color subTitleColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.9);
-    GoogleAds anuncio = GoogleAds(tipo: AdType.banner, location: AdLocation.puntuacion);
 
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
@@ -82,7 +96,7 @@ class PuntuacionPage extends StatelessWidget {
                   child: CustomIconButtom(
                       onTap: () {
                         Jugador jugador = jugadorProvider.jugadorEnTurno!;
-                        jugadorProvider.deleteJugador(context, jugador: jugador, panelController: panelController);
+                        jugadorProvider.deleteJugador(context, jugador: jugador, panelController: widget.panelController);
                       },
                       icon: Icons.delete_forever,
                       size: IconSize.min,
@@ -174,7 +188,7 @@ class PuntuacionPage extends StatelessWidget {
   }
 
   nextPage() {
-    pageController.nextPage(duration: const Duration(milliseconds: 500), curve: Curves.easeInOutQuart);
+    widget.pageController.nextPage(duration: const Duration(milliseconds: 500), curve: Curves.easeInOutQuart);
   }
 
   Future<int> changePuntuacion(

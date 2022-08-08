@@ -1,7 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:game_score/providers/partida_provider.dart';
+import 'package:game_score/providers/providers.dart';
 import 'package:game_score/screens/screens.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
@@ -24,7 +27,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
 
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       await Future.delayed(const Duration(seconds: 1));
-      
+
       final PartidaProvider partidaProvider = context.read<PartidaProvider>();
       partidaProvider.deletePartida(context, partida: partidaProvider.partidaEnTurno!);
     });
@@ -32,6 +35,9 @@ class _GanadorScreenState extends State<GanadorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
+    googleAdsProvider.loadInterstitialAd();
+
     final routeArgs = ModalRoute.of(context)!.settings.arguments as Map;
     final String partida = routeArgs['partida'];
     final String jugador = routeArgs['jugador'];
@@ -62,13 +68,15 @@ class _GanadorScreenState extends State<GanadorScreen> {
                   icon: Icons.close,
                   // onTap: () => Navigator.pushReplacementNamed(context, 'home'),
                   onTap: () {
-                    Navigator.pushReplacement(
-                        context,
-                        PageTransition(
-                            type: PageTransitionType.fade,
-                            child: const HomeScreen(),
-                            alignment: Alignment.center,
-                            duration: const Duration(milliseconds: 500)));
+                    googleAdsProvider.showInterstitialAd(onCloseFunction: () {
+                      Navigator.pushReplacement(
+                          context,
+                          PageTransition(
+                              type: PageTransitionType.fade,
+                              child: const HomeScreen(),
+                              alignment: Alignment.center,
+                              duration: const Duration(milliseconds: 500)));
+                    });
                   })),
           Container(
               margin: const EdgeInsets.only(top: 200),

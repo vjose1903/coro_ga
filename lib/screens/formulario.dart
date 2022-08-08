@@ -11,8 +11,6 @@ import 'package:reactive_forms/reactive_forms.dart';
 class FormularioScreen extends StatelessWidget {
   const FormularioScreen({Key? key}) : super(key: key);
 
-// SlidingUpPanelController panelController = SlidingUpPanelController();
-
   @override
   Widget build(BuildContext context) {
     GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
