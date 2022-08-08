@@ -42,6 +42,7 @@ class CustomReactiveDropDown extends StatelessWidget {
         key: key,
         formControlName: "tipo",
         items: items,
+        
         autofocus: autoFocus!,
         onChanged: (value) => onChanged != null ? onChanged!(value) : null,
         decoration: InputDecoration(

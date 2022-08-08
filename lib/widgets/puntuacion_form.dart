@@ -110,16 +110,17 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
 
             // CAMPO PUNTUACION
             //
-            CustomInputField(
-              key: UniqueKey(),
-              enabled: false,
-              controller: puntuacionController,
-              initialValueFn: () => puntuacion,
-              onChanged: (value) => puntuacion = value,
-              inputType: TextInputType.number,
-              labelText: 'Puntuación',
-            ),
-            const SizedBox(height: 10),
+            if (partidaProvider.partidaEnTurno!.tipo == "Puntuación")
+              CustomInputField(
+                key: UniqueKey(),
+                enabled: false,
+                controller: puntuacionController,
+                initialValueFn: () => puntuacion,
+                onChanged: (value) => puntuacion = value,
+                inputType: TextInputType.number,
+                labelText: 'Puntuación',
+              ),
+            if (partidaProvider.partidaEnTurno!.tipo == "Puntuación") const SizedBox(height: 10),
             // CUADRO OSCURO
             //
             Expanded(
@@ -137,8 +138,8 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
             const SizedBox(height: 10),
             // TECLADO
             //
-            _Keyboard(puntuacionController: puntuacionController),
-            const SizedBox(height: 10),
+            if (partidaProvider.partidaEnTurno!.tipo == "Puntuación") _Keyboard(puntuacionController: puntuacionController),
+            if (partidaProvider.partidaEnTurno!.tipo == "Puntuación") const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -148,7 +149,8 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                     label: "Aumentar",
                     textColor: Colors.white,
                     onTap: () {
-                      changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacionController.text, tipo: "aumentar", context: context)
+                      String puntuacion = partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? puntuacionController.text : "1";
+                      changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: "aumentar", context: context)
                           .then((newPuntuacion) {
                         if (newPuntuacion != 0) {
                           if (newPuntuacion >= partidaProvider.partidaEnTurno!.maxPuntuacion!.toInt()) {
@@ -174,8 +176,10 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                     backgroundColor: Colors.red[400],
                     label: "Reducir",
                     textColor: Colors.white,
-                    onTap: () =>
-                        changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacionController.text, tipo: "reducir", context: context)),
+                    onTap: () {
+                      String puntuacion = partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? puntuacionController.text : "1";
+                      changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: "reducir", context: context);
+                    }),
               ],
             ),
             const SizedBox(height: 10),
@@ -199,11 +203,21 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
       int puntuacionInt = int.parse(puntuacion);
 
       Jugador jugador = jugadorProvider.jugadorEnTurno!;
-      SqlResponse response =
-          await Jugador.changePuntuacion(jugador: jugador, newPuntuacion: puntuacionInt, tipo: tipo, context: context, isLoading: true);
-      partidaProvider.refresh();
-      jugadorProvider.changeJugadorEnTurno(response.data);
-      return response.data.puntuacion;
+      int puntuacion_actual = jugador.puntuacion!;
+
+      if (tipo == "reducir" && puntuacion_actual - puntuacionInt < 0) {
+        String msgErrorReducir =
+            partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? "La puntuación minima debe de ser 0." : "La ronda minima debe de ser 0.";
+        Fun.toast(type: ToasType.warning, context: context, title: "AVISO", message: msgErrorReducir);
+
+        return puntuacion_actual;
+      } else {
+        SqlResponse response =
+            await Jugador.changePuntuacion(jugador: jugador, newPuntuacion: puntuacionInt, tipo: tipo, context: context, isLoading: true);
+        partidaProvider.refresh();
+        jugadorProvider.changeJugadorEnTurno(response.data);
+        return response.data.puntuacion;
+      }
     } else {
       String msg = puntuacion == "0" ? "Puntuación debe de ser mayor a 0" : "Debe introducir una puntutación para continuar";
 
@@ -218,8 +232,10 @@ class _ListHistorial extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final PartidaProvider? partidaProvider = context.read<PartidaProvider?>();
     final JugadorProvider? jugadorProvider = context.watch<JugadorProvider?>();
     final Jugador? jugador = jugadorProvider?.jugadorEnTurno;
+    final msgNoRgistros = partidaProvider!.partidaEnTurno!.tipo == "Puntuación" ? "No hay puntuaciones registradas" : "No tiene rondas registradas";
 
     if (jugador == null) return Container();
 
@@ -230,7 +246,7 @@ class _ListHistorial extends StatelessWidget {
         children: [
           Icon(Icons.history, size: 40, color: Colors.grey.withOpacity(0.3)),
           const SizedBox(height: 10),
-          Text('No hay puntuaciónes registradas', style: TextStyle(fontFamily: 'Poppins', fontSize: 15, color: Colors.grey[500]!.withOpacity(0.4)))
+          Text(msgNoRgistros, style: TextStyle(fontFamily: 'Poppins', fontSize: 15, color: Colors.grey[500]!.withOpacity(0.4)))
         ],
       ));
     } else {
