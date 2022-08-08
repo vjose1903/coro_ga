@@ -9,7 +9,7 @@ import 'package:game_score/widgets/widgets.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
-import 'package:we_slide/we_slide.dart';
+
 
 class PuntuacionForm extends StatelessWidget {
   const PuntuacionForm({Key? key, required this.panelController}) : super(key: key);
@@ -230,6 +230,7 @@ class _ListHistorial extends StatelessWidget {
           Expanded(
             child: ListView.separated(
                 controller: ScrollController(),
+                physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.all(5),
                 separatorBuilder: (_, __) => const Divider(),
                 itemCount: jugador.historialJugadas!.length,

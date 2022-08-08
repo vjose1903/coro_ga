@@ -63,6 +63,7 @@ class _GanadorPerdedor extends StatelessWidget {
           shrinkWrap: true,
           scrollDirection: Axis.horizontal,
           itemCount: ganadorPerdedor.length,
+          physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
             List<String> estados = [Estado.ganador, Estado.perdedor];
 

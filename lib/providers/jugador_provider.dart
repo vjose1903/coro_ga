@@ -5,7 +5,6 @@ import 'package:game_score/utils/utils.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
-import 'package:we_slide/we_slide.dart';
 
 class JugadorProvider extends ChangeNotifier {
   Jugador? jugadorEnTurno;

@@ -1,6 +1,5 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
@@ -11,7 +10,6 @@ import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_shadow_container/scroll_shadow_container.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import 'package:we_slide/we_slide.dart';
 
 class PartidaScreen extends StatelessWidget {
   const PartidaScreen({Key? key}) : super(key: key);
@@ -32,7 +30,7 @@ class PartidaScreen extends StatelessWidget {
             visible: panelController.status == SlidingUpPanelStatus.collapsed,
             child: FloatingActionButton(
               onPressed: () {
-                Navigator.pushNamed(context, 'formulario');
+                Navigator.pushReplacementNamed(context, 'formulario');
               },
               child: const Icon(Icons.add, size: 30),
             ),
@@ -136,7 +134,13 @@ class JugadoresList extends StatelessWidget {
                   return Center(child: CircularProgressIndicator(color: AppThemes.colorTercero));
                 } else {
                   return SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(), child: Wrap(runSpacing: 8, spacing: 8, children: snapshot.data));
+                      physics: const BouncingScrollPhysics(),
+                      child: Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        runSpacing: 15,
+                        spacing: 0,
+                        children: snapshot.data,
+                      ));
                 }
               },
             ),

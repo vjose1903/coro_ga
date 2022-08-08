@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
 
-import 'package:we_slide/we_slide.dart';
 
 class SlideUpProvider extends ChangeNotifier {
   Widget? Body;

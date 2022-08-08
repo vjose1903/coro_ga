@@ -5,7 +5,6 @@ import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/functions.dart';
 import 'package:provider/provider.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:we_slide/we_slide.dart';
 
 class Layout extends StatelessWidget {
   Layout({
@@ -54,22 +53,8 @@ class Layout extends StatelessWidget {
             _AppBar(title: appBarTitle, leading: appBarLeading, trailing: appBarTrailing),
             _Body(child: bodyContent),
             SlidingUpPanelWidget(
-              child: Container(
-                margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.19),
-                decoration: ShapeDecoration(
-                  shadows: [
-                    if (panelController.status == SlidingUpPanelStatus.expanded)
-                      BoxShadow(blurRadius: 0, spreadRadius: (MediaQuery.of(context).size.height + 200), color: Colors.black.withOpacity(0.6)),
-                    if (panelController.status == SlidingUpPanelStatus.expanded)
-                      BoxShadow(blurRadius: 7, spreadRadius: 1, color: Colors.black.withOpacity(0.4))
-                  ],
-                  color: AppThemes.themeColor_2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-                  ),
-                ),
-                child: _WeSlideContent(panelController: panelController),
-              ),
+              
+              enableOnTap: false,
               controlHeight: 0,
               panelController: panelController,
               dragDown: (details) {
@@ -100,6 +85,22 @@ class Layout extends StatelessWidget {
                   slideUpProvider.closeSlideUp(controller: panelController, isListener: true);
                 }
               },
+              child: Container(
+                margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.19),
+                decoration: ShapeDecoration(
+                  shadows: [
+                    if (panelController.status == SlidingUpPanelStatus.expanded)
+                      BoxShadow(blurRadius: 0, spreadRadius: (MediaQuery.of(context).size.height + 200), color: Colors.black.withOpacity(0.6)),
+                    if (panelController.status == SlidingUpPanelStatus.expanded)
+                      BoxShadow(blurRadius: 7, spreadRadius: 1, color: Colors.black.withOpacity(0.4))
+                  ],
+                  color: AppThemes.themeColor_2,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                  ),
+                ),
+                child: _WeSlideContent(panelController: panelController),
+              ),
             ),
             const _Loading(),
           ],

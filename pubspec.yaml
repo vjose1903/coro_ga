@@ -47,7 +47,6 @@ dependencies:
   scroll_shadow_container:
     git: git@github.com:vjose1903/scroll_shadow_container.git
   scrollable_positioned_list: ^0.3.2
-  we_slide: ^2.3.0
   loading_animation_widget: ^1.2.0+2
   reactive_forms: ^13.0.0
   flutter_staggered_animations: ^1.0.0
@@ -62,15 +61,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  flutter_launcher_icons: ^0.9.3
-
-flutter_icons:
-  android: "launcher_icon"
-  ios: true
-  image_path: "assets/icon/icon.png"
-  adaptive_icon_background: "assets/icon/icon.png"
-  remove_alpha_ios: true
+  icons_launcher: ^2.0.2
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

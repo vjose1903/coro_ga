@@ -48,6 +48,7 @@ class ListJugadores extends StatelessWidget {
 
     return ListView.separated(
         controller: jugadoresController,
+        physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.all(5),
         separatorBuilder: (_, __) => const Divider(),
         itemCount: jugadores.length,

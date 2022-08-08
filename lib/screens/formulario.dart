@@ -7,7 +7,7 @@ import 'package:game_score/widgets/widgets.dart';
 import 'package:game_score/models/models.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
-import 'package:we_slide/we_slide.dart';
+
 
 class FormularioScreen extends StatelessWidget {
   const FormularioScreen({Key? key}) : super(key: key);
@@ -27,8 +27,6 @@ class FormularioScreen extends StatelessWidget {
           icon: Icons.arrow_back_ios_new,
           onTap: () {
             FocusManager.instance.primaryFocus?.unfocus();
-            final FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
-            formPartidaProvider.resetForm();
 
             Navigator.pop(context, 'home');
           },
@@ -80,7 +78,7 @@ class _Body extends StatelessWidget {
                             duration: const Duration(milliseconds: 300),
                             curve: Curves.easeOut,
                             // height: 45,
-                            width: tipoPartida == '' || tipoPartida == null ? screenSize.width - 52 : screenSize.width * 0.43,
+                            width: tipoPartida == '' || tipoPartida == null ? screenSize.width - 52 : screenSize.width * 0.425,
                             child: CustomReactiveDropDown(
                               formControlName: 'tipo',
                               labelText: "Tipo",
@@ -97,7 +95,7 @@ class _Body extends StatelessWidget {
                         child: AnimatedContainer(
                             duration: const Duration(milliseconds: 300),
                             curve: Curves.easeOut,
-                            width: tipoPartida == '' || tipoPartida == null ? 0.01 : screenSize.width * 0.43,
+                            width: tipoPartida == '' || tipoPartida == null ? 0.01 : screenSize.width * 0.425,
                             child: CustomReactiveInput(
                                 formControlName: 'maxPuntuacion',
                                 labelText: tipoPartida == "Rondas" ? "Cant. rondas" : "Puntuación Máxima",
@@ -186,6 +184,7 @@ class Titulo extends StatelessWidget {
           visible: formPartidaProvider.jugadores.length < 20,
           child: CustomIconButtom(
             onTap: () async {
+              FocusManager.instance.primaryFocus?.unfocus();
               formPartidaProvider.addJugadorToList();
               await Future.delayed(const Duration(milliseconds: 20));
 

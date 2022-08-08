@@ -5,6 +5,7 @@ import 'package:game_score/routes/app_routes.dart';
 import 'package:game_score/screens/screens.dart';
 import 'package:provider/provider.dart';
 import 'package:splash_screen_view/SplashScreenView.dart';
+import 'package:flutter/services.dart';
 
 import 'shared_preferences/preferences.dart';
 
@@ -42,11 +43,19 @@ class MyApp extends StatelessWidget {
       backgroundColor: Preferences.isDarkMode ? Color(0xff020036) : Color(0xFFF0F0F0),
     );
 
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Coro Games',
-        home: MyAppWithSplash,
-        routes: AppRoutes.getAppRoutes(),
-        theme: themeProvider.getCurrentTheme);
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Coro Games',
+          home: MyAppWithSplash,
+          routes: AppRoutes.getAppRoutes(),
+          theme: themeProvider.getCurrentTheme),
+    );
   }
 }

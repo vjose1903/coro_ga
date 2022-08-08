@@ -8,7 +8,7 @@ import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
-import 'package:we_slide/we_slide.dart';
+
 
 class EditarEntidad extends StatelessWidget {
   const EditarEntidad({Key? key, this.pageController, this.panelController}) : super(key: key);
@@ -156,7 +156,7 @@ class EditPartida extends StatelessWidget {
                       duration: const Duration(milliseconds: 300),
                       curve: Curves.easeOut,
                       // height: 45,
-                      width: tipoPartida == '' ? screenSize.width - 20 : screenSize.width * 0.465,
+                      width: tipoPartida == '' ? screenSize.width - 20 : screenSize.width * 0.46,
                       child: CustomReactiveDropDown(
                         formControlName: 'tipo',
                         labelText: "Tipo",
@@ -173,7 +173,7 @@ class EditPartida extends StatelessWidget {
                   child: AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
                       curve: Curves.easeOut,
-                      width: tipoPartida == '' ? 0.01 : screenSize.width * 0.465,
+                      width: tipoPartida == '' ? 0.01 : screenSize.width * 0.46,
                       child: CustomReactiveInput(
                           formControlName: 'maxPuntuacion',
                           labelText: tipoPartida == "Rondas" ? "Cant. rondas" : "Puntuación Máxima",
