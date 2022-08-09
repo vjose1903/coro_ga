@@ -11,6 +11,7 @@ import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -138,7 +139,12 @@ class ListPartidas extends StatelessWidget {
                       title: "Confirmar",
                       dialogType: DialogType.error,
                       buttonsList: [
-                        CustomActionsButtons.cancelButton({"onTap": () => Navigator.pop(context)}),
+                        CustomActionsButtons.cancelButton({
+                          "onTap": () {
+                            Navigator.pop(context);
+                            handler(false);
+                          }
+                        }),
                         CustomActionsButtons.aceptarButton({"onTap": () => removePartida(context, handler, partidas, index)})
                       ]);
                 },

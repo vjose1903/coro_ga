@@ -1,9 +1,10 @@
 import 'dart:io';
+import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 
-enum DialogType { error, success, warning, info }
+enum DialogType { error, success, warning, info, custom }
 
 class CustomActionsButtons {
   CustomActionsButtons({this.textColor, required this.label, this.onTap});
@@ -32,13 +33,14 @@ class CustomAlertDialog {
     BuildContext context, {
     required String menssage,
     required String title,
+    Widget? body,
     DialogType? dialogType,
     List<CustomActionsButtons>? buttonsList,
   }) {
     if (Platform.isAndroid) {
-      displayDialogAndroid(context: context, menssage: menssage, title: title, dialogType: dialogType, buttonsList: buttonsList);
+      displayDialogAndroid(context: context, menssage: menssage, title: title, dialogType: dialogType, body: body, buttonsList: buttonsList);
     } else {
-      displayDialogIOs(context: context, menssage: menssage, title: title, dialogType: dialogType, buttonsList: buttonsList);
+      displayDialogIOs(context: context, menssage: menssage, title: title, dialogType: dialogType, body: body, buttonsList: buttonsList);
     }
   }
 
@@ -46,6 +48,7 @@ class CustomAlertDialog {
       {required BuildContext context,
       required String title,
       required String menssage,
+      Widget? body,
       List<CustomActionsButtons>? buttonsList,
       DialogType? dialogType}) {
     showDialog(
@@ -57,11 +60,11 @@ class CustomAlertDialog {
               elevation: 5,
               title: Text(title),
               actions: _makeActionsButtons(buttonsList),
-              content: Row(mainAxisSize: MainAxisSize.min, children: [
-                if (dialogType != null) _getIcon(dialogType)!,
-                const SizedBox(width: 10),
-                Flexible(child: Text(menssage)),
-              ]));
+              content: DialogBody(
+                dialogType: dialogType,
+                menssage: menssage,
+                body: body,
+              ));
         });
   }
 
@@ -69,6 +72,7 @@ class CustomAlertDialog {
       {required BuildContext context,
       required String title,
       required String menssage,
+      Widget? body,
       List<CustomActionsButtons>? buttonsList,
       DialogType? dialogType}) {
     showCupertinoDialog(
@@ -78,11 +82,11 @@ class CustomAlertDialog {
           return CupertinoAlertDialog(
               title: Text(title),
               actions: _makeActionsButtons(buttonsList),
-              content: Row(mainAxisSize: MainAxisSize.min, children: [
-                if (dialogType != null) _getIcon(dialogType)!,
-                const SizedBox(width: 10),
-                Flexible(child: Text(menssage)),
-              ]));
+              content: DialogBody(
+                dialogType: dialogType,
+                menssage: menssage,
+                body: body,
+              ));
         });
   }
 
@@ -110,5 +114,30 @@ class CustomAlertDialog {
     }
 
     return buttonsList;
+  }
+}
+
+class DialogBody extends StatelessWidget {
+  const DialogBody({Key? key, required this.dialogType, required this.menssage, this.body}) : super(key: key);
+
+  final DialogType? dialogType;
+  final String menssage;
+  final Widget? body;
+
+  @override
+  Widget build(BuildContext context) {
+    return ConditionalBuilder(
+      condition: dialogType == DialogType.custom,
+      builder: (context) {
+        return body != null ? body! : Container();
+      },
+      fallback: (context) {
+        return Row(mainAxisSize: MainAxisSize.min, children: [
+          if (dialogType != null) CustomAlertDialog._getIcon(dialogType)!,
+          const SizedBox(width: 10),
+          Flexible(child: Text(menssage)),
+        ]);
+      },
+    );
   }
 }
