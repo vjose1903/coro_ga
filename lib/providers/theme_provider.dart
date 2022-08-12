@@ -15,7 +15,6 @@ class ThemeProvider extends ChangeNotifier {
   changeCurrentTheme() {
     isDarkMode = Preferences.isDarkMode;
 
-    Fun.logColor(color: Colores.green, body: "AppThemes.currentTheme: $isDarkMode");
     notifyListeners();
   }
 }

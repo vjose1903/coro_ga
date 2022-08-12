@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
 import 'package:game_score/providers/providers.dart';
+import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
@@ -8,8 +10,22 @@ import 'package:game_score/models/models.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
-class FormularioScreen extends StatelessWidget {
+class FormularioScreen extends StatefulWidget {
   const FormularioScreen({Key? key}) : super(key: key);
+
+  @override
+  State<FormularioScreen> createState() => _FormularioScreenState();
+}
+
+class _FormularioScreenState extends State<FormularioScreen> {
+  @override
+  initState() {
+    super.initState();
+
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      openDefaultsPartidasDialog(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +34,6 @@ class FormularioScreen extends StatelessWidget {
     googleAdsProvider.loadInterstitialAd();
 
     return Scaffold(
-      // resizeToAvoidBottomInset: true,
       body: Layout(
         panelController: SlidingUpPanelController(),
         appBarTitle: "Crear nueva partida",
@@ -28,15 +43,27 @@ class FormularioScreen extends StatelessWidget {
           icon: Icons.arrow_back_ios_new,
           onTap: () {
             FocusManager.instance.primaryFocus?.unfocus();
-
             Navigator.pop(context, 'home');
           },
         ),
         bodyContent: SingleChildScrollView(physics: const BouncingScrollPhysics(), child: _Body()),
-        // bodyContent: _Body(),
       ),
     );
   }
+}
+
+openDefaultsPartidasDialog(BuildContext context) {
+  final screenSize = MediaQuery.of(context).size;
+
+  final FormPartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<FormPartidaPredefinidaProvider>();
+  formPartidaPredefinidaProvider.resetForm();
+
+  FluidAlerts.show(context,
+      rootPage: SizedBox(
+        width: (screenSize.width - 40),
+        height: (screenSize.height - 150),
+        child: const PartidasDefaultAlert(),
+      ));
 }
 
 class _Body extends StatelessWidget {
@@ -49,14 +76,14 @@ class _Body extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
     return Consumer(builder: (BuildContext context, value, Widget? child) {
       final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
+      final form = formPartidaProvider.form;
 
-      final dynamic tipoPartida = formPartidaProvider.formPartida.control('tipo').value;
-      final form = formPartidaProvider.formPartida;
+      final dynamic tipoPartida = form.control('tipo').value;
 
       return Container(
           height: ((screenSize.height - (screenSize.height * 0.125)) - 80),
           // height: screenSize.height - 600,
-          margin: const EdgeInsets.only(top: 40, bottom: 40),
+          margin: const EdgeInsets.only(top: 15, bottom: 40),
           padding: const EdgeInsets.symmetric(horizontal: 25),
           child: ReactiveForm(
             formGroup: form,
@@ -65,44 +92,49 @@ class _Body extends StatelessWidget {
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: CustomIconButtom(
+                      onTap: () => openDefaultsPartidasDialog(context),
+                      icon: Icons.apps_rounded,
+                      size: IconSize.min,
+                      iconSize: 20,
+                      iconColor: Preferences.isDarkMode ? Colors.white.withOpacity(0.4) : AppThemes.colorCuarto.withOpacity(0.7),
+                      backgroundColor: Preferences.isDarkMode ? Colors.white.withOpacity(0.2) : AppThemes.colorCuarto.withOpacity(0.5),
+                      splashColor: const Color(0xFF2E7A31),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
                   //
-                  const CustomReactiveInput(formControlName: 'nombre', labelText: "Nombre", textCapitalization: TextCapitalization.words),
-                  SizedBox(height: tipoPartida == '' || tipoPartida == null ? 25 : 10),
+                  const CustomReactiveInput(formControlName: 'nombre', labelText: "Nombre Partida", textCapitalization: TextCapitalization.words),
+                  const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Flexible(
-                        child: FittedBox(
-                          alignment: Alignment.centerLeft,
-                          fit: BoxFit.none,
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeOut,
-                            // height: 45,
-                            width: tipoPartida == '' || tipoPartida == null ? screenSize.width - 52 : screenSize.width * 0.425,
-                            child: CustomReactiveDropDown(
-                              formControlName: 'tipo',
-                              labelText: "Tipo",
-                              items: const [
-                                DropdownMenuItem(value: "Rondas", child: Text("Rondas")),
-                                DropdownMenuItem(value: "Puntuación", child: Text("Puntuación"))
-                              ],
-                              onChanged: (value) => formPartidaProvider.changeTipo(value),
-                            ),
-                          ),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeOut,
+                        width: tipoPartida == '' || tipoPartida == null ? screenSize.width - 52 : screenSize.width * 0.425,
+                        child: CustomReactiveDropDown(
+                          formControlName: 'tipo',
+                          labelText: "Tipo",
+                          items: const [
+                            DropdownMenuItem(value: "Rondas", child: Text("Rondas")),
+                            DropdownMenuItem(value: "Puntuación", child: Text("Puntuación"))
+                          ],
+                          onChanged: (value) => formPartidaProvider.changeTipo(value),
                         ),
                       ),
-                      Flexible(
-                        child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeOut,
-                            width: tipoPartida == '' || tipoPartida == null ? 0.01 : screenSize.width * 0.425,
-                            child: CustomReactiveInput(
-                                formControlName: 'maxPuntuacion',
-                                labelText: tipoPartida == "Rondas" ? "Cant. rondas" : "Puntuación Máxima",
-                                inputType: TextInputType.number)),
-                      ),
+                      AnimatedContainer(
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.easeOut,
+                          width: tipoPartida == '' || tipoPartida == null ? 0.01 : screenSize.width * 0.425,
+                          child: CustomReactiveInput(
+                              formControlName: 'maxPuntuacion',
+                              labelText: tipoPartida == "Rondas" ? "Cant. rondas" : "Puntuación Máxima",
+                              inputType: TextInputType.number)),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -222,7 +254,7 @@ class _Inputs extends StatelessWidget {
   Widget build(BuildContext context) {
     final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
 
-    final formJugadoresArray = formPartidaProvider.formPartida.control('jugadores') as FormArray<dynamic>;
+    final formJugadoresArray = formPartidaProvider.form.control('jugadores') as FormArray<dynamic>;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),

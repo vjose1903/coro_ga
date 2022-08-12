@@ -1,0 +1,283 @@
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:fluid_dialog/fluid_dialog.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_shake_animated/flutter_shake_animated.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:game_score/models/models.dart';
+import 'package:game_score/providers/providers.dart';
+import 'package:game_score/shared_preferences/preferences.dart';
+import 'package:game_score/themes/app_themes.dart';
+import 'package:game_score/utils/utils.dart';
+import 'package:game_score/widgets/widgets.dart';
+import 'package:provider/provider.dart';
+import 'package:reorderables/reorderables.dart';
+
+class PartidasDefaultAlert extends StatelessWidget {
+  const PartidasDefaultAlert({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    ReorderableProvider reorderableProvider = context.watch<ReorderableProvider>();
+
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Partidas predefinidas",
+              style: TextStyle(
+                  color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  letterSpacing: 2)),
+
+          const SizedBox(height: 15),
+          //
+
+          Visibility(
+            visible: reorderableProvider.isReording,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+              decoration: BoxDecoration(color: AppThemes.themeColor_4.withOpacity(0.7), borderRadius: BorderRadius.circular(15)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CustomIconButtom(
+                    onTap: () {
+                      DialogNavigator.of(context).push(
+                        FluidDialogPage(
+                          builder: (context) => const FormPartidaPredefinida(),
+                        ),
+                      );
+                    },
+                    icon: Icons.add,
+                    size: IconSize.min,
+                    iconSize: 20,
+                    backgroundColor: const Color(0xFF4CAF50),
+                    splashColor: const Color(0xFF2E7A31),
+                  ),
+                  FittedBox(
+                    fit: BoxFit.fitWidth,
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.circular(50),
+                        child: Material(
+                            color: Preferences.isDarkMode ? Colors.grey.withOpacity(0.8) : Colors.grey[350],
+                            child: InkWell(
+                                onTap: () => reorderableProvider.isReording = false,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
+                                  child: Text("Listo",
+                                      style: TextStyle(
+                                          color: Preferences.isDarkMode ? Colors.white.withOpacity(0.7) : AppThemes.colorSexto,
+                                          fontFamily: 'Poppins',
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w700,
+                                          letterSpacing: 2)),
+                                )))),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          //
+          const SizedBox(height: 20),
+
+          Flexible(
+            child: Container(
+              height: double.infinity,
+              width: double.infinity,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), color: AppThemes.themeColor_1),
+              child: PartidasScrollView(reorderableProvider: reorderableProvider),
+            ),
+          ),
+          //
+          const SizedBox(height: 20),
+
+          Align(
+            alignment: Alignment.centerRight,
+            child: ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.red[400]),
+                  padding: MaterialStateProperty.all(const EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cerrar', style: TextStyle(fontFamily: "Poppins", color: Colors.white))),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PartidasScrollView extends StatelessWidget {
+  const PartidasScrollView({Key? key, required this.reorderableProvider}) : super(key: key);
+
+  final ReorderableProvider reorderableProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    FormPartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<FormPartidaPredefinidaProvider>();
+
+    return FutureBuilder(
+      future: getPartidas(context, formPartidaPredefinidaProvider),
+      initialData: List<PartidaPredefinida>.from([]),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        Fun.logColor(color: Colores.magenta, body: '${snapshot.connectionState}');
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator(color: AppThemes.colorTercero));
+        } else if (!snapshot.hasData) {
+          return Center(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FaIcon(FontAwesomeIcons.gamepad, size: 40, color: Colors.grey.withOpacity(0.7)),
+              Text('No hay partidas predefinidas', style: TextStyle(fontFamily: 'Poppins', fontSize: 18, color: Colors.grey[500]))
+            ],
+          ));
+        } else {
+          return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.all(10),
+            child: ReorderableWrap(
+                enableReorder: reorderableProvider.isReording,
+                needsLongPressDraggable: false,
+                runSpacing: 15,
+                spacing: 8,
+                maxMainAxisCount: 3,
+                scrollPhysics: const BouncingScrollPhysics(),
+                onReorder: (oldIndex, newIndex) =>
+                    reorderableProvider.onReorder(oldIndex: oldIndex, newIndex: newIndex, reordenableList: snapshot.data),
+                onNoReorder: (int index) {
+                  //this callback is optional
+                  debugPrint('${DateTime.now().toString().substring(5, 22)} reorder cancelled. index:$index');
+                },
+                onReorderStarted: (int index) {
+                  //this callback is optional
+                  debugPrint('${DateTime.now().toString().substring(5, 22)} reorder started: index:$index');
+                },
+                children: snapshot.data),
+          );
+        }
+      },
+    );
+  }
+}
+
+Future<List<Widget>> getPartidas(context, FormPartidaPredefinidaProvider formPartidaPredefinidaProvider) async {
+  Fun.logColor(color: Colores.yellow, body: "getPartidas");
+
+  await formPartidaPredefinidaProvider.getPartidasPredefinidas(context, isLoading: false);
+
+  formPartidaPredefinidaProvider.partidasPredefinidas.sort((a, b) => a.orden!.compareTo(b.orden!));
+
+  Fun.logColor(color: Colores.green, body: "getPartidas");
+
+  return formPartidaPredefinidaProvider.partidasPredefinidas.map((partida) {
+    return ReordenableItem(partidaPredefinida: partida);
+  }).toList();
+}
+
+class ReordenableItem extends StatelessWidget {
+  const ReordenableItem({Key? key, required this.partidaPredefinida}) : super(key: key);
+  final PartidaPredefinida partidaPredefinida;
+
+  @override
+  Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+
+    return Consumer(builder: (BuildContext context, value, Widget? child) {
+      ReorderableProvider reorderableProvider = context.watch<ReorderableProvider>();
+
+      return ShakeWidget(
+        shakeConstant: ShakeRotateConstant1(),
+        autoPlay: reorderableProvider.isReording,
+        duration: const Duration(seconds: 11),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: Material(
+                color: AppThemes.colorSegundo,
+                child: InkWell(
+                  onTap: () => !reorderableProvider.isReording
+                      ? selectPartidaPredefinida(context: context)
+                      : patchFormPartida(context: context, partida: partidaPredefinida),
+                  onLongPress: () => reorderableProvider.isReording = true,
+                  child: SizedBox(
+                    width: screenSize.width * 0.25,
+                    height: 90,
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: AutoSizeText(partidaPredefinida.nombre!,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 3,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontFamily: "Poppins", fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Visibility(
+              visible: reorderableProvider.isReording,
+              child: Positioned(
+                top: -8,
+                left: -8,
+                child: CustomIconButtom(
+                    onTap: () => deletePartidaPredefinida(context, partidaPredefinida),
+                    icon: Icons.remove,
+                    size: IconSize.min,
+                    iconSize: 25,
+                    iconColor: Colors.white,
+                    backgroundColor: const Color(0xFFAF4C4C),
+                    splashColor: const Color(0xFF7A2E2E)),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  deletePartidaPredefinida(BuildContext context, PartidaPredefinida partida) {
+    FormPartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<FormPartidaPredefinidaProvider>();
+    ReorderableProvider reorderableProvider = context.read<ReorderableProvider>();
+
+    CustomAlertDialog.show(context,
+        menssage: "Seguro que desea eliminar la partida predefinida: ${partida.nombre}",
+        title: "Confirmar",
+        dialogType: DialogType.error,
+        buttonsList: [
+          CustomActionsButtons.cancelButton({"onTap": () => Navigator.pop(context)}),
+          CustomActionsButtons.aceptarButton({
+            "onTap": () {
+              Navigator.pop(context);
+              formPartidaPredefinidaProvider.deletePartidaPredefinida(context, partida: partida);
+              reorderableProvider.changesOnList();
+            }
+          })
+        ]);
+  }
+
+  selectPartidaPredefinida({required BuildContext context}) {
+    FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
+    formPartidaProvider.rellenarFormulario(partidaPredefinida);
+    Navigator.pop(context);
+  }
+
+  patchFormPartida({required BuildContext context, required PartidaPredefinida partida}) {
+    FormPartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<FormPartidaPredefinidaProvider>();
+    formPartidaPredefinidaProvider.rellenarFormulario(partida);
+
+    DialogNavigator.of(context).push(
+      FluidDialogPage(
+        builder: (context) => const FormPartidaPredefinida(),
+      ),
+    );
+  }
+}

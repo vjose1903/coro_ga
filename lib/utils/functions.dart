@@ -50,7 +50,7 @@ class Fun {
 
   static removeKeys(Map<dynamic, dynamic> obj, List<String> keys) {
     for (var key in keys) {
-      obj.remove(key);
+      if (obj.containsKey(key)) obj.remove(key);
     }
   }
 

@@ -57,7 +57,6 @@ class Layout extends StatelessWidget {
                 // Fun.logColor(color: Colores.cyan, body: "dragDown");
               },
               dragStart: (details) {
-                // Fun.logColor(color: Colores.green, body: "dragStart");
                 FocusManager.instance.primaryFocus?.unfocus();
               },
               dragCancel: () async {
@@ -204,7 +203,7 @@ class _WeSlideContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
-    print("@@@@@@@@@@@: ( ${slideUpProvider.body} ) ");
+
     return Container(
         width: double.infinity,
         decoration: BoxDecoration(

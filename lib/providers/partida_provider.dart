@@ -6,7 +6,8 @@ import 'package:reactive_forms/reactive_forms.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 
 class PartidaProvider extends ChangeNotifier {
-  bool firstSearch = false;
+  bool isFirstSearch = false;
+  bool isChangePartida = false;
 
   List<Partida> partidas = [];
   Partida? partidaEnTurno;
@@ -25,9 +26,13 @@ class PartidaProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void changePartidaEnTurno(Partida partida) {
+  Future<void> changePartidaEnTurno(Partida partida) async {
     partidaEnTurno = partida;
+    isChangePartida = true;
     notifyListeners();
+
+    await Future.delayed(const Duration(milliseconds: 500));
+    isChangePartida = false;
   }
 
   void removeJugador(Jugador jugador) {
@@ -68,7 +73,7 @@ class PartidaProvider extends ChangeNotifier {
     final partidasFuture = Partida.getPartidas(context, isLoading: isLoading);
 
     partidas = await partidasFuture;
-    firstSearch = true;
+    isFirstSearch = true;
     notifyListeners();
     return partidasFuture;
   }

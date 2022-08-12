@@ -12,7 +12,7 @@ import 'shared_preferences/preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  _initGoogleMobileAds() => MobileAds.instance.initialize();
   await Preferences.init();
 
   runApp(MultiProvider(providers: [
@@ -22,6 +22,8 @@ void main() async {
     ChangeNotifierProvider(create: (_) => JugadorProvider()),
     ChangeNotifierProvider(create: (_) => LoadingProvider()),
     ChangeNotifierProvider(create: (_) => GoogleAdsProvider()),
+    ChangeNotifierProvider(create: (_) => ReorderableProvider()),
+    ChangeNotifierProvider(create: (_) => FormPartidaPredefinidaProvider()),
     ChangeNotifierProvider(create: (_) => ThemeProvider(isDarkMode_: Preferences.isDarkMode)),
   ], child: const MyApp()));
 }
@@ -41,8 +43,8 @@ class MyApp extends StatelessWidget {
       imageSrc: "assets/img/${Preferences.isDarkMode ? "logo_dark" : "logo_light"}.png",
       text: "CARGANDO...",
       textType: TextType.TyperAnimatedText,
-      textStyle: TextStyle(fontSize: 30.0, fontFamily: "Poppins"),
-      backgroundColor: Preferences.isDarkMode ? Color(0xff020036) : Color(0xFFF0F0F0),
+      textStyle: const TextStyle(fontSize: 30.0, fontFamily: "Poppins"),
+      backgroundColor: Preferences.isDarkMode ? const Color(0xff020036) : const Color(0xFFF0F0F0),
     );
 
     SystemChrome.setPreferredOrientations([

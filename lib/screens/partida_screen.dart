@@ -1,4 +1,5 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
@@ -9,7 +10,6 @@ import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:scroll_shadow_container/scroll_shadow_container.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class PartidaScreen extends StatelessWidget {
@@ -18,7 +18,6 @@ class PartidaScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SlidingUpPanelController panelController = SlidingUpPanelController();
-    Fun.logColor(color: Colores.green, body: "PARTIDA SCREEN");
     GoogleAds anuncio = GoogleAds(tipo: AdType.banner, location: AdLocation.partida);
 
     return Consumer(
@@ -37,7 +36,7 @@ class PartidaScreen extends StatelessWidget {
               child: const Icon(Icons.add, size: 30),
             ),
           ),
-          bottomNavigationBar: BottomBar(child: NavigationBar(), panelController: panelController),
+          bottomNavigationBar: BottomBar(panelController: panelController, child: const NavigationBar()),
         );
       },
     );
@@ -95,20 +94,20 @@ class JugadoresCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       shadowColor: AppThemes.colorQuinto.withOpacity(0.3),
       elevation: 7,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Align(
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            Align(
                 alignment: Alignment.topRight,
                 child: CustomIconButtom(onTap: () => openSlideUp(), icon: Icons.add, iconSize: 25, size: IconSize.min)),
-          ),
-          Expanded(
-              child: Container(
-            decoration: const BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12), bottomRight: Radius.circular(12))),
-            child: JugadoresList(panelController: panelController),
-          ))
-        ],
+            Expanded(
+                child: Container(
+              decoration: const BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12), bottomRight: Radius.circular(12))),
+              child: JugadoresList(panelController: panelController),
+            ))
+          ],
+        ),
       ),
     ));
   }
@@ -122,37 +121,31 @@ class JugadoresList extends StatelessWidget {
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final partida = partidaProvider.partidaEnTurno!;
-    Color shadowColor = Preferences.isDarkMode ? const Color(0x7B050924) : const Color(0x67325796);
-    Fun.logColor(color: Colores.yellow, body: "BUILD LIST");
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: ScrollShadowContainer.custom(
-            boxShadow: BoxShadow(blurRadius: 15, spreadRadius: 10, color: shadowColor),
-            child: FutureBuilder(
-              future: getJugadores(partida.jugadores!, panelController),
-              initialData: List<Widget>.from([]),
-              builder: (BuildContext context, AsyncSnapshot snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator(color: AppThemes.colorTercero));
-                } else {
-                  return SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      child: Wrap(
-                        alignment: WrapAlignment.spaceBetween,
-                        runSpacing: 15,
-                        spacing: 0,
-                        children: snapshot.data,
-                      ));
-                }
-              },
-            ),
-          )),
+
+    return SizedBox(
+      width: double.infinity,
+      child: FutureBuilder(
+        future: getJugadores(partida.jugadores!, panelController, partidaProvider),
+        initialData: List<Widget>.from([]),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator(color: AppThemes.colorTercero));
+          } else {
+            return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  runSpacing: 15,
+                  spacing: 0,
+                  children: snapshot.data,
+                ));
+          }
+        },
+      ),
     );
   }
 
-  Future<List<Widget>> getJugadores(List<Jugador> jugadores, SlidingUpPanelController panelController) async {
+  Future<List<Widget>> getJugadores(List<Jugador> jugadores, SlidingUpPanelController panelController, PartidaProvider partidaProvider) async {
     await Future.delayed(const Duration(milliseconds: 10));
 
     jugadores.sort((a, b) => a.id!.compareTo(b.id!));
@@ -160,7 +153,15 @@ class JugadoresList extends StatelessWidget {
       int index = entry.key;
       Jugador jugador = entry.value;
 
-      return ElasticIn(delay: Duration(milliseconds: 100 * index), child: JugadorInfo(jugador: jugador, panelController: panelController));
+      return ConditionalBuilder(
+        condition: partidaProvider.isChangePartida,
+        builder: (context) {
+          return ElasticIn(delay: Duration(milliseconds: 100 * index), child: JugadorInfo(jugador: jugador, panelController: panelController));
+        },
+        fallback: (context) {
+          return JugadorInfo(jugador: jugador, panelController: panelController);
+        },
+      );
     }).toList();
   }
 }
@@ -231,19 +232,17 @@ class _CardBackGround extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
 
-    return Container(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(15),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => function != null ? function!() : null,
-            child: Container(
-              height: 130,
-              width: screenSize.width * 0.4,
-              decoration: boxDecoration,
-              child: child,
-            ),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(15),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => function != null ? function!() : null,
+          child: Container(
+            height: 130,
+            width: screenSize.width * 0.4,
+            decoration: boxDecoration,
+            child: child,
           ),
         ),
       ),

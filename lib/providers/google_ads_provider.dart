@@ -9,33 +9,35 @@ class GoogleAdsProvider extends ChangeNotifier {
   Function? onCloseFunction_;
 
   loadInterstitialAd() {
-    Fun.logColor(color: Colores.magenta, body: "_loadInterstitialAd");
-    InterstitialAd.load(
-      // adUnitId: AdHelper.interstitialAdUnitId,
-      adUnitId: AdHelper.getTestingId(AdType.completo),
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          ad.fullScreenContentCallback = FullScreenContentCallback(
-            onAdFailedToShowFullScreenContent: (ad, error) {
-              cleanInterstitialAd();
-            },
-            onAdDismissedFullScreenContent: (ad) {
-              onCloseFunction_ != null ? onCloseFunction_!() : null;
+    if (interstitialAd == null) {
+      Fun.logColor(color: Colores.magenta, body: "_loadInterstitialAd");
+      InterstitialAd.load(
+        // adUnitId: AdHelper.interstitialAdUnitId,
+        adUnitId: AdHelper.getTestingId(AdType.completo),
+        request: const AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (ad) {
+            ad.fullScreenContentCallback = FullScreenContentCallback(
+              onAdFailedToShowFullScreenContent: (ad, error) {
+                cleanInterstitialAd();
+              },
+              onAdDismissedFullScreenContent: (ad) {
+                onCloseFunction_ != null ? onCloseFunction_!() : null;
 
-              cleanInterstitialAd();
-            },
-          );
+                cleanInterstitialAd();
+              },
+            );
 
-          interstitialAd = ad;
-        },
-        onAdFailedToLoad: (err) {
-          print('Failed to load an interstitial ad: ${err.message}');
-          onCloseFunction_ != null ? onCloseFunction_!() : null;
-          cleanInterstitialAd();
-        },
-      ),
-    );
+            interstitialAd = ad;
+          },
+          onAdFailedToLoad: (err) {
+            print('Failed to load an interstitial ad: ${err.message}');
+            onCloseFunction_ != null ? onCloseFunction_!() : null;
+            cleanInterstitialAd();
+          },
+        ),
+      );
+    }
   }
 
   showInterstitialAd({required Function onCloseFunction}) {

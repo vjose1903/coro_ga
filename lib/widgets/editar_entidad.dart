@@ -38,7 +38,7 @@ class EditarEntidad extends StatelessWidget {
     final Color titleColor = Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : AppThemes.colorQuinto.withOpacity(0.7);
     final Color subTitleColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.9);
 
-    FormGroup form = tipo == "Partida" ? formPartidaProvider.formPartida : jugadorProvider.formJugador;
+    FormGroup form = tipo == "Partida" ? formPartidaProvider.form : jugadorProvider.formJugador;
 
     return Container(
       height: double.infinity,
@@ -93,7 +93,7 @@ class EditarEntidad extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           // ANUNCIOS ==========================================
-           GoogleAds(tipo: AdType.banner,location: AdLocation.editarEntidad)
+          GoogleAds(tipo: AdType.banner, location: AdLocation.editarEntidad)
         ],
       ),
     );
@@ -139,48 +139,41 @@ class EditPartida extends StatelessWidget {
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
         final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
-        final dynamic tipoPartida = formPartidaProvider.formPartida.control('tipo').value;
+        final dynamic tipoPartida = formPartidaProvider.form.control('tipo').value;
+
         return Expanded(
             child: ReactiveForm(
           formGroup: form,
           child: Column(children: <Widget>[
             const CustomReactiveInput(formControlName: 'nombre', labelText: "nombre", textCapitalization: TextCapitalization.words),
-            SizedBox(height: tipoPartida == '' ? 25 : 10),
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Flexible(
-                  child: FittedBox(
-                    alignment: Alignment.centerLeft,
-                    fit: BoxFit.none,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeOut,
-                      // height: 45,
-                      width: tipoPartida == '' ? screenSize.width - 20 : screenSize.width * 0.46,
-                      child: CustomReactiveDropDown(
-                        formControlName: 'tipo',
-                        labelText: "Tipo",
-                        items: const [
-                          DropdownMenuItem(value: "Rondas", child: Text("Rondas")),
-                          DropdownMenuItem(value: "Puntuación", child: Text("Puntuación"))
-                        ],
-                        onChanged: (value) => formPartidaProvider.changeTipo(value),
-                      ),
-                    ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeOut,
+                  // height: 45,
+                  width: tipoPartida == '' ? screenSize.width - 21 : screenSize.width * 0.46,
+                  child: CustomReactiveDropDown(
+                    formControlName: 'tipo',
+                    labelText: "Tipo",
+                    items: const [
+                      DropdownMenuItem(value: "Rondas", child: Text("Rondas")),
+                      DropdownMenuItem(value: "Puntuación", child: Text("Puntuación"))
+                    ],
+                    onChanged: (value) => formPartidaProvider.changeTipo(value),
                   ),
                 ),
-                Flexible(
-                  child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeOut,
-                      width: tipoPartida == '' ? 0.01 : screenSize.width * 0.46,
-                      child: CustomReactiveInput(
-                          formControlName: 'maxPuntuacion',
-                          labelText: tipoPartida == "Rondas" ? "Cant. rondas" : "Puntuación Máxima",
-                          inputType: TextInputType.number)),
-                ),
+                AnimatedContainer(
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeOut,
+                    width: tipoPartida == '' ? 0.01 : screenSize.width * 0.46,
+                    child: CustomReactiveInput(
+                        formControlName: 'maxPuntuacion',
+                        labelText: tipoPartida == "Rondas" ? "Cant. rondas" : "Puntuación Máxima",
+                        inputType: TextInputType.number)),
               ],
             ),
           ]),

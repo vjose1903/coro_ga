@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:game_score/models/models.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:path_provider/path_provider.dart';
@@ -8,7 +7,7 @@ import 'package:path/path.dart';
 
 class DatabaseHelper {
   static const dbFileName = 'GameScore.db';
-  static const sbCurrentVersion = 1;
+  static const dbCurrentVersion = 3;
 
   static final DatabaseHelper db = DatabaseHelper._();
 
@@ -33,8 +32,30 @@ class DatabaseHelper {
     Fun.logColor(color: Colores.green, body: 'path: $path');
 
     var myDatabase =
-        await openDatabase(path, version: sbCurrentVersion, onOpen: (db) {}, onConfigure: _onConfigure, onCreate: (Database db, int version) async {
-      await db.execute(''' 
+        await openDatabase(path, version: dbCurrentVersion, onOpen: (db) {}, onConfigure: _onConfigure, onCreate: _onCreate, onUpgrade: _onUpgrade);
+    return myDatabase;
+  }
+
+  static void _onCreate(Database db, int version) async {
+    _databaseV1(db);
+  }
+
+  static void _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    Fun.logColor(color: Colores.red, body: "::::::: oldVersion ==> $oldVersion");
+    Fun.logColor(color: Colores.green, body: "::::::: newVersion ==> $newVersion");
+    if (newVersion >= 2) await _databaseV2(db);
+    if (newVersion >= 3) await _databaseV3(db);
+  }
+
+  static Future _onConfigure(Database db) async {
+    await db.execute('PRAGMA foreign_keys = ON');
+  }
+
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+  static _databaseV1(Database db) async {
+    Fun.logColor(color: Colores.yellow, body: "=========== BASE DE DATOS V1 ===========");
+    await db.execute(''' 
         CREATE TABLE ${Partida.tableName}(
           id INTEGER PRIMARY KEY,
           nombre TEXT,
@@ -46,7 +67,7 @@ class DatabaseHelper {
         );
       ''');
 
-      await db.execute('''
+    await db.execute('''
         CREATE TABLE ${Jugador.tableName}(
           id INTEGER PRIMARY KEY,
           partida_id INTEGER NOT NULL,
@@ -55,7 +76,7 @@ class DatabaseHelper {
         );
       ''');
 
-      await db.execute('''
+    await db.execute('''
       CREATE TABLE ${HistorialJugada.tableName}(
         id INTEGER PRIMARY KEY,
         jugador_id INTEGER NOT NULL,
@@ -63,11 +84,26 @@ class DatabaseHelper {
         puntuacion INTEGER
       );
     ''');
-    });
-    return myDatabase;
+  }
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+  static _databaseV2(Database db) async {
+    Fun.logColor(color: Colores.yellow, body: "=========== BASE DE DATOS V2 ===========");
+    await db.execute('''
+      CREATE TABLE ${PartidaPredefinida.tableName}(
+        id INTEGER PRIMARY KEY,
+        nombre TEXT,
+        tipo TEXT,
+        maxPuntuacion INTEGER,
+        orden INTEGER
+      );
+    ''');
   }
 
-  static Future _onConfigure(Database db) async {
-    await db.execute('PRAGMA foreign_keys = ON');
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+  static _databaseV3(Database db) async {
+    Fun.logColor(color: Colores.yellow, body: "=========== BASE DE DATOS V3 ===========");
+    await db.execute("ALTER TABLE ${PartidaPredefinida.tableName} ADD COLUMN cantidadJugadores INTEGER;");
   }
 }

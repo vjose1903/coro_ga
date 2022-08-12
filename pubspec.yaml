@@ -44,12 +44,9 @@ dependencies:
   path_provider: ^2.0.11
   sqflite: ^2.0.3
   motion_toast: ^2.2.3
-  scroll_shadow_container:
-    git: git@github.com:vjose1903/scroll_shadow_container.git
   scrollable_positioned_list: ^0.3.2
   loading_animation_widget: ^1.2.0+2
   reactive_forms: ^13.0.0
-  flutter_staggered_animations: ^1.0.0
   animate_do: ^2.1.0
   lottie: ^1.4.1
   page_transition: ^2.0.9
@@ -60,6 +57,12 @@ dependencies:
   google_mobile_ads: ^2.0.0
   skeletons: ^0.0.3
   conditional_builder_null_safety: ^0.0.6
+  fluid_dialog: ^1.0.0
+  animations: ^2.0.3
+  reorderables: ^0.5.0
+  flutter_shake_animated: ^0.0.5
+  auto_size_text: ^3.0.0
+  
 
 dev_dependencies:
   flutter_test:

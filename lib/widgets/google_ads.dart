@@ -21,10 +21,11 @@ class GoogleAds extends StatefulWidget {
   State<GoogleAds> createState() => _GoogleAdsState();
 
   BannerAd? _bannerAd;
+  bool isHideSkeleton = false;
 
   disposeBannerAd() {
     if (_bannerAd != null) _bannerAd?.dispose();
-    if (_bannerAd != null) _bannerAd = null;
+    _bannerAd = null;
   }
 }
 
@@ -49,45 +50,56 @@ class _GoogleAdsState extends State<GoogleAds> {
   Widget build(BuildContext context) {
     if (widget.tipo == AdType.completo) return Container();
 
-    return Container(
-      width: 300,
-      alignment: Alignment.topCenter,
-      child: Skeleton(
-          themeMode: Preferences.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-          isLoading: widget._bannerAd == null,
-          skeleton: const SkeletonLine(style: SkeletonLineStyle(height: 50)),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              if (widget._bannerAd != null)
-                SizedBox(
-                    width: widget._bannerAd!.size.width.toDouble(),
-                    height: widget._bannerAd!.size.height.toDouble(),
-                    child: AdWidget(ad: widget._bannerAd!)),
-            ],
-          )),
-    );
+    if (widget.isHideSkeleton) {
+      return Container();
+    } else {
+      return Container(
+        width: 300,
+        alignment: Alignment.topCenter,
+        child: Skeleton(
+            themeMode: Preferences.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+            isLoading: widget._bannerAd == null,
+            skeleton: const SkeletonLine(style: SkeletonLineStyle(height: 50)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (widget._bannerAd != null)
+                  SizedBox(
+                      width: widget._bannerAd!.size.width.toDouble(),
+                      height: widget._bannerAd!.size.height.toDouble(),
+                      child: AdWidget(ad: widget._bannerAd!)),
+              ],
+            )),
+      );
+    }
   }
 
   void _loadBannerAd() {
     BannerAd(
       // adUnitId: AdHelper.getBannerAdUnitId(widget.location),
       adUnitId: AdHelper.getTestingId(AdType.banner),
-      request: AdRequest(),
+      request: const AdRequest(),
+
       size: AdSize.banner,
       listener: BannerAdListener(
         onAdLoaded: (ad) {
           setState(() {
-            // Fun.logColor(color: Colores.green, body: "===> $ad");
             widget._bannerAd = ad as BannerAd;
           });
         },
         onAdFailedToLoad: (ad, err) {
-          // Fun.logColor(color: Colores.red, body: "Failed to load a banner ad: ${err.message}");
+          Fun.logColor(color: Colores.red, body: "Failed to load a banner ad: ${err.message}");
 
           ad.dispose();
         },
       ),
     ).load();
+
+    Future.delayed(const Duration(seconds: 10)).then((value) {
+      if (widget._bannerAd == null) {
+        widget.disposeBannerAd();
+        setState(() => widget.isHideSkeleton = true);
+      }
+    });
   }
 }

@@ -26,9 +26,10 @@ class HomeScreen extends StatelessWidget {
 class MainHome extends StatelessWidget {
   const MainHome({Key? key}) : super(key: key);
 
-  Future<InitializationStatus> _initGoogleMobileAds() => MobileAds.instance.initialize();
+  // Future<InitializationStatus> _initGoogleMobileAds() => MobileAds.instance.initialize();
   @override
   Widget build(BuildContext context) {
+    Fun.logColor(color: Colores.cyan, body: "--==--==--==-- MainHome --==--==--==--");
     SlidingUpPanelController panelController = SlidingUpPanelController();
 
     openMenuSlideUp() {
@@ -103,7 +104,7 @@ class ListPartidas extends StatelessWidget {
     final List<Partida> partidas = partidaProvider.partidas;
 
     if (partidas.isEmpty) {
-      if (partidaProvider.firstSearch) {
+      if (partidaProvider.isFirstSearch) {
         return Center(
             child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -151,7 +152,7 @@ class ListPartidas extends StatelessWidget {
                 // functionEditar: () async => partidaProvider.newPartida(partidas[index], context),
                 functionEditar: () {
                   FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
-                  formPartidaProvider.formPartida.patchValue(partidas[index].toMap());
+                  formPartidaProvider.form.patchValue(partidas[index].toMap());
                   partidaProvider.partidaEditar = partidas[index];
                   slideUpProvider.openSlideUp(controller: panelController, bodyContent: EditarEntidad(panelController: panelController));
                 },

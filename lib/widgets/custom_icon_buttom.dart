@@ -3,7 +3,9 @@ import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 
 class IconSize {
+  static const double xMin = 20;
   static const double min = 30;
+  static const double medium = 40;
   static const double max = 50;
 }
 

@@ -1,24 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:game_score/utils/functions.dart';
+import 'package:game_score/models/partida_predefinida.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 class FormPartidaProvider extends ChangeNotifier {
-  FormGroup formPartida = fb.group({
+  FormGroup form = fb.group({
     'nombre': ['', Validators.required],
     'activo': ["true"],
     'tipo': ['', Validators.required],
     'maxPuntuacion': [1, Validators.min(1)],
-    'jugadores': fb.array(createItem(2))
+    'jugadores': fb.array([])
   });
+
+  void rellenarFormulario(PartidaPredefinida partidaPredefinida) async {
+    await resetForm(restoreJugadores: false);
+    form.patchValue(partidaPredefinida.toMap());
+
+    for (var index = 0; index < partidaPredefinida.cantidadJugadores!; index++) {
+      addJugadorToList(name: "Jugador ${index + 1}");
+    }
+
+    notifyListeners();
+  }
 
   void changeTipo(value) {
     notifyListeners();
   }
 
-  void resetForm() async {
-    formPartida.reset();
+  resetForm({bool restoreJugadores = true}) async {
+    form.reset();
 
-    final jugadoresArray = formPartida.control('jugadores') as FormArray<dynamic>;
+    final jugadoresArray = form.control('jugadores') as FormArray<dynamic>;
 
     if (jugadoresArray.value != null && jugadoresArray.value!.isNotEmpty) {
       final longitud = jugadoresArray.value!.length;
@@ -27,40 +38,44 @@ class FormPartidaProvider extends ChangeNotifier {
       }
     }
 
-    for (var i = 0; i < List.from([1, 2]).length; i++) {
-      addJugadorToList();
+    if (restoreJugadores) {
+      for (var i = 0; i < List.from([1, 2]).length; i++) {
+        addJugadorToList();
+      }
     }
 
-    formPartida.control("activo").value = "true";
-
+    form.control("activo").value = "true";
     notifyListeners();
+    return Future.delayed(const Duration(milliseconds: 10));
   }
 
   get jugadores {
-    final jugadoresArray = formPartida.control('jugadores').value;
+    final jugadoresArray = form.control('jugadores').value;
     return jugadoresArray ?? [];
   }
 
-  void addJugadorToList() {
-    final jugadoresArray = formPartida.control('jugadores') as FormArray<dynamic>;
-    final newFormGroup = createItem(1).first;
+  void addJugadorToList({String? name}) {
+    final jugadoresArray = form.control('jugadores') as FormArray<dynamic>;
+    final newFormGroup = createItem(cant: 1, name: name).first;
+
     jugadoresArray.add(newFormGroup);
+
     notifyListeners();
   }
 
   void removeJugadorToList(int index) {
-    final jugadoresArray = formPartida.control('jugadores') as FormArray<dynamic>;
+    final jugadoresArray = form.control('jugadores') as FormArray<dynamic>;
     jugadoresArray.removeAt(index);
 
     notifyListeners();
   }
 
-  static List<FormGroup> createItem(count) {
+  static List<FormGroup> createItem({required int cant, String? name}) {
     List<FormGroup> jugadoresForm = List<FormGroup>.from([]);
 
-    for (var i = 0; i < count; i++) {
+    for (var i = 0; i < cant; i++) {
       jugadoresForm.add(fb.group({
-        'nombre': ['', Validators.required]
+        'nombre': [name ?? '', Validators.required]
       }));
     }
     return jugadoresForm;
