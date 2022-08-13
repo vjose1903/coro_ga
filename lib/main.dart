@@ -3,6 +3,8 @@ import 'package:game_score/providers/providers.dart';
 
 import 'package:game_score/routes/app_routes.dart';
 import 'package:game_score/screens/screens.dart';
+import 'package:game_score/utils/utils.dart';
+import 'package:get_it/get_it.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:splash_screen_view/SplashScreenView.dart';
@@ -12,7 +14,9 @@ import 'shared_preferences/preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   _initGoogleMobileAds() => MobileAds.instance.initialize();
+
   await Preferences.init();
 
   runApp(MultiProvider(providers: [
@@ -23,7 +27,7 @@ void main() async {
     ChangeNotifierProvider(create: (_) => LoadingProvider()),
     ChangeNotifierProvider(create: (_) => GoogleAdsProvider()),
     ChangeNotifierProvider(create: (_) => ReorderableProvider()),
-    ChangeNotifierProvider(create: (_) => FormPartidaPredefinidaProvider()),
+    ChangeNotifierProvider(create: (_) => PartidaPredefinidaProvider()),
     ChangeNotifierProvider(create: (_) => ThemeProvider(isDarkMode_: Preferences.isDarkMode)),
   ], child: const MyApp()));
 }
@@ -33,6 +37,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    GetIt.I.allowReassignment = true;
+    GetIt.I.registerSingleton<LoadingProvider>(LoadingProvider());
+
     ThemeProvider themeProvider = context.watch<ThemeProvider>();
 
     Widget myAppWithSplash = SplashScreenView(
@@ -51,6 +58,9 @@ class MyApp extends StatelessWidget {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+
+    Fun.logColor(color: Colores.red, body: "ANDO AQUI");
+    // if (Preferences.isFirstTimeOpen) PartidaPredefinidaProvider.seed();
 
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),

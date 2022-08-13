@@ -146,7 +146,7 @@ class Partida extends DynamicClass {
 
     Fun.removeKeys(tempPartidaMap, ['id', 'jugadores', 'createdAt']);
 
-    final SqlResponse partidaRes = await CrudHelper.insert(tableName: Partida.tableName, body: tempPartidaMap, context: context);
+    final SqlResponse partidaRes = await CrudHelper.insert(tableName: Partida.tableName, body: tempPartidaMap);
 
     for (var jugador in jugadores) {
       //
@@ -155,7 +155,7 @@ class Partida extends DynamicClass {
       Map<String, dynamic> tempJugadorMap = jugador.toMap();
       Fun.removeKeys(tempJugadorMap, ['id']);
 
-      final SqlResponse jugadorRes = await CrudHelper.insert(tableName: Jugador.tableName, body: tempJugadorMap, context: context);
+      final SqlResponse jugadorRes = await CrudHelper.insert(tableName: Jugador.tableName, body: tempJugadorMap);
       jugador.id = jugadorRes.data;
     }
 
@@ -166,28 +166,27 @@ class Partida extends DynamicClass {
     return response;
   }
 
-  static Future<SqlResponse> addNewJugador(BuildContext context, {required Partida partida, required Jugador jugador}) async {
+  static Future<SqlResponse> addNewJugador({required Partida partida, required Jugador jugador}) async {
     jugador.partidaId = partida.id;
 
     Map<String, dynamic> tempJugadorMap = jugador.toMap();
     Fun.removeKeys(tempJugadorMap, ['id']);
 
-    final SqlResponse response = await CrudHelper.insert(tableName: Jugador.tableName, body: tempJugadorMap, context: context);
+    final SqlResponse response = await CrudHelper.insert(tableName: Jugador.tableName, body: tempJugadorMap);
     jugador.id = response.data;
     partida.addJugador(jugador);
     response.data = partida;
     return response;
   }
 
-  static getPartidas(BuildContext context, {required bool isLoading}) async {
-    final response =
-        await CrudHelper.getAll(tableName: Partida.tableName, context: context, where_: "activo = ?", whereArgs_: ["true"], isLoading: isLoading);
+  static getPartidas({required bool isLoading}) async {
+    final response = await CrudHelper.getAll(tableName: Partida.tableName, where_: "activo = ?", whereArgs_: ["true"], isLoading: isLoading);
 
     if (!response.hasError!) {
       final partidasParsed = List<Partida>.from(response.data.map((x) => Partida.fromMap(x)));
 
       for (var partida in partidasParsed) {
-        await findJugadores(partida: partida, context: context, isLoading: isLoading);
+        await findJugadores(partida: partida, isLoading: isLoading);
       }
       return partidasParsed;
     } else {
@@ -196,40 +195,36 @@ class Partida extends DynamicClass {
     }
   }
 
-
-  static Future<SqlResponse> delete(BuildContext context, {required Partida partida, required bool isLoading}) async {
+  static Future<SqlResponse> delete({required Partida partida, required bool isLoading}) async {
     Map<String, dynamic> tempPartidaMap = partida.toUpdateMap();
     tempPartidaMap["activo"] = "false";
 
-    final response =
-        await CrudHelper.updateOne(tableName: Partida.tableName, id: partida.id, newData: tempPartidaMap, context: context, isLoading: isLoading);
+    final response = await CrudHelper.updateOne(tableName: Partida.tableName, id: partida.id, newData: tempPartidaMap, isLoading: isLoading);
 
     if (response.hasError!) response.addMsg('No se pudo borrar la partida seleccionada.');
 
     return response;
   }
 
-  static Future<SqlResponse> edit(BuildContext context, {required Partida partida, required String newNombrePartida}) async {
+  static Future<SqlResponse> edit({required Partida partida, required String newNombrePartida}) async {
     Map<String, dynamic> tempPartidaMap = partida.toUpdateMap();
     tempPartidaMap["nombre"] = newNombrePartida;
 
-    final response =
-        await CrudHelper.updateOne(tableName: Partida.tableName, id: partida.id, newData: tempPartidaMap, context: context, isLoading: true);
+    final response = await CrudHelper.updateOne(tableName: Partida.tableName, id: partida.id, newData: tempPartidaMap, isLoading: true);
 
     if (response.hasError!) response.addMsg('No se pudo editar la partida seleccionada.');
 
     return response;
   }
 
-  static findJugadores({required Partida partida, required BuildContext context, required bool isLoading}) async {
-    final response = await CrudHelper.getAll(
-        tableName: Jugador.tableName, where_: "partida_id = ?", whereArgs_: [partida.id], context: context, isLoading: isLoading);
+  static findJugadores({required Partida partida, required bool isLoading}) async {
+    final response = await CrudHelper.getAll(tableName: Jugador.tableName, where_: "partida_id = ?", whereArgs_: [partida.id], isLoading: isLoading);
 
     if (!response.hasError!) {
       final jugadoresParsed = List<Jugador>.from(response.data.map((x) => Jugador.fromMap(x)));
 
       for (var jugador in jugadoresParsed) {
-        await Jugador.findHistorial(jugador: jugador, context: context, isLoading: isLoading);
+        await Jugador.findHistorial(jugador: jugador, isLoading: isLoading);
       }
 
       partida.addJugadores(jugadoresParsed);

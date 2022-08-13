@@ -5,6 +5,6 @@ class LoadingProvider extends ChangeNotifier {
 
   changeIsLoading(value) {
     isLoading = value;
-    notifyListeners();
+    notifyListeners();  
   }
 }

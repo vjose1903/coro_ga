@@ -57,12 +57,11 @@ class Jugador extends DynamicClass {
     }
   }
 
-  static Future<SqlResponse> edit(BuildContext context, {required Jugador jugador, required String newNombreJugador}) async {
+  static Future<SqlResponse> edit({required Jugador jugador, required String newNombreJugador}) async {
     Map<String, dynamic> tempJugadorMap = jugador.toUpdateMap();
     tempJugadorMap["nombre"] = newNombreJugador;
 
-    final response =
-        await CrudHelper.updateOne(tableName: Jugador.tableName, id: jugador.id, newData: tempJugadorMap, context: context, isLoading: true);
+    final response = await CrudHelper.updateOne(tableName: Jugador.tableName, id: jugador.id, newData: tempJugadorMap, isLoading: true);
 
     if (response.hasError!) response.addMsg('No se pudo editar el jugador seleccionado.');
 
@@ -70,7 +69,7 @@ class Jugador extends DynamicClass {
   }
 
   static Future<SqlResponse> changePuntuacion(
-      {required Jugador jugador, required int newPuntuacion, required String tipo, required BuildContext context, required bool isLoading}) async {
+      {required Jugador jugador, required int newPuntuacion, required String tipo, required bool isLoading}) async {
     //
     final SqlResponse response = SqlResponse();
     Map body = jugador.toMap();
@@ -78,10 +77,10 @@ class Jugador extends DynamicClass {
     if (tipo == "aumentar") body["puntuacion"] = body["puntuacion"] + newPuntuacion;
     if (tipo == "reducir") body["puntuacion"] = body["puntuacion"] - newPuntuacion;
 
-    final res = await CrudHelper.updateOne(tableName: Jugador.tableName, id: jugador.id!, newData: body, context: context, isLoading: isLoading);
+    final res = await CrudHelper.updateOne(tableName: Jugador.tableName, id: jugador.id!, newData: body, isLoading: isLoading);
 
     if (!res.hasError!) {
-      final resHistorial = await HistorialJugada.newHistorial(jugadorId: jugador.id!, puntuacion: newPuntuacion, tipo: tipo, context: context);
+      final resHistorial = await HistorialJugada.newHistorial(jugadorId: jugador.id!, puntuacion: newPuntuacion, tipo: tipo);
 
       jugador.addHistorial(resHistorial.data);
       jugador.puntuacion = body["puntuacion"];
@@ -93,12 +92,11 @@ class Jugador extends DynamicClass {
     return response;
   }
 
-  static findHistorial({required Jugador jugador, required BuildContext context, required bool isLoading}) async {
+  static findHistorial({required Jugador jugador, required bool isLoading}) async {
     final response = await CrudHelper.getAll(
       tableName: HistorialJugada.tableName,
       where_: "jugador_id = ?",
       whereArgs_: [jugador.id],
-      context: context,
       isLoading: isLoading,
     );
 
@@ -110,15 +108,14 @@ class Jugador extends DynamicClass {
     }
   }
 
-  Future<SqlResponse> delete(BuildContext context, {required bool isLoading}) async {
+  Future<SqlResponse> delete({required bool isLoading}) async {
     SqlResponse response = SqlResponse();
 
-    response = await CrudHelper.deleteOne(tableName: Jugador.tableName, id: id!, context: context, isLoading: isLoading);
+    response = await CrudHelper.deleteOne(tableName: Jugador.tableName, id: id!, isLoading: isLoading);
     if (!response.hasError!) {
       if (historialJugadas != null && historialJugadas!.isNotEmpty) {
         for (var historial in historialJugadas!) {
-          final responseHistorial =
-              await CrudHelper.deleteOne(tableName: HistorialJugada.tableName, id: historial.id!, context: context, isLoading: isLoading);
+          final responseHistorial = await CrudHelper.deleteOne(tableName: HistorialJugada.tableName, id: historial.id!, isLoading: isLoading);
 
           if (responseHistorial.hasError! && response.messages == null) {
             response.addMsg('Algunos historiales de jugadas, no pudieron ser eliminados');

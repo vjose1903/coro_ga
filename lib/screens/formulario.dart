@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
+import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
@@ -23,6 +24,8 @@ class _FormularioScreenState extends State<FormularioScreen> {
     super.initState();
 
     SchedulerBinding.instance.addPostFrameCallback((_) async {
+      if (Preferences.isFirstTimeOpen) context.read<PartidaPredefinidaProvider>().seed();
+
       openDefaultsPartidasDialog(context);
     });
   }
@@ -53,15 +56,13 @@ class _FormularioScreenState extends State<FormularioScreen> {
 }
 
 openDefaultsPartidasDialog(BuildContext context) {
-  final screenSize = MediaQuery.of(context).size;
-
-  final FormPartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<FormPartidaPredefinidaProvider>();
+  final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
   formPartidaPredefinidaProvider.resetForm();
 
   FluidAlerts.show(context,
       rootPage: SizedBox(
-        width: (screenSize.width - 40),
-        height: (screenSize.height - 150),
+        width: (ResponsiveApp.size.width - 40),
+        height: (ResponsiveApp.size.height - 150),
         child: const PartidasDefaultAlert(),
       ));
 }
@@ -73,16 +74,18 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
+    Fun.logColor(color: Colores.yellow, body: "body");
+
+    //
     return Consumer(builder: (BuildContext context, value, Widget? child) {
       final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
       final form = formPartidaProvider.form;
+      final isDarkMode = Preferences.isDarkMode;
 
       final dynamic tipoPartida = form.control('tipo').value;
 
       return Container(
-          height: ((screenSize.height - (screenSize.height * 0.125)) - 80),
-          // height: screenSize.height - 600,
+          height: ((ResponsiveApp.size.height - (ResponsiveApp.size.height * 0.125)) - 80),
           margin: const EdgeInsets.only(top: 15, bottom: 40),
           padding: const EdgeInsets.symmetric(horizontal: 25),
           child: ReactiveForm(
@@ -99,8 +102,8 @@ class _Body extends StatelessWidget {
                       icon: Icons.apps_rounded,
                       size: IconSize.min,
                       iconSize: 20,
-                      iconColor: Preferences.isDarkMode ? Colors.white.withOpacity(0.4) : AppThemes.colorCuarto.withOpacity(0.7),
-                      backgroundColor: Preferences.isDarkMode ? Colors.white.withOpacity(0.2) : AppThemes.colorCuarto.withOpacity(0.5),
+                      iconColor: isDarkMode ? Colors.white.withOpacity(0.4) : AppThemes.colorCuarto.withOpacity(0.7),
+                      backgroundColor: isDarkMode ? Colors.white.withOpacity(0.2) : AppThemes.colorCuarto.withOpacity(0.5),
                       splashColor: const Color(0xFF2E7A31),
                     ),
                   ),
@@ -116,7 +119,7 @@ class _Body extends StatelessWidget {
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 500),
                         curve: Curves.easeOut,
-                        width: tipoPartida == '' || tipoPartida == null ? screenSize.width - 52 : screenSize.width * 0.425,
+                        width: tipoPartida == '' || tipoPartida == null ? ResponsiveApp.size.width - 52 : ResponsiveApp.size.width * 0.425,
                         child: CustomReactiveDropDown(
                           formControlName: 'tipo',
                           labelText: "Tipo",
@@ -130,7 +133,7 @@ class _Body extends StatelessWidget {
                       AnimatedContainer(
                           duration: const Duration(milliseconds: 500),
                           curve: Curves.easeOut,
-                          width: tipoPartida == '' || tipoPartida == null ? 0.01 : screenSize.width * 0.425,
+                          width: tipoPartida == '' || tipoPartida == null ? 0.01 : ResponsiveApp.size.width * 0.425,
                           child: CustomReactiveInput(
                               formControlName: 'maxPuntuacion',
                               labelText: tipoPartida == "Rondas" ? "Cant. rondas" : "Puntuación Máxima",
@@ -255,7 +258,7 @@ class _Inputs extends StatelessWidget {
     final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
 
     final formJugadoresArray = formPartidaProvider.form.control('jugadores') as FormArray<dynamic>;
-
+    print("formJugadoresArray.value: ${formJugadoresArray.value}");
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
       child: ReactiveFormArray(

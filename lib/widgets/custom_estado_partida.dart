@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/themes/app_themes.dart';
@@ -54,7 +55,6 @@ class _GanadorPerdedor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Map ganadorPerdedor = getGanadorPerdedorMap(partida);
-    final screenSize = MediaQuery.of(context).size;
 
     return SizedBox(
       height: 40,
@@ -68,7 +68,7 @@ class _GanadorPerdedor extends StatelessWidget {
             List<String> estados = [Estado.ganador, Estado.perdedor];
 
             return Container(
-              width: screenSize.width * 0.4,
+              width: ResponsiveApp.size.width * 0.4,
               decoration: getDecoration(ganadorPerdedor[estados[index]]["backgroundColor"]),
               child: Padding(
                 padding: const EdgeInsets.all(5),

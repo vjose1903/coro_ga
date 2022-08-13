@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
+import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/functions.dart';
@@ -57,6 +58,7 @@ class Layout extends StatelessWidget {
                 // Fun.logColor(color: Colores.cyan, body: "dragDown");
               },
               dragStart: (details) {
+                // Fun.logColor(color: Colores.green, body: "dragStart");
                 FocusManager.instance.primaryFocus?.unfocus();
               },
               dragCancel: () async {
@@ -79,11 +81,11 @@ class Layout extends StatelessWidget {
                 }
               },
               child: Container(
-                margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.12),
+                margin: EdgeInsets.only(top: ResponsiveApp.size.height * 0.12),
                 decoration: ShapeDecoration(
                   shadows: [
                     if (panelController.status == SlidingUpPanelStatus.expanded)
-                      BoxShadow(blurRadius: 0, spreadRadius: (MediaQuery.of(context).size.height + 200), color: Colors.black.withOpacity(0.6)),
+                      BoxShadow(blurRadius: 0, spreadRadius: (ResponsiveApp.size.height + 200), color: Colors.black.withOpacity(0.6)),
                     if (panelController.status == SlidingUpPanelStatus.expanded)
                       BoxShadow(blurRadius: 7, spreadRadius: 1, color: Colors.black.withOpacity(0.4))
                   ],
@@ -115,7 +117,7 @@ class _Loading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final LoadingProvider loadingProvider = context.watch<LoadingProvider>();
-    Size size = MediaQuery.of(context).size;
+    Size size = ResponsiveApp.size;
     return Visibility(
       visible: loadingProvider.isLoading,
       child: Positioned(
@@ -172,7 +174,7 @@ class _Body extends StatelessWidget {
   final Widget child;
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
+    final screenSize = ResponsiveApp.size;
     return Column(
       children: [
         SizedBox(height: screenSize.height * 0.125),

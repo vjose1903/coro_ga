@@ -3,6 +3,7 @@ import 'package:conditional_builder_null_safety/conditional_builder_null_safety.
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
+import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -18,7 +19,7 @@ class PartidaScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SlidingUpPanelController panelController = SlidingUpPanelController();
-    GoogleAds anuncio = GoogleAds(tipo: AdType.banner, location: AdLocation.partida);
+    GoogleBannerAd anuncio = GoogleBannerAd(location: AdLocation.partida);
 
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
@@ -47,7 +48,7 @@ class _Body extends StatelessWidget {
   const _Body({Key? key, required this.panelController, required this.anuncio}) : super(key: key);
 
   final SlidingUpPanelController panelController;
-  final GoogleAds anuncio;
+  final GoogleBannerAd anuncio;
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
@@ -230,8 +231,6 @@ class _CardBackGround extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-
     return ClipRRect(
       borderRadius: BorderRadius.circular(15),
       child: Material(
@@ -240,7 +239,7 @@ class _CardBackGround extends StatelessWidget {
           onTap: () => function != null ? function!() : null,
           child: Container(
             height: 130,
-            width: screenSize.width * 0.4,
+            width: ResponsiveApp.size.width * 0.4,
             decoration: boxDecoration,
             child: child,
           ),

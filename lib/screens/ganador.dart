@@ -35,6 +35,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    
     GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
     googleAdsProvider.loadInterstitialAd();
 

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -16,9 +17,7 @@ class FormPartidaPredefinida extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-
-    final FormPartidaPredefinidaProvider formPartidaPredefinidaProvider = context.watch<FormPartidaPredefinidaProvider>();
+    final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.watch<PartidaPredefinidaProvider>();
     final form = formPartidaPredefinidaProvider.form;
 
     final dynamic tipoPartida = form.control('tipo').value;
@@ -59,7 +58,7 @@ class FormPartidaPredefinida extends StatelessWidget {
                           duration: const Duration(milliseconds: 500),
                           curve: Curves.easeOut,
                           // width: tipoPartida == '' || tipoPartida == null ? screenSize.width - 55 : screenSize.width * 0.415,
-                          width: tipoPartida == '' || tipoPartida == null ? screenSize.width - 55 : screenSize.width * 0.42,
+                          width: tipoPartida == '' || tipoPartida == null ? ResponsiveApp.size.width - 55 : ResponsiveApp.size.width * 0.42,
 
                           child: CustomReactiveDropDown(
                             formControlName: 'tipo',
@@ -74,7 +73,7 @@ class FormPartidaPredefinida extends StatelessWidget {
                         AnimatedContainer(
                             duration: const Duration(milliseconds: 500),
                             curve: Curves.easeOut,
-                            width: tipoPartida == '' || tipoPartida == null ? 0.01 : screenSize.width * 0.42,
+                            width: tipoPartida == '' || tipoPartida == null ? 0.01 : ResponsiveApp.size.width * 0.42,
                             child: CustomReactiveInput(
                                 formControlName: 'maxPuntuacion',
                                 labelText: tipoPartida == "Rondas" ? "Cant. rondas" : "Puntuación Máxima",
@@ -157,11 +156,11 @@ class FormPartidaPredefinida extends StatelessWidget {
   }
 
   crearEditarPartida({required FormGroup form, required BuildContext context}) async {
-    final FormPartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<FormPartidaPredefinidaProvider>();
+    final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
     form.markAllAsTouched();
 
     if (form.valid) {
-      final FormPartidaPredefinidaProvider partidaPredefinidaProvider = context.read<FormPartidaPredefinidaProvider>();
+      final PartidaPredefinidaProvider partidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
       final GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
 
       SqlResponse response = SqlResponse();
@@ -171,7 +170,9 @@ class FormPartidaPredefinida extends StatelessWidget {
             partida: formPartidaPredefinidaProvider.partidaPredefinidaEditar!, partidaEdit: form.value);
       } else {
         final PartidaPredefinida partida = PartidaPredefinida.fromMap(form.value);
-        response = await partidaPredefinidaProvider.newPartida(partida, context);
+        response = await partidaPredefinidaProvider.newPartida(
+          partida: partida,
+        );
       }
 
       if (!response.hasError!) {

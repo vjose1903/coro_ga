@@ -39,7 +39,7 @@ class PuntuacionPage extends StatefulWidget {
 }
 
 class _PuntuacionPageState extends State<PuntuacionPage> {
-  final GoogleAds anuncio = GoogleAds(tipo: AdType.banner, location: AdLocation.puntuacion);
+  final GoogleBannerAd anuncio = GoogleBannerAd(location: AdLocation.puntuacion);
 
   @override
   void dispose() {
@@ -212,8 +212,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
 
         return puntuacion_actual;
       } else {
-        SqlResponse response =
-            await Jugador.changePuntuacion(jugador: jugador, newPuntuacion: puntuacionInt, tipo: tipo, context: context, isLoading: true);
+        SqlResponse response = await Jugador.changePuntuacion(jugador: jugador, newPuntuacion: puntuacionInt, tipo: tipo, isLoading: true);
         partidaProvider.refresh();
         jugadorProvider.changeJugadorEnTurno(response.data);
         return response.data.puntuacion;

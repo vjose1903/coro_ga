@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:game_score/widgets/widgets.dart';
 
 class AdHelper {
-  static String getTestingId(AdType tipo) {
-    if (tipo == AdType.banner) {
+  static String getTestingId(String tipo) {
+    if (tipo == "banner") {
       return 'ca-app-pub-3940256099942544/6300978111';
-    } else if (tipo == AdType.completo) {
+    } else if (tipo == "completo") {
       return 'ca-app-pub-3940256099942544/1033173712';
     } else {
       return '';

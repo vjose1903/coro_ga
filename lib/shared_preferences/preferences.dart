@@ -1,7 +1,12 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+enum PrefsType { bool, string, int, double, undefined }
+
 class Preferences {
   static late SharedPreferences _prefs;
+
+  static bool _isFirstTimeOpen = true;
+  static bool _isTutorialDone = false;
 
   static bool _isDarkMode = false;
   static bool _isSystemMode = false;
@@ -18,6 +23,32 @@ class Preferences {
     _isDarkMode = value;
     _prefs.setBool('isDarkMode', value);
   }
+  // ==============================================================
+  // ==============================================================
+
+  static bool get isFirstTimeOpen {
+    return _prefs.getBool('isFirstTimeOpen') ?? _isFirstTimeOpen;
+  }
+
+  static set isFirstTimeOpen(bool value) {
+    _isFirstTimeOpen = value;
+    _prefs.setBool('isFirstTimeOpen', value);
+  }
+
+  // ==============================================================
+  // ==============================================================
+
+  static bool get isTutorialDone {
+    return _prefs.getBool('isTutorialDone') ?? _isTutorialDone;
+  }
+
+  static set isTutorialDone(bool value) {
+    _isTutorialDone = value;
+    _prefs.setBool('isTutorialDone', value);
+  }
+
+  // ==============================================================
+  // ==============================================================
 
   static bool get isSystemMode {
     return _prefs.getBool('isSystemMode') ?? _isSystemMode;

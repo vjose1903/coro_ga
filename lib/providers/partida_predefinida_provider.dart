@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/models/models.dart';
+import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/utils/functions.dart';
 
 import 'package:reactive_forms/reactive_forms.dart';
 
-class FormPartidaPredefinidaProvider extends ChangeNotifier {
+class PartidaPredefinidaProvider extends ChangeNotifier {
   List<PartidaPredefinida> partidasPredefinidas = [];
   PartidaPredefinida? partidaPredefinidaEditar;
 
@@ -53,8 +54,28 @@ class FormPartidaPredefinidaProvider extends ChangeNotifier {
     return Future.delayed(const Duration(milliseconds: 10));
   }
 
-  Future<SqlResponse> newPartida(PartidaPredefinida partida, BuildContext context) async {
-    final response = await PartidaPredefinida.createPartidaPredefinida(context, partida: partida);
+  seed() async {
+    Fun.logColor(color: Colores.yellow, body: ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    Fun.logColor(color: Colores.yellow, body: "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+    Fun.logColor(color: Colores.yellow, body: "SEED DE PARTIDAS PREDEFINIDAS");
+    Fun.logColor(color: Colores.yellow, body: ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    Fun.logColor(color: Colores.yellow, body: "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+
+    List<PartidaPredefinida> listado = [PartidaPredefinida(nombre: "Domino", orden: 1, tipo: "Puntuación", maxPuntuacion: 200, cantidadJugadores: 2)];
+
+    Fun.logColor(color: Colores.magenta, body: "LENGTH: ${listado.length}");
+
+    for (var index = 0; index < listado.length; index++) {
+      PartidaPredefinida partida = listado[index];
+      partida.orden = index += 1;
+      await newPartida(partida: partida, isLoading: false);
+    }
+
+    Preferences.isFirstTimeOpen = false;
+  }
+
+  Future<SqlResponse> newPartida({required PartidaPredefinida partida, bool? isLoading = true}) async {
+    final response = await PartidaPredefinida.createPartidaPredefinida(partida: partida, isLoading: isLoading!);
     PartidaPredefinida newPartida = response.data;
 
     partidasPredefinidas.add(newPartida);
@@ -65,7 +86,7 @@ class FormPartidaPredefinidaProvider extends ChangeNotifier {
   }
 
   Future<SqlResponse> editPartida(BuildContext context, {required PartidaPredefinida partida, required Map<String, dynamic> partidaEdit}) async {
-    final responseFuture = PartidaPredefinida.edit(context, id: partida.id!, partidaEdit: partidaEdit);
+    final responseFuture = PartidaPredefinida.edit(id: partida.id!, partidaEdit: partidaEdit);
     final response = await responseFuture;
 
     if (!response.hasError!) {
@@ -80,7 +101,7 @@ class FormPartidaPredefinidaProvider extends ChangeNotifier {
   Future getPartidasPredefinidas(context, {required bool isLoading}) async {
     await Future.delayed(const Duration(microseconds: 100));
 
-    final partidasFuture = PartidaPredefinida.getPartidasPredefinidas(context, isLoading: isLoading);
+    final partidasFuture = PartidaPredefinida.getPartidasPredefinidas(isLoading: isLoading);
     partidasPredefinidas = await partidasFuture;
 
     notifyListeners();
@@ -88,7 +109,7 @@ class FormPartidaPredefinidaProvider extends ChangeNotifier {
   }
 
   Future<SqlResponse> deletePartidaPredefinida(BuildContext context, {required PartidaPredefinida partida}) async {
-    final response = await PartidaPredefinida.delete(context, partida: partida, isLoading: true);
+    final response = await PartidaPredefinida.delete(partida: partida, isLoading: true);
 
     if (!response.hasError!) {
       partidasPredefinidas.remove(partida);

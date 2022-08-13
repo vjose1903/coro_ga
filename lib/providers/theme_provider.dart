@@ -8,7 +8,6 @@ class ThemeProvider extends ChangeNotifier {
   ThemeProvider({required bool isDarkMode_}) : isDarkMode = isDarkMode_;
 
   ThemeData get getCurrentTheme {
-
     return isDarkMode ? AppThemes.darkTheme : AppThemes.lightTheme;
   }
 

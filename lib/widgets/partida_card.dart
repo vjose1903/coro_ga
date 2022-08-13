@@ -26,7 +26,6 @@ class PartidaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     ThemeProvider themeProvider = context.watch<ThemeProvider>();
 
     return Material(
@@ -124,8 +123,6 @@ class EstadoPartida extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
     Map<String, dynamic> estadoPartida = {
       "empate": {"label": "Empate", "icono": Icons.swap_horiz_outlined, "iconColor": Colors.yellow[800], "color": Colors.yellow[100]},
       "sinIniciar": {"label": "Iniciando", "icono": Icons.arrow_forward, "iconColor": Colors.blue[800], "color": Colors.blue[100]},
@@ -157,7 +154,6 @@ class _GanadorPerdedor extends StatelessWidget {
   final Partida partida;
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     return Row(
       children: [
         //

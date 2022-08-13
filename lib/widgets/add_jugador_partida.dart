@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -41,7 +42,7 @@ class AddJugador extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       controller: ScrollController(),
       child: SizedBox(
-        height: (MediaQuery.of(context).size.height - (MediaQuery.of(context).size.height * 0.22)),
+        height: (ResponsiveApp.size.height - (ResponsiveApp.size.height * 0.22)),
         child: Column(
           children: [
             // Titulo
@@ -93,7 +94,7 @@ class AddJugador extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             // ANUNCIOS ==========================================
-             GoogleAds(tipo: AdType.banner, location: AdLocation.agregarJugador)
+            GoogleBannerAd(location: AdLocation.agregarJugador)
           ],
         ),
       ),

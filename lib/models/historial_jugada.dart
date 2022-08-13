@@ -30,15 +30,14 @@ class HistorialJugada extends DynamicClass {
     return '{"id": "$id", "jugador_id": $jugadorId, "puntuacion": $puntuacion, "tipo": "$tipo"}';
   }
 
-  static Future<SqlResponse> newHistorial(
-      {required int jugadorId, required int puntuacion, required String tipo, required BuildContext context}) async {
+  static Future<SqlResponse> newHistorial({required int jugadorId, required int puntuacion, required String tipo}) async {
     final SqlResponse response = SqlResponse();
 
     final HistorialJugada historialJugada = HistorialJugada(jugadorId: jugadorId, puntuacion: puntuacion, tipo: tipo);
     Map body = historialJugada.toMap();
     Fun.removeKeys(body, ['id']);
 
-    final res = await CrudHelper.insert(tableName: HistorialJugada.tableName, body: body, context: context, isLoading: false);
+    final res = await CrudHelper.insert(tableName: HistorialJugada.tableName, body: body, isLoading: false);
 
     if (!response.hasError!) {
       historialJugada.id = res.data;

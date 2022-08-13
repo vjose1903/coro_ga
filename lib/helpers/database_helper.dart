@@ -7,7 +7,7 @@ import 'package:path/path.dart';
 
 class DatabaseHelper {
   static const dbFileName = 'GameScore.db';
-  static const dbCurrentVersion = 3;
+  static const dbCurrentVersion = 2;
 
   static final DatabaseHelper db = DatabaseHelper._();
 
@@ -21,6 +21,7 @@ class DatabaseHelper {
 
   static Future<Database> get database async {
     _database ??= await initializeDatabase();
+
     return _database!;
   }
 
@@ -31,20 +32,28 @@ class DatabaseHelper {
 
     Fun.logColor(color: Colores.green, body: 'path: $path');
 
-    var myDatabase =
-        await openDatabase(path, version: dbCurrentVersion, onOpen: (db) {}, onConfigure: _onConfigure, onCreate: _onCreate, onUpgrade: _onUpgrade);
+    var myDatabase = await openDatabase(
+      path,
+      version: dbCurrentVersion,
+      onOpen: _onOpen,
+      onConfigure: _onConfigure,
+      onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
+    );
     return myDatabase;
   }
 
+  static void _onOpen(Database db) async {
+    Fun.logColor(color: Colores.red, body: "_onOpen");
+  }
+
   static void _onCreate(Database db, int version) async {
-    _databaseV1(db);
+    await _databaseV1(db);
+    if (version >= 2) await _databaseV2(db);
   }
 
   static void _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    Fun.logColor(color: Colores.red, body: "::::::: oldVersion ==> $oldVersion");
-    Fun.logColor(color: Colores.green, body: "::::::: newVersion ==> $newVersion");
     if (newVersion >= 2) await _databaseV2(db);
-    if (newVersion >= 3) await _databaseV3(db);
   }
 
   static Future _onConfigure(Database db) async {
@@ -90,20 +99,14 @@ class DatabaseHelper {
   static _databaseV2(Database db) async {
     Fun.logColor(color: Colores.yellow, body: "=========== BASE DE DATOS V2 ===========");
     await db.execute('''
-      CREATE TABLE ${PartidaPredefinida.tableName}(
+      CREATE TABLE IF NOT EXISTS ${PartidaPredefinida.tableName}(
         id INTEGER PRIMARY KEY,
         nombre TEXT,
         tipo TEXT,
         maxPuntuacion INTEGER,
+        cantidadJugadores INTEGER,
         orden INTEGER
       );
     ''');
-  }
-
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-  static _databaseV3(Database db) async {
-    Fun.logColor(color: Colores.yellow, body: "=========== BASE DE DATOS V3 ===========");
-    await db.execute("ALTER TABLE ${PartidaPredefinida.tableName} ADD COLUMN cantidadJugadores INTEGER;");
   }
 }

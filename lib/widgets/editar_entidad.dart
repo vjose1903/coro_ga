@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
+import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -93,7 +94,7 @@ class EditarEntidad extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           // ANUNCIOS ==========================================
-          GoogleAds(tipo: AdType.banner, location: AdLocation.editarEntidad)
+          GoogleBannerAd(location: AdLocation.editarEntidad)
         ],
       ),
     );
@@ -134,8 +135,6 @@ class EditPartida extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
         final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
@@ -155,7 +154,7 @@ class EditPartida extends StatelessWidget {
                   duration: const Duration(milliseconds: 500),
                   curve: Curves.easeOut,
                   // height: 45,
-                  width: tipoPartida == '' ? screenSize.width - 21 : screenSize.width * 0.46,
+                  width: tipoPartida == '' ? ResponsiveApp.size.width - 21 : ResponsiveApp.size.width * 0.46,
                   child: CustomReactiveDropDown(
                     formControlName: 'tipo',
                     labelText: "Tipo",
@@ -169,7 +168,7 @@ class EditPartida extends StatelessWidget {
                 AnimatedContainer(
                     duration: const Duration(milliseconds: 500),
                     curve: Curves.easeOut,
-                    width: tipoPartida == '' ? 0.01 : screenSize.width * 0.46,
+                    width: tipoPartida == '' ? 0.01 : ResponsiveApp.size.width * 0.46,
                     child: CustomReactiveInput(
                         formControlName: 'maxPuntuacion',
                         labelText: tipoPartida == "Rondas" ? "Cant. rondas" : "Puntuación Máxima",

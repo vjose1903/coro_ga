@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:game_score/models/models.dart';
@@ -60,14 +58,14 @@ class PartidaPredefinida extends DynamicClass {
   // ==================================================================================================================================
   // ==================================================================================================================================
 
-  static createPartidaPredefinida(BuildContext context, {required PartidaPredefinida partida}) async {
+  static createPartidaPredefinida({required PartidaPredefinida partida, bool? isLoading = true}) async {
     final SqlResponse response = SqlResponse();
 
     Map<String, dynamic> tempPartidaMap = partida.toMap();
 
     Fun.removeKeys(tempPartidaMap, ['id']);
 
-    final SqlResponse partidaRes = await CrudHelper.insert(tableName: PartidaPredefinida.tableName, body: tempPartidaMap, context: context);
+    final SqlResponse partidaRes = await CrudHelper.insert(tableName: PartidaPredefinida.tableName, body: tempPartidaMap, isLoading: isLoading!);
 
     partida.id = partidaRes.data;
 
@@ -76,8 +74,8 @@ class PartidaPredefinida extends DynamicClass {
     return response;
   }
 
-  static getPartidasPredefinidas(BuildContext context, {required bool isLoading}) async {
-    final response = await CrudHelper.getAll(tableName: PartidaPredefinida.tableName, context: context, isLoading: isLoading);
+  static getPartidasPredefinidas({required bool isLoading}) async {
+    final response = await CrudHelper.getAll(tableName: PartidaPredefinida.tableName, isLoading: isLoading);
 
     if (!response.hasError!) {
       final partidasParsed = List<PartidaPredefinida>.from(response.data.map((x) => PartidaPredefinida.fromMap(x)));
@@ -89,17 +87,16 @@ class PartidaPredefinida extends DynamicClass {
     }
   }
 
-  static Future<SqlResponse> delete(BuildContext context, {required PartidaPredefinida partida, required bool isLoading}) async {
-    final response = await CrudHelper.deleteOne(tableName: PartidaPredefinida.tableName, id: partida.id!, context: context, isLoading: isLoading);
+  static Future<SqlResponse> delete({required PartidaPredefinida partida, required bool isLoading}) async {
+    final response = await CrudHelper.deleteOne(tableName: PartidaPredefinida.tableName, id: partida.id!, isLoading: isLoading);
 
     if (response.hasError!) response.addMsg('No se pudo borrar la partida predefinida seleccionada.');
 
     return response;
   }
 
-  static Future<SqlResponse> edit(BuildContext context, {required int id, required Map<String, dynamic> partidaEdit}) async {
-    final response =
-        await CrudHelper.updateOne(tableName: PartidaPredefinida.tableName, id: id, newData: partidaEdit, context: context, isLoading: true);
+  static Future<SqlResponse> edit({required int id, required Map<String, dynamic> partidaEdit}) async {
+    final response = await CrudHelper.updateOne(tableName: PartidaPredefinida.tableName, id: id, newData: partidaEdit, isLoading: true);
 
     if (response.hasError!) response.addMsg('No se pudo editar la partida seleccionada.');
 

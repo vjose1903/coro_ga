@@ -57,7 +57,7 @@ class PartidaProvider extends ChangeNotifier {
   }
 
   Future<Partida> addJugadorToPartida(BuildContext context, {required Partida partida, required Jugador jugador}) async {
-    final response = await Partida.addNewJugador(context, partida: partida, jugador: jugador);
+    final response = await Partida.addNewJugador(partida: partida, jugador: jugador);
 
     int index = partidas.indexWhere((item) => item.id == partida.id);
     partidas[index] = response.data;
@@ -70,7 +70,7 @@ class PartidaProvider extends ChangeNotifier {
   getPartidas(BuildContext context, {required bool isLoading}) async {
     await Future.delayed(const Duration(microseconds: 100));
 
-    final partidasFuture = Partida.getPartidas(context, isLoading: isLoading);
+    final partidasFuture = Partida.getPartidas(isLoading: isLoading);
 
     partidas = await partidasFuture;
     isFirstSearch = true;
@@ -79,7 +79,7 @@ class PartidaProvider extends ChangeNotifier {
   }
 
   Future<SqlResponse> deletePartida(BuildContext context, {required Partida partida, CompletionHandler? handler}) async {
-    final response = await Partida.delete(context, partida: partida, isLoading: true);
+    final response = await Partida.delete(partida: partida, isLoading: true);
 
     if (!response.hasError!) {
       if (handler != null) await handler(true);
@@ -95,7 +95,7 @@ class PartidaProvider extends ChangeNotifier {
   }
 
   Future<SqlResponse> editPartida(BuildContext context, {required Partida partida, required String newNombrePartida}) async {
-    final responseFuture = Partida.edit(context, partida: partida, newNombrePartida: newNombrePartida);
+    final responseFuture = Partida.edit(partida: partida, newNombrePartida: newNombrePartida);
     final response = await responseFuture;
 
     if (!response.hasError!) {

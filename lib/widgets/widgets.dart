@@ -1,7 +1,7 @@
 export 'package:game_score/widgets/form_partida_predefinida.dart';
 
 export 'package:game_score/widgets/partidas_predefinidas_alert.dart';
-export 'package:game_score/widgets/google_ads.dart';
+export 'package:game_score/widgets/google_banner_ad.dart';
 export 'package:game_score/widgets/bottom_bar.dart';
 export 'package:game_score/widgets/lottie_animation.dart';
 export 'package:game_score/widgets/jugadores_actuales.dart';

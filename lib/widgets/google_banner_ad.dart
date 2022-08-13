@@ -8,17 +8,14 @@ import 'package:skeletons/skeletons.dart';
 
 enum AdLocation { partida, puntuacion, agregarJugador, editarEntidad, pageTransition }
 
-enum AdType { banner, completo }
+class GoogleBannerAd extends StatefulWidget {
+  GoogleBannerAd({Key? key, required this.location, this.onCloseAd}) : super(key: key);
 
-class GoogleAds extends StatefulWidget {
-  GoogleAds({Key? key, required this.location, required this.tipo, this.onCloseAd}) : super(key: key);
-
-  final AdType tipo;
   final AdLocation location;
   final Function? onCloseAd;
 
   @override
-  State<GoogleAds> createState() => _GoogleAdsState();
+  State<GoogleBannerAd> createState() => _GoogleBannerAdState();
 
   BannerAd? _bannerAd;
   bool isHideSkeleton = false;
@@ -29,14 +26,12 @@ class GoogleAds extends StatefulWidget {
   }
 }
 
-class _GoogleAdsState extends State<GoogleAds> {
+class _GoogleBannerAdState extends State<GoogleBannerAd> {
   @override
   void initState() {
     super.initState();
 
-    Fun.logColor(color: Colores.yellow, body: "widget.tipo: ${widget.tipo}");
-
-    if (widget.tipo == AdType.banner) _loadBannerAd();
+    _loadBannerAd();
   }
 
   @override
@@ -48,8 +43,6 @@ class _GoogleAdsState extends State<GoogleAds> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.tipo == AdType.completo) return Container();
-
     if (widget.isHideSkeleton) {
       return Container();
     } else {
@@ -77,7 +70,7 @@ class _GoogleAdsState extends State<GoogleAds> {
   void _loadBannerAd() {
     BannerAd(
       // adUnitId: AdHelper.getBannerAdUnitId(widget.location),
-      adUnitId: AdHelper.getTestingId(AdType.banner),
+      adUnitId: AdHelper.getTestingId("banner"),
       request: const AdRequest(),
 
       size: AdSize.banner,

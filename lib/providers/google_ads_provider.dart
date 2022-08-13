@@ -13,7 +13,7 @@ class GoogleAdsProvider extends ChangeNotifier {
       Fun.logColor(color: Colores.magenta, body: "_loadInterstitialAd");
       InterstitialAd.load(
         // adUnitId: AdHelper.interstitialAdUnitId,
-        adUnitId: AdHelper.getTestingId(AdType.completo),
+        adUnitId: AdHelper.getTestingId("completo"),
         request: const AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(
           onAdLoaded: (ad) {

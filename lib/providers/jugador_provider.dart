@@ -36,7 +36,7 @@ class JugadorProvider extends ChangeNotifier {
   }
 
   Future<SqlResponse> editJugador(BuildContext context, {required Jugador jugador, required String newNombreJugador}) async {
-    final responseFuture = Jugador.edit(context, jugador: jugador, newNombreJugador: newNombreJugador);
+    final responseFuture = Jugador.edit(jugador: jugador, newNombreJugador: newNombreJugador);
     final response = await responseFuture;
 
     if (!response.hasError!) {
@@ -62,7 +62,7 @@ class JugadorProvider extends ChangeNotifier {
             "onTap": () async {
               Navigator.pop(context);
 
-              final response = await jugador.delete(context, isLoading: true);
+              final response = await jugador.delete(isLoading: true);
 
               if (!response.hasError!) {
                 if (panelController != null) slideUpProvider.closeSlideUp(controller: panelController);
