@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:game_score/providers/providers.dart';
-
 import 'package:game_score/routes/app_routes.dart';
 import 'package:game_score/screens/screens.dart';
 import 'package:game_score/utils/utils.dart';
-import 'package:get_it/get_it.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:splash_screen_view/SplashScreenView.dart';
@@ -24,7 +23,6 @@ void main() async {
     ChangeNotifierProvider(create: (_) => FormPartidaProvider()),
     ChangeNotifierProvider(create: (_) => SlideUpProvider()),
     ChangeNotifierProvider(create: (_) => JugadorProvider()),
-    ChangeNotifierProvider(create: (_) => LoadingProvider()),
     ChangeNotifierProvider(create: (_) => GoogleAdsProvider()),
     ChangeNotifierProvider(create: (_) => ReorderableProvider()),
     ChangeNotifierProvider(create: (_) => PartidaPredefinidaProvider()),
@@ -37,16 +35,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    GetIt.I.allowReassignment = true;
-    GetIt.I.registerSingleton<LoadingProvider>(LoadingProvider());
-
     ThemeProvider themeProvider = context.watch<ThemeProvider>();
 
     Widget myAppWithSplash = SplashScreenView(
       pageRouteTransition: PageRouteTransition.CupertinoPageRoute,
       navigateRoute: const HomeScreen(),
-      duration: 3000,
-      imageSize: 290,
+      // navigateRoute: const GanadorScreen(),
+      duration: 2500,
+      imageSize: 280,
       imageSrc: "assets/img/${Preferences.isDarkMode ? "logo_dark" : "logo_light"}.png",
       text: "CARGANDO...",
       textType: TextType.TyperAnimatedText,
@@ -68,6 +64,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Coro Games',
           home: myAppWithSplash,
+          builder: EasyLoading.init(),
           routes: AppRoutes.getAppRoutes(),
           theme: themeProvider.getCurrentTheme),
     );

@@ -51,21 +51,21 @@ class PartidaPredefinida extends DynamicClass {
 
   @override
   String toString() {
-    return '{"id": $id, "nombre": "$nombre", "tipo": "$tipo", "maxPuntuacion": $maxPuntuacion}, "cantidadJugadores": $cantidadJugadores}, "orden": $orden}';
+    return '{"id": $id, "nombre": "$nombre", "tipo": "$tipo", "maxPuntuacion": $maxPuntuacion, "cantidadJugadores": $cantidadJugadores, "orden": $orden}';
   }
 
   // ==================================================================================================================================
   // ==================================================================================================================================
   // ==================================================================================================================================
 
-  static createPartidaPredefinida({required PartidaPredefinida partida, bool? isLoading = true}) async {
+  static createPartidaPredefinida({required PartidaPredefinida partida}) async {
     final SqlResponse response = SqlResponse();
 
     Map<String, dynamic> tempPartidaMap = partida.toMap();
 
     Fun.removeKeys(tempPartidaMap, ['id']);
 
-    final SqlResponse partidaRes = await CrudHelper.insert(tableName: PartidaPredefinida.tableName, body: tempPartidaMap, isLoading: isLoading!);
+    final SqlResponse partidaRes = await CrudHelper.insert(tableName: PartidaPredefinida.tableName, body: tempPartidaMap);
 
     partida.id = partidaRes.data;
 
@@ -74,8 +74,8 @@ class PartidaPredefinida extends DynamicClass {
     return response;
   }
 
-  static getPartidasPredefinidas({required bool isLoading}) async {
-    final response = await CrudHelper.getAll(tableName: PartidaPredefinida.tableName, isLoading: isLoading);
+  static getPartidasPredefinidas() async {
+    final response = await CrudHelper.getAll(tableName: PartidaPredefinida.tableName);
 
     if (!response.hasError!) {
       final partidasParsed = List<PartidaPredefinida>.from(response.data.map((x) => PartidaPredefinida.fromMap(x)));
@@ -87,8 +87,8 @@ class PartidaPredefinida extends DynamicClass {
     }
   }
 
-  static Future<SqlResponse> delete({required PartidaPredefinida partida, required bool isLoading}) async {
-    final response = await CrudHelper.deleteOne(tableName: PartidaPredefinida.tableName, id: partida.id!, isLoading: isLoading);
+  static Future<SqlResponse> delete({required PartidaPredefinida partida}) async {
+    final response = await CrudHelper.deleteOne(tableName: PartidaPredefinida.tableName, id: partida.id!);
 
     if (response.hasError!) response.addMsg('No se pudo borrar la partida predefinida seleccionada.');
 
@@ -96,7 +96,7 @@ class PartidaPredefinida extends DynamicClass {
   }
 
   static Future<SqlResponse> edit({required int id, required Map<String, dynamic> partidaEdit}) async {
-    final response = await CrudHelper.updateOne(tableName: PartidaPredefinida.tableName, id: id, newData: partidaEdit, isLoading: true);
+    final response = await CrudHelper.updateOne(tableName: PartidaPredefinida.tableName, id: id, newData: partidaEdit);
 
     if (response.hasError!) response.addMsg('No se pudo editar la partida seleccionada.');
 

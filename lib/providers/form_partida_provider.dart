@@ -26,7 +26,7 @@ class FormPartidaProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  resetForm({bool restoreJugadores = true}) async {
+  resetForm({bool restoreJugadores = true}) {
     form.reset();
 
     final jugadoresArray = form.control('jugadores') as FormArray<dynamic>;
@@ -46,7 +46,7 @@ class FormPartidaProvider extends ChangeNotifier {
 
     form.control("activo").value = "true";
     notifyListeners();
-    return Future.delayed(const Duration(milliseconds: 10));
+    // return Future.delayed(const Duration(milliseconds: 10));
   }
 
   get jugadores {

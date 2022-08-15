@@ -62,7 +62,7 @@ class JugadorProvider extends ChangeNotifier {
             "onTap": () async {
               Navigator.pop(context);
 
-              final response = await jugador.delete(isLoading: true);
+              final response = await jugador.delete();
 
               if (!response.hasError!) {
                 if (panelController != null) slideUpProvider.closeSlideUp(controller: panelController);

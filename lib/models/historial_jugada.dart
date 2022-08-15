@@ -37,7 +37,7 @@ class HistorialJugada extends DynamicClass {
     Map body = historialJugada.toMap();
     Fun.removeKeys(body, ['id']);
 
-    final res = await CrudHelper.insert(tableName: HistorialJugada.tableName, body: body, isLoading: false);
+    final res = await CrudHelper.insert(tableName: HistorialJugada.tableName, body: body);
 
     if (!response.hasError!) {
       historialJugada.id = res.data;

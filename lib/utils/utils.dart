@@ -1,3 +1,5 @@
+export 'package:game_score/utils/loading.dart';
+
 export 'package:game_score/utils/fluid_alerts.dart';
 export 'package:game_score/utils/alert_dialog.dart';
 export 'package:game_score/utils/dynamic_class.dart';

@@ -161,18 +161,18 @@ class _Body extends StatelessWidget {
                           final PartidaProvider partidaProvider = context.read<PartidaProvider>();
                           final GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
 
-                          Fun.logColor(color: Colores.yellow, body: "${form.value}");
+                          MyLoading.show();
                           final Partida partida = Partida.fromMap(form.value);
                           final response = await partidaProvider.newPartida(partida, context);
+                          MyLoading.close();
 
                           if (!response.hasError!) {
                             final newPartida = response.data;
 
-                            formPartidaProvider.resetForm();
-
                             googleAdsProvider.showInterstitialAd(onCloseFunction: () {
                               partidaProvider.changePartidaEnTurno(newPartida);
                               Navigator.pushReplacementNamed(context, 'partida');
+                              formPartidaProvider.resetForm();
                             });
                           } else {
                             Fun.toast(type: ToasType.error, context: context, message: "Error registrando partida.");

@@ -179,6 +179,7 @@ class FormPartidaPredefinida extends StatelessWidget {
         googleAdsProvider.showInterstitialAd(onCloseFunction: () {
           DialogNavigator.of(context).pop();
           formPartidaPredefinidaProvider.resetForm();
+          googleAdsProvider.loadInterstitialAd();
         });
       } else {
         Fun.toast(type: ToasType.error, context: context, message: "Error registrando partida.");

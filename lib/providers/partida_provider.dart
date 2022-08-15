@@ -6,7 +6,7 @@ import 'package:reactive_forms/reactive_forms.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 
 class PartidaProvider extends ChangeNotifier {
-  bool isFirstSearch = false;
+  bool isFirstSearch = true;
   bool isChangePartida = false;
 
   List<Partida> partidas = [];
@@ -67,19 +67,21 @@ class PartidaProvider extends ChangeNotifier {
     return response.data;
   }
 
-  getPartidas(BuildContext context, {required bool isLoading}) async {
+  getPartidas() async {
+    MyLoading.show();
     await Future.delayed(const Duration(microseconds: 100));
 
-    final partidasFuture = Partida.getPartidas(isLoading: isLoading);
+    final partidasFuture = Partida.getPartidas();
 
     partidas = await partidasFuture;
-    isFirstSearch = true;
+    isFirstSearch = false;
     notifyListeners();
+    MyLoading.close();
     return partidasFuture;
   }
 
   Future<SqlResponse> deletePartida(BuildContext context, {required Partida partida, CompletionHandler? handler}) async {
-    final response = await Partida.delete(partida: partida, isLoading: true);
+    final response = await Partida.delete(partida: partida);
 
     if (!response.hasError!) {
       if (handler != null) await handler(true);

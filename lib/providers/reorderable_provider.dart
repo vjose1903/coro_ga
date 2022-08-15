@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:game_score/utils/functions.dart';
 
 class ReorderableProvider extends ChangeNotifier {
   bool _isReording = false;
@@ -12,7 +11,6 @@ class ReorderableProvider extends ChangeNotifier {
   bool get isReording => _isReording;
 
   void onReorder({required int oldIndex, required int newIndex, required reordenableList}) {
-    Fun.logColor(color: Colores.white, body: "--- ON REORDER ---");
     Widget row = reordenableList.removeAt(oldIndex);
     reordenableList.insert(newIndex, row);
   }

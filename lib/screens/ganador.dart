@@ -3,11 +3,14 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:game_score/models/models.dart';
+import 'package:game_score/models/partida.dart';
 import 'package:game_score/providers/partida_provider.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/screens/screens.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
+import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
@@ -35,13 +38,14 @@ class _GanadorScreenState extends State<GanadorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    
     GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
     googleAdsProvider.loadInterstitialAd();
 
     final routeArgs = ModalRoute.of(context)!.settings.arguments as Map;
     final String partida = routeArgs['partida'];
     final String jugador = routeArgs['jugador'];
+    // final String partida = "Domino";
+    // final String jugador = "Pedro";
 
     final Color ganadorColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.7) : const Color(0xFF06187E);
     final Color partidaColor = Preferences.isDarkMode ? AppThemes.colorSegundo : Colors.grey[700]!;
@@ -50,7 +54,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
       gradient: LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        stops: const [0.5, 0.99],
+        stops: const [0.3, 1],
         colors: [AppThemes.themeColor_1, const Color(0xFF08134F)],
       ),
     );
@@ -80,7 +84,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
                     });
                   })),
           Container(
-              margin: const EdgeInsets.only(top: 200),
+              margin: const EdgeInsets.only(top: 150),
               width: double.infinity,
               child: Column(
                 children: [
@@ -93,7 +97,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
                       incomingEffect: WidgetTransitionEffects.incomingScaleDown(duration: const Duration(seconds: 1)),
                       style: TextStyle(color: partidaColor, fontFamily: 'Poppins', fontSize: 20)),
                   //
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 20),
 
                   SizedBox(
                     height: 300,
@@ -111,12 +115,44 @@ class _GanadorScreenState extends State<GanadorScreen> {
                       incomingEffect: WidgetTransitionEffects.incomingScaleUp(),
                       atRestEffect: WidgetRestingEffects.pulse(effectStrength: 0.8),
                       initialDelay: const Duration(seconds: 2),
-                      // atRestEffect: WidgetRestingEffects.pulse(duration: const Duration(seconds: 4)),
                       style: TextStyle(color: ganadorColor, fontFamily: 'Poppins', fontSize: 30, fontWeight: FontWeight.bold, letterSpacing: 3)),
+
+                  const SizedBox(height: 40),
+
+                  GestureDetector(
+                    onTap: () => revanchaFunction(),
+                    child: TextAnimator("Revancha",
+                        initialDelay: const Duration(seconds: 2, milliseconds: 800),
+                        incomingEffect: WidgetTransitionEffects.incomingScaleDown(duration: const Duration(seconds: 1)),
+                        style: TextStyle(color: Colors.white, fontFamily: 'Poppins', fontSize: 15)),
+                  ),
                 ],
               )),
         ],
       ),
     );
+  }
+
+  revanchaFunction() async {
+    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+    GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
+    Fun.logColor(color: Colores.red, body: "${partidaProvider.partidaEnTurno}");
+
+    for (Jugador jugador in partidaProvider.partidaEnTurno!.jugadores!) {
+      jugador.puntuacion = 0;
+    }
+
+    final response = await partidaProvider.newPartida(partidaProvider.partidaEnTurno!, context);
+    if (!response.hasError!) {
+      final newPartida = response.data;
+
+      googleAdsProvider.showInterstitialAd(onCloseFunction: () {
+        partidaProvider.changePartidaEnTurno(newPartida);
+        Navigator.pushReplacementNamed(context, 'partida');
+      });
+    } else {
+      Fun.toast(type: ToasType.error, context: context, message: "Error renovando partida.");
+      Navigator.pushReplacementNamed(context, 'home');
+    }
   }
 }

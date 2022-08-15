@@ -17,8 +17,9 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ResponsiveApp.setMq(context);
+
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-    partidaProvider.getPartidas(context, isLoading: true);
+    if (partidaProvider.isFirstSearch) partidaProvider.getPartidas();
     return const MainHome();
   }
 }
@@ -79,7 +80,7 @@ class _Body extends StatelessWidget {
     // final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     return ListPartidas(panelController: panelController);
     // return FutureBuilder(
-    //   future: partidaProvider.getPartidas(context, isLoading: true),
+    //   future: partidaProvider.getPartidas(context),
     //   builder: (BuildContext context, AsyncSnapshot snapshot) {
     //     if (!snapshot.hasData) {
     //       return const Center(
@@ -104,7 +105,7 @@ class ListPartidas extends StatelessWidget {
     final List<Partida> partidas = partidaProvider.partidas;
 
     if (partidas.isEmpty) {
-      if (partidaProvider.isFirstSearch) {
+      if (!partidaProvider.isFirstSearch) {
         return Center(
             child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -273,6 +274,13 @@ class _MenuState extends State<_Menu> {
                 ],
               ),
             ),
+
+            TextButton(
+                onPressed: () {
+                  // EasyLoading.show(status: 'loading...');
+                  MyLoading.show();
+                },
+                child: const Text("prueba"))
           ],
         ));
   }

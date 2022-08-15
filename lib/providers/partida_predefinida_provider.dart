@@ -48,7 +48,6 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
 
     form.control("maxPuntuacion").value = 1;
     form.control("cantidadJugadores").value = 2;
-    form.control("orden").value = partidasPredefinidas.length + 1;
     notifyListeners();
 
     return Future.delayed(const Duration(milliseconds: 10));
@@ -68,14 +67,16 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
     for (var index = 0; index < listado.length; index++) {
       PartidaPredefinida partida = listado[index];
       partida.orden = index += 1;
-      await newPartida(partida: partida, isLoading: false);
+      await newPartida(partida: partida);
     }
 
     Preferences.isFirstTimeOpen = false;
   }
 
-  Future<SqlResponse> newPartida({required PartidaPredefinida partida, bool? isLoading = true}) async {
-    final response = await PartidaPredefinida.createPartidaPredefinida(partida: partida, isLoading: isLoading!);
+  Future<SqlResponse> newPartida({required PartidaPredefinida partida}) async {
+    partida.orden = partidasPredefinidas.length + 1;
+
+    final response = await PartidaPredefinida.createPartidaPredefinida(partida: partida);
     PartidaPredefinida newPartida = response.data;
 
     partidasPredefinidas.add(newPartida);
@@ -98,18 +99,18 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
     }
   }
 
-  Future getPartidasPredefinidas(context, {required bool isLoading}) async {
+  Future getPartidasPredefinidas() async {
     await Future.delayed(const Duration(microseconds: 100));
 
-    final partidasFuture = PartidaPredefinida.getPartidasPredefinidas(isLoading: isLoading);
+    final partidasFuture = PartidaPredefinida.getPartidasPredefinidas();
     partidasPredefinidas = await partidasFuture;
-
+    Fun.logColor(color: Colores.green, body: "partidasPredefinidas: $partidasPredefinidas");
     notifyListeners();
     return partidasFuture;
   }
 
   Future<SqlResponse> deletePartidaPredefinida(BuildContext context, {required PartidaPredefinida partida}) async {
-    final response = await PartidaPredefinida.delete(partida: partida, isLoading: true);
+    final response = await PartidaPredefinida.delete(partida: partida);
 
     if (!response.hasError!) {
       partidasPredefinidas.remove(partida);

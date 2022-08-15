@@ -4,8 +4,8 @@ import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/functions.dart';
+
 import 'package:provider/provider.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class Layout extends StatelessWidget {
   Layout({
@@ -97,7 +97,6 @@ class Layout extends StatelessWidget {
                 child: _WeSlideContent(panelController: panelController),
               ),
             ),
-            const _Loading(),
           ],
         );
       },
@@ -108,33 +107,6 @@ class Layout extends StatelessWidget {
     if (slideUpProvider.body != null) slideUpProvider.body = null;
     FocusManager.instance.primaryFocus?.unfocus();
     slideUpProvider.closeSlideUp(controller: panelController, isListener: isListener);
-  }
-}
-
-class _Loading extends StatelessWidget {
-  const _Loading({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final LoadingProvider loadingProvider = context.watch<LoadingProvider>();
-    Size size = ResponsiveApp.size;
-    return Visibility(
-      visible: loadingProvider.isLoading,
-      child: Positioned(
-          top: 0,
-          child: Container(
-            height: size.height,
-            width: size.width,
-            color: Colors.black.withOpacity(0.7),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Center(child: LoadingAnimationWidget.staggeredDotsWave(color: AppThemes.colorSegundo, size: 150)),
-                const Text('Cargando...', style: TextStyle(fontFamily: "Poppins", fontSize: 25))
-              ],
-            ),
-          )),
-    );
   }
 }
 

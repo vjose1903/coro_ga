@@ -3,8 +3,6 @@ import 'package:game_score/screens/screens.dart';
 import '../models/menu_option.dart';
 
 class AppRoutes {
-  static const initialRoute = 'home';
-
   static final menuOptions = <MenuOption>[
     MenuOption(route: 'home', screen: const HomeScreen()),
     MenuOption(route: 'partida', screen: const PartidaScreen()),

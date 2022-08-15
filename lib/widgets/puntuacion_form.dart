@@ -153,6 +153,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                       changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: "aumentar", context: context)
                           .then((newPuntuacion) {
                         if (newPuntuacion != 0) {
+                          puntuacionController.text = "";
                           if (newPuntuacion >= partidaProvider.partidaEnTurno!.maxPuntuacion!.toInt()) {
                             Navigator.pushReplacement(
                                 context,
@@ -178,7 +179,8 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                     textColor: Colors.white,
                     onTap: () {
                       String puntuacion = partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? puntuacionController.text : "1";
-                      changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: "reducir", context: context);
+                      changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: "reducir", context: context)
+                          .then((value) => puntuacionController.text = "");
                     }),
               ],
             ),
@@ -212,9 +214,11 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
 
         return puntuacion_actual;
       } else {
-        SqlResponse response = await Jugador.changePuntuacion(jugador: jugador, newPuntuacion: puntuacionInt, tipo: tipo, isLoading: true);
+        MyLoading.show();
+        SqlResponse response = await Jugador.changePuntuacion(jugador: jugador, newPuntuacion: puntuacionInt, tipo: tipo);
         partidaProvider.refresh();
         jugadorProvider.changeJugadorEnTurno(response.data);
+        MyLoading.close();
         return response.data.puntuacion;
       }
     } else {
