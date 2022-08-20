@@ -273,13 +273,6 @@ class _MenuState extends State<_Menu> {
                 ],
               ),
             ),
-
-            TextButton(
-                onPressed: () {
-                  // EasyLoading.show(status: 'loading...');
-                  MyLoading.show();
-                },
-                child: const Text("prueba"))
           ],
         ));
   }
