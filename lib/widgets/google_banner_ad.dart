@@ -81,14 +81,12 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
           });
         },
         onAdFailedToLoad: (ad, err) {
-          Fun.logColor(color: Colores.red, body: "Failed to load a banner ad: ${err.message}");
-
           ad.dispose();
         },
       ),
     ).load();
 
-    Future.delayed(const Duration(seconds: 10)).then((value) {
+    Future.delayed(const Duration(seconds: 33)).then((value) {
       if (widget._bannerAd == null) {
         widget.disposeBannerAd();
         setState(() => widget.isHideSkeleton = true);

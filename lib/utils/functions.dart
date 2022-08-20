@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:motion_toast/motion_toast.dart';
 import 'package:palestine_console/palestine_console.dart';
@@ -18,22 +19,23 @@ class Colores {
 
 class Fun {
   static void logColor({required String color, required dynamic body, String title = '', bool pretty = false}) {
-    final printColors = {
-      'red': Print.red,
-      'white': Print.white,
-      'yellow': Print.yellow,
-      'green': Print.green,
-      'magenta': Print.magenta,
-      'cyan': Print.cyan,
-      'blue': Print.blue,
-    };
+    if (!kReleaseMode) {
+      final printColors = {
+        'red': Print.red,
+        'white': Print.white,
+        'yellow': Print.yellow,
+        'green': Print.green,
+        'magenta': Print.magenta,
+        'cyan': Print.cyan,
+        'blue': Print.blue,
+      };
 
-    if (title != '') {
-      printColors[color]!(title);
-      pretty ? Print.white(getPrettyJSONString(jsonDecode(body))) : Print.white(body);
-      print(' ');
-    } else {
-      pretty ? printColors[color]!(getPrettyJSONString(jsonDecode(body))) : printColors[color]!(body);
+      if (title != '') {
+        printColors[color]!(title);
+        pretty ? Print.white(getPrettyJSONString(jsonDecode(body))) : Print.white(body);
+      } else {
+        pretty ? printColors[color]!(getPrettyJSONString(jsonDecode(body))) : printColors[color]!(body);
+      }
     }
   }
 
@@ -80,5 +82,23 @@ class Fun {
       description: message != null ? Text(message, style: const TextStyle(color: Colors.black)) : Container(),
       dismissable: true,
     ).show(context);
+  }
+
+  static bool arraySortedOrNot(List<dynamic> arr, dynamic property) {
+    int n = arr.length;
+    return sortFun(arr, property, n);
+  }
+
+  static sortFun(List<dynamic> arr, dynamic property, int n) {
+// Array has one or no element or the
+    // rest are already checked and approved.
+    if (n == 1 || n == 0) return true;
+
+    // Unsorted pair found (Equal values allowed)
+    if (arr[n - 1][property] < arr[n - 2][property]) return false;
+
+    // Last pair was sorted
+    // Keep on checking
+    return sortFun(arr, property, n - 1);
   }
 }

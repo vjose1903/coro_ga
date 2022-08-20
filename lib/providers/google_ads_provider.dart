@@ -10,7 +10,6 @@ class GoogleAdsProvider extends ChangeNotifier {
 
   loadInterstitialAd() {
     if (interstitialAd == null) {
-      Fun.logColor(color: Colores.magenta, body: "_loadInterstitialAd");
       InterstitialAd.load(
         // adUnitId: AdHelper.interstitialAdUnitId,
         adUnitId: AdHelper.getTestingId("completo"),
@@ -31,7 +30,7 @@ class GoogleAdsProvider extends ChangeNotifier {
             interstitialAd = ad;
           },
           onAdFailedToLoad: (err) {
-            print('Failed to load an interstitial ad: ${err.message}');
+            Fun.logColor(color: Colores.red, body: 'Failed to load an interstitial ad: ${err.message}');
             onCloseFunction_ != null ? onCloseFunction_!() : null;
             cleanInterstitialAd();
           },

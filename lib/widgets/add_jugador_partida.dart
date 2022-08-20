@@ -15,22 +15,31 @@ class AddJugadorPartida extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final PageController pageController = PageController();
-
+    GoogleBannerAd anuncio = GoogleBannerAd(location: AdLocation.agregarJugador);
     return PageView.builder(
         controller: pageController,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: 2,
         itemBuilder: (context, index) {
-          return index == 0 ? AddJugador(pageController: pageController) : EditarEntidad(pageController: pageController);
+          return index == 0 ? AddJugador(pageController: pageController, anuncio: anuncio) : EditarEntidad(pageController: pageController);
         });
   }
 }
 
-class AddJugador extends StatelessWidget {
-  AddJugador({Key? key, required this.pageController}) : super(key: key);
+class AddJugador extends StatefulWidget {
+  AddJugador({Key? key, required this.pageController, required this.anuncio}) : super(key: key);
 
   final PageController pageController;
+  final GoogleBannerAd anuncio;
+
+  @override
+  State<AddJugador> createState() => _AddJugadorState();
+}
+
+class _AddJugadorState extends State<AddJugador> {
   final ScrollController jugadoresController = ScrollController();
+
+  resetWidget() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +73,7 @@ class AddJugador extends StatelessWidget {
             const SizedBox(height: 5),
             // Jugadores Actuales
             //
-            JugadoresActuales(pageController: pageController, jugadoresController: jugadoresController),
+            JugadoresActuales(pageController: widget.pageController, jugadoresController: jugadoresController, resetWidget: resetWidget),
             const SizedBox(height: 20),
             // Boton
             //
@@ -76,12 +85,13 @@ class AddJugador extends StatelessWidget {
                   Jugador nuevoJugador = Jugador.fromMap(form.value);
 
                   partidaProvider.addJugadorToPartida(context, jugador: nuevoJugador, partida: partidaProvider.partidaEnTurno!).then((value) async {
-                    partidaProvider.changePartidaEnTurno(value);
                     form.reset();
+                    resetWidget();
 
-                    await Future.delayed(const Duration(milliseconds: 20));
+                    await Future.delayed(const Duration(milliseconds: 50));
+
                     jugadoresController.animateTo(jugadoresController.position.maxScrollExtent,
-                        duration: const Duration(seconds: 1, milliseconds: 500), curve: Curves.elasticOut);
+                        duration: const Duration(seconds: 1), curve: Curves.easeOutCubic);
                   });
                 } else {
                   Fun.toast(type: ToasType.error, context: context, message: "Debe de introducir el nombre del nuevo jugador");
@@ -94,7 +104,7 @@ class AddJugador extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             // ANUNCIOS ==========================================
-            GoogleBannerAd(location: AdLocation.agregarJugador)
+            widget.anuncio
           ],
         ),
       ),

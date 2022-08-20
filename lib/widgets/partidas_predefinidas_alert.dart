@@ -188,8 +188,6 @@ class PartidasScrollView extends StatelessWidget {
 Future<List<Widget>> getPartidas(BuildContext context, PartidaPredefinidaProvider formPartidaPredefinidaProvider) async {
   formPartidaPredefinidaProvider.partidasPredefinidas.sort((a, b) => a.orden!.compareTo(b.orden!));
 
-  Fun.logColor(color: Colores.green, body: "getPartidas");
-
   return formPartidaPredefinidaProvider.partidasPredefinidas.map((partida) {
     return ReordenableItem(partidaPredefinida: partida);
   }).toList();

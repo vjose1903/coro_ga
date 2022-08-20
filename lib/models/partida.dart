@@ -37,6 +37,18 @@ class Partida extends DynamicClass {
     return estado;
   }
 
+  get jugadoresMap {
+    return jugadores != null ? List<dynamic>.from(jugadores!.map((x) => x.toMap())) : [];
+  }
+
+  get jugadoresSort {
+    if (!Fun.arraySortedOrNot(jugadoresMap, "id")) {
+      jugadores!.sort((a, b) => a.id!.compareTo(b.id!));
+    }
+
+    return jugadores;
+  }
+
   ordenarPorPuntuacion() {
     if (jugadores!.isEmpty) return [];
     jugadores!.sort((a, b) => a.puntuacion!.compareTo(b.puntuacion!));
@@ -153,9 +165,10 @@ class Partida extends DynamicClass {
       jugador.partidaId = partidaRes.data;
 
       Map<String, dynamic> tempJugadorMap = jugador.toMap();
-      Fun.removeKeys(tempJugadorMap, ['id']);
+      Fun.removeKeys(tempJugadorMap, ['id', 'historialJugadas']);
 
       final SqlResponse jugadorRes = await CrudHelper.insert(tableName: Jugador.tableName, body: tempJugadorMap);
+      jugador.historialJugadas = [];
       jugador.id = jugadorRes.data;
     }
 

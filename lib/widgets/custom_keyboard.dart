@@ -31,7 +31,7 @@ class CustomKeyboard extends StatelessWidget {
         TableRow(children: [
           Container(),
           _Tecla(label: "0", onChanged: (value) => onChanged(value)),
-          _Tecla(label: "DEL", icon: Icons.cancel, onChanged: (value) => onChanged(value), backgroundColor: Colors.transparent)
+          _Tecla(label: "DEL", icon: Icons.backspace_rounded, onChanged: (value) => onChanged(value), backgroundColor: Colors.transparent)
         ]),
       ],
     );

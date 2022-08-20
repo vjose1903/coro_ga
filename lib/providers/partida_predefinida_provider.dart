@@ -54,15 +54,7 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
   }
 
   seed() async {
-    Fun.logColor(color: Colores.yellow, body: ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-    Fun.logColor(color: Colores.yellow, body: "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-    Fun.logColor(color: Colores.yellow, body: "SEED DE PARTIDAS PREDEFINIDAS");
-    Fun.logColor(color: Colores.yellow, body: ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-    Fun.logColor(color: Colores.yellow, body: "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-
     List<PartidaPredefinida> listado = [PartidaPredefinida(nombre: "Domino", orden: 1, tipo: "Puntuación", maxPuntuacion: 200, cantidadJugadores: 2)];
-
-    Fun.logColor(color: Colores.magenta, body: "LENGTH: ${listado.length}");
 
     for (var index = 0; index < listado.length; index++) {
       PartidaPredefinida partida = listado[index];
@@ -104,7 +96,7 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
 
     final partidasFuture = PartidaPredefinida.getPartidasPredefinidas();
     partidasPredefinidas = await partidasFuture;
-    Fun.logColor(color: Colores.green, body: "partidasPredefinidas: $partidasPredefinidas");
+
     notifyListeners();
     return partidasFuture;
   }

@@ -3,12 +3,14 @@ import 'package:game_score/models/models.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/providers/providers.dart';
+import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
 class JugadoresActuales extends StatelessWidget {
-  const JugadoresActuales({Key? key, required this.pageController, required this.jugadoresController}) : super(key: key);
+  const JugadoresActuales({Key? key, required this.pageController, required this.jugadoresController, required this.resetWidget}) : super(key: key);
   final PageController pageController;
+  final Function resetWidget;
   final ScrollController jugadoresController;
 
   @override
@@ -22,7 +24,8 @@ class JugadoresActuales extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(10),
           child: Container(
-              color: AppThemes.themeColor_1, child: ListJugadores(pageController: pageController, jugadoresController: jugadoresController)),
+              color: AppThemes.themeColor_1,
+              child: ListJugadores(pageController: pageController, jugadoresController: jugadoresController, resetWidget: resetWidget)),
         ),
       ),
     );
@@ -30,23 +33,26 @@ class JugadoresActuales extends StatelessWidget {
 }
 
 class ListJugadores extends StatelessWidget {
-  const ListJugadores({Key? key, required this.pageController, required this.jugadoresController}) : super(key: key);
+  const ListJugadores({Key? key, required this.pageController, required this.jugadoresController, required this.resetWidget}) : super(key: key);
   final PageController pageController;
   final ScrollController jugadoresController;
+  final Function resetWidget;
 
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
 
-    List<Jugador> jugadores = partidaProvider.partidaEnTurno!.jugadores!;
-    jugadores.sort((a, b) => a.id!.compareTo(b.id!));
+    List<Jugador> jugadores = [];
+    jugadores = partidaProvider.partidaEnTurno!.jugadoresSort;
+    // List<Jugador> jugadores = partidaProvider.partidaEnTurno!.jugadores!;
 
     Color nombreColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.7);
     Color puntuacionColor = Preferences.isDarkMode ? AppThemes.colorSegundo : AppThemes.colorQuinto.withOpacity(0.7);
     final Color iconsColor = Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : AppThemes.colorQuinto.withOpacity(0.7);
 
     return ListView.separated(
+        key: UniqueKey(),
         controller: jugadoresController,
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.all(5),
@@ -83,7 +89,18 @@ class ListJugadores extends StatelessWidget {
               Visibility(
                 visible: partidaProvider.partidaEnTurno!.jugadores!.length > 2,
                 child: CustomIconButtom(
-                    onTap: () => jugadorProvider.deleteJugador(context, jugador: jugador),
+                    onTap: () {
+                      jugadorProvider.deleteJugador(context, jugador: jugador, callBack: (value) async {
+                        if (value["tipo"] == "aceptar") {
+                          double actualPosition = jugadoresController.position.pixels;
+
+                          resetWidget();
+
+                          await Future.delayed(const Duration(milliseconds: 50));
+                          jugadoresController.jumpTo(actualPosition);
+                        }
+                      });
+                    },
                     icon: Icons.delete_forever,
                     size: IconSize.min,
                     iconSize: 20,

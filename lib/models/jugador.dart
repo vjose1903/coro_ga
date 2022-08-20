@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
+import 'package:game_score/utils/functions.dart';
 import 'package:game_score/utils/utils.dart';
 
 class Jugador extends DynamicClass {
@@ -43,7 +44,7 @@ class Jugador extends DynamicClass {
 
   @override
   String toString() {
-    return '{"nombre": "$nombre", "puntuacion": $puntuacion, "partidaId": $partidaId, "historialJugadas": $historialJugadas}';
+    return '{"id": $id, "nombre": "$nombre", "puntuacion": $puntuacion, "partidaId": $partidaId, "historialJugadas": $historialJugadas}';
   }
 
   addHistorial(HistorialJugada historial) {
@@ -69,22 +70,16 @@ class Jugador extends DynamicClass {
   }
 
   static Future<SqlResponse> changePuntuacion(
-      {required Jugador jugador, required int newPuntuacion, required String tipo}) async {
+      {required Jugador jugador, required int newPuntuacion, required String tipo, required Map newData}) async {
     //
     final SqlResponse response = SqlResponse();
-    Map body = jugador.toMap();
 
-    if (tipo == "aumentar") body["puntuacion"] = body["puntuacion"] + newPuntuacion;
-    if (tipo == "reducir") body["puntuacion"] = body["puntuacion"] - newPuntuacion;
-
-    final res = await CrudHelper.updateOne(tableName: Jugador.tableName, id: jugador.id!, newData: body);
+    final res = await CrudHelper.updateOne(tableName: Jugador.tableName, id: jugador.id!, newData: newData);
 
     if (!res.hasError!) {
       final resHistorial = await HistorialJugada.newHistorial(jugadorId: jugador.id!, puntuacion: newPuntuacion, tipo: tipo);
 
-      jugador.addHistorial(resHistorial.data);
-      jugador.puntuacion = body["puntuacion"];
-      response.data = jugador;
+      response.data = {"historial": resHistorial.data, "newPuntuacion": newData["puntuacion"]};
     } else {
       response.addMsgs(res.messages);
     }

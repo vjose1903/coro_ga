@@ -48,7 +48,26 @@ class JugadorProvider extends ChangeNotifier {
     }
   }
 
-  void deleteJugador(BuildContext context, {required Jugador jugador, SlidingUpPanelController? panelController}) {
+  Future<SqlResponse> changePuntuacion({required Jugador jugador, required int newPuntuacion, required String tipo}) async {
+    Map body = jugador.toMap();
+
+    if (tipo == "aumentar") body["puntuacion"] = body["puntuacion"] + newPuntuacion;
+    if (tipo == "reducir") body["puntuacion"] = body["puntuacion"] - newPuntuacion;
+
+    SqlResponse response = await Jugador.changePuntuacion(jugador: jugador, newPuntuacion: newPuntuacion, tipo: tipo, newData: body);
+
+    if (!response.hasError!) {
+      jugadorEnTurno!.addHistorial(response.data["historial"]);
+      jugadorEnTurno!.puntuacion = response.data["newPuntuacion"];
+      response.data = jugadorEnTurno;
+      notifyListeners();
+    }
+
+    return response;
+  }
+
+  Future<dynamic> deleteJugador(BuildContext context,
+      {required Jugador jugador, SlidingUpPanelController? panelController, required Function callBack}) async {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
 
@@ -57,7 +76,12 @@ class JugadorProvider extends ChangeNotifier {
         title: "Confirmar",
         dialogType: DialogType.error,
         buttonsList: [
-          CustomActionsButtons.cancelButton({"onTap": () => Navigator.pop(context)}),
+          CustomActionsButtons.cancelButton({
+            "onTap": () {
+              Navigator.pop(context);
+              callBack({"tipo": "cancelar"});
+            }
+          }),
           CustomActionsButtons.aceptarButton({
             "onTap": () async {
               Navigator.pop(context);
@@ -74,6 +98,7 @@ class JugadorProvider extends ChangeNotifier {
               } else {
                 Fun.toast(type: ToasType.error, context: context, message: response.messages!.first);
               }
+              callBack({"tipo": "aceptar"});
             }
           })
         ]);

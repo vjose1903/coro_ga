@@ -74,8 +74,6 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Fun.logColor(color: Colores.yellow, body: "body");
-
     //
     return Consumer(builder: (BuildContext context, value, Widget? child) {
       final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
@@ -258,7 +256,7 @@ class _Inputs extends StatelessWidget {
     final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
 
     final formJugadoresArray = formPartidaProvider.form.control('jugadores') as FormArray<dynamic>;
-    print("formJugadoresArray.value: ${formJugadoresArray.value}");
+    
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
       child: ReactiveFormArray(

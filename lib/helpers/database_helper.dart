@@ -43,9 +43,7 @@ class DatabaseHelper {
     return myDatabase;
   }
 
-  static void _onOpen(Database db) async {
-    Fun.logColor(color: Colores.red, body: "_onOpen");
-  }
+  static void _onOpen(Database db) async {}
 
   static void _onCreate(Database db, int version) async {
     await _databaseV1(db);

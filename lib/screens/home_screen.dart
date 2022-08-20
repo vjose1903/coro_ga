@@ -30,7 +30,6 @@ class MainHome extends StatelessWidget {
   // Future<InitializationStatus> _initGoogleMobileAds() => MobileAds.instance.initialize();
   @override
   Widget build(BuildContext context) {
-    Fun.logColor(color: Colores.cyan, body: "--==--==--==-- MainHome --==--==--==--");
     SlidingUpPanelController panelController = SlidingUpPanelController();
 
     openMenuSlideUp() {

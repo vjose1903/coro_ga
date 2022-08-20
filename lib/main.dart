@@ -14,7 +14,7 @@ import 'shared_preferences/preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  _initGoogleMobileAds() => MobileAds.instance.initialize();
+  MobileAds.instance.initialize();
 
   await Preferences.init();
 
@@ -55,7 +55,6 @@ class MyApp extends StatelessWidget {
       DeviceOrientation.portraitDown,
     ]);
 
-    Fun.logColor(color: Colores.red, body: "ANDO AQUI");
     // if (Preferences.isFirstTimeOpen) PartidaPredefinidaProvider.seed();
 
     return GestureDetector(

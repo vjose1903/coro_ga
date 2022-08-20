@@ -43,7 +43,6 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
 
   @override
   void dispose() {
-    Fun.logColor(color: Colores.magenta, body: "CERRANDO EL SLIDE UP");
     super.dispose();
     anuncio.disposeBannerAd();
   }
@@ -52,6 +51,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
   Widget build(BuildContext context) {
     String? puntuacion;
     TextEditingController puntuacionController = TextEditingController();
+    final ScrollController historialController = ScrollController();
 
     final Color titleColor = Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : AppThemes.colorQuinto.withOpacity(0.7);
     final Color subTitleColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.9);
@@ -96,7 +96,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                   child: CustomIconButtom(
                       onTap: () {
                         Jugador jugador = jugadorProvider.jugadorEnTurno!;
-                        jugadorProvider.deleteJugador(context, jugador: jugador, panelController: widget.panelController);
+                        jugadorProvider.deleteJugador(context, jugador: jugador, panelController: widget.panelController, callBack: (value) {});
                       },
                       icon: Icons.delete_forever,
                       size: IconSize.min,
@@ -131,7 +131,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                 elevation: 7,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: Container(color: AppThemes.themeColor_1, child: const _ListHistorial()),
+                  child: Container(color: AppThemes.themeColor_1, child: _ListHistorial(historialController: historialController)),
                 ),
               ),
             ),
@@ -151,7 +151,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                     onTap: () {
                       String puntuacion = partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? puntuacionController.text : "1";
                       changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: "aumentar", context: context)
-                          .then((newPuntuacion) {
+                          .then((newPuntuacion) async {
                         if (newPuntuacion != 0) {
                           puntuacionController.text = "";
                           if (newPuntuacion >= partidaProvider.partidaEnTurno!.maxPuntuacion!.toInt()) {
@@ -167,6 +167,11 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                                     alignment: Alignment.center,
                                     duration: const Duration(milliseconds: 500)));
                           }
+                          await Future.delayed(const Duration(milliseconds: 50));
+                          //
+                          historialController.animateTo(historialController.position.maxScrollExtent,
+                              duration: const Duration(seconds: 1), curve: Curves.easeOutCubic);
+                          //
                         }
                       });
                     }),
@@ -215,7 +220,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
         return puntuacion_actual;
       } else {
         MyLoading.show();
-        SqlResponse response = await Jugador.changePuntuacion(jugador: jugador, newPuntuacion: puntuacionInt, tipo: tipo);
+        SqlResponse response = await jugadorProvider.changePuntuacion(jugador: jugador, newPuntuacion: puntuacionInt, tipo: tipo);
         partidaProvider.refresh();
         jugadorProvider.changeJugadorEnTurno(response.data);
         MyLoading.close();
@@ -231,7 +236,8 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
 }
 
 class _ListHistorial extends StatelessWidget {
-  const _ListHistorial({Key? key}) : super(key: key);
+  const _ListHistorial({Key? key, required this.historialController}) : super(key: key);
+  final ScrollController historialController;
 
   @override
   Widget build(BuildContext context) {
@@ -268,7 +274,7 @@ class _ListHistorial extends StatelessWidget {
         children: [
           Expanded(
             child: ListView.separated(
-                controller: ScrollController(),
+                controller: historialController,
                 physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.all(5),
                 separatorBuilder: (_, __) => const Divider(),

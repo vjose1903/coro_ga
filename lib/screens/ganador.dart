@@ -71,7 +71,6 @@ class _GanadorScreenState extends State<GanadorScreen> {
                   iconSize: 40,
                   iconColor: ganadorColor,
                   icon: Icons.close,
-                  // onTap: () => Navigator.pushReplacementNamed(context, 'home'),
                   onTap: () {
                     googleAdsProvider.showInterstitialAd(onCloseFunction: () {
                       Navigator.pushReplacement(
@@ -119,13 +118,18 @@ class _GanadorScreenState extends State<GanadorScreen> {
 
                   const SizedBox(height: 40),
 
-                  GestureDetector(
-                    onTap: () => revanchaFunction(),
-                    child: TextAnimator("Revancha",
-                        initialDelay: const Duration(seconds: 2, milliseconds: 800),
-                        incomingEffect: WidgetTransitionEffects.incomingScaleDown(duration: const Duration(seconds: 1)),
-                        style: TextStyle(color: Colors.white, fontFamily: 'Poppins', fontSize: 15)),
-                  ),
+                  WidgetAnimator(
+                    incomingEffect: WidgetTransitionEffects.outgoingScaleUp(
+                        delay: const Duration(seconds: 2, milliseconds: 800), duration: const Duration(seconds: 1)),
+                    child: ElevatedButton(
+                      style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.green[400])),
+                      onPressed: () => revanchaFunction(),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        child: Text("Revancha", style: TextStyle(fontSize: 15, fontFamily: 'Poppins', fontWeight: FontWeight.bold, letterSpacing: 2)),
+                      ),
+                    ),
+                  )
                 ],
               )),
         ],
@@ -136,13 +140,13 @@ class _GanadorScreenState extends State<GanadorScreen> {
   revanchaFunction() async {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
-    Fun.logColor(color: Colores.red, body: "${partidaProvider.partidaEnTurno}");
-
+    MyLoading.show();
     for (Jugador jugador in partidaProvider.partidaEnTurno!.jugadores!) {
       jugador.puntuacion = 0;
     }
 
     final response = await partidaProvider.newPartida(partidaProvider.partidaEnTurno!, context);
+    MyLoading.close();
     if (!response.hasError!) {
       final newPartida = response.data;
 

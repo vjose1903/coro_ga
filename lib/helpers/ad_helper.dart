@@ -18,16 +18,16 @@ class AdHelper {
     if (Platform.isAndroid) {
       switch (location) {
         case AdLocation.partida:
-          id = 'ca-app-pub-4324407503643964/8520147255';
+          id = 'ca-app-pub-7138392349989063/9555188441';
           break;
         case AdLocation.puntuacion:
-          id = 'ca-app-pub-4324407503643964/3158911880';
+          id = 'ca-app-pub-7138392349989063/7103983607';
           break;
         case AdLocation.agregarJugador:
-          id = 'ca-app-pub-4324407503643964/3785597846';
+          id = 'ca-app-pub-7138392349989063/8717320319';
           break;
         case AdLocation.editarEntidad:
-          id = 'ca-app-pub-4324407503643964/7034577710';
+          id = 'ca-app-pub-7138392349989063/5628122544';
           break;
         default:
       }
@@ -42,7 +42,7 @@ class AdHelper {
 
   // static String get interstitialAdUnitId {
   //   if (Platform.isAndroid) {
-  //     return '<YOUR_ANDROID_INTERSTITIAL_AD_UNIT_ID>';
+  //     return 'ca-app-pub-7138392349989063/3081850257';
   //   } else if (Platform.isIOS) {
   //     return '<YOUR_IOS_INTERSTITIAL_AD_UNIT_ID>';
   //   } else {
