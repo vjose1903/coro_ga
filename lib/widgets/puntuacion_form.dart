@@ -61,6 +61,8 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
         final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
         final JugadorProvider jugadorProvider = context.watch<JugadorProvider>();
 
+        
+
         return Column(
           children: [
             Row(

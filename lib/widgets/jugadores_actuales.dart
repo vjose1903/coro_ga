@@ -8,9 +8,9 @@ import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
 class JugadoresActuales extends StatelessWidget {
-  const JugadoresActuales({Key? key, required this.pageController, required this.jugadoresController, required this.resetWidget}) : super(key: key);
+  const JugadoresActuales({Key? key, required this.pageController, required this.jugadoresController, required this.rebuildWidget}) : super(key: key);
   final PageController pageController;
-  final Function resetWidget;
+  final Function rebuildWidget;
   final ScrollController jugadoresController;
 
   @override
@@ -25,7 +25,7 @@ class JugadoresActuales extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           child: Container(
               color: AppThemes.themeColor_1,
-              child: ListJugadores(pageController: pageController, jugadoresController: jugadoresController, resetWidget: resetWidget)),
+              child: ListJugadores(pageController: pageController, jugadoresController: jugadoresController, rebuildWidget: rebuildWidget)),
         ),
       ),
     );
@@ -33,23 +33,25 @@ class JugadoresActuales extends StatelessWidget {
 }
 
 class ListJugadores extends StatelessWidget {
-  const ListJugadores({Key? key, required this.pageController, required this.jugadoresController, required this.resetWidget}) : super(key: key);
+  const ListJugadores({Key? key, required this.pageController, required this.jugadoresController, required this.rebuildWidget}) : super(key: key);
   final PageController pageController;
   final ScrollController jugadoresController;
-  final Function resetWidget;
+  final Function rebuildWidget;
 
   @override
   Widget build(BuildContext context) {
-    final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
+    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
+    final PageEditarProvider pageEditarProvider = context.read<PageEditarProvider>();
 
     List<Jugador> jugadores = [];
     jugadores = partidaProvider.partidaEnTurno!.jugadoresSort;
-    // List<Jugador> jugadores = partidaProvider.partidaEnTurno!.jugadores!;
 
     Color nombreColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.7);
     Color puntuacionColor = Preferences.isDarkMode ? AppThemes.colorSegundo : AppThemes.colorQuinto.withOpacity(0.7);
     final Color iconsColor = Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : AppThemes.colorQuinto.withOpacity(0.7);
+
+    final double actualPage = pageEditarProvider.getActualPage();
 
     return ListView.separated(
         key: UniqueKey(),
@@ -60,6 +62,20 @@ class ListJugadores extends StatelessWidget {
         itemCount: jugadores.length,
         itemBuilder: (context, index) {
           Jugador jugador = jugadores[index];
+
+          pageController.addListener(() async {
+            Fun.logColor(color: Colores.yellow, body: "actualPage: $actualPage");
+
+            if (actualPage == 1.0 && pageController.page == 0.0) {
+              Fun.logColor(color: Colores.green, body: "ENTREEE");
+
+              await Future.delayed(const Duration(milliseconds: 100));
+              rebuildWidget();
+            }
+
+            Fun.logColor(color: Colores.red, body: "pageController.page: ${pageController.page}");
+            pageEditarProvider.setActualPage(pageController.page);
+          });
 
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -94,7 +110,7 @@ class ListJugadores extends StatelessWidget {
                         if (value["tipo"] == "aceptar") {
                           double actualPosition = jugadoresController.position.pixels;
 
-                          resetWidget();
+                          rebuildWidget();
 
                           await Future.delayed(const Duration(milliseconds: 50));
                           jugadoresController.jumpTo(actualPosition);

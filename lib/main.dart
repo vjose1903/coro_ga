@@ -25,6 +25,7 @@ void main() async {
     ChangeNotifierProvider(create: (_) => JugadorProvider()),
     ChangeNotifierProvider(create: (_) => GoogleAdsProvider()),
     ChangeNotifierProvider(create: (_) => ReorderableProvider()),
+    ChangeNotifierProvider(create: (_) => PageEditarProvider()),
     ChangeNotifierProvider(create: (_) => PartidaPredefinidaProvider()),
     ChangeNotifierProvider(create: (_) => ThemeProvider(isDarkMode_: Preferences.isDarkMode)),
   ], child: const MyApp()));

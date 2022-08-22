@@ -39,7 +39,12 @@ class AddJugador extends StatefulWidget {
 class _AddJugadorState extends State<AddJugador> {
   final ScrollController jugadoresController = ScrollController();
 
-  resetWidget() => setState(() {});
+  rebuildWidget() {
+    Fun.logColor(color: Colores.magenta, body: "mounted: $mounted");
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +78,7 @@ class _AddJugadorState extends State<AddJugador> {
             const SizedBox(height: 5),
             // Jugadores Actuales
             //
-            JugadoresActuales(pageController: widget.pageController, jugadoresController: jugadoresController, resetWidget: resetWidget),
+            JugadoresActuales(pageController: widget.pageController, jugadoresController: jugadoresController, rebuildWidget: rebuildWidget),
             const SizedBox(height: 20),
             // Boton
             //
@@ -86,7 +91,7 @@ class _AddJugadorState extends State<AddJugador> {
 
                   partidaProvider.addJugadorToPartida(context, jugador: nuevoJugador, partida: partidaProvider.partidaEnTurno!).then((value) async {
                     form.reset();
-                    resetWidget();
+                    rebuildWidget();
 
                     await Future.delayed(const Duration(milliseconds: 50));
 
