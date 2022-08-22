@@ -212,62 +212,69 @@ class _MenuState extends State<_Menu> {
                           fontWeight: FontWeight.w800,
                           fontSize: 18)),
                   const SizedBox(height: 5),
-                  // Container(
-                  //   alignment: Alignment.centerRight,
-                  //   child: SwitchListTile.adaptive(
-                  //       contentPadding: EdgeInsets.zero,
-                  //       activeColor: AppThemes.colorTercero,
-                  //       title: Text('Tema del sistema',
-                  //           style: TextStyle(
-                  //             color: Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : Colors.grey[800]!.withOpacity(0.9),
-                  //             fontFamily: 'Poppins',
-                  //           )),
-                  //       value: Preferences.isSystemMode,
-                  //       onChanged: (value) {
-                  //         Preferences.isSystemMode = value;
-                  //         setState(() {});
-                  //       }),
-                  // ),
                   Container(
                     alignment: Alignment.centerRight,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("Cambiar tema a:",
+                    child: SwitchListTile.adaptive(
+                        contentPadding: EdgeInsets.zero,
+                        activeColor: AppThemes.colorTercero,
+                        title: Text('Tema del sistema',
                             style: TextStyle(
-                                color: Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : Colors.grey[800]!.withOpacity(0.9),
-                                fontFamily: 'Poppins',
-                                fontSize: 15)),
-                        FittedBox(
-                          fit: BoxFit.fitWidth,
-                          child: ClipRRect(
-                              borderRadius: BorderRadius.circular(50),
-                              child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                      onTap: () {
-                                        Preferences.isDarkMode = !Preferences.isDarkMode;
-                                        themeProvider.changeCurrentTheme();
-                                        setState(() {});
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 10),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
-                                          children: [
-                                            Text(Preferences.isDarkMode ? "Claro" : "Oscuro",
-                                                style: TextStyle(
-                                                    color: Preferences.isDarkMode ? Colors.grey.withOpacity(0.7) : Colors.grey,
-                                                    fontFamily: 'Poppins',
-                                                    fontSize: 15)),
-                                            const SizedBox(width: 5),
-                                            Icon(Preferences.isDarkMode ? Icons.wb_sunny_outlined : Icons.nights_stay,
-                                                color: Preferences.isDarkMode ? Colors.grey.withOpacity(0.7) : Colors.grey.withOpacity(0.9))
-                                          ],
-                                        ),
-                                      )))),
-                        ),
-                      ],
+                              color: Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : Colors.grey[800]!.withOpacity(0.9),
+                              fontFamily: 'Poppins',
+                            )),
+                        value: Preferences.isSystemMode,
+                        onChanged: (value) {
+                          Preferences.isSystemMode = value;
+                          Preferences.isDarkMode = WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
+                          themeProvider.changeCurrentTheme();
+                          setState(() {});
+                        }),
+                  ),
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 500),
+                    height: Preferences.isSystemMode ? 0.01 : 40,
+                    curve: Curves.easeOut,
+                    child: Container(
+                      alignment: Alignment.centerRight,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Cambiar tema a:",
+                              style: TextStyle(
+                                  color: Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : Colors.grey[800]!.withOpacity(0.9),
+                                  fontFamily: 'Poppins',
+                                  fontSize: 15)),
+                          FittedBox(
+                            fit: BoxFit.fitWidth,
+                            child: ClipRRect(
+                                borderRadius: BorderRadius.circular(50),
+                                child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                        onTap: () {
+                                          Preferences.isDarkMode = !Preferences.isDarkMode;
+                                          themeProvider.changeCurrentTheme();
+                                          setState(() {});
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 10),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            children: [
+                                              Text(Preferences.isDarkMode ? "Claro" : "Oscuro",
+                                                  style: TextStyle(
+                                                      color: Preferences.isDarkMode ? Colors.grey.withOpacity(0.7) : Colors.grey,
+                                                      fontFamily: 'Poppins',
+                                                      fontSize: 15)),
+                                              const SizedBox(width: 5),
+                                              Icon(Preferences.isDarkMode ? Icons.wb_sunny_outlined : Icons.nights_stay,
+                                                  color: Preferences.isDarkMode ? Colors.grey.withOpacity(0.7) : Colors.grey.withOpacity(0.9))
+                                            ],
+                                          ),
+                                        )))),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

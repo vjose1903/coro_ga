@@ -285,7 +285,7 @@ class _NavigationBarState extends State<NavigationBar> {
     final int selectedIndex = partidaProvider.partidas.indexWhere((partida) => partida.id == partidaProvider.partidaEnTurno!.id);
     await Future.delayed(const Duration(milliseconds: 200));
 
-    if (partidaProvider.partidas.length > 3 && (selectedIndex <= visibleIndeces.first) || (selectedIndex >= visibleIndeces.last)) {
+    if (partidaProvider.partidas.length > 3 && ((selectedIndex <= visibleIndeces.first) || (selectedIndex >= visibleIndeces.last))) {
       itemScrollController.scrollTo(index: selectedIndex, duration: const Duration(milliseconds: 700), curve: Curves.easeInOutCubic, alignment: 0.4);
     }
   }
@@ -337,8 +337,10 @@ class _Chip extends StatelessWidget {
           child: InkWell(
             borderRadius: BorderRadius.circular(20),
             onTap: () {
-              partidaProvider.changePartidaEnTurno(partida!);
-              scrollToGame(context);
+              if (partidaProvider.partidaEnTurno?.id != partida!.id) {
+                partidaProvider.changePartidaEnTurno(partida!);
+                scrollToGame(context);
+              }
             },
             child: SizedBox(
               height: 35,

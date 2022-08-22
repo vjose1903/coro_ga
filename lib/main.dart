@@ -18,6 +18,9 @@ void main() async {
 
   await Preferences.init();
 
+  final isPlatformDark = WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
+  bool initInDarkMode = Preferences.isSystemMode ? isPlatformDark : Preferences.isDarkMode;
+
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => PartidaProvider()),
     ChangeNotifierProvider(create: (_) => FormPartidaProvider()),
@@ -27,12 +30,48 @@ void main() async {
     ChangeNotifierProvider(create: (_) => ReorderableProvider()),
     ChangeNotifierProvider(create: (_) => PageEditarProvider()),
     ChangeNotifierProvider(create: (_) => PartidaPredefinidaProvider()),
-    ChangeNotifierProvider(create: (_) => ThemeProvider(isDarkMode_: Preferences.isDarkMode)),
+    ChangeNotifierProvider(create: (_) => ThemeProvider(isDarkMode_: initInDarkMode)),
   ], child: const MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  AppLifecycleState? _lastLifecycleState;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    setState(() {
+      ThemeProvider themeProvider = context.read<ThemeProvider>();
+      _lastLifecycleState = state;
+
+      if (Preferences.isSystemMode && _lastLifecycleState == AppLifecycleState.resumed) {
+        bool isActualSystemDark = WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
+
+        if (isActualSystemDark != Preferences.isDarkMode) {
+          Preferences.isDarkMode = isActualSystemDark;
+          themeProvider.changeCurrentTheme();
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
