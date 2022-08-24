@@ -37,6 +37,13 @@ class MainHome extends StatelessWidget {
       slideUpProvider.openSlideUp(controller: panelController, bodyContent: const _Menu());
     }
 
+    navigateToForm() {
+      FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
+      formPartidaProvider.resetForm();
+
+      Navigator.pushNamed(context, 'formulario');
+    }
+
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
         final SlideUpProvider slideUpProvider = context.watch<SlideUpProvider>();
@@ -57,10 +64,21 @@ class MainHome extends StatelessWidget {
             visible: panelController.status == SlidingUpPanelStatus.collapsed,
             child: FloatingActionButton(
                 onPressed: () {
-                  FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
-                  formPartidaProvider.resetForm();
+                  final PartidaProvider partidaProvider = context.read<PartidaProvider>();
 
-                  Navigator.pushNamed(context, 'formulario');
+                  if (AppEnvironment.isPro) {
+                    navigateToForm();
+                  } else {
+                    if (partidaProvider.partidas.length < 3) {
+                      navigateToForm();
+                    } else {
+                      Fun.toast(
+                          type: ToasType.info,
+                          context: context,
+                          message:
+                              "La version gratis de Coro Games, solo permite 3 partidas simultaneas, para agregar más comprar la versión Pro.");
+                    }
+                  }
                 },
                 child: const Icon(Icons.add, size: 30)),
           ),
@@ -192,7 +210,7 @@ class _MenuState extends State<_Menu> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Coro Games",
+            Text(AppEnvironment.appName,
                 style: TextStyle(
                     color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
                     fontFamily: 'Poppins',
@@ -232,7 +250,7 @@ class _MenuState extends State<_Menu> {
                   ),
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 500),
-                    height: Preferences.isSystemMode ? 0.01 : 40,
+                    height: Preferences.isSystemMode ? 0.01 : null,
                     curve: Curves.easeOut,
                     child: Container(
                       alignment: Alignment.centerRight,

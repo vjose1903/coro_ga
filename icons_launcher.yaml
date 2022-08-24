@@ -8,3 +8,5 @@ icons_launcher:
       adaptive_background_color: "#020036"
     ios:
       enable: true
+
+       generar_flutter_icons  "--path icons_launcher.yaml" "--flavor free"

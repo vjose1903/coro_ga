@@ -225,15 +225,27 @@ class Titulo extends StatelessWidget {
           visible: formPartidaProvider.jugadores.length < 20,
           child: CustomIconButtom(
             onTap: () async {
-              FocusManager.instance.primaryFocus?.unfocus();
-              formPartidaProvider.addJugadorToList();
-              await Future.delayed(const Duration(milliseconds: 20));
+              bool continuar = true;
 
-              jugadoresController.animateTo(jugadoresController.position.maxScrollExtent,
-                  duration: const Duration(seconds: 1, milliseconds: 500), curve: Curves.elasticOut);
+              if (!AppEnvironment.isPro && formPartidaProvider.jugadores.length > 3) {
+                continuar = false;
+                Fun.toast(
+                    type: ToasType.info,
+                    context: context,
+                    message: "La version gratis de Coro Games, solo permite 4 jugadores, para agregar más comprar la versión Pro.");
+              }
 
-              if (formPartidaProvider.jugadores.length == 20) {
-                Fun.toast(type: ToasType.info, context: context, message: "Máximo de jugadores alcanzados");
+              if (continuar) {
+                FocusManager.instance.primaryFocus?.unfocus();
+                formPartidaProvider.addJugadorToList();
+                await Future.delayed(const Duration(milliseconds: 20));
+
+                jugadoresController.animateTo(jugadoresController.position.maxScrollExtent,
+                    duration: const Duration(seconds: 1, milliseconds: 500), curve: Curves.elasticOut);
+
+                if (formPartidaProvider.jugadores.length == 20) {
+                  Fun.toast(type: ToasType.info, context: context, message: "Máximo de jugadores alcanzados");
+                }
               }
             },
             icon: Icons.add,
@@ -256,7 +268,7 @@ class _Inputs extends StatelessWidget {
     final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
 
     final formJugadoresArray = formPartidaProvider.form.control('jugadores') as FormArray<dynamic>;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
       child: ReactiveFormArray(

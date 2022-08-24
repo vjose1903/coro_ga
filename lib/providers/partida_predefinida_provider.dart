@@ -17,6 +17,12 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
     'orden': [null]
   });
 
+  get cantidadJugadores {
+    final cantidadJugadores = form.control('cantidadJugadores').value;
+    
+    return cantidadJugadores ?? 0;
+  }
+
   void changeTipo(value) {
     notifyListeners();
   }

@@ -114,7 +114,21 @@ class FormPartidaPredefinida extends StatelessWidget {
                         Flexible(
                           flex: 1,
                           child: CustomIconButtom(
-                              onTap: () => formPartidaPredefinidaProvider.changeCantidadJugadores(context: context, tipo: "+"),
+                              onTap: () {
+                                bool continuar = true;
+
+                                if (!AppEnvironment.isPro && formPartidaPredefinidaProvider.cantidadJugadores > 3) {
+                                  continuar = false;
+                                  Fun.toast(
+                                      type: ToasType.info,
+                                      context: context,
+                                      message: "La version gratis de Coro Games, solo permite 4 jugadores, para agregar más comprar la versión Pro.");
+                                }
+
+                                if (continuar) {
+                                  formPartidaPredefinidaProvider.changeCantidadJugadores(context: context, tipo: "+");
+                                }
+                              },
                               icon: Icons.add,
                               size: IconSize.medium,
                               iconColor: Colors.white,
@@ -170,9 +184,7 @@ class FormPartidaPredefinida extends StatelessWidget {
             partida: formPartidaPredefinidaProvider.partidaPredefinidaEditar!, partidaEdit: form.value);
       } else {
         final PartidaPredefinida partida = PartidaPredefinida.fromMap(form.value);
-        response = await partidaPredefinidaProvider.newPartida(
-          partida: partida,
-        );
+        response = await partidaPredefinidaProvider.newPartida(partida: partida);
       }
 
       if (!response.hasError!) {

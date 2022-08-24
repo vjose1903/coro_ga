@@ -8,6 +8,7 @@ import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
+import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -100,7 +101,24 @@ class JugadoresCard extends StatelessWidget {
           children: [
             Align(
                 alignment: Alignment.topRight,
-                child: CustomIconButtom(onTap: () => openSlideUp(), icon: Icons.add, iconSize: 25, size: IconSize.min)),
+                child: CustomIconButtom(
+                    onTap: () {
+                      final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+                      bool continuar = true;
+
+                      if (!AppEnvironment.isPro && partidaProvider.partidaEnTurno!.jugadores!.length > 3) {
+                        continuar = false;
+                        Fun.toast(
+                            type: ToasType.info,
+                            context: context,
+                            message: "La version gratis de Coro Games, solo permite 4 jugadores, para agregar más comprar la versión Pro.");
+                      }
+
+                      if (continuar) openSlideUp();
+                    },
+                    icon: Icons.add,
+                    iconSize: 25,
+                    size: IconSize.min)),
             Expanded(
                 child: Container(
               decoration: const BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12), bottomRight: Radius.circular(12))),
