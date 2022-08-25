@@ -22,7 +22,7 @@ class AppEnvironment {
   }
 
   static bool get isPro {
-    return appName.contains("pro");
+    return !packageId.contains("free");
   }
 
   static initialize() async {

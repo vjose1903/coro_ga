@@ -64,16 +64,11 @@ class ListJugadores extends StatelessWidget {
           Jugador jugador = jugadores[index];
 
           pageController.addListener(() async {
-            Fun.logColor(color: Colores.yellow, body: "actualPage: $actualPage");
-
             if (actualPage == 1.0 && pageController.page == 0.0) {
-              Fun.logColor(color: Colores.green, body: "ENTREEE");
-
               await Future.delayed(const Duration(milliseconds: 100));
               rebuildWidget();
             }
 
-            Fun.logColor(color: Colores.red, body: "pageController.page: ${pageController.page}");
             pageEditarProvider.setActualPage(pageController.page);
           });
 

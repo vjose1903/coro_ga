@@ -40,7 +40,6 @@ class _AddJugadorState extends State<AddJugador> {
   final ScrollController jugadoresController = ScrollController();
 
   rebuildWidget() {
-    Fun.logColor(color: Colores.magenta, body: "mounted: $mounted");
     if (mounted) {
       setState(() {});
     }
@@ -94,7 +93,7 @@ class _AddJugadorState extends State<AddJugador> {
                       context: context,
                       message: "La version gratis de Coro Games, solo permite 4 jugadores, para agregar más comprar la versión Pro.");
                 }
-                
+
                 if (continuar) {
                   if (form.valid) {
                     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
@@ -122,7 +121,7 @@ class _AddJugadorState extends State<AddJugador> {
             ),
             const SizedBox(height: 10),
             // ANUNCIOS ==========================================
-            widget.anuncio
+            if (!AppEnvironment.isPro) widget.anuncio
           ],
         ),
       ),

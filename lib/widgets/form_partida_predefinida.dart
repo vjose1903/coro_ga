@@ -17,14 +17,17 @@ class FormPartidaPredefinida extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.watch<PartidaPredefinidaProvider>();
+    final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
+    final GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
     final form = formPartidaPredefinidaProvider.form;
-
-    final dynamic tipoPartida = form.control('tipo').value;
+    googleAdsProvider.loadInterstitialAd();
 
     final Color titleColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.7) : AppThemes.colorQuinto.withOpacity(0.8);
 
     return Consumer(builder: (BuildContext context, value, Widget? child) {
+      final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.watch<PartidaPredefinidaProvider>();
+      final dynamic tipoPartida = form.control('tipo').value;
+
       return Padding(
         padding: const EdgeInsets.all(15),
         child: Column(
@@ -147,13 +150,18 @@ class FormPartidaPredefinida extends StatelessWidget {
                             backgroundColor: Colors.red[400],
                             label: "Cerrar",
                             textColor: Colors.white,
-                            onTap: () => DialogNavigator.of(context).pop()),
+                            onTap: () {
+                              final GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
+                              googleAdsProvider.loadInterstitialAd();
+                              formPartidaPredefinidaProvider.partidaPredefinidaEditar = null;
+                              DialogNavigator.of(context).pop();
+                            }),
 
                         const SizedBox(width: 10),
                         // CREAR ==========================================
                         ExpandedButtom(
                             backgroundColor: Colors.green[400],
-                            label: "Crear",
+                            label: formPartidaPredefinidaProvider.partidaPredefinidaEditar == null ? "Crear" : "Editar",
                             textColor: Colors.white,
                             onTap: () => crearEditarPartida(context: context, form: form)),
                       ],
@@ -188,11 +196,17 @@ class FormPartidaPredefinida extends StatelessWidget {
       }
 
       if (!response.hasError!) {
-        googleAdsProvider.showInterstitialAd(onCloseFunction: () {
+        formPartidaPredefinidaProvider.partidaPredefinidaEditar = null;
+        cerrarForm() {
           DialogNavigator.of(context).pop();
           formPartidaPredefinidaProvider.resetForm();
-          googleAdsProvider.loadInterstitialAd();
-        });
+        }
+
+        if (AppEnvironment.isPro) {
+          cerrarForm();
+        } else {
+          googleAdsProvider.showInterstitialAd(onCloseFunction: () => cerrarForm());
+        }
       } else {
         Fun.toast(type: ToasType.error, context: context, message: "Error registrando partida.");
       }

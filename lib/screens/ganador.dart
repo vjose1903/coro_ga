@@ -3,6 +3,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/models/partida.dart';
 import 'package:game_score/providers/partida_provider.dart';
@@ -72,7 +73,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
                   iconColor: ganadorColor,
                   icon: Icons.close,
                   onTap: () {
-                    googleAdsProvider.showInterstitialAd(onCloseFunction: () {
+                    goToHome() {
                       Navigator.pushReplacement(
                           context,
                           PageTransition(
@@ -80,7 +81,13 @@ class _GanadorScreenState extends State<GanadorScreen> {
                               child: const HomeScreen(),
                               alignment: Alignment.center,
                               duration: const Duration(milliseconds: 500)));
-                    });
+                    }
+
+                    if (AppEnvironment.isPro) {
+                      goToHome();
+                    } else {
+                      googleAdsProvider.showInterstitialAd(onCloseFunction: () => goToHome());
+                    }
                   })),
           Container(
               margin: const EdgeInsets.only(top: 150),
@@ -148,12 +155,17 @@ class _GanadorScreenState extends State<GanadorScreen> {
     final response = await partidaProvider.newPartida(partidaProvider.partidaEnTurno!, context);
     MyLoading.close();
     if (!response.hasError!) {
-      final newPartida = response.data;
-
-      googleAdsProvider.showInterstitialAd(onCloseFunction: () {
+      goToPartida() {
+        final newPartida = response.data;
         partidaProvider.changePartidaEnTurno(newPartida);
         Navigator.pushReplacementNamed(context, 'partida');
-      });
+      }
+
+      if (AppEnvironment.isPro) {
+        goToPartida();
+      } else {
+        googleAdsProvider.showInterstitialAd(onCloseFunction: () => goToPartida());
+      }
     } else {
       Fun.toast(type: ToasType.error, context: context, message: "Error renovando partida.");
       Navigator.pushReplacementNamed(context, 'home');

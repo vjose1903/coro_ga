@@ -19,7 +19,7 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
 
   get cantidadJugadores {
     final cantidadJugadores = form.control('cantidadJugadores').value;
-    
+
     return cantidadJugadores ?? 0;
   }
 
@@ -28,7 +28,6 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
   }
 
   void changeCantidadJugadores({required String tipo, required BuildContext context}) {
-    print("formPartidaPredefinida.control(cantidadJugadores).value: ${form.control("cantidadJugadores").value} ");
     int actualCantidad = form.control("cantidadJugadores").value;
 
     if (tipo == "+") {

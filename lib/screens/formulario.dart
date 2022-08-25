@@ -165,13 +165,19 @@ class _Body extends StatelessWidget {
                           MyLoading.close();
 
                           if (!response.hasError!) {
-                            final newPartida = response.data;
-
-                            googleAdsProvider.showInterstitialAd(onCloseFunction: () {
+                            crearPartida() {
+                              final newPartida = response.data;
                               partidaProvider.changePartidaEnTurno(newPartida);
                               Navigator.pushReplacementNamed(context, 'partida');
                               formPartidaProvider.resetForm();
-                            });
+                            }
+
+                            if (AppEnvironment.isPro) {
+                              crearPartida();
+                            } else {
+                              googleAdsProvider.showInterstitialAd(onCloseFunction: () => crearPartida());
+                            }
+                            
                           } else {
                             Fun.toast(type: ToasType.error, context: context, message: "Error registrando partida.");
                           }

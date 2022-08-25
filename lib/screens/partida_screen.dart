@@ -71,7 +71,7 @@ class _Body extends StatelessWidget {
               const SizedBox(height: 20),
               JugadoresCard(panelController: panelController),
               const SizedBox(height: 20),
-              anuncio
+              if (!AppEnvironment.isPro) anuncio
             ])));
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
+import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/screens/ganador.dart';
@@ -60,8 +61,6 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
       builder: (BuildContext context, value, Widget? child) {
         final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
         final JugadorProvider jugadorProvider = context.watch<JugadorProvider>();
-
-        
 
         return Column(
           children: [
@@ -193,7 +192,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
             ),
             const SizedBox(height: 10),
             // ANUNCIOS ==========================================
-            anuncio
+            if (!AppEnvironment.isPro) anuncio
           ],
         );
       },

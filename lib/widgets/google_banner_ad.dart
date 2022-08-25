@@ -31,7 +31,7 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
   void initState() {
     super.initState();
 
-    _loadBannerAd();
+    if (!AppEnvironment.isPro) _loadBannerAd();
   }
 
   @override

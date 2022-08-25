@@ -49,6 +49,7 @@ class PartidasDefaultAlert extends StatelessWidget {
                     CustomIconButtom(
                       onTap: () {
                         PartidaPredefinidaProvider partidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
+                        formPartidaPredefinidaProvider.resetForm();
 
                         bool continuar = true;
 
@@ -293,7 +294,10 @@ class ReordenableItem extends StatelessWidget {
 
   selectPartidaPredefinida({required BuildContext context}) {
     FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
+    final GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
+
     formPartidaProvider.rellenarFormulario(partidaPredefinida);
+    googleAdsProvider.loadInterstitialAd();
     Navigator.pop(context);
   }
 

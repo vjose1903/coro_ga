@@ -75,8 +75,7 @@ class MainHome extends StatelessWidget {
                       Fun.toast(
                           type: ToasType.info,
                           context: context,
-                          message:
-                              "La version gratis de Coro Games, solo permite 3 partidas simultaneas, para agregar más comprar la versión Pro.");
+                          message: "La version gratis de Coro Games, solo permite 3 partidas simultaneas, para agregar más comprar la versión Pro.");
                     }
                   }
                 },
@@ -210,7 +209,7 @@ class _MenuState extends State<_Menu> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(AppEnvironment.appName,
+            Text("${AppEnvironment.appName} ${AppEnvironment.isPro ? "pro" : ""}",
                 style: TextStyle(
                     color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
                     fontFamily: 'Poppins',
