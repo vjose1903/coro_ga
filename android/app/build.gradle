@@ -54,13 +54,12 @@ android {
         applicationId "com.inSpot.coro_games"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
-        minSdkVersion 19
-        targetSdkVersion 28
-        versionCode 6
-        versionName "1.0.5"
+        minSdkVersion 28
+        targetSdkVersion 31
+        versionCode 12
+        versionName "1.0.6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
-
     }
 
     signingConfigs {
@@ -105,3 +104,5 @@ dependencies {
     def billing_version = "5.0.0"
     implementation "com.android.billingclient:billing:$billing_version"
 }
+
+android.buildTypes.release.ndk.debugSymbolLevel = 'FULL'

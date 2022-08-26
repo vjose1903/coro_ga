@@ -10,7 +10,6 @@ class CustomReactiveDropDown extends StatelessWidget {
   final IconData? innerLeft;
   final IconData? innerRight;
   final TextInputType? inputType;
-  final bool obscureText;
   final bool enabled;
   final bool? autoFocus;
   final TextCapitalization? textCapitalization;
@@ -28,7 +27,6 @@ class CustomReactiveDropDown extends StatelessWidget {
     this.innerLeft,
     this.innerRight,
     this.inputType,
-    this.obscureText = false,
     this.enabled = true,
     this.autoFocus = false,
     this.maxLength,
@@ -40,9 +38,9 @@ class CustomReactiveDropDown extends StatelessWidget {
   Widget build(BuildContext context) {
     return ReactiveDropdownField<dynamic>(
         key: key,
-        formControlName: "tipo",
+        formControlName: formControlName,
         items: items,
-        
+        itemHeight: 48,
         autofocus: autoFocus!,
         onChanged: (value) => onChanged != null ? onChanged!(value) : null,
         decoration: InputDecoration(

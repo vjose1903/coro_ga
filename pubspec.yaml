@@ -52,7 +52,6 @@ dependencies:
   widget_and_text_animator: ^1.0.9
   shared_preferences: ^2.0.15
   flutter_sliding_up_panel: ^2.0.1
-  splash_screen_view: ^3.0.0
   google_mobile_ads: ^2.0.0
   skeletons: ^0.0.3
   conditional_builder_null_safety: ^0.0.6

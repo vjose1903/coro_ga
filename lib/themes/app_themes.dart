@@ -15,10 +15,10 @@ class AppThemes {
   static Color get themeColor_3 => Preferences.isDarkMode ? const Color(0xff727272) : const Color(0xFFE7E7E7);
   static Color get themeColor_4 => Preferences.isDarkMode ? const Color(0xFF898989) : const Color(0xFFF0F0F0);
 
-  static Color get inputColor => Preferences.isDarkMode ? Colors.white.withOpacity(0.3) : Colors.blueGrey.withOpacity(0.2);
+  static Color get inputColor => Preferences.isDarkMode ? const Color(0xFF6C6C6C) : Colors.blueGrey.withOpacity(0.2);
   static Color get inputDisabledColor => Preferences.isDarkMode ? Colors.white.withOpacity(0.1) : Colors.blueGrey[200]!.withOpacity(0.8);
 
-  static Color get labelInputColor => Preferences.isDarkMode ? Colors.white.withOpacity(0.7) : Colors.blueGrey[600]!.withOpacity(0.7);
+  static Color get labelInputColor => Preferences.isDarkMode ? Colors.white.withOpacity(1) : Colors.blueGrey[600]!.withOpacity(0.7);
   static Color get labelInputDisabledColor => Preferences.isDarkMode ? Colors.white.withOpacity(0.3) : Colors.blueGrey.withOpacity(0.6);
 
   static ThemeData get lightTheme => ThemeData.light().copyWith(

@@ -69,7 +69,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
               width: double.infinity,
               margin: const EdgeInsets.only(top: 70, right: 30),
               child: CustomIconButtom(
-                  iconSize: 40,
+                tooltip: "Cerrar",
                   iconColor: ganadorColor,
                   icon: Icons.close,
                   onTap: () {

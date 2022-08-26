@@ -92,9 +92,9 @@ class FormPartidaPredefinida extends StatelessWidget {
                         Flexible(
                           flex: 1,
                           child: CustomIconButtom(
+                              tooltip: "Quitar jugador",
                               onTap: () => formPartidaPredefinidaProvider.changeCantidadJugadores(context: context, tipo: "-"),
                               icon: Icons.remove,
-                              size: IconSize.medium,
                               iconColor: Colors.white,
                               backgroundColor: const Color(0xFFAF4C4C),
                               splashColor: const Color(0xFF7A2E2E)),
@@ -117,6 +117,7 @@ class FormPartidaPredefinida extends StatelessWidget {
                         Flexible(
                           flex: 1,
                           child: CustomIconButtom(
+                              tooltip: "Agregar jugador",
                               onTap: () {
                                 bool continuar = true;
 
@@ -133,7 +134,6 @@ class FormPartidaPredefinida extends StatelessWidget {
                                 }
                               },
                               icon: Icons.add,
-                              size: IconSize.medium,
                               iconColor: Colors.white,
                               backgroundColor: const Color(0xFF4CAF50),
                               splashColor: const Color(0xFF2E7A31)),

@@ -76,6 +76,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                         Text(jugadorProvider.nombreJugador,
                             style: TextStyle(fontFamily: "Poppins", fontSize: 15, color: subTitleColor, fontWeight: FontWeight.bold)),
                         CustomIconButtom(
+                          tooltip: "Editar Jugador",
                           onTap: () {
                             jugadorProvider.jugadorEditar = jugadorProvider.jugadorEnTurno;
                             jugadorProvider.formJugador.patchValue(jugadorProvider.jugadorEnTurno!.toMap());
@@ -83,8 +84,6 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                             nextPage();
                           },
                           icon: Icons.edit_outlined,
-                          size: IconSize.min,
-                          iconSize: 20,
                           iconColor: titleColor,
                           splashColor: AppThemes.colorTercero,
                         ),
@@ -95,13 +94,12 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                 Visibility(
                   visible: partidaProvider.partidaEnTurno!.jugadores!.length > 2,
                   child: CustomIconButtom(
+                      tooltip: "Borrar Jugador",
                       onTap: () {
                         Jugador jugador = jugadorProvider.jugadorEnTurno!;
                         jugadorProvider.deleteJugador(context, jugador: jugador, panelController: widget.panelController, callBack: (value) {});
                       },
                       icon: Icons.delete_forever,
-                      size: IconSize.min,
-                      iconSize: 20,
                       iconColor: titleColor,
                       splashColor: Colors.red[900]),
                 )

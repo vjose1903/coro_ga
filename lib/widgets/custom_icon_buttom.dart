@@ -2,30 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 
-class IconSize {
-  static const double xMin = 20;
-  static const double min = 30;
-  static const double medium = 40;
-  static const double max = 50;
-}
-
 class CustomIconButtom extends StatelessWidget {
   const CustomIconButtom(
       {Key? key,
       required this.icon,
       this.onTap,
-      this.size = IconSize.max,
-      this.iconSize = 30,
       this.splashColor = Colors.grey,
       this.backgroundColor = Colors.transparent,
-      this.iconColor})
+      this.iconColor,
+      required this.tooltip})
       : super(key: key);
 
+  final String tooltip;
   final IconData icon;
-  final double? iconSize;
   final Color? iconColor;
   final Function? onTap;
-  final double? size;
   final Color? splashColor;
   final Color? backgroundColor;
 
@@ -39,12 +30,12 @@ class CustomIconButtom extends StatelessWidget {
         color: backgroundColor,
         child: InkWell(
           splashColor: splashColor,
-          onTap: () => onTap != null ? onTap!() : null,
-          child: SizedBox(
-            width: size,
-            height: size,
-            child: Icon(icon, color: myIconColor, size: iconSize),
-          ),
+          child: IconButton(
+              constraints: const BoxConstraints(minHeight: 40, minWidth: 40, maxHeight: 40, maxWidth: 40),
+              padding: const EdgeInsets.all(0),
+              tooltip: tooltip,
+              onPressed: () => onTap != null ? onTap!() : null,
+              icon: Icon(icon, color: myIconColor, size: 25)),
         ),
       ),
     );

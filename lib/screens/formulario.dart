@@ -41,7 +41,7 @@ class _FormularioScreenState extends State<FormularioScreen> {
         panelController: SlidingUpPanelController(),
         appBarTitle: "Crear nueva partida",
         appBarLeading: CustomIconButtom(
-          iconSize: 25,
+          tooltip: "Regresar",
           iconColor: Colors.white,
           icon: Icons.arrow_back_ios_new,
           onTap: () {
@@ -96,10 +96,9 @@ class _Body extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerRight,
                     child: CustomIconButtom(
+                      tooltip: "Partidas Predefinidas",
                       onTap: () => openDefaultsPartidasDialog(context),
                       icon: Icons.apps_rounded,
-                      size: IconSize.min,
-                      iconSize: 20,
                       iconColor: isDarkMode ? Colors.white.withOpacity(0.4) : AppThemes.colorCuarto.withOpacity(0.7),
                       backgroundColor: isDarkMode ? Colors.white.withOpacity(0.2) : AppThemes.colorCuarto.withOpacity(0.5),
                       splashColor: const Color(0xFF2E7A31),
@@ -177,7 +176,6 @@ class _Body extends StatelessWidget {
                             } else {
                               googleAdsProvider.showInterstitialAd(onCloseFunction: () => crearPartida());
                             }
-                            
                           } else {
                             Fun.toast(type: ToasType.error, context: context, message: "Error registrando partida.");
                           }
@@ -230,6 +228,7 @@ class Titulo extends StatelessWidget {
         Visibility(
           visible: formPartidaProvider.jugadores.length < 20,
           child: CustomIconButtom(
+            tooltip: "Agregar Jugador",
             onTap: () async {
               bool continuar = true;
 
@@ -255,8 +254,6 @@ class Titulo extends StatelessWidget {
               }
             },
             icon: Icons.add,
-            size: IconSize.min,
-            iconSize: 25,
             backgroundColor: const Color(0xFF4CAF50),
             splashColor: const Color(0xFF2E7A31),
           ),
@@ -342,10 +339,9 @@ class _JugadorInput extends StatelessWidget {
             Visibility(
               visible: index >= 2,
               child: CustomIconButtom(
+                  tooltip: "Quitar Jugador",
                   onTap: () => formPartidaProvider.removeJugadorToList(index),
                   icon: Icons.remove,
-                  size: IconSize.min,
-                  iconSize: 25,
                   backgroundColor: const Color(0xFFAF4C4C),
                   splashColor: const Color(0xFF7A2E2E)),
             )

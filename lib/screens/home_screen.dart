@@ -52,7 +52,7 @@ class MainHome extends StatelessWidget {
           body: Layout(
             appBarTitle: 'Mis Partidas',
             appBarTrailing: CustomIconButtom(
-              iconSize: 25,
+              tooltip: "Abrir menú",
               iconColor: Colors.white,
               icon: Icons.menu,
               onTap: () => openMenuSlideUp(),

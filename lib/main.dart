@@ -3,13 +3,9 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/routes/app_routes.dart';
-import 'package:game_score/screens/screens.dart';
-import 'package:game_score/utils/utils.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
-import 'package:splash_screen_view/SplashScreenView.dart';
 import 'package:flutter/services.dart';
-
 import 'shared_preferences/preferences.dart';
 
 void main() async {
@@ -79,30 +75,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     ThemeProvider themeProvider = context.watch<ThemeProvider>();
 
-    Widget myAppWithSplash = SplashScreenView(
-      pageRouteTransition: PageRouteTransition.CupertinoPageRoute,
-      navigateRoute: const HomeScreen(),
-      // navigateRoute: const GanadorScreen(),
-      duration: 2500,
-      imageSize: 280,
-      imageSrc: "assets/img/${Preferences.isDarkMode ? "logo_dark" : "logo_light"}.png",
-      text: "CARGANDO...",
-      textType: TextType.TyperAnimatedText,
-      textStyle: const TextStyle(fontSize: 30.0, fontFamily: "Poppins"),
-      backgroundColor: Preferences.isDarkMode ? const Color(0xff020036) : const Color(0xFFF0F0F0),
-    );
-
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Coro Games',
-          home: myAppWithSplash,
+          initialRoute: AppRoutes.initialRoute,
           builder: EasyLoading.init(),
           routes: AppRoutes.getAppRoutes(),
           theme: themeProvider.getCurrentTheme),

@@ -79,6 +79,7 @@ class ListJugadores extends StatelessWidget {
                 children: [
                   const SizedBox(width: 5),
                   CustomIconButtom(
+                    tooltip: "Editar Jugador",
                     onTap: () async {
                       jugadorProvider.jugadorEditar = jugador;
                       nextPage();
@@ -86,8 +87,6 @@ class ListJugadores extends StatelessWidget {
                       jugadorProvider.formJugador.patchValue(jugadorProvider.jugadorEditar!.toMap());
                     },
                     icon: Icons.edit_outlined,
-                    size: IconSize.min,
-                    iconSize: 20,
                     iconColor: iconsColor,
                     splashColor: AppThemes.colorCuarto,
                   ),
@@ -100,6 +99,7 @@ class ListJugadores extends StatelessWidget {
               Visibility(
                 visible: partidaProvider.partidaEnTurno!.jugadores!.length > 2,
                 child: CustomIconButtom(
+                    tooltip: "Borrar Jugador",
                     onTap: () {
                       jugadorProvider.deleteJugador(context, jugador: jugador, callBack: (value) async {
                         if (value["tipo"] == "aceptar") {
@@ -113,8 +113,6 @@ class ListJugadores extends StatelessWidget {
                       });
                     },
                     icon: Icons.delete_forever,
-                    size: IconSize.min,
-                    iconSize: 20,
                     iconColor: iconsColor,
                     splashColor: Colors.red[900]),
               )

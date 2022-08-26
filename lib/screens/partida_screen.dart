@@ -58,7 +58,7 @@ class _Body extends StatelessWidget {
         hasFooter: true,
         appBarTitle: partida.nombre,
         appBarLeading: CustomIconButtom(
-          iconSize: 25,
+          tooltip: "Regresar",
           iconColor: Colors.white,
           icon: Icons.arrow_back_ios_new,
           onTap: () => Navigator.pop(context),
@@ -102,23 +102,24 @@ class JugadoresCard extends StatelessWidget {
             Align(
                 alignment: Alignment.topRight,
                 child: CustomIconButtom(
-                    onTap: () {
-                      final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-                      bool continuar = true;
+                  tooltip: "Agregar jugador",
+                  onTap: () {
+                    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+                    bool continuar = true;
 
-                      if (!AppEnvironment.isPro && partidaProvider.partidaEnTurno!.jugadores!.length > 3) {
-                        continuar = false;
-                        Fun.toast(
-                            type: ToasType.info,
-                            context: context,
-                            message: "La version gratis de Coro Games, solo permite 4 jugadores, para agregar más comprar la versión Pro.");
-                      }
+                    if (!AppEnvironment.isPro && partidaProvider.partidaEnTurno!.jugadores!.length > 3) {
+                      continuar = false;
+                      Fun.toast(
+                          type: ToasType.info,
+                          context: context,
+                          message: "La version gratis de Coro Games, solo permite 4 jugadores, para agregar más comprar la versión Pro.");
+                    }
 
-                      if (continuar) openSlideUp();
-                    },
-                    icon: Icons.add,
-                    iconSize: 25,
-                    size: IconSize.min)),
+                    if (continuar) openSlideUp();
+                  },
+                  icon: Icons.add,
+                )),
+            const SizedBox(height: 8),
             Expanded(
                 child: Container(
               decoration: const BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12), bottomRight: Radius.circular(12))),

@@ -47,6 +47,7 @@ class PartidasDefaultAlert extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     CustomIconButtom(
+                      tooltip: "Agregar Partida Predefinida",
                       onTap: () {
                         PartidaPredefinidaProvider partidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
                         formPartidaPredefinidaProvider.resetForm();
@@ -71,8 +72,6 @@ class PartidasDefaultAlert extends StatelessWidget {
                         }
                       },
                       icon: Icons.add,
-                      size: IconSize.min,
-                      iconSize: 20,
                       backgroundColor: const Color(0xFF4CAF50),
                       splashColor: const Color(0xFF2E7A31),
                     ),
@@ -257,10 +256,9 @@ class ReordenableItem extends StatelessWidget {
                 top: -8,
                 left: -8,
                 child: CustomIconButtom(
+                    tooltip: "Borrar partida predefinida",
                     onTap: () => deletePartidaPredefinida(context, partidaPredefinida),
                     icon: Icons.remove,
-                    size: IconSize.min,
-                    iconSize: 25,
                     iconColor: Colors.white,
                     backgroundColor: const Color(0xFFAF4C4C),
                     splashColor: const Color(0xFF7A2E2E)),
