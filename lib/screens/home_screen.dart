@@ -11,6 +11,7 @@ import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:purchases_flutter/object_wrappers.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -198,6 +199,19 @@ class _Menu extends StatefulWidget {
 }
 
 class _MenuState extends State<_Menu> {
+  fetchOffers() async {
+    Fun.logColor(color: Colores.magenta, body: "===");
+    final Offerings = await PurchaseHelper.fetchOffers();
+    Fun.logColor(color: Colores.green, body: "$Offerings");
+  }
+
+  @override
+  initState() {
+    super.initState();
+    Fun.logColor(color: Colores.yellow, body: "BUSCANDO OFFERING");
+    fetchOffers();
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeProvider themeProvider = context.read<ThemeProvider>();

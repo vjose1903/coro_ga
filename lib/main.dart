@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/routes/app_routes.dart';
+import 'package:game_score/utils/utils.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +16,14 @@ void main() async {
 
   MobileAds.instance.initialize();
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (Platform.isIOS || Platform.isMacOS) {
+    StoreConfig(store: Store.appleStore, apiKey: appleApiKey);
+  } else if (Platform.isAndroid) {
+    StoreConfig(store: Store.googlePlay, apiKey: googleApiKey);
+  }
+
+  await PurchaseHelper.init();
   await Preferences.init();
   AppEnvironment.initialize();
 

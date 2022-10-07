@@ -10,6 +10,7 @@
 .history
 .svn/
 
+
 # IntelliJ related
 *.iml
 *.ipr
@@ -123,3 +124,5 @@ app.*.symbols
 !/dev/ci/**/Gemfile.lock
 
 
+
+revenue/
