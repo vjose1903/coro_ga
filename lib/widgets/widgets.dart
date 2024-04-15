@@ -5,7 +5,7 @@ export 'package:game_score/widgets/google_banner_ad.dart';
 export 'package:game_score/widgets/bottom_bar.dart';
 export 'package:game_score/widgets/lottie_animation.dart';
 export 'package:game_score/widgets/jugadores_actuales.dart';
-export 'package:game_score/widgets/custom_reactive_dropDown.dart';
+export 'package:game_score/widgets/custom_reactive_dropdown.dart';
 export 'package:game_score/widgets/icon_rounded.dart';
 export 'package:game_score/widgets/add_jugador_partida.dart';
 export 'package:game_score/widgets/editar_entidad.dart';

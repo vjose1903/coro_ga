@@ -11,7 +11,6 @@ import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:purchases_flutter/object_wrappers.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -201,8 +200,8 @@ class _Menu extends StatefulWidget {
 class _MenuState extends State<_Menu> {
   fetchOffers() async {
     Fun.logColor(color: Colores.magenta, body: "===");
-    final Offerings = await PurchaseHelper.fetchOffers();
-    Fun.logColor(color: Colores.green, body: "$Offerings");
+    final offerings = await PurchaseHelper.fetchOffers();
+    Fun.logColor(color: Colores.green, body: "$offerings");
   }
 
   @override
@@ -223,7 +222,7 @@ class _MenuState extends State<_Menu> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("${AppEnvironment.appName} ${AppEnvironment.isPro ? "pro" : ""}",
+            Text("Coro Games",
                 style: TextStyle(
                     color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
                     fontFamily: 'Poppins',

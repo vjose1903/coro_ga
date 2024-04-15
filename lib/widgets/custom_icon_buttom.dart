@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/themes/app_themes.dart';
 
 class CustomIconButtom extends StatelessWidget {
   const CustomIconButtom(

@@ -24,7 +24,7 @@ class AppThemes {
   static ThemeData get lightTheme => ThemeData.light().copyWith(
         primaryColor: colorCuarto,
         floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: colorCuarto, elevation: 8),
-        elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(primary: colorCuarto)),
+        elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(backgroundColor: colorCuarto)),
         inputDecorationTheme: InputDecorationTheme(
             filled: true,
             contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -39,10 +39,7 @@ class AppThemes {
   static ThemeData get darkTheme => ThemeData.dark().copyWith(
         primaryColor: colorCuarto,
         floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: colorTercero, elevation: 8),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-          primary: colorTercero,
-        )),
+        elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(backgroundColor: colorTercero)),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),

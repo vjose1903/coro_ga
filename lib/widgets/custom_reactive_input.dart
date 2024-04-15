@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/utils/utils.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 class CustomReactiveInput extends StatelessWidget {

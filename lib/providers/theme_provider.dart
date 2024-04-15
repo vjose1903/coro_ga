@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/utils/utils.dart';
 
 class ThemeProvider extends ChangeNotifier {
   bool isDarkMode;

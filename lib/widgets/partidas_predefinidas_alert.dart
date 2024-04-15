@@ -157,7 +157,7 @@ class PartidasScrollView extends StatelessWidget {
             PartidaPredefinida partidaPredefinida = snapshot.data[index].partidaPredefinida;
             partidaPredefinida.orden = index + 1;
             final partidaEdit = partidaPredefinida.toMap();
-            final res = await PartidaPredefinida.edit(id: partidaPredefinida.id!, partidaEdit: partidaEdit);
+            await PartidaPredefinida.edit(id: partidaPredefinida.id!, partidaEdit: partidaEdit);
           }
         }
 

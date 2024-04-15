@@ -1,9 +1,5 @@
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
-import 'package:game_score/providers/providers.dart';
-
-import 'package:flutter/material.dart';
-import 'package:game_score/utils/utils.dart';
 import 'package:sqflite/sqflite.dart';
 
 class CrudHelper {

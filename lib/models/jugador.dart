@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
-import 'package:game_score/utils/functions.dart';
 import 'package:game_score/utils/utils.dart';
 
 class Jugador extends DynamicClass {
@@ -38,6 +36,7 @@ class Jugador extends DynamicClass {
             json["historial_jugadas"] != null ? List<HistorialJugada>.from(json["historial_jugadas"].map((x) => HistorialJugada.fromMap(x))) : [],
       );
 
+  @override
   Map<String, dynamic> toMap() => {"id": id, "nombre": nombre, "puntuacion": puntuacion, "partida_id": partidaId};
 
   Map<String, dynamic> toUpdateMap() => {"nombre": nombre};

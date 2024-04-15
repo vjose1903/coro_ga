@@ -209,14 +209,14 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
       int puntuacionInt = int.parse(puntuacion);
 
       Jugador jugador = jugadorProvider.jugadorEnTurno!;
-      int puntuacion_actual = jugador.puntuacion!;
+      int puntuacionActual = jugador.puntuacion!;
 
-      if (tipo == "reducir" && puntuacion_actual - puntuacionInt < 0) {
+      if (tipo == "reducir" && puntuacionActual - puntuacionInt < 0) {
         String msgErrorReducir =
             partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? "La puntuación minima debe de ser 0." : "La ronda minima debe de ser 0.";
         Fun.toast(type: ToasType.warning, context: context, title: "AVISO", message: msgErrorReducir);
 
-        return puntuacion_actual;
+        return puntuacionActual;
       } else {
         MyLoading.show();
         SqlResponse response = await jugadorProvider.changePuntuacion(jugador: jugador, newPuntuacion: puntuacionInt, tipo: tipo);

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/utils/utils.dart';
-
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:skeletons/skeletons.dart';
 

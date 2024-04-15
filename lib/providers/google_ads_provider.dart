@@ -1,9 +1,6 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/utils/utils.dart';
-import 'package:game_score/widgets/widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class GoogleAdsProvider extends ChangeNotifier {

@@ -3,8 +3,6 @@ import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/utils/functions.dart';
-
 import 'package:provider/provider.dart';
 
 class Layout extends StatelessWidget {
