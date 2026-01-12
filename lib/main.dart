@@ -4,10 +4,9 @@ import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/routes/app_routes.dart';
 import 'package:game_score/screens/screens.dart';
-import 'package:game_score/utils/utils.dart';
+import 'package:game_score/widgets/custom_splash_screen.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
-import 'package:splash_screen_view/SplashScreenView.dart';
 import 'package:flutter/services.dart';
 
 import 'shared_preferences/preferences.dart';
@@ -16,11 +15,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   MobileAds.instance.initialize();
-  WidgetsFlutterBinding.ensureInitialized();
   await Preferences.init();
   AppEnvironment.initialize();
 
-  final isPlatformDark = WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
+  final isPlatformDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
   bool initInDarkMode = Preferences.isSystemMode ? isPlatformDark : Preferences.isDarkMode;
 
   runApp(MultiProvider(providers: [
@@ -65,7 +63,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       _lastLifecycleState = state;
 
       if (Preferences.isSystemMode && _lastLifecycleState == AppLifecycleState.resumed) {
-        bool isActualSystemDark = WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
+        bool isActualSystemDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
 
         if (isActualSystemDark != Preferences.isDarkMode) {
           Preferences.isDarkMode = isActualSystemDark;
@@ -79,15 +77,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     ThemeProvider themeProvider = context.watch<ThemeProvider>();
 
-    Widget myAppWithSplash = SplashScreenView(
-      pageRouteTransition: PageRouteTransition.CupertinoPageRoute,
+    Widget myAppWithSplash = CustomSplashScreen(
       navigateRoute: const HomeScreen(),
-      // navigateRoute: const GanadorScreen(),
       duration: 2500,
       imageSize: 280,
       imageSrc: "assets/img/${Preferences.isDarkMode ? "logo_dark" : "logo_light"}.png",
       text: "CARGANDO...",
-      textType: TextType.TyperAnimatedText,
       textStyle: const TextStyle(fontSize: 30.0, fontFamily: "Poppins"),
       backgroundColor: Preferences.isDarkMode ? const Color(0xff020036) : const Color(0xFFF0F0F0),
     );

@@ -1,5 +1,4 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_shake_animated/flutter_shake_animated.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -62,11 +61,7 @@ class PartidasDefaultAlert extends StatelessWidget {
                         }
 
                         if (continuar) {
-                          DialogNavigator.of(context).push(
-                            FluidDialogPage(
-                              builder: (context) => const FormPartidaPredefinida(),
-                            ),
-                          );
+                          _showFormPartidaDialog(context);
                         }
                       },
                       icon: Icons.add,
@@ -123,8 +118,8 @@ class PartidasDefaultAlert extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.red[400]),
-                      padding: MaterialStateProperty.all(const EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
+                      backgroundColor: WidgetStateProperty.all(Colors.red[400]),
+                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
                     ),
                     onPressed: () {
                       ReorderableProvider reorderableProvider = context.read<ReorderableProvider>();
@@ -138,6 +133,17 @@ class PartidasDefaultAlert extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  void _showFormPartidaDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: const FormPartidaPredefinida(),
+      ),
     );
   }
 }
@@ -157,7 +163,7 @@ class PartidasScrollView extends StatelessWidget {
             PartidaPredefinida partidaPredefinida = snapshot.data[index].partidaPredefinida;
             partidaPredefinida.orden = index + 1;
             final partidaEdit = partidaPredefinida.toMap();
-            final res = await PartidaPredefinida.edit(id: partidaPredefinida.id!, partidaEdit: partidaEdit);
+            await PartidaPredefinida.edit(id: partidaPredefinida.id!, partidaEdit: partidaEdit);
           }
         }
 
@@ -273,7 +279,6 @@ class ReordenableItem extends StatelessWidget {
 
   deletePartidaPredefinida(BuildContext context, PartidaPredefinida partida) {
     PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
-    // ReorderableProvider reorderableProvider = context.read<ReorderableProvider>();
 
     CustomAlertDialog.show(context,
         menssage: "Seguro que desea eliminar la partida predefinida: ${partida.nombre}",
@@ -285,7 +290,6 @@ class ReordenableItem extends StatelessWidget {
             "onTap": () {
               Navigator.pop(context);
               formPartidaPredefinidaProvider.deletePartidaPredefinida(context, partida: partida);
-              // reorderableProvider.changesOnList();
             }
           })
         ]);
@@ -301,9 +305,12 @@ class ReordenableItem extends StatelessWidget {
     PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
     formPartidaPredefinidaProvider.rellenarFormulario(partida);
 
-    DialogNavigator.of(context).push(
-      FluidDialogPage(
-        builder: (context) => const FormPartidaPredefinida(),
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: const FormPartidaPredefinida(),
       ),
     );
   }

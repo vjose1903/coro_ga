@@ -69,8 +69,8 @@ class CustomReactiveDropDown extends StatelessWidget {
           }),
         ),
         showErrors: (control) => control.invalid && (control.touched || control.dirty),
-        validationMessages: (control) => {
-              'required': "Campo requerido.",
+        validationMessages: {
+              'required': (error) => "Campo requerido.",
             });
   }
 }

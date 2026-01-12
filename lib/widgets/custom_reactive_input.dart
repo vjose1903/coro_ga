@@ -68,19 +68,9 @@ class CustomReactiveInput extends StatelessWidget {
           }),
         ),
         showErrors: (control) => control.invalid && (control.touched || control.dirty),
-        validationMessages: (control) => handleErrorsMsg(control));
-  }
-
-  Map<String, String> handleErrorsMsg(control) {
-    Map<String, String> errors = {};
-
-    if (control.errors.containsKey("required")) errors["required"] = "Campo requerido.";
-
-    if (control.errors.containsKey("min")) {
-      final minValue = control.errors["min"] as Map;
-      errors["min"] = "Valor minimo es: ${minValue["min"]}";
-    }
-
-    return errors;
+        validationMessages: {
+              'required': (error) => "Campo requerido.",
+              'min': (error) => "Valor minimo es: ${(error as Map)["min"]}",
+            });
   }
 }

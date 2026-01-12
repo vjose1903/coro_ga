@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:motion_toast/motion_toast.dart';
-import 'package:palestine_console/palestine_console.dart';
 
 enum ToasType { error, success, warning, info }
 
@@ -20,21 +19,11 @@ class Colores {
 class Fun {
   static void logColor({required String color, required dynamic body, String title = '', bool pretty = false}) {
     if (!kReleaseMode) {
-      final printColors = {
-        'red': Print.red,
-        'white': Print.white,
-        'yellow': Print.yellow,
-        'green': Print.green,
-        'magenta': Print.magenta,
-        'cyan': Print.cyan,
-        'blue': Print.blue,
-      };
-
       if (title != '') {
-        printColors[color]!(title);
-        pretty ? Print.white(getPrettyJSONString(jsonDecode(body))) : Print.white(body);
+        debugPrint('[$color] $title');
+        pretty ? debugPrint(getPrettyJSONString(jsonDecode(body))) : debugPrint(body.toString());
       } else {
-        pretty ? printColors[color]!(getPrettyJSONString(jsonDecode(body))) : printColors[color]!(body);
+        pretty ? debugPrint('[$color] ${getPrettyJSONString(jsonDecode(body))}') : debugPrint('[$color] $body');
       }
     }
   }

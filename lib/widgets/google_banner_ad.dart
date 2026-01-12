@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/utils/utils.dart';
 
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:skeletons/skeletons.dart';
+import 'package:shimmer/shimmer.dart';
 
 enum AdLocation { partida, puntuacion, agregarJugador, editarEntidad, pageTransition }
 
@@ -49,20 +48,28 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
       return Container(
         width: 300,
         alignment: Alignment.topCenter,
-        child: Skeleton(
-            themeMode: Preferences.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-            isLoading: widget._bannerAd == null,
-            skeleton: const SkeletonLine(style: SkeletonLineStyle(height: 50)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                if (widget._bannerAd != null)
+        child: widget._bannerAd == null
+            ? Shimmer.fromColors(
+                baseColor: Preferences.isDarkMode ? Colors.grey[800]! : Colors.grey[300]!,
+                highlightColor: Preferences.isDarkMode ? Colors.grey[700]! : Colors.grey[100]!,
+                child: Container(
+                  width: 300,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
                   SizedBox(
                       width: widget._bannerAd!.size.width.toDouble(),
                       height: widget._bannerAd!.size.height.toDouble(),
                       child: AdWidget(ad: widget._bannerAd!)),
-              ],
-            )),
+                ],
+              ),
       );
     }
   }

@@ -1,6 +1,3 @@
-import 'dart:developer';
-
-import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
@@ -147,7 +144,7 @@ class FormPartidaPredefinida extends StatelessWidget {
                             backgroundColor: Colors.red[400],
                             label: "Cerrar",
                             textColor: Colors.white,
-                            onTap: () => DialogNavigator.of(context).pop()),
+                            onTap: () => Navigator.of(context).pop()),
 
                         const SizedBox(width: 10),
                         // CREAR ==========================================
@@ -189,7 +186,7 @@ class FormPartidaPredefinida extends StatelessWidget {
 
       if (!response.hasError!) {
         googleAdsProvider.showInterstitialAd(onCloseFunction: () {
-          DialogNavigator.of(context).pop();
+          Navigator.of(context).pop();
           formPartidaPredefinidaProvider.resetForm();
           googleAdsProvider.loadInterstitialAd();
         });
