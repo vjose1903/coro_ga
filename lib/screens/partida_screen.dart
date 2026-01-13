@@ -103,9 +103,22 @@ class JugadoresCard extends StatelessWidget {
         padding: const EdgeInsets.all(10),
         child: Column(
           children: [
-            Align(
-                alignment: Alignment.topRight,
-                child: CustomIconButtom(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomIconButtom(
+                    onTap: () {
+                      final SlideUpProvider slideUpProvider =
+                          context.read<SlideUpProvider>();
+                      slideUpProvider.openSlideUp(
+                          controller: panelController,
+                          bodyContent:
+                              HistorialGeneral(panelController: panelController));
+                    },
+                    icon: Icons.history,
+                    iconSize: 25,
+                    size: IconSize.min),
+                CustomIconButtom(
                     onTap: () {
                       final PartidaProvider partidaProvider =
                           context.read<PartidaProvider>();
@@ -126,7 +139,9 @@ class JugadoresCard extends StatelessWidget {
                     },
                     icon: Icons.add,
                     iconSize: 25,
-                    size: IconSize.min)),
+                    size: IconSize.min),
+              ],
+            ),
             const SizedBox(height: 10),
             Expanded(
                 child: Container(

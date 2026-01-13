@@ -1,5 +1,5 @@
 export 'package:game_score/widgets/form_partida_predefinida.dart';
-
+export 'package:game_score/widgets/historial_general.dart';
 export 'package:game_score/widgets/partidas_predefinidas_alert.dart';
 export 'package:game_score/widgets/google_banner_ad.dart';
 export 'package:game_score/widgets/bottom_bar.dart';
