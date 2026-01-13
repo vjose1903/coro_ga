@@ -31,10 +31,11 @@ class PartidaScreen extends StatelessWidget {
           floatingActionButton: Visibility(
             visible: panelController.status == SlidingUpPanelStatus.collapsed,
             child: FloatingActionButton(
+              shape: const CircleBorder(),
               onPressed: () {
                 Navigator.pushReplacementNamed(context, 'formulario');
               },
-              child: const Icon(Icons.add, size: 30),
+              child: const Icon(Icons.add, size: 30, color: Colors.white),
             ),
           ),
           bottomNavigationBar: BottomBar(

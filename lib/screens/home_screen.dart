@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
@@ -58,8 +60,9 @@ class _MainHomeState extends State<MainHome> {
   Widget build(BuildContext context) {
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
-        // Watch para que se reconstruya cuando cambie el estado del SlideUp
+        // Watch para que se reconstruya cuando cambie el estado del SlideUp o el tema
         context.watch<SlideUpProvider>();
+        context.watch<ThemeProvider>();
 
         return Scaffold(
           body: Layout(
@@ -76,6 +79,7 @@ class _MainHomeState extends State<MainHome> {
           floatingActionButton: Visibility(
             visible: panelController.status == SlidingUpPanelStatus.collapsed,
             child: FloatingActionButton(
+                shape: const CircleBorder(),
                 onPressed: () {
                   final PartidaProvider partidaProvider =
                       context.read<PartidaProvider>();
@@ -92,7 +96,7 @@ class _MainHomeState extends State<MainHome> {
                             "La versión gratis solo permite ${PremiumProvider.freeMaxGames} partidas simultáneas. ¡Desbloquea PRO para más!");
                   }
                 },
-                child: const Icon(Icons.add, size: 30)),
+                child: const Icon(Icons.add, size: 30, color: Colors.white)),
           ),
         );
       },
@@ -196,8 +200,10 @@ class ListPartidas extends StatelessWidget {
                     partidaProvider.partidaEditar = partida;
                     slideUp.openSlideUp(
                         controller: panelController,
+                        topMargin: 0.5,
                         bodyContent:
-                            EditarEntidad(panelController: panelController));
+                            EditarEntidad(panelController: panelController)
+                    );
                   },
 
                   index: index,
@@ -231,7 +237,7 @@ class _Menu extends StatefulWidget {
 class _MenuState extends State<_Menu> {
   @override
   Widget build(BuildContext context) {
-    ThemeProvider themeProvider = context.read<ThemeProvider>();
+    ThemeProvider themeProvider = context.watch<ThemeProvider>();
 
     return Container(
         width: double.infinity,
@@ -268,7 +274,7 @@ class _MenuState extends State<_Menu> {
                     alignment: Alignment.centerRight,
                     child: SwitchListTile.adaptive(
                         contentPadding: EdgeInsets.zero,
-                        activeColor: AppThemes.colorTercero,
+                        activeTrackColor: AppThemes.colorTercero,
                         title: Text('Tema del sistema',
                             style: TextStyle(
                               color: Preferences.isDarkMode
@@ -279,8 +285,8 @@ class _MenuState extends State<_Menu> {
                         value: Preferences.isSystemMode,
                         onChanged: (value) {
                           Preferences.isSystemMode = value;
-                          Preferences.isDarkMode = WidgetsBinding
-                                  .instance.window.platformBrightness ==
+                          Preferences.isDarkMode = PlatformDispatcher
+                                  .instance.platformBrightness ==
                               Brightness.dark;
                           themeProvider.changeCurrentTheme();
                           setState(() {});

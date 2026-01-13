@@ -14,6 +14,7 @@ class Layout extends StatelessWidget {
     this.appBarLeading,
     this.appBarTrailing,
     this.hasFooter = false,
+    this.slideUpTopMargin = 0.07,
   }) : super(key: key);
 
   final Widget bodyContent;
@@ -21,6 +22,7 @@ class Layout extends StatelessWidget {
   final Widget? appBarLeading;
   final Widget? appBarTrailing;
   final bool? hasFooter;
+  final double slideUpTopMargin;
 
   final SlidingUpPanelController panelController;
 
@@ -36,13 +38,27 @@ class Layout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
+    final SlideUpProvider slideUpProvider = context.watch<SlideUpProvider>();
+    final double currentTopMargin = slideUpProvider.topMargin ?? slideUpTopMargin;
+
+    final bool isExpanded = panelController.status == SlidingUpPanelStatus.expanded;
 
     return Stack(
           children: [
             Container(decoration: boxDecoration),
             _AppBar(title: appBarTitle, leading: appBarLeading, trailing: appBarTrailing),
             _Body(child: bodyContent),
+            // Backdrop visual con fade animation (cubre toda la pantalla, no se mueve)
+            IgnorePointer(
+              ignoring: true,
+              child: AnimatedOpacity(
+                opacity: isExpanded ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 300),
+                child: Container(
+                  color: Colors.black.withValues(alpha: 0.6),
+                ),
+              ),
+            ),
             SlidingUpPanelWidget(
               anchor: 0,
               enableOnTap: false,
@@ -71,13 +87,10 @@ class Layout extends StatelessWidget {
                 }
               },
               child: Container(
-                margin: EdgeInsets.only(top: ResponsiveApp.size.height * 0.12),
+                margin: EdgeInsets.only(top: ResponsiveApp.size.height * currentTopMargin),
                 decoration: ShapeDecoration(
                   shadows: [
-                    if (panelController.status == SlidingUpPanelStatus.expanded)
-                      BoxShadow(blurRadius: 0, spreadRadius: (ResponsiveApp.size.height + 200), color: Colors.black.withValues(alpha: 0.6)),
-                    if (panelController.status == SlidingUpPanelStatus.expanded)
-                      BoxShadow(blurRadius: 7, spreadRadius: 1, color: Colors.black.withValues(alpha: 0.4))
+                    BoxShadow(blurRadius: 7, spreadRadius: 1, color: Colors.black.withValues(alpha: 0.4))
                   ],
                   color: AppThemes.themeColor_2,
                   shape: const RoundedRectangleBorder(
@@ -87,6 +100,19 @@ class Layout extends StatelessWidget {
                 child: _WeSlideContent(panelController: panelController),
               ),
             ),
+            // GestureDetector para cerrar al tocar fuera (área superior del backdrop)
+            if (isExpanded && slideUpProvider.closeOnOutsideClick)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: ResponsiveApp.size.height * currentTopMargin,
+                child: GestureDetector(
+                  onTap: () => cleanSlideUp(slideUpProvider),
+                  behavior: HitTestBehavior.opaque,
+                  child: Container(color: Colors.transparent),
+                ),
+              ),
           ],
         );
   }
@@ -164,7 +190,8 @@ class _WeSlideContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
+    SlideUpProvider slideUpProvider = context.watch<SlideUpProvider>();
+    ThemeProvider themeProvider = context.watch<ThemeProvider>();
 
     return Container(
         width: double.infinity,
@@ -185,7 +212,15 @@ class _WeSlideContent extends StatelessWidget {
                       color: Colors.grey.withValues(alpha: 0.5),
                     )),
                 Column(
-                  children: [Container(height: 25), Expanded(child: slideUpProvider.body ?? Container())],
+                  children: [
+                    Container(height: 25),
+                    Expanded(
+                      child: KeyedSubtree(
+                        key: ValueKey('body_${themeProvider.isDarkMode}'),
+                        child: slideUpProvider.body ?? Container(),
+                      ),
+                    ),
+                  ],
                 )
               ],
             )));
