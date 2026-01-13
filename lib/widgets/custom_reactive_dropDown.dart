@@ -57,8 +57,8 @@ class CustomReactiveDropDown extends StatelessWidget {
 
           // Labels -----------
           labelStyle: TextStyle(color: enabled ? AppThemes.labelInputColor : AppThemes.labelInputDisabledColor, fontFamily: 'Poppins'),
-          floatingLabelStyle: MaterialStateTextStyle.resolveWith((Set<MaterialState> states) {
-            final Color? color = states.contains(MaterialState.error)
+          floatingLabelStyle: WidgetStateTextStyle.resolveWith((Set<WidgetState> states) {
+            final Color? color = states.contains(WidgetState.error)
                 ? enabled
                     ? Colors.red[900]
                     : Colors.red[900]!.withOpacity(0.6)

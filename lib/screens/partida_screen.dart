@@ -1,5 +1,4 @@
 import 'package:animate_do/animate_do.dart';
-import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
@@ -171,15 +170,9 @@ class JugadoresList extends StatelessWidget {
       int index = entry.key;
       Jugador jugador = entry.value;
 
-      return ConditionalBuilder(
-        condition: partidaProvider.isChangePartida,
-        builder: (context) {
-          return ElasticIn(delay: Duration(milliseconds: 100 * index), child: JugadorInfo(jugador: jugador, panelController: panelController));
-        },
-        fallback: (context) {
-          return JugadorInfo(jugador: jugador, panelController: panelController);
-        },
-      );
+      return partidaProvider.isChangePartida
+          ? ElasticIn(delay: Duration(milliseconds: 100 * index), child: JugadorInfo(jugador: jugador, panelController: panelController))
+          : JugadorInfo(jugador: jugador, panelController: panelController);
     }).toList();
   }
 }

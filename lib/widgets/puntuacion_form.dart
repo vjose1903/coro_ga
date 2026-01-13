@@ -7,7 +7,6 @@ import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:game_score/utils/utils.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
 class PuntuacionForm extends StatelessWidget {
@@ -159,15 +158,15 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                           if (newPuntuacion >= partidaProvider.partidaEnTurno!.maxPuntuacion!.toInt()) {
                             Navigator.pushReplacement(
                                 context,
-                                PageTransition(
-                                    type: PageTransitionType.fade,
+                                PageRouteBuilder(
                                     settings: RouteSettings(arguments: {
                                       "partida": partidaProvider.partidaEnTurno!.nombre,
                                       "jugador": jugadorProvider.jugadorEnTurno!.nombre,
                                     }),
-                                    child: const GanadorScreen(),
-                                    alignment: Alignment.center,
-                                    duration: const Duration(milliseconds: 500)));
+                                    pageBuilder: (context, animation, secondaryAnimation) => const GanadorScreen(),
+                                    transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+                                        FadeTransition(opacity: animation, child: child),
+                                    transitionDuration: const Duration(milliseconds: 500)));
                           }
                           await Future.delayed(const Duration(milliseconds: 50));
                           //

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -126,18 +125,13 @@ class DialogBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConditionalBuilder(
-      condition: dialogType == DialogType.custom,
-      builder: (context) {
-        return body != null ? body! : Container();
-      },
-      fallback: (context) {
-        return Row(mainAxisSize: MainAxisSize.min, children: [
-          if (dialogType != null) CustomAlertDialog._getIcon(dialogType)!,
-          const SizedBox(width: 10),
-          Flexible(child: Text(menssage)),
-        ]);
-      },
-    );
+    if (dialogType == DialogType.custom) {
+      return body != null ? body! : Container();
+    }
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      if (dialogType != null) CustomAlertDialog._getIcon(dialogType)!,
+      const SizedBox(width: 10),
+      Flexible(child: Text(menssage)),
+    ]);
   }
 }

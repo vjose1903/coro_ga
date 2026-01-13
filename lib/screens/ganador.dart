@@ -4,7 +4,6 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:game_score/models/models.dart';
-import 'package:game_score/models/partida.dart';
 import 'package:game_score/providers/partida_provider.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/screens/screens.dart';
@@ -12,7 +11,6 @@ import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:widget_and_text_animator/widget_and_text_animator.dart';
 
@@ -75,11 +73,11 @@ class _GanadorScreenState extends State<GanadorScreen> {
                     googleAdsProvider.showInterstitialAd(onCloseFunction: () {
                       Navigator.pushReplacement(
                           context,
-                          PageTransition(
-                              type: PageTransitionType.fade,
-                              child: const HomeScreen(),
-                              alignment: Alignment.center,
-                              duration: const Duration(milliseconds: 500)));
+                          PageRouteBuilder(
+                              pageBuilder: (context, animation, secondaryAnimation) => const HomeScreen(),
+                              transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+                                  FadeTransition(opacity: animation, child: child),
+                              transitionDuration: const Duration(milliseconds: 500)));
                     });
                   })),
           Container(
@@ -122,7 +120,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
                     incomingEffect: WidgetTransitionEffects.outgoingScaleUp(
                         delay: const Duration(seconds: 2, milliseconds: 800), duration: const Duration(seconds: 1)),
                     child: ElevatedButton(
-                      style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.green[400])),
+                      style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.green[400])),
                       onPressed: () => revanchaFunction(),
                       child: const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
