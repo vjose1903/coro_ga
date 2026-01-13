@@ -37,7 +37,8 @@ class PartidaScreen extends StatelessWidget {
               child: const Icon(Icons.add, size: 30),
             ),
           ),
-          bottomNavigationBar: BottomBar(panelController: panelController, child: const NavigationBar()),
+          bottomNavigationBar: BottomBar(
+              panelController: panelController, child: const NavigationBar()),
         );
       },
     );
@@ -45,7 +46,8 @@ class PartidaScreen extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({Key? key, required this.panelController, required this.anuncio}) : super(key: key);
+  const _Body({Key? key, required this.panelController, required this.anuncio})
+      : super(key: key);
 
   final SlidingUpPanelController panelController;
   final GoogleBannerAd anuncio;
@@ -77,7 +79,8 @@ class _Body extends StatelessWidget {
 }
 
 class JugadoresCard extends StatelessWidget {
-  const JugadoresCard({Key? key, required this.panelController}) : super(key: key);
+  const JugadoresCard({Key? key, required this.panelController})
+      : super(key: key);
   final SlidingUpPanelController panelController;
 
   @override
@@ -86,7 +89,8 @@ class JugadoresCard extends StatelessWidget {
       final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
       final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
       jugadorProvider.formJugador.reset();
-      slideUpProvider.openSlideUp(controller: panelController, bodyContent: const AddJugadorPartida());
+      slideUpProvider.openSlideUp(
+          controller: panelController, bodyContent: const AddJugadorPartida());
     }
 
     return Expanded(
@@ -103,14 +107,18 @@ class JugadoresCard extends StatelessWidget {
                 alignment: Alignment.topRight,
                 child: CustomIconButtom(
                     onTap: () {
-                      final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-                      final PremiumProvider premiumProvider = context.read<PremiumProvider>();
+                      final PartidaProvider partidaProvider =
+                          context.read<PartidaProvider>();
+                      final PremiumProvider premiumProvider =
+                          context.read<PremiumProvider>();
 
-                      if (!premiumProvider.canAddPlayer(partidaProvider.partidaEnTurno!.jugadores!.length)) {
+                      if (!premiumProvider.canAddPlayer(
+                          partidaProvider.partidaEnTurno!.jugadores!.length)) {
                         Toast.show(
                             type: ToastType.info,
                             context: context,
-                            message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores. ¡Desbloquea PRO para más!");
+                            message:
+                                "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores. ¡Desbloquea PRO para más!");
                         return;
                       }
 
@@ -119,9 +127,13 @@ class JugadoresCard extends StatelessWidget {
                     icon: Icons.add,
                     iconSize: 25,
                     size: IconSize.min)),
+            const SizedBox(height: 10),
             Expanded(
                 child: Container(
-              decoration: const BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12), bottomRight: Radius.circular(12))),
+              decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(12),
+                      bottomRight: Radius.circular(12))),
               child: JugadoresList(panelController: panelController),
             ))
           ],
@@ -132,7 +144,8 @@ class JugadoresCard extends StatelessWidget {
 }
 
 class JugadoresList extends StatelessWidget {
-  const JugadoresList({Key? key, required this.panelController}) : super(key: key);
+  const JugadoresList({Key? key, required this.panelController})
+      : super(key: key);
   final SlidingUpPanelController panelController;
 
   @override
@@ -140,7 +153,7 @@ class JugadoresList extends StatelessWidget {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final partida = partidaProvider.partidaEnTurno!;
     final jugadores = List<Jugador>.from(partida.jugadores ?? []);
-    
+
     // Ordenar solo si es necesario
     jugadores.sort((a, b) => a.id!.compareTo(b.id!));
 
@@ -158,9 +171,13 @@ class JugadoresList extends StatelessWidget {
 
             return partidaProvider.isChangePartida
                 ? ElasticIn(
-                    delay: Duration(milliseconds: 50 * index), // Reducido de 100ms a 50ms
-                    child: JugadorInfo(jugador: jugador, panelController: panelController))
-                : JugadorInfo(jugador: jugador, panelController: panelController);
+                    key: ValueKey('${partida.id}_${jugador.id}'),
+                    delay: Duration(
+                        milliseconds: 100 * index), // Reducido de 100ms a 50ms
+                    child: JugadorInfo(
+                        jugador: jugador, panelController: panelController))
+                : JugadorInfo(
+                    jugador: jugador, panelController: panelController);
           }).toList(),
         ),
       ),
@@ -169,7 +186,9 @@ class JugadoresList extends StatelessWidget {
 }
 
 class JugadorInfo extends StatelessWidget {
-  const JugadorInfo({Key? key, required this.jugador, required this.panelController}) : super(key: key);
+  const JugadorInfo(
+      {Key? key, required this.jugador, required this.panelController})
+      : super(key: key);
   final Jugador jugador;
   final SlidingUpPanelController panelController;
 
@@ -177,9 +196,15 @@ class JugadorInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
 
-    Color fontNombreColor = Preferences.isDarkMode ? const Color(0xD26776E6) : const Color(0xE30B4DBF);
-    Color? fontPuntuacionColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.8) : const Color(0xDF062864);
-    Color? iconEstadoColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.2) : AppThemes.colorCuarto.withValues(alpha: 0.3);
+    Color fontNombreColor = Preferences.isDarkMode
+        ? const Color(0xD26776E6)
+        : const Color(0xE30B4DBF);
+    Color? fontPuntuacionColor = Preferences.isDarkMode
+        ? Colors.white.withValues(alpha: 0.8)
+        : const Color(0xDF062864);
+    Color? iconEstadoColor = Preferences.isDarkMode
+        ? Colors.white.withValues(alpha: 0.2)
+        : AppThemes.colorCuarto.withValues(alpha: 0.3);
 
     Map iconEstado = {
       Estado.ganador: Icons.arrow_upward,
@@ -190,10 +215,14 @@ class JugadorInfo extends StatelessWidget {
 
     return _CardBackGround(
         function: () {
-          final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
-          final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
+          final JugadorProvider jugadorProvider =
+              context.read<JugadorProvider>();
+          final SlideUpProvider slideUpProvider =
+              context.read<SlideUpProvider>();
           jugadorProvider.changeJugadorEnTurno(jugador);
-          slideUpProvider.openSlideUp(controller: panelController, bodyContent: PuntuacionForm(panelController: panelController));
+          slideUpProvider.openSlideUp(
+              controller: panelController,
+              bodyContent: PuntuacionForm(panelController: panelController));
         },
         child: Padding(
           padding: const EdgeInsets.all(8),
@@ -205,18 +234,29 @@ class JugadorInfo extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.start,
-                style: TextStyle(fontFamily: "Poppins", fontSize: 15, color: fontNombreColor),
+                style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 15,
+                    color: fontNombreColor),
               ),
               Expanded(
                   child: Center(
                       child: Text(
                 jugador.puntuacion.toString(),
                 textAlign: TextAlign.start,
-                style: TextStyle(fontFamily: "Poppins", fontSize: 40, color: fontPuntuacionColor, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 40,
+                    color: fontPuntuacionColor,
+                    fontWeight: FontWeight.bold),
               ))),
               Align(
                   alignment: Alignment.centerRight,
-                  child: Icon(iconEstado[partidaProvider.partidaEnTurno!.getJugadorEstatus(jugador)], color: iconEstadoColor, size: 18))
+                  child: Icon(
+                      iconEstado[partidaProvider.partidaEnTurno!
+                          .getJugadorEstatus(jugador)],
+                      color: iconEstadoColor,
+                      size: 18))
             ],
           ),
         ));
@@ -224,9 +264,13 @@ class JugadorInfo extends StatelessWidget {
 }
 
 class _CardBackGround extends StatelessWidget {
-  _CardBackGround({Key? key, required this.child, this.function}) : super(key: key);
-  final boxDecoration =
-      BoxDecoration(color: Preferences.isDarkMode ? const Color(0x7921233C) : const Color(0x7BA1A6DE), borderRadius: BorderRadius.circular(15));
+  _CardBackGround({Key? key, required this.child, this.function})
+      : super(key: key);
+  final boxDecoration = BoxDecoration(
+      color: Preferences.isDarkMode
+          ? const Color(0x7921233C)
+          : const Color(0x7BA1A6DE),
+      borderRadius: BorderRadius.circular(15));
   final Widget child;
   final Function? function;
 
@@ -269,10 +313,13 @@ class _NavigationBarState extends State<NavigationBar> {
     itemScrollController = ItemScrollController();
     itemPositionsListener = ItemPositionsListener.create();
 
-    SchedulerBinding.instance.addPostFrameCallback((_) => scrollToGame(context));
+    SchedulerBinding.instance
+        .addPostFrameCallback((_) => scrollToGame(context));
 
     itemPositionsListener.itemPositions.addListener(() {
-      visibleIndeces = itemPositionsListener.itemPositions.value.map((item) => item.index).toList();
+      visibleIndeces = itemPositionsListener.itemPositions.value
+          .map((item) => item.index)
+          .toList();
     });
   }
 
@@ -284,14 +331,20 @@ class _NavigationBarState extends State<NavigationBar> {
   void scrollToGame(BuildContext context) {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
 
-    final int selectedIndex = partidaProvider.partidas.indexWhere((partida) => partida.id == partidaProvider.partidaEnTurno!.id);
+    final int selectedIndex = partidaProvider.partidas.indexWhere(
+        (partida) => partida.id == partidaProvider.partidaEnTurno!.id);
 
     // Usar post frame callback en lugar de delay
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (partidaProvider.partidas.length > 3 && 
+      if (partidaProvider.partidas.length > 3 &&
           visibleIndeces.isNotEmpty &&
-          ((selectedIndex <= visibleIndeces.first) || (selectedIndex >= visibleIndeces.last))) {
-        itemScrollController.scrollTo(index: selectedIndex, duration: const Duration(milliseconds: 500), curve: Curves.easeInOutCubic, alignment: 0.4);
+          ((selectedIndex <= visibleIndeces.first) ||
+              (selectedIndex >= visibleIndeces.last))) {
+        itemScrollController.scrollTo(
+            index: selectedIndex,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOutCubic,
+            alignment: 0.4);
       }
     });
   }
@@ -310,7 +363,8 @@ class _NavigationBarState extends State<NavigationBar> {
           physics: const BouncingScrollPhysics(),
           itemCount: partidas.length,
           padding: const EdgeInsets.only(left: 20, right: 150),
-          itemBuilder: (context, index) => _Chip(partida: partidas[index], scrollToGame: scrollToGame));
+          itemBuilder: (context, index) =>
+              _Chip(partida: partidas[index], scrollToGame: scrollToGame));
     } else {
       return Container();
     }
@@ -318,12 +372,16 @@ class _NavigationBarState extends State<NavigationBar> {
 }
 
 class _Chip extends StatelessWidget {
-  const _Chip({Key? key, required this.partida, required this.scrollToGame}) : super(key: key);
+  const _Chip({Key? key, required this.partida, required this.scrollToGame})
+      : super(key: key);
   final Partida? partida;
   final Function scrollToGame;
   Color getChipColor(Partida partida, PartidaProvider partidaProvider) {
-    Color colorChipSelected = Preferences.isDarkMode ? AppThemes.colorCuarto : AppThemes.colorTercero;
-    Color colorChip = Preferences.isDarkMode ? const Color(0xE1494949) : const Color(0xDF787A84);
+    Color colorChipSelected =
+        Preferences.isDarkMode ? AppThemes.colorCuarto : AppThemes.colorTercero;
+    Color colorChip = Preferences.isDarkMode
+        ? const Color(0xE1494949)
+        : const Color(0xDF787A84);
 
     Color color = colorChipSelected;
     if (partida.id != partidaProvider.partidaEnTurno!.id) color = colorChip;
@@ -352,7 +410,12 @@ class _Chip extends StatelessWidget {
               height: 35,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Center(child: Text(partida!.nombre!, style: const TextStyle(fontFamily: "Poppins", color: Colors.white, fontSize: 15))),
+                child: Center(
+                    child: Text(partida!.nombre!,
+                        style: const TextStyle(
+                            fontFamily: "Poppins",
+                            color: Colors.white,
+                            fontSize: 15))),
               ),
             ),
           ),

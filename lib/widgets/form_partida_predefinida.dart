@@ -1,3 +1,4 @@
+import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
@@ -28,7 +29,7 @@ class FormPartidaPredefinida extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text("Crear Partida predefinida",
+            Text(formPartidaPredefinidaProvider.partidaPredefinidaEditar != null ? "Editar Partida" : "Crear Partida predefinida",
                 style: TextStyle(
                     color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
                     fontFamily: 'Poppins',
@@ -136,15 +137,15 @@ class FormPartidaPredefinida extends StatelessWidget {
                         // CERRAR ==========================================
                         ExpandedButtom(
                             backgroundColor: Colors.red[400],
-                            label: "Cerrar",
+                            label: "Volver",
                             textColor: Colors.white,
-                            onTap: () => Navigator.of(context).pop()),
+                            onTap: () => DialogNavigator.of(context).pop()),
 
                         const SizedBox(width: 10),
                         // CREAR ==========================================
                         ExpandedButtom(
                             backgroundColor: Colors.green[400],
-                            label: "Crear",
+                            label: formPartidaPredefinidaProvider.partidaPredefinidaEditar != null ? "Guardar" : "Crear",
                             textColor: Colors.white,
                             onTap: () => crearEditarPartida(context: context, form: form)),
                       ],
@@ -180,7 +181,7 @@ class FormPartidaPredefinida extends StatelessWidget {
 
       if (!response.hasError!) {
         googleAdsProvider.showInterstitialAd(onCloseFunction: () {
-          Navigator.of(context).pop();
+          DialogNavigator.of(context).pop();
           formPartidaPredefinidaProvider.resetForm();
           googleAdsProvider.loadInterstitialAd();
         });

@@ -87,6 +87,28 @@ class Jugador extends DynamicClass {
     return response;
   }
 
+  static Future<SqlResponse> deleteHistorial({required Jugador jugador, required HistorialJugada historial}) async {
+    final SqlResponse response = SqlResponse();
+
+    final res = await CrudHelper.deleteOne(tableName: HistorialJugada.tableName, id: historial.id!);
+
+    if (!res.hasError!) {
+      jugador.historialJugadas!.remove(historial);
+      int newPuntuacion = historial.tipo == "aumentar"
+          ? jugador.puntuacion! - historial.puntuacion!
+          : jugador.puntuacion! + historial.puntuacion!;
+
+      await CrudHelper.updateOne(tableName: Jugador.tableName, id: jugador.id!, newData: {"puntuacion": newPuntuacion});
+
+      response.data = {"newPuntuacion": newPuntuacion};
+    } else {
+      response.hasError = true;
+      response.addMsg('Error eliminando el historial');
+    }
+
+    return response;
+  }
+
   static findHistorial({required Jugador jugador}) async {
     final response = await CrudHelper.getAll(
       tableName: HistorialJugada.tableName,

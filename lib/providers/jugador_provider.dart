@@ -66,6 +66,17 @@ class JugadorProvider extends ChangeNotifier {
     return response;
   }
 
+  Future<SqlResponse> deleteHistorial({required HistorialJugada historial}) async {
+    SqlResponse response = await Jugador.deleteHistorial(jugador: jugadorEnTurno!, historial: historial);
+
+    if (!response.hasError!) {
+      jugadorEnTurno!.puntuacion = response.data["newPuntuacion"];
+      notifyListeners();
+    }
+
+    return response;
+  }
+
   Future<dynamic> deleteJugador(BuildContext context,
       {required Jugador jugador, SlidingUpPanelController? panelController, required Function callBack}) async {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();

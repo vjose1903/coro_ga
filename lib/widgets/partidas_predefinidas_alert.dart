@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_shake_animated/flutter_shake_animated.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -23,7 +24,7 @@ class PartidasDefaultAlert extends StatelessWidget {
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
         return Padding(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(15),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -36,7 +37,6 @@ class PartidasDefaultAlert extends StatelessWidget {
                       letterSpacing: 2)),
 
               const SizedBox(height: 15),
-              //
 
               Container(
                 width: double.infinity,
@@ -59,7 +59,9 @@ class PartidasDefaultAlert extends StatelessWidget {
                           return;
                         }
 
-                        _showFormPartidaDialog(context);
+                        DialogNavigator.of(context).push(FluidDialogPage(
+                          builder: (context) => const FormPartidaPredefinida(),
+                        ));
                       },
                       icon: Icons.add,
                       size: IconSize.min,
@@ -97,7 +99,6 @@ class PartidasDefaultAlert extends StatelessWidget {
                   ],
                 ),
               ),
-              //
               const SizedBox(height: 20),
 
               Flexible(
@@ -108,7 +109,6 @@ class PartidasDefaultAlert extends StatelessWidget {
                   child: const PartidasScrollView(),
                 ),
               ),
-              //
               const SizedBox(height: 20),
 
               Align(
@@ -130,17 +130,6 @@ class PartidasDefaultAlert extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-  void _showFormPartidaDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        child: const FormPartidaPredefinida(),
-      ),
     );
   }
 }
@@ -302,13 +291,8 @@ class ReordenableItem extends StatelessWidget {
     PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
     formPartidaPredefinidaProvider.rellenarFormulario(partida);
 
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        child: const FormPartidaPredefinida(),
-      ),
-    );
+    DialogNavigator.of(context).push(FluidDialogPage(
+      builder: (context) => const FormPartidaPredefinida(),
+    ));
   }
 }

@@ -24,7 +24,8 @@ class _FormularioScreenState extends State<FormularioScreen> {
     super.initState();
 
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      if (Preferences.isFirstTimeOpen) context.read<PartidaPredefinidaProvider>().seed();
+      if (Preferences.isFirstTimeOpen)
+        context.read<PartidaPredefinidaProvider>().seed();
 
       openDefaultsPartidasDialog(context);
     });
@@ -49,14 +50,16 @@ class _FormularioScreenState extends State<FormularioScreen> {
             Navigator.pop(context, 'home');
           },
         ),
-        bodyContent: SingleChildScrollView(physics: const BouncingScrollPhysics(), child: _Body()),
+        bodyContent: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(), child: _Body()),
       ),
     );
   }
 }
 
 openDefaultsPartidasDialog(BuildContext context) {
-  final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
+  final PartidaPredefinidaProvider formPartidaPredefinidaProvider =
+      context.read<PartidaPredefinidaProvider>();
   formPartidaPredefinidaProvider.resetForm();
 
   FluidAlerts.show(context,
@@ -76,14 +79,17 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     //
     return Consumer(builder: (BuildContext context, value, Widget? child) {
-      final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
+      final FormPartidaProvider formPartidaProvider =
+          context.watch<FormPartidaProvider>();
       final form = formPartidaProvider.form;
       final isDarkMode = Preferences.isDarkMode;
 
       final dynamic tipoPartida = form.control('tipo').value;
 
       return Container(
-          height: ((ResponsiveApp.size.height - (ResponsiveApp.size.height * 0.125)) - 80),
+          height: ((ResponsiveApp.size.height -
+                  (ResponsiveApp.size.height * 0.125)) -
+              80),
           margin: const EdgeInsets.only(top: 15, bottom: 40),
           padding: const EdgeInsets.symmetric(horizontal: 25),
           child: ReactiveForm(
@@ -100,15 +106,22 @@ class _Body extends StatelessWidget {
                       icon: Icons.apps_rounded,
                       size: IconSize.min,
                       iconSize: 20,
-                      iconColor: isDarkMode ? Colors.white.withValues(alpha: 0.4) : AppThemes.colorCuarto.withValues(alpha: 0.7),
-                      backgroundColor: isDarkMode ? Colors.white.withValues(alpha: 0.2) : AppThemes.colorCuarto.withValues(alpha: 0.5),
+                      iconColor: isDarkMode
+                          ? Colors.white.withValues(alpha: 0.4)
+                          : AppThemes.colorCuarto.withValues(alpha: 0.7),
+                      backgroundColor: isDarkMode
+                          ? Colors.white.withValues(alpha: 0.2)
+                          : AppThemes.colorCuarto.withValues(alpha: 0.5),
                       splashColor: const Color(0xFF2E7A31),
                     ),
                   ),
                   const SizedBox(height: 10),
 
                   //
-                  const CustomReactiveInput(formControlName: 'nombre', labelText: "Nombre Partida", textCapitalization: TextCapitalization.words),
+                  const CustomReactiveInput(
+                      formControlName: 'nombre',
+                      labelText: "Nombre Partida",
+                      textCapitalization: TextCapitalization.words),
                   const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -117,24 +130,33 @@ class _Body extends StatelessWidget {
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 500),
                         curve: Curves.easeOut,
-                        width: tipoPartida == '' || tipoPartida == null ? ResponsiveApp.size.width - 52 : ResponsiveApp.size.width * 0.425,
+                        width: tipoPartida == '' || tipoPartida == null
+                            ? ResponsiveApp.size.width - 52
+                            : ResponsiveApp.size.width * 0.425,
                         child: CustomReactiveDropDown(
                           formControlName: 'tipo',
                           labelText: "Tipo",
                           items: const [
-                            DropdownMenuItem(value: "Rondas", child: Text("Rondas")),
-                            DropdownMenuItem(value: "Puntuación", child: Text("Puntuación"))
+                            DropdownMenuItem(
+                                value: "Rondas", child: Text("Rondas")),
+                            DropdownMenuItem(
+                                value: "Puntuación", child: Text("Puntuación"))
                           ],
-                          onChanged: (value) => formPartidaProvider.changeTipo(value),
+                          onChanged: (value) =>
+                              formPartidaProvider.changeTipo(value),
                         ),
                       ),
                       AnimatedContainer(
                           duration: const Duration(milliseconds: 500),
                           curve: Curves.easeOut,
-                          width: tipoPartida == '' || tipoPartida == null ? 0.01 : ResponsiveApp.size.width * 0.425,
+                          width: tipoPartida == '' || tipoPartida == null
+                              ? 0.01
+                              : ResponsiveApp.size.width * 0.425,
                           child: CustomReactiveInput(
                               formControlName: 'maxPuntuacion',
-                              labelText: tipoPartida == "Rondas" ? "Cant. rondas" : "Puntuación Máxima",
+                              labelText: tipoPartida == "Rondas"
+                                  ? "Cant. rondas"
+                                  : "Puntuación Máxima",
                               inputType: TextInputType.number)),
                     ],
                   ),
@@ -156,32 +178,46 @@ class _Body extends StatelessWidget {
                         form.markAllAsTouched();
 
                         if (form.valid) {
-                          final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-                          final GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
+                          final PartidaProvider partidaProvider =
+                              context.read<PartidaProvider>();
+                          final GoogleAdsProvider googleAdsProvider =
+                              context.read<GoogleAdsProvider>();
 
                           MyLoading.show();
                           final Partida partida = Partida.fromMap(form.value);
-                          final response = await partidaProvider.newPartida(partida, context);
+                          final response = await partidaProvider.newPartida(
+                              partida, context);
                           MyLoading.close();
 
                           if (!response.hasError!) {
                             final newPartida = response.data;
 
-                            googleAdsProvider.showInterstitialAd(onCloseFunction: () {
+                            googleAdsProvider.showInterstitialAd(
+                                onCloseFunction: () {
                               partidaProvider.changePartidaEnTurno(newPartida);
-                              Navigator.pushReplacementNamed(context, 'partida');
+                              Navigator.pushReplacementNamed(
+                                  context, 'partida');
                               formPartidaProvider.resetForm();
                             });
                           } else {
-                            Toast.show(type: ToastType.error, context: context, message: "Error registrando partida.");
+                            Toast.show(
+                                type: ToastType.error,
+                                context: context,
+                                message: "Error registrando partida.");
                           }
                         } else {
-                          Toast.show(type: ToastType.warning, context: context, message: "Revisar todos los campos de texto.");
+                          Toast.show(
+                              type: ToastType.warning,
+                              context: context,
+                              message: "Revisar todos los campos de texto.");
                         }
                       },
                       child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        child: Text("Crear", style: TextStyle(fontSize: 15, fontFamily: 'Poppins')),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        child: Text("Crear",
+                            style:
+                                TextStyle(fontSize: 15, fontFamily: 'Poppins')),
                       ),
                     ),
                   )
@@ -198,19 +234,26 @@ class Titulo extends StatelessWidget {
   final ScrollController jugadoresController;
   @override
   Widget build(BuildContext context) {
-    final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
+    final FormPartidaProvider formPartidaProvider =
+        context.watch<FormPartidaProvider>();
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Row(
           children: [
-            const Text('Jugadores', style: TextStyle(fontFamily: 'Poppins', fontSize: 18, fontWeight: FontWeight.w100)),
+            const Text('Jugadores',
+                style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 18,
+                    fontWeight: FontWeight.w100)),
             Container(
               width: 26,
               margin: const EdgeInsets.only(left: 8),
               padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(color: AppThemes.colorTercero, borderRadius: BorderRadius.circular(50)),
+              decoration: BoxDecoration(
+                  color: AppThemes.colorTercero,
+                  borderRadius: BorderRadius.circular(50)),
               child: Center(
                   child: Text(
                 formPartidaProvider.jugadores.length.toString(),
@@ -223,31 +266,39 @@ class Titulo extends StatelessWidget {
         ),
         Visibility(
           visible: formPartidaProvider.jugadores.length < 20,
-          child:           CustomIconButtom(
+          child: CustomIconButtom(
             onTap: () {
-              final PremiumProvider premiumProvider = context.read<PremiumProvider>();
-              
-              if (!premiumProvider.canAddPlayer(formPartidaProvider.jugadores.length)) {
+              final PremiumProvider premiumProvider =
+                  context.read<PremiumProvider>();
+
+              if (!premiumProvider
+                  .canAddPlayer(formPartidaProvider.jugadores.length)) {
                 Toast.show(
                     type: ToastType.info,
                     context: context,
-                    message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores. ¡Desbloquea PRO para más!");
+                    message:
+                        "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores. ¡Desbloquea PRO para más!");
                 return;
               }
 
               FocusManager.instance.primaryFocus?.unfocus();
               formPartidaProvider.addJugadorToList();
-              
+
               // Usar post frame para scroll después del rebuild
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (jugadoresController.hasClients) {
-                  jugadoresController.animateTo(jugadoresController.position.maxScrollExtent,
-                      duration: const Duration(milliseconds: 800), curve: Curves.easeOutCubic);
+                  jugadoresController.animateTo(
+                      jugadoresController.position.maxScrollExtent,
+                      duration: const Duration(milliseconds: 800),
+                      curve: Curves.easeOutCubic);
                 }
               });
 
               if (formPartidaProvider.jugadores.length == 20) {
-                Toast.show(type: ToastType.info, context: context, message: "Máximo de jugadores alcanzados");
+                Toast.show(
+                    type: ToastType.info,
+                    context: context,
+                    message: "Máximo de jugadores alcanzados");
               }
             },
             icon: Icons.add,
@@ -263,13 +314,16 @@ class Titulo extends StatelessWidget {
 }
 
 class _Inputs extends StatelessWidget {
-  const _Inputs({Key? key, required this.jugadoresController}) : super(key: key);
+  const _Inputs({Key? key, required this.jugadoresController})
+      : super(key: key);
   final ScrollController jugadoresController;
   @override
   Widget build(BuildContext context) {
-    final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
+    final FormPartidaProvider formPartidaProvider =
+        context.watch<FormPartidaProvider>();
 
-    final formJugadoresArray = formPartidaProvider.form.control('jugadores') as FormArray<dynamic>;
+    final formJugadoresArray =
+        formPartidaProvider.form.control('jugadores') as FormArray<dynamic>;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
@@ -277,11 +331,14 @@ class _Inputs extends StatelessWidget {
           formArrayName: 'jugadores',
           builder: (context, formArray, child) {
             final jugadoresInputs = [];
-            final Iterable<FormGroup> jugadoresControls = formJugadoresArray.controls.map((control) => control as FormGroup);
+            final Iterable<FormGroup> jugadoresControls = formJugadoresArray
+                .controls
+                .map((control) => control as FormGroup);
 
             for (var index = 0; index < jugadoresControls.length; index++) {
               final currentform = jugadoresControls.toList()[index];
-              jugadoresInputs.add(_JugadorInput(formGroup: currentform, index: index));
+              jugadoresInputs
+                  .add(_JugadorInput(formGroup: currentform, index: index));
             }
 
             final jugadores = jugadoresInputs.toList();
@@ -302,7 +359,8 @@ class _Inputs extends StatelessWidget {
 }
 
 class _JugadorInput extends StatelessWidget {
-  const _JugadorInput({Key? key, required this.formGroup, required this.index}) : super(key: key);
+  const _JugadorInput({Key? key, required this.formGroup, required this.index})
+      : super(key: key);
 
   final FormGroup formGroup;
 
@@ -310,7 +368,8 @@ class _JugadorInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
+    final FormPartidaProvider formPartidaProvider =
+        context.read<FormPartidaProvider>();
     return ReactiveForm(
         formGroup: formGroup,
         child: Row(
@@ -325,14 +384,19 @@ class _JugadorInput extends StatelessWidget {
                       maxLines: 1,
                       softWrap: false,
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontFamily: 'Poppins', color: Colors.grey.withValues(alpha: 0.6)),
+                      style: TextStyle(
+                          fontFamily: 'Poppins',
+                          color: Colors.grey.withValues(alpha: 0.6)),
                     ))),
             const SizedBox(width: 5),
             Flexible(
               flex: 12,
               fit: FlexFit.tight,
-              child:
-                  CustomReactiveInput(key: ValueKey('jugador_$index'), formControlName: 'nombre', labelText: "Nombre", textCapitalization: TextCapitalization.words),
+              child: CustomReactiveInput(
+                  key: ValueKey('jugador_$index'),
+                  formControlName: 'nombre',
+                  labelText: "Nombre",
+                  textCapitalization: TextCapitalization.words),
             ),
             const SizedBox(width: 10),
             Visibility(

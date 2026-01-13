@@ -30,8 +30,8 @@ class PartidaProvider extends ChangeNotifier {
     isChangePartida = true;
     notifyListeners();
 
-    // Reset flag después del frame actual
-    Future.microtask(() {
+    // Reset flag después de que el frame se haya renderizado
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       isChangePartida = false;
     });
   }

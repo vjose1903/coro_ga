@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
+import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/screens/ganador.dart';
@@ -40,12 +41,31 @@ class PuntuacionPage extends StatefulWidget {
 class _PuntuacionPageState extends State<PuntuacionPage> {
   // El widget GoogleBannerAd maneja su propio dispose internamente
   final GoogleBannerAd anuncio = const GoogleBannerAd(location: AdLocation.puntuacion);
+  final ScrollController historialController = ScrollController();
+  int? _lastJugadorId;
+
+  @override
+  void dispose() {
+    historialController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (historialController.hasClients && historialController.position.maxScrollExtent > 0) {
+        historialController.animateTo(
+          historialController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeOutCubic,
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     String? puntuacion;
     TextEditingController puntuacionController = TextEditingController();
-    final ScrollController historialController = ScrollController();
 
     final Color titleColor = Preferences.isDarkMode ? Colors.grey.withValues(alpha: 0.9) : AppThemes.colorQuinto.withValues(alpha: 0.7);
     final Color subTitleColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorQuinto.withValues(alpha: 0.9);
@@ -55,7 +75,11 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
         final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
         final JugadorProvider jugadorProvider = context.watch<JugadorProvider>();
 
-        
+        // Scroll al final cuando cambia el jugador
+        if (_lastJugadorId != jugadorProvider.jugadorEnTurno?.id) {
+          _lastJugadorId = jugadorProvider.jugadorEnTurno?.id;
+          _scrollToBottom();
+        }
 
         return Column(
           children: [
@@ -280,21 +304,60 @@ class _ListHistorial extends StatelessWidget {
                 itemBuilder: (context, index) {
                   HistorialJugada historial = jugador.historialJugadas![index];
 
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                          margin: const EdgeInsets.only(left: 10),
-                          child: Text(historial.puntuacion.toString(), style: TextStyle(color: historialColor))),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(historial.tipo!.capitalize(),
-                              style: TextStyle(fontFamily: "Poppins", fontSize: 12, color: tipoColor, letterSpacing: 1)),
-                          Icon(iconHistorial[historial.tipo]["icon"], color: iconHistorial[historial.tipo]["color"], size: 25),
-                        ],
+                  return SwipeActionCell(
+                    key: ValueKey(historial.id),
+                    backgroundColor: Colors.transparent,
+                    trailingActions: [
+                      SwipeAction(
+                        title: "Borrar",
+                        onTap: (CompletionHandler handler) async {
+                          CustomAlertDialog.show(
+                            context,
+                            title: "Confirmar",
+                            menssage: "¿Seguro que desea eliminar la puntuación ${historial.puntuacion} del jugador ${jugador.nombre}?",
+                            dialogType: DialogType.error,
+                            buttonsList: [
+                              CustomActionsButtons.cancelButton({
+                                "onTap": () {
+                                  Navigator.pop(context);
+                                  handler(false);
+                                }
+                              }),
+                              CustomActionsButtons.aceptarButton({
+                                "onTap": () async {
+                                  Navigator.pop(context);
+                                  final jugadorProvider = context.read<JugadorProvider>();
+                                  final partidaProvider = context.read<PartidaProvider>();
+                                  await jugadorProvider.deleteHistorial(historial: historial);
+                                  partidaProvider.refresh();
+                                  await handler(true);
+                                }
+                              }),
+                            ],
+                          );
+                        },
+                        color: Colors.red,
                       ),
                     ],
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 2),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                              margin: const EdgeInsets.only(left: 10),
+                              child: Text(historial.puntuacion.toString(), style: TextStyle(color: historialColor))),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(historial.tipo!.capitalize(),
+                                  style: TextStyle(fontFamily: "Poppins", fontSize: 12, color: tipoColor, letterSpacing: 1)),
+                              Icon(iconHistorial[historial.tipo]["icon"], color: iconHistorial[historial.tipo]["color"], size: 25),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   );
                 }),
           ),
