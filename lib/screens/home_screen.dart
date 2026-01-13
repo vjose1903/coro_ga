@@ -82,8 +82,7 @@ class _MainHomeState extends State<MainHome> {
                   final PremiumProvider premiumProvider =
                       context.read<PremiumProvider>();
 
-                  if (premiumProvider
-                      .canCreateGame(partidaProvider.partidas.length)) {
+                  if (premiumProvider.canCreateGame(partidaProvider.partidas.length)) {
                     navigateToForm();
                   } else {
                     Toast.show(
@@ -107,20 +106,16 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-    return ListPartidas(panelController: panelController);
-    // return FutureBuilder(
-    //   future: partidaProvider.getPartidas(context),
-    //   builder: (BuildContext context, AsyncSnapshot snapshot) {
-    //     if (!snapshot.hasData) {
-    //       return const Center(
-    //         child: CircularProgressIndicator(color: AppThemes.colorSegundo),
-    //       );
-    //     } else {
-    //       return ListPartidas(panelController: weSlideController);
-    //     }
-    //   },
-    // );
+    return Column(
+      children: [
+        Expanded(child: ListPartidas(panelController: panelController)),
+        // Banner de anuncios en la parte inferior
+        Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: GoogleBannerAd(location: AdLocation.home),
+        ),
+      ],
+    );
   }
 }
 

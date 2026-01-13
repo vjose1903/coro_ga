@@ -122,4 +122,6 @@ app.*.symbols
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
 
-
+# Scripts de build con credenciales
+build_release.sh
+build_release_ios.sh

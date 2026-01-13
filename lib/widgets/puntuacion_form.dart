@@ -38,13 +38,8 @@ class PuntuacionPage extends StatefulWidget {
 }
 
 class _PuntuacionPageState extends State<PuntuacionPage> {
-  final GoogleBannerAd anuncio = GoogleBannerAd(location: AdLocation.puntuacion);
-
-  @override
-  void dispose() {
-    super.dispose();
-    anuncio.disposeBannerAd();
-  }
+  // El widget GoogleBannerAd maneja su propio dispose internamente
+  final GoogleBannerAd anuncio = const GoogleBannerAd(location: AdLocation.puntuacion);
 
   @override
   Widget build(BuildContext context) {

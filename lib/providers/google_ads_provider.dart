@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/utils/utils.dart';
-import 'package:game_score/widgets/widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class GoogleAdsProvider extends ChangeNotifier {
@@ -11,8 +10,7 @@ class GoogleAdsProvider extends ChangeNotifier {
   loadInterstitialAd() {
     if (interstitialAd == null) {
       InterstitialAd.load(
-        // adUnitId: AdHelper.interstitialAdUnitId,
-        adUnitId: AdHelper.getTestingId("completo"),
+        adUnitId: AdHelper.getInterstitialAdUnitId(),
         request: const AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(
           onAdLoaded: (ad) {

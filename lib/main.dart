@@ -3,8 +3,10 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/routes/app_routes.dart';
 import 'package:game_score/screens/screens.dart';
+import 'package:game_score/services/app_integrity_service.dart';
 import 'package:game_score/services/purchase_service.dart';
 import 'package:game_score/widgets/custom_splash_screen.dart';
+import 'package:game_score/widgets/piracy_blocker.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
@@ -14,7 +16,16 @@ import 'shared_preferences/preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  MobileAds.instance.initialize();
+  // Verificar integridad de la app (anti-piratería)
+  final isLegit = await AppIntegrityService.instance.verifyIntegrity();
+  
+  if (!isLegit) {
+    // App pirata detectada - mostrar bloqueador
+    runApp(const PiracyBlocker());
+    return;
+  }
+
+  await MobileAds.instance.initialize();
   await Preferences.init();
 
   final isPlatformDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
