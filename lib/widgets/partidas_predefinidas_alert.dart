@@ -55,7 +55,7 @@ class PartidasDefaultAlert extends StatelessWidget {
                               type: ToastType.info,
                               context: context,
                               message:
-                                  "La versión gratis solo permite ${PremiumProvider.freeMaxPredefinedGames} partidas predefinidas. ¡Desbloquea Premium para más!");
+                                  "La versión gratis solo permite ${PremiumProvider.freeMaxPredefinedGames} partidas predefinidas. ¡Desbloquea PRO para más!");
                           return;
                         }
 

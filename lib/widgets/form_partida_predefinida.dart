@@ -49,14 +49,9 @@ class FormPartidaPredefinida extends StatelessWidget {
                     const SizedBox(height: 10),
 
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 500),
-                          curve: Curves.easeOut,
-                          // width: tipoPartida == '' || tipoPartida == null ? screenSize.width - 55 : screenSize.width * 0.415,
-                          width: tipoPartida == '' || tipoPartida == null ? ResponsiveApp.size.width - 55 : ResponsiveApp.size.width * 0.42,
-
+                        Expanded(
+                          flex: tipoPartida == '' || tipoPartida == null ? 1 : 1,
                           child: CustomReactiveDropDown(
                             formControlName: 'tipo',
                             labelText: "Tipo",
@@ -67,14 +62,15 @@ class FormPartidaPredefinida extends StatelessWidget {
                             onChanged: (value) => formPartidaPredefinidaProvider.changeTipo(value),
                           ),
                         ),
-                        AnimatedContainer(
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.easeOut,
-                            width: tipoPartida == '' || tipoPartida == null ? 0.01 : ResponsiveApp.size.width * 0.42,
+                        if (tipoPartida != '' && tipoPartida != null) ...[
+                          const SizedBox(width: 10),
+                          Expanded(
                             child: CustomReactiveInput(
                                 formControlName: 'maxPuntuacion',
                                 labelText: tipoPartida == "Rondas" ? "Cant. rondas" : "Puntuación Máxima",
-                                inputType: TextInputType.number)),
+                                inputType: TextInputType.number),
+                          ),
+                        ],
                       ],
                     ),
                     const SizedBox(height: 10),
@@ -118,7 +114,7 @@ class FormPartidaPredefinida extends StatelessWidget {
                                   Toast.show(
                                       type: ToastType.info,
                                       context: context,
-                                      message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores. ¡Desbloquea Premium para más!");
+                                      message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores. ¡Desbloquea PRO para más!");
                                   return;
                                 }
 

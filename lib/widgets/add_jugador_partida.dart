@@ -91,7 +91,7 @@ class _AddJugadorState extends State<AddJugador> {
                   Toast.show(
                       type: ToastType.info,
                       context: context,
-                      message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores. ¡Desbloquea Premium para más!");
+                      message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores. ¡Desbloquea PRO para más!");
                   return;
                 }
                 

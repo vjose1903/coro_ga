@@ -89,7 +89,7 @@ class _MainHomeState extends State<MainHome> {
                         type: ToastType.info,
                         context: context,
                         message:
-                            "La versión gratis solo permite ${PremiumProvider.freeMaxGames} partidas simultáneas. ¡Desbloquea Premium para más!");
+                            "La versión gratis solo permite ${PremiumProvider.freeMaxGames} partidas simultáneas. ¡Desbloquea PRO para más!");
                   }
                 },
                 child: const Icon(Icons.add, size: 30)),
