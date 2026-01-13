@@ -36,8 +36,8 @@ class EditarEntidad extends StatelessWidget {
       entidad = jugador;
     }
 
-    final Color titleColor = Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : AppThemes.colorQuinto.withOpacity(0.7);
-    final Color subTitleColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.9);
+    final Color titleColor = Preferences.isDarkMode ? Colors.grey.withValues(alpha: 0.9) : AppThemes.colorQuinto.withValues(alpha: 0.7);
+    final Color subTitleColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorQuinto.withValues(alpha: 0.9);
 
     FormGroup form = tipo == "Partida" ? formPartidaProvider.form : jugadorProvider.formJugador;
 
@@ -204,7 +204,7 @@ aceptarFunction(BuildContext context, dynamic entidad,
         if (panelController != null) slideUpProvider.closeSlideUp(controller: panelController);
       });
     } else {
-      Fun.toast(type: ToasType.error, context: context, message: "El nombre de la partida no puede estar vacio.");
+      Toast.show(type: ToastType.error, context: context, message: "El nombre de la partida no puede estar vacio.");
     }
   } else {
     if (form.valid) {
@@ -218,7 +218,7 @@ aceptarFunction(BuildContext context, dynamic entidad,
         resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
       });
     } else {
-      Fun.toast(type: ToasType.error, context: context, message: "El nombre del jugador no puede estar vacio.");
+      Toast.show(type: ToastType.error, context: context, message: "El nombre del jugador no puede estar vacio.");
     }
   }
 }

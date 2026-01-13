@@ -100,8 +100,8 @@ class _Body extends StatelessWidget {
                       icon: Icons.apps_rounded,
                       size: IconSize.min,
                       iconSize: 20,
-                      iconColor: isDarkMode ? Colors.white.withOpacity(0.4) : AppThemes.colorCuarto.withOpacity(0.7),
-                      backgroundColor: isDarkMode ? Colors.white.withOpacity(0.2) : AppThemes.colorCuarto.withOpacity(0.5),
+                      iconColor: isDarkMode ? Colors.white.withValues(alpha: 0.4) : AppThemes.colorCuarto.withValues(alpha: 0.7),
+                      backgroundColor: isDarkMode ? Colors.white.withValues(alpha: 0.2) : AppThemes.colorCuarto.withValues(alpha: 0.5),
                       splashColor: const Color(0xFF2E7A31),
                     ),
                   ),
@@ -145,7 +145,7 @@ class _Body extends StatelessWidget {
                       child: Material(
                     color: AppThemes.themeColor_2,
                     borderRadius: BorderRadius.circular(12),
-                    shadowColor: AppThemes.colorQuinto.withOpacity(0.3),
+                    shadowColor: AppThemes.colorQuinto.withValues(alpha: 0.3),
                     elevation: 7,
                     child: _Inputs(jugadoresController: jugadoresController),
                   )),
@@ -173,10 +173,10 @@ class _Body extends StatelessWidget {
                               formPartidaProvider.resetForm();
                             });
                           } else {
-                            Fun.toast(type: ToasType.error, context: context, message: "Error registrando partida.");
+                            Toast.show(type: ToastType.error, context: context, message: "Error registrando partida.");
                           }
                         } else {
-                          Fun.toast(type: ToasType.warning, context: context, message: "Revisar todos los campos de texto.");
+                          Toast.show(type: ToastType.warning, context: context, message: "Revisar todos los campos de texto.");
                         }
                       },
                       child: const Padding(
@@ -228,8 +228,8 @@ class Titulo extends StatelessWidget {
               final PremiumProvider premiumProvider = context.read<PremiumProvider>();
               
               if (!premiumProvider.canAddPlayer(formPartidaProvider.jugadores.length)) {
-                Fun.toast(
-                    type: ToasType.info,
+                Toast.show(
+                    type: ToastType.info,
                     context: context,
                     message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores. ¡Desbloquea Premium para más!");
                 return;
@@ -243,7 +243,7 @@ class Titulo extends StatelessWidget {
                   duration: const Duration(seconds: 1, milliseconds: 500), curve: Curves.elasticOut);
 
               if (formPartidaProvider.jugadores.length == 20) {
-                Fun.toast(type: ToasType.info, context: context, message: "Máximo de jugadores alcanzados");
+                Toast.show(type: ToastType.info, context: context, message: "Máximo de jugadores alcanzados");
               }
             },
             icon: Icons.add,
@@ -321,7 +321,7 @@ class _JugadorInput extends StatelessWidget {
                       maxLines: 1,
                       softWrap: false,
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontFamily: 'Poppins', color: Colors.grey.withOpacity(0.6)),
+                      style: TextStyle(fontFamily: 'Poppins', color: Colors.grey.withValues(alpha: 0.6)),
                     ))),
             const SizedBox(width: 5),
             Flexible(

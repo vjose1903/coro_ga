@@ -56,5 +56,29 @@
 		</array>
 		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false/>
+		<key>CFBundleIcons</key>
+		<dict>
+			<key>CFBundleAlternateIcons</key>
+			<dict>
+				<key>premium</key>
+				<dict>
+					<key>CFBundleIconFiles</key>
+					<array>
+						<string>icon_premium</string>
+					</array>
+					<key>UIPrerenderedIcon</key>
+					<false/>
+				</dict>
+			</dict>
+			<key>CFBundlePrimaryIcon</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>AppIcon</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+		</dict>
 	</dict>
 </plist>

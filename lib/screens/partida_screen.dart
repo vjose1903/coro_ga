@@ -92,7 +92,7 @@ class JugadoresCard extends StatelessWidget {
         child: Material(
       color: AppThemes.themeColor_2,
       borderRadius: BorderRadius.circular(12),
-      shadowColor: AppThemes.colorQuinto.withOpacity(0.3),
+      shadowColor: AppThemes.colorQuinto.withValues(alpha: 0.3),
       elevation: 7,
       child: Padding(
         padding: const EdgeInsets.all(10),
@@ -106,8 +106,8 @@ class JugadoresCard extends StatelessWidget {
                       final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
                       if (!premiumProvider.canAddPlayer(partidaProvider.partidaEnTurno!.jugadores!.length)) {
-                        Fun.toast(
-                            type: ToasType.info,
+                        Toast.show(
+                            type: ToastType.info,
                             context: context,
                             message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores. ¡Desbloquea Premium para más!");
                         return;
@@ -187,8 +187,8 @@ class JugadorInfo extends StatelessWidget {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
 
     Color fontNombreColor = Preferences.isDarkMode ? const Color(0xD26776E6) : const Color(0xE30B4DBF);
-    Color? fontPuntuacionColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.8) : const Color(0xDF062864);
-    Color? iconEstadoColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.2) : AppThemes.colorCuarto.withOpacity(0.3);
+    Color? fontPuntuacionColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.8) : const Color(0xDF062864);
+    Color? iconEstadoColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.2) : AppThemes.colorCuarto.withValues(alpha: 0.3);
 
     Map iconEstado = {
       Estado.ganador: Icons.arrow_upward,

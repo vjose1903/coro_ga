@@ -19,7 +19,7 @@ class FormPartidaPredefinida extends StatelessWidget {
 
     final dynamic tipoPartida = form.control('tipo').value;
 
-    final Color titleColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.7) : AppThemes.colorQuinto.withOpacity(0.8);
+    final Color titleColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.7) : AppThemes.colorQuinto.withValues(alpha: 0.8);
 
     return Consumer(builder: (BuildContext context, value, Widget? child) {
       return Padding(
@@ -115,8 +115,8 @@ class FormPartidaPredefinida extends StatelessWidget {
                                 PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
                                 if (!premiumProvider.canAddPlayer(formPartidaPredefinidaProvider.cantidadJugadores)) {
-                                  Fun.toast(
-                                      type: ToasType.info,
+                                  Toast.show(
+                                      type: ToastType.info,
                                       context: context,
                                       message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores. ¡Desbloquea Premium para más!");
                                   return;
@@ -189,10 +189,10 @@ class FormPartidaPredefinida extends StatelessWidget {
           googleAdsProvider.loadInterstitialAd();
         });
       } else {
-        Fun.toast(type: ToasType.error, context: context, message: "Error registrando partida.");
+        Toast.show(type: ToastType.error, context: context, message: "Error registrando partida.");
       }
     } else {
-      Fun.toast(type: ToasType.warning, context: context, message: "Revisar todos los campos de texto.");
+      Toast.show(type: ToastType.warning, context: context, message: "Revisar todos los campos de texto.");
     }
   }
 }

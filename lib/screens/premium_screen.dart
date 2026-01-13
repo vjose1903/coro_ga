@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/providers/premium_provider.dart';
 import 'package:game_score/services/purchase_service.dart';
+import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
@@ -32,9 +33,15 @@ class PremiumScreen extends StatelessWidget {
                     const Spacer(),
                     TextButton(
                       onPressed: () => _restorePurchases(context),
-                      child: const Text(
+                      style: TextButton.styleFrom(
+                        overlayColor: AppThemes.colorTercero,
+                      ),
+                      child: Text(
                         'Restaurar compras',
-                        style: TextStyle(fontFamily: 'Poppins'),
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          color: AppThemes.colorPrimero,
+                        ),
                       ),
                     ),
                   ],
@@ -43,20 +50,12 @@ class PremiumScreen extends StatelessWidget {
                 
                 // Logo Premium
                 FadeInDown(
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [AppThemes.colorTercero, AppThemes.colorSegundo],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Icon(
-                      Icons.workspace_premium,
-                      size: 80,
-                      color: Colors.white,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(30),
+                    child: Image.asset(
+                      'assets/icon/icon-pro.png',
+                      width: 150,
+                      height: 150,
                     ),
                   ),
                 ),
@@ -65,7 +64,7 @@ class PremiumScreen extends StatelessWidget {
                 FadeInUp(
                   delay: const Duration(milliseconds: 200),
                   child: const Text(
-                    'Coro Games Premium',
+                    'Coro Games Pro',
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 28,
@@ -130,7 +129,7 @@ class PremiumScreen extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.1),
+                            color: Colors.green.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(15),
                             border: Border.all(color: Colors.green, width: 2),
                           ),
@@ -170,7 +169,7 @@ class PremiumScreen extends StatelessWidget {
                           child: Column(
                             children: [
                               const Text(
-                                'Obtener Premium',
+                                'Obtener Pro',
                                 style: TextStyle(
                                   fontFamily: 'Poppins',
                                   fontSize: 20,
@@ -219,8 +218,8 @@ class PremiumScreen extends StatelessWidget {
   void _buyPremium(BuildContext context) async {
     final success = await PurchaseService.instance.buyPremium();
     if (!success) {
-      Fun.toast(
-        type: ToasType.error,
+      Toast.show(
+        type: ToastType.error,
         context: context,
         message: 'No se pudo completar la compra. Intenta de nuevo.',
       );
@@ -232,14 +231,14 @@ class PremiumScreen extends StatelessWidget {
     await premiumProvider.checkAndRestorePurchases();
     
     if (premiumProvider.isPremium) {
-      Fun.toast(
-        type: ToasType.success,
+      Toast.show(
+        type: ToastType.success,
         context: context,
         message: '¡Compras restauradas! Ya eres Premium.',
       );
     } else {
-      Fun.toast(
-        type: ToasType.info,
+      Toast.show(
+        type: ToastType.info,
         context: context,
         message: 'No se encontraron compras anteriores.',
       );
@@ -276,7 +275,9 @@ class _FeatureItem extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppThemes.colorTercero.withOpacity(0.1),
+                color: Preferences.isDarkMode 
+                    ? Colors.white.withValues(alpha: 0.15) 
+                    : AppThemes.colorTercero.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, color: AppThemes.colorTercero, size: 28),

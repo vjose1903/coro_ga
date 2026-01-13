@@ -31,7 +31,7 @@ class PartidaCard extends StatelessWidget {
     return Material(
       color: AppThemes.themeColor_2,
       borderRadius: BorderRadius.circular(12),
-      shadowColor: AppThemes.colorCuarto.withOpacity(0.3),
+      shadowColor: AppThemes.colorCuarto.withValues(alpha: 0.3),
       elevation: 7,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
@@ -81,7 +81,7 @@ class PartidaCard extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                               fontSize: 10,
                               letterSpacing: 2,
-                              color: Preferences.isDarkMode ? Colors.grey[600]!.withOpacity(0.4) : Colors.grey.withOpacity(0.5)),
+                              color: Preferences.isDarkMode ? Colors.grey[600]!.withValues(alpha: 0.4) : Colors.grey.withValues(alpha: 0.5)),
                         ),
                         const SizedBox(height: 10),
                         Row(

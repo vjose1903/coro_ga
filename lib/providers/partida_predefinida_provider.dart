@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/utils/functions.dart';
+import 'package:game_score/utils/utils.dart';
 
 import 'package:reactive_forms/reactive_forms.dart';
 
@@ -37,7 +37,7 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
       if (actualCantidad > 2) {
         form.control("cantidadJugadores").value -= 1;
       } else {
-        Fun.toast(type: ToasType.warning, context: context, message: "La cantidad de jugadores no puede ser menor a 2.");
+        Toast.show(type: ToastType.warning, context: context, message: "La cantidad de jugadores no puede ser menor a 2.");
       }
     }
     notifyListeners();
@@ -92,7 +92,7 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
       notifyListeners();
       return responseFuture;
     } else {
-      Fun.toast(type: ToasType.error, context: context, message: response.messages!.first);
+      Toast.show(type: ToastType.error, context: context, message: response.messages!.first);
       return responseFuture;
     }
   }
@@ -115,7 +115,7 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
       notifyListeners();
       return response;
     } else {
-      Fun.toast(type: ToasType.error, context: context, message: response.messages!.first);
+      Toast.show(type: ToastType.error, context: context, message: response.messages!.first);
       return response;
     }
   }

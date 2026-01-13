@@ -5,6 +5,8 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
 		android:roundIcon="@mipmap/ic_launcher_round">
+        
+        <!-- Actividad principal con icono default -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -14,20 +16,33 @@
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize"
             android:resizeableActivity="false"
-            >
-            <!-- Specifies an Android theme to apply to this Activity as soon as
-                 the Android process has started. This theme is visible to the user
-                 while the Flutter UI initializes. After that, this theme continues
-                 to determine the Window background behind the Flutter UI. -->
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher_round">
             <meta-data android:name="io.flutter.embedding.android.NormalTheme" android:resource="@style/NormalTheme" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        
+        <!-- Alias para icono Premium -->
+        <activity-alias
+            android:name=".MainActivityPremium"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_pro"
+            android:roundIcon="@mipmap/ic_launcher_pro_round"
+            android:label="@string/app_name"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity-alias>
+        
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data android:name="flutterEmbedding" android:value="2" />
-         <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-7138392349989063~7695311863"/>
+        <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-7138392349989063~7695311863"/>
     </application>
 </manifest>

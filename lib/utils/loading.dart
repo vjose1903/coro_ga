@@ -13,10 +13,10 @@ class MyLoading {
       ..loadingStyle = EasyLoadingStyle.custom
       ..indicatorSize = 45.0
       ..radius = 10.0
-      ..backgroundColor = Colors.black.withOpacity(0.5)
+      ..backgroundColor = Colors.black.withValues(alpha: 0.5)
       ..textColor = Colors.white
       ..indicatorColor = Colors.transparent
-      ..maskColor = Colors.black.withOpacity(0.5)
+      ..maskColor = Colors.black.withValues(alpha: 0.5)
       ..userInteractions = false
       ..dismissOnTap = false;
 

@@ -1,10 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:motion_toast/motion_toast.dart';
-
-enum ToasType { error, success, warning, info }
 
 class Colores {
   static String red = 'red';
@@ -43,34 +39,6 @@ class Fun {
     for (var key in keys) {
       if (obj.containsKey(key)) obj.remove(key);
     }
-  }
-
-  static toast({required ToasType type, required context, String? title, String? message}) {
-    dynamic nextToast;
-
-    switch (type) {
-      case ToasType.info:
-        nextToast = MotionToast.info;
-
-        break;
-      case ToasType.error:
-        nextToast = MotionToast.error;
-        break;
-      case ToasType.success:
-        nextToast = MotionToast.success;
-        break;
-      case ToasType.warning:
-        nextToast = MotionToast.warning;
-        break;
-      default:
-        nextToast = MotionToast.success;
-    }
-
-    nextToast(
-      title: title != null ? Text(title, style: const TextStyle(color: Colors.black)) : Container(),
-      description: message != null ? Text(message, style: const TextStyle(color: Colors.black)) : Container(),
-      dismissable: true,
-    ).show(context);
   }
 
   static bool arraySortedOrNot(List<dynamic> arr, dynamic property) {

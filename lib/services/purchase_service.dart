@@ -159,7 +159,7 @@ class PurchaseService {
 
   // Precio formateado del producto premium
   String get premiumPrice {
-    if (_products.isEmpty) return '\$2.99'; // Precio por defecto
+    if (_products.isEmpty) return '\$7.00'; // Precio por defecto
     final product = _products.firstWhere(
       (p) => p.id == premiumProductId,
       orElse: () => _products.first,

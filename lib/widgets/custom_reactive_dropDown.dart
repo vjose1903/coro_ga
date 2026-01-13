@@ -61,10 +61,10 @@ class CustomReactiveDropDown extends StatelessWidget {
             final Color? color = states.contains(WidgetState.error)
                 ? enabled
                     ? Colors.red[900]
-                    : Colors.red[900]!.withOpacity(0.6)
+                    : Colors.red[900]!.withValues(alpha: 0.6)
                 : enabled
                     ? AppThemes.colorQuinto
-                    : AppThemes.colorQuinto.withOpacity(0.6);
+                    : AppThemes.colorQuinto.withValues(alpha: 0.6);
             return TextStyle(color: color, fontSize: 15, fontWeight: FontWeight.bold, fontFamily: 'Poppins');
           }),
         ),

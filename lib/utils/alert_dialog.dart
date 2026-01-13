@@ -12,7 +12,7 @@ class CustomActionsButtons {
   final Function? onTap;
   final Color? textColor;
 
-  static Color? defaultTextColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.7) : Colors.blueGrey[600]!.withOpacity(0.7);
+  static Color? defaultTextColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.7) : Colors.blueGrey[600]!.withValues(alpha: 0.7);
 
   factory CustomActionsButtons.cancelButton(Map<String, dynamic> json) => CustomActionsButtons(
         label: json["label"] ?? "Cancelar",
@@ -92,7 +92,7 @@ class CustomAlertDialog {
   static Icon? _getIcon(DialogType? type) {
     Icon? myIcon;
 
-    if (type == DialogType.error) myIcon = Icon(Icons.cancel_outlined, color: Colors.red[800]!.withOpacity(0.5), size: 50);
+    if (type == DialogType.error) myIcon = Icon(Icons.cancel_outlined, color: Colors.red[800]!.withValues(alpha: 0.5), size: 50);
     if (type == DialogType.info) myIcon = const Icon(Icons.info_outline);
     if (type == DialogType.success) myIcon = const Icon(Icons.check_circle_outline);
     if (type == DialogType.warning) myIcon = const Icon(Icons.warning_amber_rounded);

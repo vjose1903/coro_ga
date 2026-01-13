@@ -43,7 +43,7 @@ class JugadorProvider extends ChangeNotifier {
       notifyListeners();
       return responseFuture;
     } else {
-      Fun.toast(type: ToasType.error, context: context, message: response.messages!.first);
+      Toast.show(type: ToastType.error, context: context, message: response.messages!.first);
       return responseFuture;
     }
   }
@@ -93,10 +93,10 @@ class JugadorProvider extends ChangeNotifier {
 
                 partidaProvider.removeJugador(jugador);
                 if (response.messages != null && response.messages!.isNotEmpty) {
-                  Fun.toast(type: ToasType.warning, context: context, message: response.messages!.first);
+                  Toast.show(type: ToastType.warning, context: context, message: response.messages!.first);
                 }
               } else {
-                Fun.toast(type: ToasType.error, context: context, message: response.messages!.first);
+                Toast.show(type: ToastType.error, context: context, message: response.messages!.first);
               }
               callBack({"tipo": "aceptar"});
             }

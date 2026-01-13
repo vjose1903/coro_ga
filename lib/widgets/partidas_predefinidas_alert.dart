@@ -41,7 +41,7 @@ class PartidasDefaultAlert extends StatelessWidget {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                decoration: BoxDecoration(color: AppThemes.themeColor_4.withOpacity(0.7), borderRadius: BorderRadius.circular(15)),
+                decoration: BoxDecoration(color: AppThemes.themeColor_4.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(15)),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -51,8 +51,8 @@ class PartidasDefaultAlert extends StatelessWidget {
                         PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
                         if (!premiumProvider.canCreatePredefinedGame(partidaPredefinidaProvider.partidasPredefinidas.length)) {
-                          Fun.toast(
-                              type: ToasType.info,
+                          Toast.show(
+                              type: ToastType.info,
                               context: context,
                               message:
                                   "La versión gratis solo permite ${PremiumProvider.freeMaxPredefinedGames} partidas predefinidas. ¡Desbloquea Premium para más!");
@@ -77,14 +77,14 @@ class PartidasDefaultAlert extends StatelessWidget {
                             child: ClipRRect(
                                 borderRadius: BorderRadius.circular(50),
                                 child: Material(
-                                    color: Preferences.isDarkMode ? Colors.grey.withOpacity(0.8) : Colors.grey[350],
+                                    color: Preferences.isDarkMode ? Colors.grey.withValues(alpha: 0.8) : Colors.grey[350],
                                     child: InkWell(
                                         onTap: () => reorderableProvider.isReording = false,
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
                                           child: Text("Listo",
                                               style: TextStyle(
-                                                  color: Preferences.isDarkMode ? Colors.white.withOpacity(0.7) : AppThemes.colorSexto,
+                                                  color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.7) : AppThemes.colorSexto,
                                                   fontFamily: 'Poppins',
                                                   fontSize: 15,
                                                   fontWeight: FontWeight.w700,
@@ -171,7 +171,7 @@ class PartidasScrollView extends StatelessWidget {
               child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              FaIcon(FontAwesomeIcons.gamepad, size: 40, color: Colors.grey.withOpacity(0.7)),
+              FaIcon(FontAwesomeIcons.gamepad, size: 40, color: Colors.grey.withValues(alpha: 0.7)),
               Text('No hay partidas predefinidas', style: TextStyle(fontFamily: 'Poppins', fontSize: 18, color: Colors.grey[500]))
             ],
           ));

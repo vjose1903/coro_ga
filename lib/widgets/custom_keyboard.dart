@@ -77,7 +77,7 @@ class _Simbolo extends StatelessWidget {
   final Color? labelColor;
   @override
   Widget build(BuildContext context) {
-    Color color = labelColor ?? (Preferences.isDarkMode ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.9));
+    Color color = labelColor ?? (Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorQuinto.withValues(alpha: 0.9));
     if (icon != null) {
       return Icon(icon, size: 20, color: color);
     } else {

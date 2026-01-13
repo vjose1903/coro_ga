@@ -45,7 +45,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
     // final String partida = "Domino";
     // final String jugador = "Pedro";
 
-    final Color ganadorColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.7) : const Color(0xFF06187E);
+    final Color ganadorColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF06187E);
     final Color partidaColor = Preferences.isDarkMode ? AppThemes.colorSegundo : Colors.grey[700]!;
 
     final boxDecoration = BoxDecoration(
@@ -153,7 +153,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
         Navigator.pushReplacementNamed(context, 'partida');
       });
     } else {
-      Fun.toast(type: ToasType.error, context: context, message: "Error renovando partida.");
+      Toast.show(type: ToastType.error, context: context, message: "Error renovando partida.");
       Navigator.pushReplacementNamed(context, 'home');
     }
   }

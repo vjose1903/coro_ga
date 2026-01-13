@@ -85,9 +85,9 @@ class Layout extends StatelessWidget {
                 decoration: ShapeDecoration(
                   shadows: [
                     if (panelController.status == SlidingUpPanelStatus.expanded)
-                      BoxShadow(blurRadius: 0, spreadRadius: (ResponsiveApp.size.height + 200), color: Colors.black.withOpacity(0.6)),
+                      BoxShadow(blurRadius: 0, spreadRadius: (ResponsiveApp.size.height + 200), color: Colors.black.withValues(alpha: 0.6)),
                     if (panelController.status == SlidingUpPanelStatus.expanded)
-                      BoxShadow(blurRadius: 7, spreadRadius: 1, color: Colors.black.withOpacity(0.4))
+                      BoxShadow(blurRadius: 7, spreadRadius: 1, color: Colors.black.withValues(alpha: 0.4))
                   ],
                   color: AppThemes.themeColor_2,
                   shape: const RoundedRectangleBorder(
@@ -194,7 +194,7 @@ class _WeSlideContent extends StatelessWidget {
                     child: Icon(
                       Icons.remove_rounded,
                       size: 60,
-                      color: Colors.grey.withOpacity(0.5),
+                      color: Colors.grey.withValues(alpha: 0.5),
                     )),
                 Column(
                   children: [Container(height: 25), Expanded(child: slideUpProvider.body ?? Container())],

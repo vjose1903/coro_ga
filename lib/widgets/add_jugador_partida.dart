@@ -51,7 +51,7 @@ class _AddJugadorState extends State<AddJugador> {
     final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
     FormGroup form = jugadorProvider.formJugador;
 
-    final Color titleColor = Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : AppThemes.colorQuinto.withOpacity(0.7);
+    final Color titleColor = Preferences.isDarkMode ? Colors.grey.withValues(alpha: 0.9) : AppThemes.colorQuinto.withValues(alpha: 0.7);
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       controller: ScrollController(),
@@ -88,8 +88,8 @@ class _AddJugadorState extends State<AddJugador> {
                 final PremiumProvider premiumProvider = context.read<PremiumProvider>();
                 
                 if (!premiumProvider.canAddPlayer(partidaProvider.partidaEnTurno!.jugadores!.length)) {
-                  Fun.toast(
-                      type: ToasType.info,
+                  Toast.show(
+                      type: ToastType.info,
                       context: context,
                       message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores. ¡Desbloquea Premium para más!");
                   return;
@@ -110,7 +110,7 @@ class _AddJugadorState extends State<AddJugador> {
                         duration: const Duration(seconds: 1), curve: Curves.easeOutCubic);
                   });
                 } else {
-                  Fun.toast(type: ToasType.error, context: context, message: "Debe de introducir el nombre del nuevo jugador");
+                  Toast.show(type: ToastType.error, context: context, message: "Debe de introducir el nombre del nuevo jugador");
                 }
               },
               child: const Padding(

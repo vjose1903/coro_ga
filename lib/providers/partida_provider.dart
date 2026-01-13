@@ -90,7 +90,7 @@ class PartidaProvider extends ChangeNotifier {
       notifyListeners();
       return response;
     } else {
-      Fun.toast(type: ToasType.error, context: context, message: response.messages!.first);
+      Toast.show(type: ToastType.error, context: context, message: response.messages!.first);
       if (handler != null) await handler(false);
       return response;
     }
@@ -104,7 +104,7 @@ class PartidaProvider extends ChangeNotifier {
       notifyListeners();
       return responseFuture;
     } else {
-      Fun.toast(type: ToasType.error, context: context, message: response.messages!.first);
+      Toast.show(type: ToastType.error, context: context, message: response.messages!.first);
       return responseFuture;
     }
   }

@@ -58,4 +58,15 @@ class Preferences {
     _isSystemMode = value;
     _prefs.setBool('isSystemMode', value);
   }
+
+  // ==============================================================
+  // ==============================================================
+
+  static bool get isPremium {
+    return _prefs.getBool('isPremium') ?? false;
+  }
+
+  static set isPremium(bool value) {
+    _prefs.setBool('isPremium', value);
+  }
 }

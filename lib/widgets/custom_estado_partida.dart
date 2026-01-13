@@ -31,11 +31,11 @@ class CustomEstadoPartida extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(estadoPartida[partidaIs]["icono"], color: Colors.black.withOpacity(0.8)),
+                Icon(estadoPartida[partidaIs]["icono"], color: Colors.black.withValues(alpha: 0.8)),
                 const SizedBox(width: 10),
                 Text(
                   estadoPartida[partidaIs]["label"],
-                  style: TextStyle(fontFamily: "Poppins", fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black.withOpacity(0.8)),
+                  style: TextStyle(fontFamily: "Poppins", fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black.withValues(alpha: 0.8)),
                 )
               ],
             ),
@@ -75,14 +75,14 @@ class _GanadorPerdedor extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(ganadorPerdedor[estados[index]]["icono"], color: Colors.black.withOpacity(0.8), size: 18),
+                    Icon(ganadorPerdedor[estados[index]]["icono"], color: Colors.black.withValues(alpha: 0.8), size: 18),
                     const SizedBox(width: 5),
                     Flexible(
                         child: Text(
                       ganadorPerdedor[estados[index]]["label"],
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontFamily: "Poppins", fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black.withOpacity(0.8)),
+                      style: TextStyle(fontFamily: "Poppins", fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black.withValues(alpha: 0.8)),
                     ))
                   ],
                 ),
@@ -97,7 +97,7 @@ BoxDecoration getDecoration(Color backgroundColor) {
   return BoxDecoration(
     color: backgroundColor,
     borderRadius: BorderRadius.circular(10),
-    boxShadow: [BoxShadow(blurRadius: 5, spreadRadius: -1, offset: Offset(0, 5), color: AppThemes.colorQuinto.withOpacity(0.3))],
+    boxShadow: [BoxShadow(blurRadius: 5, spreadRadius: -1, offset: Offset(0, 5), color: AppThemes.colorQuinto.withValues(alpha: 0.3))],
   );
 }
 

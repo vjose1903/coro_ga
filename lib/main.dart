@@ -87,11 +87,19 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     ThemeProvider themeProvider = context.watch<ThemeProvider>();
 
+    // Determinar qué logo usar
+    String logoPath;
+    if (Preferences.isPremium) {
+      logoPath = "assets/img/logo_pro.png";
+    } else {
+      logoPath = "assets/img/${Preferences.isDarkMode ? "logo_dark" : "logo_light"}.png";
+    }
+
     Widget myAppWithSplash = CustomSplashScreen(
       navigateRoute: const HomeScreen(),
       duration: 2500,
       imageSize: 280,
-      imageSrc: "assets/img/${Preferences.isDarkMode ? "logo_dark" : "logo_light"}.png",
+      imageSrc: logoPath,
       text: "CARGANDO...",
       textStyle: const TextStyle(fontSize: 30.0, fontFamily: "Poppins"),
       backgroundColor: Preferences.isDarkMode ? const Color(0xff020036) : const Color(0xFFF0F0F0),
@@ -108,7 +116,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           debugShowCheckedModeBanner: false,
           title: 'Coro Games',
           home: myAppWithSplash,
-          builder: EasyLoading.init(),
+          builder: EasyLoading.init(
+            builder: (context, child) => child ?? const SizedBox.shrink(),
+          ),
           routes: AppRoutes.getAppRoutes(),
           theme: themeProvider.getCurrentTheme),
     );

@@ -52,8 +52,8 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
     TextEditingController puntuacionController = TextEditingController();
     final ScrollController historialController = ScrollController();
 
-    final Color titleColor = Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : AppThemes.colorQuinto.withOpacity(0.7);
-    final Color subTitleColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.9);
+    final Color titleColor = Preferences.isDarkMode ? Colors.grey.withValues(alpha: 0.9) : AppThemes.colorQuinto.withValues(alpha: 0.7);
+    final Color subTitleColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorQuinto.withValues(alpha: 0.9);
 
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
@@ -128,7 +128,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
               flex: 2,
               child: Material(
                 borderRadius: BorderRadius.circular(10),
-                shadowColor: AppThemes.colorQuinto.withOpacity(0.3),
+                shadowColor: AppThemes.colorQuinto.withValues(alpha: 0.3),
                 elevation: 7,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
@@ -216,7 +216,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
       if (tipo == "reducir" && puntuacion_actual - puntuacionInt < 0) {
         String msgErrorReducir =
             partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? "La puntuación minima debe de ser 0." : "La ronda minima debe de ser 0.";
-        Fun.toast(type: ToasType.warning, context: context, title: "AVISO", message: msgErrorReducir);
+        Toast.show(type: ToastType.warning, context: context, title: "AVISO", message: msgErrorReducir);
 
         return puntuacion_actual;
       } else {
@@ -230,7 +230,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
     } else {
       String msg = puntuacion == "0" ? "Puntuación debe de ser mayor a 0" : "Debe introducir una puntutación para continuar";
 
-      Fun.toast(type: ToasType.warning, context: context, title: "AVISO", message: msg);
+      Toast.show(type: ToastType.warning, context: context, title: "AVISO", message: msg);
       return 0;
     }
   }
@@ -254,9 +254,9 @@ class _ListHistorial extends StatelessWidget {
           child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.history, size: 40, color: Colors.grey.withOpacity(0.3)),
+          Icon(Icons.history, size: 40, color: Colors.grey.withValues(alpha: 0.3)),
           const SizedBox(height: 10),
-          Text(msgNoRgistros, style: TextStyle(fontFamily: 'Poppins', fontSize: 15, color: Colors.grey[500]!.withOpacity(0.4)))
+          Text(msgNoRgistros, style: TextStyle(fontFamily: 'Poppins', fontSize: 15, color: Colors.grey[500]!.withValues(alpha: 0.4)))
         ],
       ));
     } else {
@@ -265,11 +265,11 @@ class _ListHistorial extends StatelessWidget {
         "reducir": {"icon": Icons.arrow_downward_rounded, "color": Colors.red[400]}
       };
 
-      Color historialColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.7);
-      Color tipoColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.2) : Colors.blueGrey.withOpacity(0.5);
+      Color historialColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorQuinto.withValues(alpha: 0.7);
+      Color tipoColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.2) : Colors.blueGrey.withValues(alpha: 0.5);
 
-      Color totalLabelColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.7) : AppThemes.colorQuinto.withOpacity(0.7);
-      Color totalContainerColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.25) : Colors.blueGrey.withOpacity(0.3);
+      Color totalLabelColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.7) : AppThemes.colorQuinto.withValues(alpha: 0.7);
+      Color totalContainerColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.25) : Colors.blueGrey.withValues(alpha: 0.3);
 
       return Column(
         children: [
@@ -350,7 +350,7 @@ class _Keyboard extends StatelessWidget {
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(10),
-          boxShadow: [BoxShadow(blurRadius: 10, spreadRadius: 1, color: AppThemes.colorQuinto.withOpacity(0.2), offset: const Offset(0, 4))],
+          boxShadow: [BoxShadow(blurRadius: 10, spreadRadius: 1, color: AppThemes.colorQuinto.withValues(alpha: 0.2), offset: const Offset(0, 4))],
         ),
         child: CustomKeyboard(onChanged: (value) => changePuntuacionValue(value), tipo: KeyboardType.number));
   }

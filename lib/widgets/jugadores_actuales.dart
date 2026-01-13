@@ -19,7 +19,7 @@ class JugadoresActuales extends StatelessWidget {
       flex: 2,
       child: Material(
         borderRadius: BorderRadius.circular(10),
-        shadowColor: AppThemes.colorQuinto.withOpacity(0.3),
+        shadowColor: AppThemes.colorQuinto.withValues(alpha: 0.3),
         elevation: 7,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(10),
@@ -47,9 +47,9 @@ class ListJugadores extends StatelessWidget {
     List<Jugador> jugadores = [];
     jugadores = partidaProvider.partidaEnTurno!.jugadoresSort;
 
-    Color nombreColor = Preferences.isDarkMode ? Colors.white.withOpacity(0.8) : AppThemes.colorQuinto.withOpacity(0.7);
-    Color puntuacionColor = Preferences.isDarkMode ? AppThemes.colorSegundo : AppThemes.colorQuinto.withOpacity(0.7);
-    final Color iconsColor = Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : AppThemes.colorQuinto.withOpacity(0.7);
+    Color nombreColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorQuinto.withValues(alpha: 0.7);
+    Color puntuacionColor = Preferences.isDarkMode ? AppThemes.colorSegundo : AppThemes.colorQuinto.withValues(alpha: 0.7);
+    final Color iconsColor = Preferences.isDarkMode ? Colors.grey.withValues(alpha: 0.9) : AppThemes.colorQuinto.withValues(alpha: 0.7);
 
     final double actualPage = pageEditarProvider.getActualPage();
 

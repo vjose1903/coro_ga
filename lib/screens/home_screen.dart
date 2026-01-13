@@ -24,29 +24,42 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class MainHome extends StatelessWidget {
+class MainHome extends StatefulWidget {
   const MainHome({Key? key}) : super(key: key);
 
-  // Future<InitializationStatus> _initGoogleMobileAds() => MobileAds.instance.initialize();
+  @override
+  State<MainHome> createState() => _MainHomeState();
+}
+
+class _MainHomeState extends State<MainHome> {
+  late final SlidingUpPanelController panelController;
+
+  @override
+  void initState() {
+    super.initState();
+    panelController = SlidingUpPanelController();
+  }
+
+  void openMenuSlideUp() {
+    final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
+    slideUpProvider.openSlideUp(
+        controller: panelController,
+        bodyContent: _Menu(panelController: panelController));
+  }
+
+  void navigateToForm() {
+    FormPartidaProvider formPartidaProvider =
+        context.read<FormPartidaProvider>();
+    formPartidaProvider.resetForm();
+    Navigator.pushNamed(context, 'formulario');
+  }
+
   @override
   Widget build(BuildContext context) {
-    SlidingUpPanelController panelController = SlidingUpPanelController();
-
-    openMenuSlideUp() {
-      final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
-      slideUpProvider.openSlideUp(controller: panelController, bodyContent: const _Menu());
-    }
-
-    navigateToForm() {
-      FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
-      formPartidaProvider.resetForm();
-
-      Navigator.pushNamed(context, 'formulario');
-    }
-
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
-        final SlideUpProvider slideUpProvider = context.watch<SlideUpProvider>();
+        final SlideUpProvider slideUpProvider =
+            context.watch<SlideUpProvider>();
 
         return Scaffold(
           body: Layout(
@@ -64,14 +77,17 @@ class MainHome extends StatelessWidget {
             visible: panelController.status == SlidingUpPanelStatus.collapsed,
             child: FloatingActionButton(
                 onPressed: () {
-                  final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-                  final PremiumProvider premiumProvider = context.read<PremiumProvider>();
+                  final PartidaProvider partidaProvider =
+                      context.read<PartidaProvider>();
+                  final PremiumProvider premiumProvider =
+                      context.read<PremiumProvider>();
 
-                  if (premiumProvider.canCreateGame(partidaProvider.partidas.length)) {
+                  if (premiumProvider
+                      .canCreateGame(partidaProvider.partidas.length)) {
                     navigateToForm();
                   } else {
-                    Fun.toast(
-                        type: ToasType.info,
+                    Toast.show(
+                        type: ToastType.info,
                         context: context,
                         message:
                             "La versión gratis solo permite ${PremiumProvider.freeMaxGames} partidas simultáneas. ¡Desbloquea Premium para más!");
@@ -109,7 +125,8 @@ class _Body extends StatelessWidget {
 }
 
 class ListPartidas extends StatelessWidget {
-  const ListPartidas({Key? key, required this.panelController}) : super(key: key);
+  const ListPartidas({Key? key, required this.panelController})
+      : super(key: key);
   final SlidingUpPanelController panelController;
   @override
   Widget build(BuildContext context) {
@@ -124,8 +141,13 @@ class ListPartidas extends StatelessWidget {
             child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            FaIcon(FontAwesomeIcons.gamepad, size: 40, color: Colors.grey.withOpacity(0.7)),
-            Text('No hay partidas iniciadas', style: TextStyle(fontFamily: 'Poppins', fontSize: 18, color: Colors.grey[500]))
+            FaIcon(FontAwesomeIcons.gamepad,
+                size: 40, color: Colors.grey.withValues(alpha: 0.7)),
+            Text('No hay partidas iniciadas',
+                style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 18,
+                    color: Colors.grey[500]))
           ],
         ));
       } else {
@@ -151,7 +173,8 @@ class ListPartidas extends StatelessWidget {
 
                 functionBorrar: (handler) async {
                   CustomAlertDialog.show(context,
-                      menssage: "Seguro que desea eliminar la partida: ${partidas[index].nombre}",
+                      menssage:
+                          "Seguro que desea eliminar la partida: ${partidas[index].nombre}",
                       title: "Confirmar",
                       dialogType: DialogType.error,
                       buttonsList: [
@@ -161,15 +184,22 @@ class ListPartidas extends StatelessWidget {
                             handler(false);
                           }
                         }),
-                        CustomActionsButtons.aceptarButton({"onTap": () => removePartida(context, handler, partidas, index)})
+                        CustomActionsButtons.aceptarButton({
+                          "onTap": () =>
+                              removePartida(context, handler, partidas, index)
+                        })
                       ]);
                 },
                 // functionEditar: () async => partidaProvider.newPartida(partidas[index], context),
                 functionEditar: () {
-                  FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
+                  FormPartidaProvider formPartidaProvider =
+                      context.read<FormPartidaProvider>();
                   formPartidaProvider.form.patchValue(partidas[index].toMap());
                   partidaProvider.partidaEditar = partidas[index];
-                  slideUpProvider.openSlideUp(controller: panelController, bodyContent: EditarEntidad(panelController: panelController));
+                  slideUpProvider.openSlideUp(
+                      controller: panelController,
+                      bodyContent:
+                          EditarEntidad(panelController: panelController));
                 },
 
                 index: index,
@@ -179,17 +209,21 @@ class ListPartidas extends StatelessWidget {
     }
   }
 
-  Future removePartida(BuildContext context, CompletionHandler handler, List<Partida> partidas, int index) async {
+  Future removePartida(BuildContext context, CompletionHandler handler,
+      List<Partida> partidas, int index) async {
     Navigator.pop(context);
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-    final responseFuture = partidaProvider.deletePartida(context, partida: partidas[index], handler: handler);
+    final responseFuture = partidaProvider.deletePartida(context,
+        partida: partidas[index], handler: handler);
 
     return responseFuture;
   }
 }
 
 class _Menu extends StatefulWidget {
-  const _Menu({Key? key}) : super(key: key);
+  final SlidingUpPanelController panelController;
+
+  const _Menu({Key? key, required this.panelController}) : super(key: key);
 
   @override
   State<_Menu> createState() => _MenuState();
@@ -209,7 +243,9 @@ class _MenuState extends State<_Menu> {
           children: [
             Text("Coro Games",
                 style: TextStyle(
-                    color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
+                    color: Preferences.isDarkMode
+                        ? Colors.white
+                        : AppThemes.colorCuarto,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
@@ -222,7 +258,9 @@ class _MenuState extends State<_Menu> {
                 children: [
                   Text("Tema",
                       style: TextStyle(
-                          color: Preferences.isDarkMode ? AppThemes.colorPrimero : AppThemes.colorTercero,
+                          color: Preferences.isDarkMode
+                              ? AppThemes.colorPrimero
+                              : AppThemes.colorTercero,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w800,
                           fontSize: 18)),
@@ -234,13 +272,17 @@ class _MenuState extends State<_Menu> {
                         activeColor: AppThemes.colorTercero,
                         title: Text('Tema del sistema',
                             style: TextStyle(
-                              color: Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : Colors.grey[800]!.withOpacity(0.9),
+                              color: Preferences.isDarkMode
+                                  ? Colors.grey.withValues(alpha: 0.9)
+                                  : Colors.grey[800]!.withValues(alpha: 0.9),
                               fontFamily: 'Poppins',
                             )),
                         value: Preferences.isSystemMode,
                         onChanged: (value) {
                           Preferences.isSystemMode = value;
-                          Preferences.isDarkMode = WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
+                          Preferences.isDarkMode = WidgetsBinding
+                                  .instance.window.platformBrightness ==
+                              Brightness.dark;
                           themeProvider.changeCurrentTheme();
                           setState(() {});
                         }),
@@ -256,7 +298,9 @@ class _MenuState extends State<_Menu> {
                         children: [
                           Text("Cambiar tema a:",
                               style: TextStyle(
-                                  color: Preferences.isDarkMode ? Colors.grey.withOpacity(0.9) : Colors.grey[800]!.withOpacity(0.9),
+                                  color: Preferences.isDarkMode
+                                      ? Colors.grey.withValues(alpha: 0.9)
+                                      : Colors.grey[800]!.withValues(alpha: 0.9),
                                   fontFamily: 'Poppins',
                                   fontSize: 15)),
                           FittedBox(
@@ -267,23 +311,40 @@ class _MenuState extends State<_Menu> {
                                     color: Colors.transparent,
                                     child: InkWell(
                                         onTap: () {
-                                          Preferences.isDarkMode = !Preferences.isDarkMode;
+                                          Preferences.isDarkMode =
+                                              !Preferences.isDarkMode;
                                           themeProvider.changeCurrentTheme();
                                           setState(() {});
                                         },
                                         child: Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 10),
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 7, horizontal: 10),
                                           child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
                                             children: [
-                                              Text(Preferences.isDarkMode ? "Claro" : "Oscuro",
+                                              Text(
+                                                  Preferences.isDarkMode
+                                                      ? "Claro"
+                                                      : "Oscuro",
                                                   style: TextStyle(
-                                                      color: Preferences.isDarkMode ? Colors.grey.withOpacity(0.7) : Colors.grey,
+                                                      color: Preferences
+                                                              .isDarkMode
+                                                          ? Colors.grey
+                                                              .withValues(alpha: 0.7)
+                                                          : Colors.grey,
                                                       fontFamily: 'Poppins',
                                                       fontSize: 15)),
                                               const SizedBox(width: 5),
-                                              Icon(Preferences.isDarkMode ? Icons.wb_sunny_outlined : Icons.nights_stay,
-                                                  color: Preferences.isDarkMode ? Colors.grey.withOpacity(0.7) : Colors.grey.withOpacity(0.9))
+                                              Icon(
+                                                  Preferences.isDarkMode
+                                                      ? Icons.wb_sunny_outlined
+                                                      : Icons.nights_stay,
+                                                  color: Preferences.isDarkMode
+                                                      ? Colors.grey
+                                                          .withValues(alpha: 0.7)
+                                                      : Colors.grey
+                                                          .withValues(alpha: 0.9))
                                             ],
                                           ),
                                         )))),
@@ -302,22 +363,30 @@ class _MenuState extends State<_Menu> {
                 return _ConfigGroup(
                   child: InkWell(
                     onTap: () {
-                      Navigator.pop(context);
-                      Navigator.pushNamed(context, 'premium');
+                      // Guardar el navigator antes de cerrar
+                      final navigator = Navigator.of(context);
+                      // Cerrar el SlideUp
+                      widget.panelController.collapse();
+                      // Navegar después de un pequeño delay
+                      Future.delayed(const Duration(milliseconds: 300), () {
+                        navigator.pushNamed('premium');
+                      });
                     },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(5),
                             decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [AppThemes.colorTercero, AppThemes.colorSegundo],
-                              ),
-                              borderRadius: BorderRadius.circular(8),
+                              color: AppThemes.colorTercero.withValues(alpha: Preferences.isDarkMode ? 0.3 : 0.1),
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Icon(Icons.workspace_premium, color: Colors.white, size: 20),
+                            child: Image.asset(
+                              'assets/img/corona-pro.png',
+                              width: 36,
+                              height: 36,
+                            ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -325,16 +394,22 @@ class _MenuState extends State<_Menu> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  premiumProvider.isPremium ? "Eres Premium" : "Obtener Premium",
+                                  premiumProvider.isPremium
+                                      ? "Eres PRO"
+                                      : "Obtener PRO",
                                   style: TextStyle(
-                                    color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
+                                    color: Preferences.isDarkMode
+                                        ? Colors.white
+                                        : AppThemes.colorCuarto,
                                     fontFamily: 'Poppins',
                                     fontWeight: FontWeight.w600,
                                     fontSize: 16,
                                   ),
                                 ),
                                 Text(
-                                  premiumProvider.isPremium ? "Todas las funciones desbloqueadas" : "Sin anuncios y funciones ilimitadas",
+                                  premiumProvider.isPremium
+                                      ? "Todas las funciones desbloqueadas"
+                                      : "Sin anuncios y funciones ilimitadas",
                                   style: TextStyle(
                                     color: Colors.grey[600],
                                     fontFamily: 'Poppins',
@@ -345,8 +420,12 @@ class _MenuState extends State<_Menu> {
                             ),
                           ),
                           Icon(
-                            premiumProvider.isPremium ? Icons.check_circle : Icons.arrow_forward_ios,
-                            color: premiumProvider.isPremium ? Colors.green : Colors.grey,
+                            premiumProvider.isPremium
+                                ? Icons.check_circle
+                                : Icons.arrow_forward_ios,
+                            color: premiumProvider.isPremium
+                                ? Colors.green
+                                : Colors.grey,
                             size: 20,
                           ),
                         ],
@@ -367,7 +446,9 @@ class _ConfigGroup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: AppThemes.themeColor_1.withOpacity(0.5), borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(
+          color: AppThemes.themeColor_1.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(10)),
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: child,
