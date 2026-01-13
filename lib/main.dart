@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/routes/app_routes.dart';
 import 'package:game_score/screens/screens.dart';
+import 'package:game_score/services/purchase_service.dart';
 import 'package:game_score/widgets/custom_splash_screen.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
@@ -16,10 +16,19 @@ void main() async {
 
   MobileAds.instance.initialize();
   await Preferences.init();
-  AppEnvironment.initialize();
 
   final isPlatformDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
   bool initInDarkMode = Preferences.isSystemMode ? isPlatformDark : Preferences.isDarkMode;
+
+  // Crear PremiumProvider primero para pasarlo al PurchaseService
+  final premiumProvider = PremiumProvider();
+  
+  // Inicializar servicio de compras
+  await PurchaseService.instance.initialize(
+    onPurchaseComplete: (success) {
+      if (success) premiumProvider.setPremium(true);
+    },
+  );
 
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => PartidaProvider()),
@@ -31,6 +40,7 @@ void main() async {
     ChangeNotifierProvider(create: (_) => PageEditarProvider()),
     ChangeNotifierProvider(create: (_) => PartidaPredefinidaProvider()),
     ChangeNotifierProvider(create: (_) => ThemeProvider(isDarkMode_: initInDarkMode)),
+    ChangeNotifierProvider.value(value: premiumProvider),
   ], child: const MyApp()));
 }
 

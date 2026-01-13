@@ -65,19 +65,16 @@ class MainHome extends StatelessWidget {
             child: FloatingActionButton(
                 onPressed: () {
                   final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+                  final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
-                  if (AppEnvironment.isPro) {
+                  if (premiumProvider.canCreateGame(partidaProvider.partidas.length)) {
                     navigateToForm();
                   } else {
-                    if (partidaProvider.partidas.length < 3) {
-                      navigateToForm();
-                    } else {
-                      Fun.toast(
-                          type: ToasType.info,
-                          context: context,
-                          message:
-                              "La version gratis de Coro Games, solo permite 3 partidas simultaneas, para agregar más comprar la versión Pro.");
-                    }
+                    Fun.toast(
+                        type: ToasType.info,
+                        context: context,
+                        message:
+                            "La versión gratis solo permite ${PremiumProvider.freeMaxGames} partidas simultáneas. ¡Desbloquea Premium para más!");
                   }
                 },
                 child: const Icon(Icons.add, size: 30)),
@@ -210,7 +207,7 @@ class _MenuState extends State<_Menu> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(AppEnvironment.appName,
+            Text("Coro Games",
                 style: TextStyle(
                     color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
                     fontFamily: 'Poppins',
@@ -297,6 +294,67 @@ class _MenuState extends State<_Menu> {
                   ),
                 ],
               ),
+            ),
+            const SizedBox(height: 20),
+            // Premium
+            Consumer<PremiumProvider>(
+              builder: (context, premiumProvider, child) {
+                return _ConfigGroup(
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, 'premium');
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [AppThemes.colorTercero, AppThemes.colorSegundo],
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(Icons.workspace_premium, color: Colors.white, size: 20),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  premiumProvider.isPremium ? "Eres Premium" : "Obtener Premium",
+                                  style: TextStyle(
+                                    color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Text(
+                                  premiumProvider.isPremium ? "Todas las funciones desbloqueadas" : "Sin anuncios y funciones ilimitadas",
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontFamily: 'Poppins',
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Icon(
+                            premiumProvider.isPremium ? Icons.check_circle : Icons.arrow_forward_ios,
+                            color: premiumProvider.isPremium ? Colors.green : Colors.grey,
+                            size: 20,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         ));

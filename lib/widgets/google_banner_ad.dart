@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/helpers/helpers.dart';
+import 'package:game_score/providers/premium_provider.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 enum AdLocation { partida, puntuacion, agregarJugador, editarEntidad, pageTransition }
@@ -42,36 +44,39 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.isHideSkeleton) {
-      return Container();
-    } else {
-      return Container(
-        width: 300,
-        alignment: Alignment.topCenter,
-        child: widget._bannerAd == null
-            ? Shimmer.fromColors(
-                baseColor: Preferences.isDarkMode ? Colors.grey[800]! : Colors.grey[300]!,
-                highlightColor: Preferences.isDarkMode ? Colors.grey[700]! : Colors.grey[100]!,
-                child: Container(
-                  width: 300,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              )
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                      width: widget._bannerAd!.size.width.toDouble(),
-                      height: widget._bannerAd!.size.height.toDouble(),
-                      child: AdWidget(ad: widget._bannerAd!)),
-                ],
-              ),
-      );
+    final premiumProvider = context.watch<PremiumProvider>();
+    
+    // No mostrar anuncios si es premium
+    if (premiumProvider.isPremium || widget.isHideSkeleton) {
+      return const SizedBox.shrink();
     }
+    
+    return Container(
+      width: 300,
+      alignment: Alignment.topCenter,
+      child: widget._bannerAd == null
+          ? Shimmer.fromColors(
+              baseColor: Preferences.isDarkMode ? Colors.grey[800]! : Colors.grey[300]!,
+              highlightColor: Preferences.isDarkMode ? Colors.grey[700]! : Colors.grey[100]!,
+              child: Container(
+                width: 300,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                    width: widget._bannerAd!.size.width.toDouble(),
+                    height: widget._bannerAd!.size.height.toDouble(),
+                    child: AdWidget(ad: widget._bannerAd!)),
+              ],
+            ),
+    );
   }
 
   void _loadBannerAd() {

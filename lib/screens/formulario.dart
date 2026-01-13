@@ -223,29 +223,27 @@ class Titulo extends StatelessWidget {
         ),
         Visibility(
           visible: formPartidaProvider.jugadores.length < 20,
-          child: CustomIconButtom(
+          child:           CustomIconButtom(
             onTap: () async {
-              bool continuar = true;
-
-              if (!AppEnvironment.isPro && formPartidaProvider.jugadores.length > 3) {
-                continuar = false;
+              final PremiumProvider premiumProvider = context.read<PremiumProvider>();
+              
+              if (!premiumProvider.canAddPlayer(formPartidaProvider.jugadores.length)) {
                 Fun.toast(
                     type: ToasType.info,
                     context: context,
-                    message: "La version gratis de Coro Games, solo permite 4 jugadores, para agregar más comprar la versión Pro.");
+                    message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores. ¡Desbloquea Premium para más!");
+                return;
               }
 
-              if (continuar) {
-                FocusManager.instance.primaryFocus?.unfocus();
-                formPartidaProvider.addJugadorToList();
-                await Future.delayed(const Duration(milliseconds: 20));
+              FocusManager.instance.primaryFocus?.unfocus();
+              formPartidaProvider.addJugadorToList();
+              await Future.delayed(const Duration(milliseconds: 20));
 
-                jugadoresController.animateTo(jugadoresController.position.maxScrollExtent,
-                    duration: const Duration(seconds: 1, milliseconds: 500), curve: Curves.elasticOut);
+              jugadoresController.animateTo(jugadoresController.position.maxScrollExtent,
+                  duration: const Duration(seconds: 1, milliseconds: 500), curve: Curves.elasticOut);
 
-                if (formPartidaProvider.jugadores.length == 20) {
-                  Fun.toast(type: ToasType.info, context: context, message: "Máximo de jugadores alcanzados");
-                }
+              if (formPartidaProvider.jugadores.length == 20) {
+                Fun.toast(type: ToasType.info, context: context, message: "Máximo de jugadores alcanzados");
               }
             },
             icon: Icons.add,

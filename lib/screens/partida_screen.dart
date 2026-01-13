@@ -103,17 +103,17 @@ class JugadoresCard extends StatelessWidget {
                 child: CustomIconButtom(
                     onTap: () {
                       final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-                      bool continuar = true;
+                      final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
-                      if (!AppEnvironment.isPro && partidaProvider.partidaEnTurno!.jugadores!.length > 3) {
-                        continuar = false;
+                      if (!premiumProvider.canAddPlayer(partidaProvider.partidaEnTurno!.jugadores!.length)) {
                         Fun.toast(
                             type: ToasType.info,
                             context: context,
-                            message: "La version gratis de Coro Games, solo permite 4 jugadores, para agregar más comprar la versión Pro.");
+                            message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores. ¡Desbloquea Premium para más!");
+                        return;
                       }
 
-                      if (continuar) openSlideUp();
+                      openSlideUp();
                     },
                     icon: Icons.add,
                     iconSize: 25,

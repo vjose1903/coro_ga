@@ -48,21 +48,18 @@ class PartidasDefaultAlert extends StatelessWidget {
                     CustomIconButtom(
                       onTap: () {
                         PartidaPredefinidaProvider partidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
+                        PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
-                        bool continuar = true;
-
-                        if (!AppEnvironment.isPro && partidaPredefinidaProvider.partidasPredefinidas.length > 1) {
-                          continuar = false;
+                        if (!premiumProvider.canCreatePredefinedGame(partidaPredefinidaProvider.partidasPredefinidas.length)) {
                           Fun.toast(
                               type: ToasType.info,
                               context: context,
                               message:
-                                  "La version gratis de Coro Games, solo permite 2 partidas predefinidas, para agregar más comprar la versión Pro.");
+                                  "La versión gratis solo permite ${PremiumProvider.freeMaxPredefinedGames} partidas predefinidas. ¡Desbloquea Premium para más!");
+                          return;
                         }
 
-                        if (continuar) {
-                          _showFormPartidaDialog(context);
-                        }
+                        _showFormPartidaDialog(context);
                       },
                       icon: Icons.add,
                       size: IconSize.min,

@@ -8,6 +8,7 @@ class AppRoutes {
     MenuOption(route: 'partida', screen: const PartidaScreen()),
     MenuOption(route: 'formulario', screen: const FormularioScreen()),
     MenuOption(route: 'ganador', screen: const GanadorScreen()),
+    MenuOption(route: 'premium', screen: const PremiumScreen()),
   ];
 
   static Map<String, Widget Function(BuildContext)> getAppRoutes() {

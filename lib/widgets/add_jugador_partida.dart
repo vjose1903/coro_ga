@@ -84,35 +84,33 @@ class _AddJugadorState extends State<AddJugador> {
             //
             ElevatedButton(
               onPressed: () async {
-                bool continuar = true;
-
                 final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-                if (!AppEnvironment.isPro && partidaProvider.partidaEnTurno!.jugadores!.length > 3) {
-                  continuar = false;
+                final PremiumProvider premiumProvider = context.read<PremiumProvider>();
+                
+                if (!premiumProvider.canAddPlayer(partidaProvider.partidaEnTurno!.jugadores!.length)) {
                   Fun.toast(
                       type: ToasType.info,
                       context: context,
-                      message: "La version gratis de Coro Games, solo permite 4 jugadores, para agregar más comprar la versión Pro.");
+                      message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores. ¡Desbloquea Premium para más!");
+                  return;
                 }
                 
-                if (continuar) {
-                  if (form.valid) {
-                    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+                if (form.valid) {
+                  final PartidaProvider partidaProvider = context.read<PartidaProvider>();
 
-                    Jugador nuevoJugador = Jugador.fromMap(form.value);
+                  Jugador nuevoJugador = Jugador.fromMap(form.value);
 
-                    partidaProvider.addJugadorToPartida(context, jugador: nuevoJugador, partida: partidaProvider.partidaEnTurno!).then((value) async {
-                      form.reset();
-                      rebuildWidget();
+                  partidaProvider.addJugadorToPartida(context, jugador: nuevoJugador, partida: partidaProvider.partidaEnTurno!).then((value) async {
+                    form.reset();
+                    rebuildWidget();
 
-                      await Future.delayed(const Duration(milliseconds: 50));
+                    await Future.delayed(const Duration(milliseconds: 50));
 
-                      jugadoresController.animateTo(jugadoresController.position.maxScrollExtent,
-                          duration: const Duration(seconds: 1), curve: Curves.easeOutCubic);
-                    });
-                  } else {
-                    Fun.toast(type: ToasType.error, context: context, message: "Debe de introducir el nombre del nuevo jugador");
-                  }
+                    jugadoresController.animateTo(jugadoresController.position.maxScrollExtent,
+                        duration: const Duration(seconds: 1), curve: Curves.easeOutCubic);
+                  });
+                } else {
+                  Fun.toast(type: ToasType.error, context: context, message: "Debe de introducir el nombre del nuevo jugador");
                 }
               },
               child: const Padding(
