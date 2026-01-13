@@ -4,10 +4,13 @@ import 'package:game_score/services/purchase_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PremiumProvider extends ChangeNotifier {
+  // 🔧 FLAG DE PRUEBAS: Cambiar a true para simular versión premium
+  static const bool kTestPremium = false;
+
   bool _isPremium = false;
   bool _isLoading = true;
 
-  bool get isPremium => _isPremium;
+  bool get isPremium => kTestPremium || _isPremium;
   bool get isLoading => _isLoading;
 
   // Límites para versión FREE
@@ -66,25 +69,25 @@ class PremiumProvider extends ChangeNotifier {
 
   // Verificadores de límites
   bool canAddPlayer(int currentPlayers) {
-    if (_isPremium) return true;
+    if (isPremium) return true;
     return currentPlayers < freeMaxPlayers;
   }
 
   bool canCreateGame(int currentGames) {
-    if (_isPremium) return true;
+    if (isPremium) return true;
     return currentGames < freeMaxGames;
   }
 
   bool canCreatePredefinedGame(int currentPredefined) {
-    if (_isPremium) return true;
+    if (isPremium) return true;
     return currentPredefined < freeMaxPredefinedGames;
   }
 
   int getHistoryLimit() {
-    if (_isPremium) return -1; // Sin límite
+    if (isPremium) return -1; // Sin límite
     return freeMaxHistory;
   }
 
-  bool get showAds => !_isPremium;
+  bool get showAds => !isPremium;
 }
 

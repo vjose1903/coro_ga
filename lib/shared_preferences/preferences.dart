@@ -1,3 +1,4 @@
+import 'package:game_score/providers/premium_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum PrefsType { bool, string, int, double, undefined }
@@ -63,7 +64,7 @@ class Preferences {
   // ==============================================================
 
   static bool get isPremium {
-    return _prefs.getBool('isPremium') ?? false;
+    return PremiumProvider.kTestPremium || (_prefs.getBool('isPremium') ?? false);
   }
 
   static set isPremium(bool value) {
