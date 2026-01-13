@@ -22,7 +22,8 @@ class PartidaScreen extends StatelessWidget {
 
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
-        final SlideUpProvider slideUpProvider = context.watch<SlideUpProvider>();
+        // Watch para que se reconstruya cuando cambie el estado del SlideUp
+        context.watch<SlideUpProvider>();
 
         return Scaffold(
           body: _Body(panelController: panelController, anuncio: anuncio),
@@ -138,42 +139,32 @@ class JugadoresList extends StatelessWidget {
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final partida = partidaProvider.partidaEnTurno!;
+    final jugadores = List<Jugador>.from(partida.jugadores ?? []);
+    
+    // Ordenar solo si es necesario
+    jugadores.sort((a, b) => a.id!.compareTo(b.id!));
 
     return SizedBox(
       width: double.infinity,
-      child: FutureBuilder(
-        future: getJugadores(partida.jugadores!, panelController, partidaProvider),
-        initialData: List<Widget>.from([]),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator(color: AppThemes.colorTercero));
-          } else {
-            return SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Wrap(
-                  alignment: WrapAlignment.spaceBetween,
-                  runSpacing: 15,
-                  spacing: 0,
-                  children: snapshot.data,
-                ));
-          }
-        },
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          runSpacing: 15,
+          spacing: 0,
+          children: jugadores.asMap().entries.map((entry) {
+            final index = entry.key;
+            final jugador = entry.value;
+
+            return partidaProvider.isChangePartida
+                ? ElasticIn(
+                    delay: Duration(milliseconds: 50 * index), // Reducido de 100ms a 50ms
+                    child: JugadorInfo(jugador: jugador, panelController: panelController))
+                : JugadorInfo(jugador: jugador, panelController: panelController);
+          }).toList(),
+        ),
       ),
     );
-  }
-
-  Future<List<Widget>> getJugadores(List<Jugador> jugadores, SlidingUpPanelController panelController, PartidaProvider partidaProvider) async {
-    await Future.delayed(const Duration(milliseconds: 10));
-
-    jugadores.sort((a, b) => a.id!.compareTo(b.id!));
-    return jugadores.asMap().entries.map((entry) {
-      int index = entry.key;
-      Jugador jugador = entry.value;
-
-      return partidaProvider.isChangePartida
-          ? ElasticIn(delay: Duration(milliseconds: 100 * index), child: JugadorInfo(jugador: jugador, panelController: panelController))
-          : JugadorInfo(jugador: jugador, panelController: panelController);
-    }).toList();
   }
 }
 
@@ -290,15 +281,19 @@ class _NavigationBarState extends State<NavigationBar> {
     super.dispose();
   }
 
-  void scrollToGame(BuildContext context) async {
+  void scrollToGame(BuildContext context) {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
 
     final int selectedIndex = partidaProvider.partidas.indexWhere((partida) => partida.id == partidaProvider.partidaEnTurno!.id);
-    await Future.delayed(const Duration(milliseconds: 200));
 
-    if (partidaProvider.partidas.length > 3 && ((selectedIndex <= visibleIndeces.first) || (selectedIndex >= visibleIndeces.last))) {
-      itemScrollController.scrollTo(index: selectedIndex, duration: const Duration(milliseconds: 700), curve: Curves.easeInOutCubic, alignment: 0.4);
-    }
+    // Usar post frame callback en lugar de delay
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (partidaProvider.partidas.length > 3 && 
+          visibleIndeces.isNotEmpty &&
+          ((selectedIndex <= visibleIndeces.first) || (selectedIndex >= visibleIndeces.last))) {
+        itemScrollController.scrollTo(index: selectedIndex, duration: const Duration(milliseconds: 500), curve: Curves.easeInOutCubic, alignment: 0.4);
+      }
+    });
   }
 
   @override

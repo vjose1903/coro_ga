@@ -3,8 +3,6 @@ import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/utils/functions.dart';
-
 import 'package:provider/provider.dart';
 
 class Layout extends StatelessWidget {
@@ -40,11 +38,7 @@ class Layout extends StatelessWidget {
   Widget build(BuildContext context) {
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
 
-    return Consumer(
-      builder: (BuildContext context, value, Widget? child) {
-        ThemeProvider themeProvider = context.watch<ThemeProvider>();
-
-        return Stack(
+    return Stack(
           children: [
             Container(decoration: boxDecoration),
             _AppBar(title: appBarTitle, leading: appBarLeading, trailing: appBarTrailing),
@@ -61,11 +55,7 @@ class Layout extends StatelessWidget {
                 // Fun.logColor(color: Colores.green, body: "dragStart");
                 FocusManager.instance.primaryFocus?.unfocus();
               },
-              dragCancel: () async {
-                // Fun.logColor(color: Colores.magenta, body: "dragCancel");
-
-                await Future.delayed(const Duration(milliseconds: 100));
-
+              dragCancel: () {
                 if (panelController.status == SlidingUpPanelStatus.collapsed || panelController.status == SlidingUpPanelStatus.anchored) {
                   cleanSlideUp(slideUpProvider, true);
                 }
@@ -99,8 +89,6 @@ class Layout extends StatelessWidget {
             ),
           ],
         );
-      },
-    );
   }
 
   cleanSlideUp(SlideUpProvider slideUpProvider, [isListener = false]) {

@@ -58,8 +58,8 @@ class _MainHomeState extends State<MainHome> {
   Widget build(BuildContext context) {
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
-        final SlideUpProvider slideUpProvider =
-            context.watch<SlideUpProvider>();
+        // Watch para que se reconstruya cuando cambie el estado del SlideUp
+        context.watch<SlideUpProvider>();
 
         return Scaffold(
           body: Layout(
@@ -131,8 +131,6 @@ class ListPartidas extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
-    final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
-
     final List<Partida> partidas = partidaProvider.partidas;
 
     if (partidas.isEmpty) {
@@ -156,53 +154,59 @@ class ListPartidas extends StatelessWidget {
         );
       }
     } else {
-      return ListView.separated(
+      return ListView.builder(
           itemCount: partidas.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 30),
           padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
           physics: const BouncingScrollPhysics(),
+          // Optimización: cachear items para evitar rebuilds
+          addAutomaticKeepAlives: true,
+          cacheExtent: 300,
           itemBuilder: (_, index) {
-            return BounceInLeft(
-              delay: Duration(milliseconds: 100 * index),
-              child: PartidaCard(
-                partida: partidas[index],
-                onTap: () {
-                  partidaProvider.changePartidaEnTurno(partidas[index]);
-                  Navigator.pushNamed(context, 'partida');
-                },
+            final partida = partidas[index];
+            return Padding(
+              padding: EdgeInsets.only(bottom: index < partidas.length - 1 ? 30 : 0),
+              child: BounceInLeft(
+                delay: Duration(milliseconds: 40 * (index < 5 ? index : 5)), // Limitar animación a primeros 5 items
+                child: PartidaCard(
+                  partida: partida,
+                  onTap: () {
+                    partidaProvider.changePartidaEnTurno(partida);
+                    Navigator.pushNamed(context, 'partida');
+                  },
 
-                functionBorrar: (handler) async {
-                  CustomAlertDialog.show(context,
-                      menssage:
-                          "Seguro que desea eliminar la partida: ${partidas[index].nombre}",
-                      title: "Confirmar",
-                      dialogType: DialogType.error,
-                      buttonsList: [
-                        CustomActionsButtons.cancelButton({
-                          "onTap": () {
-                            Navigator.pop(context);
-                            handler(false);
-                          }
-                        }),
-                        CustomActionsButtons.aceptarButton({
-                          "onTap": () =>
-                              removePartida(context, handler, partidas, index)
-                        })
-                      ]);
-                },
-                // functionEditar: () async => partidaProvider.newPartida(partidas[index], context),
-                functionEditar: () {
-                  FormPartidaProvider formPartidaProvider =
-                      context.read<FormPartidaProvider>();
-                  formPartidaProvider.form.patchValue(partidas[index].toMap());
-                  partidaProvider.partidaEditar = partidas[index];
-                  slideUpProvider.openSlideUp(
-                      controller: panelController,
-                      bodyContent:
-                          EditarEntidad(panelController: panelController));
-                },
+                  functionBorrar: (handler) async {
+                    CustomAlertDialog.show(context,
+                        menssage:
+                            "Seguro que desea eliminar la partida: ${partida.nombre}",
+                        title: "Confirmar",
+                        dialogType: DialogType.error,
+                        buttonsList: [
+                          CustomActionsButtons.cancelButton({
+                            "onTap": () {
+                              Navigator.pop(context);
+                              handler(false);
+                            }
+                          }),
+                          CustomActionsButtons.aceptarButton({
+                            "onTap": () =>
+                                removePartida(context, handler, partidas, index)
+                          })
+                        ]);
+                  },
+                  functionEditar: () {
+                    FormPartidaProvider formPartidaProvider =
+                        context.read<FormPartidaProvider>();
+                    SlideUpProvider slideUp = context.read<SlideUpProvider>();
+                    formPartidaProvider.form.patchValue(partida.toMap());
+                    partidaProvider.partidaEditar = partida;
+                    slideUp.openSlideUp(
+                        controller: panelController,
+                        bodyContent:
+                            EditarEntidad(panelController: panelController));
+                  },
 
-                index: index,
+                  index: index,
+                ),
               ),
             );
           });

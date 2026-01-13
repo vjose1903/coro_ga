@@ -224,7 +224,7 @@ class Titulo extends StatelessWidget {
         Visibility(
           visible: formPartidaProvider.jugadores.length < 20,
           child:           CustomIconButtom(
-            onTap: () async {
+            onTap: () {
               final PremiumProvider premiumProvider = context.read<PremiumProvider>();
               
               if (!premiumProvider.canAddPlayer(formPartidaProvider.jugadores.length)) {
@@ -237,10 +237,14 @@ class Titulo extends StatelessWidget {
 
               FocusManager.instance.primaryFocus?.unfocus();
               formPartidaProvider.addJugadorToList();
-              await Future.delayed(const Duration(milliseconds: 20));
-
-              jugadoresController.animateTo(jugadoresController.position.maxScrollExtent,
-                  duration: const Duration(seconds: 1, milliseconds: 500), curve: Curves.elasticOut);
+              
+              // Usar post frame para scroll después del rebuild
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (jugadoresController.hasClients) {
+                  jugadoresController.animateTo(jugadoresController.position.maxScrollExtent,
+                      duration: const Duration(milliseconds: 800), curve: Curves.easeOutCubic);
+                }
+              });
 
               if (formPartidaProvider.jugadores.length == 20) {
                 Toast.show(type: ToastType.info, context: context, message: "Máximo de jugadores alcanzados");
@@ -328,7 +332,7 @@ class _JugadorInput extends StatelessWidget {
               flex: 12,
               fit: FlexFit.tight,
               child:
-                  CustomReactiveInput(key: UniqueKey(), formControlName: 'nombre', labelText: "Nombre", textCapitalization: TextCapitalization.words),
+                  CustomReactiveInput(key: ValueKey('jugador_$index'), formControlName: 'nombre', labelText: "Nombre", textCapitalization: TextCapitalization.words),
             ),
             const SizedBox(width: 10),
             Visibility(

@@ -2,11 +2,9 @@ import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:game_score/models/models.dart';
-import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/widgets/widgets.dart';
-import 'package:provider/provider.dart';
 
 class PartidaCard extends StatelessWidget {
   const PartidaCard({
@@ -26,8 +24,6 @@ class PartidaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ThemeProvider themeProvider = context.watch<ThemeProvider>();
-
     return Material(
       color: AppThemes.themeColor_2,
       borderRadius: BorderRadius.circular(12),
@@ -37,7 +33,7 @@ class PartidaCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         child: SwipeActionCell(
           backgroundColor: Colors.transparent,
-          key: UniqueKey(),
+          key: ValueKey(partida.id), // Usar ValueKey con id estable en lugar de UniqueKey
           trailingActions: <SwipeAction>[
             SwipeAction(
                 // nestedAction: SwipeNestedAction(title: "Confirmar"),

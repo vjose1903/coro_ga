@@ -1,18 +1,12 @@
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
-import 'package:game_score/providers/providers.dart';
-
-import 'package:flutter/material.dart';
-import 'package:game_score/utils/utils.dart';
 import 'package:sqflite/sqflite.dart';
 
 class CrudHelper {
   static Future<SqlResponse> insert({required String tableName, required dynamic body}) async {
     final response = SqlResponse();
-    // obtener instancia de la base de datos
     final db = await DatabaseHelper.database;
 
-    // Inserta en la base de datos
     final res = await db.insert(tableName, body, conflictAlgorithm: ConflictAlgorithm.replace);
     if (res > 0) {
       response.data = res;
@@ -20,7 +14,6 @@ class CrudHelper {
       response.hasError = true;
       response.addMsg('Error ingresando registro');
     }
-    await Future.delayed(const Duration(milliseconds: 200));
 
     return response;
   }
@@ -29,10 +22,8 @@ class CrudHelper {
     final response = SqlResponse();
 
     whereArgs_ ??= [id];
-    // obtener instancia de la base de datos
     final db = await DatabaseHelper.database;
 
-    // Inserta en la base de datos
     final res = await db.query(tableName, where: where_, whereArgs: whereArgs_);
 
     if (res.isNotEmpty) {
@@ -40,7 +31,6 @@ class CrudHelper {
     } else {
       response.hasError = true;
     }
-    await Future.delayed(const Duration(milliseconds: 200));
 
     return response;
   }
@@ -58,19 +48,14 @@ class CrudHelper {
       res = await db.query(tableName);
     }
 
-    final List<dynamic> decodedRes = res.isNotEmpty ? res : [];
-
-    response.data = decodedRes;
+    response.data = res.isNotEmpty ? res : [];
     if (res.isEmpty) response.hasError = true;
-    await Future.delayed(const Duration(milliseconds: 200));
 
     return response;
   }
 
   static Future<SqlResponse> updateOne(
       {required String tableName, required dynamic newData, int? id, List? whereArgs_, String? where_ = 'id = ?'}) async {
-    //
-
     final response = SqlResponse();
 
     whereArgs_ ??= [id];
@@ -83,10 +68,8 @@ class CrudHelper {
       } else {
         response.hasError = true;
       }
-      await Future.delayed(const Duration(milliseconds: 200));
 
       return response;
-      //
     } catch (e) {
       response.hasError = true;
       return response;
@@ -96,7 +79,6 @@ class CrudHelper {
   static Future<SqlResponse> deleteOne({required String tableName, required int id, List? whereArgs_, String? where_ = 'id = ?'}) async {
     final response = SqlResponse();
 
-    whereArgs_ ??= [id];
     final db = await DatabaseHelper.database;
 
     final res = await db.delete(tableName, where: 'id = ?', whereArgs: [id]);
@@ -106,7 +88,6 @@ class CrudHelper {
     } else {
       response.hasError = true;
     }
-    await Future.delayed(const Duration(milliseconds: 200));
 
     return response;
   }

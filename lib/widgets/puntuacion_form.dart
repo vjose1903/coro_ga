@@ -152,7 +152,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                     onTap: () {
                       String puntuacion = partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? puntuacionController.text : "1";
                       changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: "aumentar", context: context)
-                          .then((newPuntuacion) async {
+                          .then((newPuntuacion) {
                         if (newPuntuacion != 0) {
                           puntuacionController.text = "";
                           if (newPuntuacion >= partidaProvider.partidaEnTurno!.maxPuntuacion!.toInt()) {
@@ -166,13 +166,15 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                                     pageBuilder: (context, animation, secondaryAnimation) => const GanadorScreen(),
                                     transitionsBuilder: (context, animation, secondaryAnimation, child) =>
                                         FadeTransition(opacity: animation, child: child),
-                                    transitionDuration: const Duration(milliseconds: 500)));
+                                    transitionDuration: const Duration(milliseconds: 400)));
                           }
-                          await Future.delayed(const Duration(milliseconds: 50));
-                          //
-                          historialController.animateTo(historialController.position.maxScrollExtent,
-                              duration: const Duration(seconds: 1), curve: Curves.easeOutCubic);
-                          //
+                          // Scroll al final del historial usando post frame
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (historialController.hasClients) {
+                              historialController.animateTo(historialController.position.maxScrollExtent,
+                                  duration: const Duration(milliseconds: 600), curve: Curves.easeOutCubic);
+                            }
+                          });
                         }
                       });
                     }),

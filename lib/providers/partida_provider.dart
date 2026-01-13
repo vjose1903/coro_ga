@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/utils/utils.dart';
-import 'package:reactive_forms/reactive_forms.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 
 class PartidaProvider extends ChangeNotifier {
@@ -26,13 +25,15 @@ class PartidaProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> changePartidaEnTurno(Partida partida) async {
+  void changePartidaEnTurno(Partida partida) {
     partidaEnTurno = partida;
     isChangePartida = true;
     notifyListeners();
 
-    await Future.delayed(const Duration(milliseconds: 500));
-    isChangePartida = false;
+    // Reset flag después del frame actual
+    Future.microtask(() {
+      isChangePartida = false;
+    });
   }
 
   void removeJugador(Jugador jugador) {
@@ -69,15 +70,12 @@ class PartidaProvider extends ChangeNotifier {
 
   getPartidas() async {
     MyLoading.show();
-    await Future.delayed(const Duration(microseconds: 100));
 
-    final partidasFuture = Partida.getPartidas();
-
-    partidas = await partidasFuture;
+    partidas = await Partida.getPartidas();
     isFirstSearch = false;
     notifyListeners();
     MyLoading.close();
-    return partidasFuture;
+    return partidas;
   }
 
   Future<SqlResponse> deletePartida(BuildContext context, {required Partida partida, CompletionHandler? handler}) async {

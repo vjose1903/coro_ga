@@ -97,7 +97,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
     Widget myAppWithSplash = CustomSplashScreen(
       navigateRoute: const HomeScreen(),
-      duration: 2500,
+      duration: 1500, // Reducido de 2500ms a 1500ms
       imageSize: 280,
       imageSrc: logoPath,
       text: "CARGANDO...",

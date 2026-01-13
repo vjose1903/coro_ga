@@ -198,9 +198,9 @@ class Partida extends DynamicClass {
     if (!response.hasError!) {
       final partidasParsed = List<Partida>.from(response.data.map((x) => Partida.fromMap(x)));
 
-      for (var partida in partidasParsed) {
-        await findJugadores(partida: partida);
-      }
+      // Ejecutar todas las consultas de jugadores en paralelo
+      await Future.wait(partidasParsed.map((partida) => findJugadores(partida: partida)));
+      
       return partidasParsed;
     } else {
       response.addMsg('No existen partidas registradas.');
@@ -236,9 +236,8 @@ class Partida extends DynamicClass {
     if (!response.hasError!) {
       final jugadoresParsed = List<Jugador>.from(response.data.map((x) => Jugador.fromMap(x)));
 
-      for (var jugador in jugadoresParsed) {
-        await Jugador.findHistorial(jugador: jugador);
-      }
+      // Ejecutar todas las consultas de historial en paralelo
+      await Future.wait(jugadoresParsed.map((jugador) => Jugador.findHistorial(jugador: jugador)));
 
       partida.addJugadores(jugadoresParsed);
     } else {
