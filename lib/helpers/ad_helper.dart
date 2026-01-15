@@ -18,7 +18,6 @@ class AdHelper {
   static const String _bannerPuntuacion = String.fromEnvironment('AD_BANNER_PUNTUACION');
   static const String _bannerAgregarJugador = String.fromEnvironment('AD_BANNER_AGREGAR_JUGADOR');
   static const String _bannerEditarEntidad = String.fromEnvironment('AD_BANNER_EDITAR_ENTIDAD');
-  static const String _bannerPageTransition = String.fromEnvironment('AD_BANNER_PAGE_TRANSITION');
   static const String _interstitial = String.fromEnvironment('AD_INTERSTITIAL');
   static const String _rewardedRevancha = String.fromEnvironment('AD_REWARDED_REVANCHA');
 
@@ -28,7 +27,6 @@ class AdHelper {
   static const String _iosBannerPuntuacion = String.fromEnvironment('AD_IOS_BANNER_PUNTUACION');
   static const String _iosBannerAgregarJugador = String.fromEnvironment('AD_IOS_BANNER_AGREGAR_JUGADOR');
   static const String _iosBannerEditarEntidad = String.fromEnvironment('AD_IOS_BANNER_EDITAR_ENTIDAD');
-  static const String _iosBannerPageTransition = String.fromEnvironment('AD_IOS_BANNER_PAGE_TRANSITION');
   static const String _iosInterstitial = String.fromEnvironment('AD_IOS_INTERSTITIAL');
   static const String _iosRewardedRevancha = String.fromEnvironment('AD_IOS_REWARDED_REVANCHA');
 
@@ -75,8 +73,6 @@ class AdHelper {
         return Platform.isIOS ? _iosBannerAgregarJugador : _bannerAgregarJugador;
       case AdLocation.editarEntidad:
         return Platform.isIOS ? _iosBannerEditarEntidad : _bannerEditarEntidad;
-      case AdLocation.pageTransition:
-        return Platform.isIOS ? _iosBannerPageTransition : _bannerPageTransition;
     }
   }
 }

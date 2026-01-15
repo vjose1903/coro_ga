@@ -13,7 +13,6 @@ enum AdLocation {
   puntuacion,
   agregarJugador,
   editarEntidad,
-  pageTransition
 }
 
 class GoogleBannerAd extends StatefulWidget {
