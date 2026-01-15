@@ -1,9 +1,9 @@
 name: game_score
-description: A new Flutter project.
+description: Aplicación para anotar puntuaciones de juegos favoritos.
 
 publish_to: "none"
 
-version: 1.0.0+1
+version: 2.0.0
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -43,6 +43,13 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.4
+
+# 👇 CONFIGURACIÓN DE ICONOS (OBLIGATORIA PARA iOS)
+flutter_icons:
+  ios: true
+  image_path: "assets/icon/icon.png"
+  remove_alpha_ios: true
 
 flutter:
   uses-material-design: true

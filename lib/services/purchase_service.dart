@@ -9,12 +9,12 @@ class PurchaseService {
   final InAppPurchase _iap = InAppPurchase.instance;
   
   // ID del producto en Google Play / App Store
-  static const String premiumProductId = 'coro_games_premium';
+  static const String premiumProductId = 'pro_version';
   
   // IDs alternativos para testing
   static const Set<String> _productIds = {
     premiumProductId,
-    'coro_games_premium_unlock',
+    'coro_games_premium',
   };
 
   StreamSubscription<List<PurchaseDetails>>? _subscription;
@@ -159,7 +159,7 @@ class PurchaseService {
 
   // Precio formateado del producto premium
   String get premiumPrice {
-    if (_products.isEmpty) return '\$7.00'; // Precio por defecto
+    if (_products.isEmpty) return '\$6.99'; // Precio por defecto
     final product = _products.firstWhere(
       (p) => p.id == premiumProductId,
       orElse: () => _products.first,

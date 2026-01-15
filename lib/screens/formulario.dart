@@ -217,7 +217,7 @@ class _Body extends StatelessWidget {
                             EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         child: Text("Crear",
                             style:
-                                TextStyle(fontSize: 15, fontFamily: 'Poppins')),
+                                TextStyle(fontSize: 15, color: Colors.white, fontFamily: 'Poppins')),
                       ),
                     ),
                   )
@@ -314,102 +314,124 @@ class Titulo extends StatelessWidget {
 }
 
 class _Inputs extends StatelessWidget {
-  const _Inputs({Key? key, required this.jugadoresController})
-      : super(key: key);
+  const _Inputs({Key? key, required this.jugadoresController}) : super(key: key);
   final ScrollController jugadoresController;
+
   @override
   Widget build(BuildContext context) {
-    final FormPartidaProvider formPartidaProvider =
-        context.watch<FormPartidaProvider>();
-
-    final formJugadoresArray =
-        formPartidaProvider.form.control('jugadores') as FormArray<dynamic>;
+    final jugadoresLength = context.select<FormPartidaProvider, int>(
+        (provider) => provider.jugadores.length);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-      child: ReactiveFormArray(
-          formArrayName: 'jugadores',
-          builder: (context, formArray, child) {
-            final jugadoresInputs = [];
-            final Iterable<FormGroup> jugadoresControls = formJugadoresArray
-                .controls
-                .map((control) => control as FormGroup);
-
-            for (var index = 0; index < jugadoresControls.length; index++) {
-              final currentform = jugadoresControls.toList()[index];
-              jugadoresInputs
-                  .add(_JugadorInput(formGroup: currentform, index: index));
-            }
-
-            final jugadores = jugadoresInputs.toList();
-
-            return ListView.separated(
-              controller: jugadoresController,
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-              separatorBuilder: (_, __) => const SizedBox(height: 15),
-              itemCount: jugadores.length,
-              itemBuilder: (BuildContext context, int index) {
-                return jugadores[index];
-              },
-            );
-          }),
+      child: ListView.separated(
+        controller: jugadoresController,
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+        addAutomaticKeepAlives: true,
+        separatorBuilder: (_, __) => const SizedBox(height: 15),
+        itemCount: jugadoresLength,
+        itemBuilder: (_, index) => _JugadorInput(index: index),
+      ),
     );
   }
 }
 
-class _JugadorInput extends StatelessWidget {
-  const _JugadorInput({Key? key, required this.formGroup, required this.index})
-      : super(key: key);
-
-  final FormGroup formGroup;
-
+class _JugadorInput extends StatefulWidget {
+  const _JugadorInput({required this.index});
   final int index;
 
   @override
+  State<_JugadorInput> createState() => _JugadorInputState();
+}
+
+class _JugadorInputState extends State<_JugadorInput>
+    with AutomaticKeepAliveClientMixin {
+  late final TextEditingController _controller;
+  late final FormPartidaProvider _provider;
+
+  @override
+  bool get wantKeepAlive => true;
+
+  FormControl<String> get _formControl {
+    final array = _provider.form.control('jugadores') as FormArray;
+    return (array.controls[widget.index] as FormGroup).control('nombre') as FormControl<String>;
+  }
+
+  void _syncToForm() {
+    if (mounted && _formControl.value != _controller.text) {
+      _formControl.value = _controller.text;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _provider = context.read<FormPartidaProvider>();
+    _controller = TextEditingController(text: _formControl.value ?? '');
+    _controller.addListener(_syncToForm);
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(_syncToForm);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final FormPartidaProvider formPartidaProvider =
-        context.read<FormPartidaProvider>();
-    return ReactiveForm(
-        formGroup: formGroup,
-        child: Row(
-          children: [
-            Flexible(
-                flex: 1,
-                fit: FlexFit.loose,
-                child: SizedBox(
-                    width: 20,
-                    child: Text(
-                      (index + 1).toString(),
-                      maxLines: 1,
-                      softWrap: false,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontFamily: 'Poppins',
-                          color: Colors.grey.withValues(alpha: 0.6)),
-                    ))),
-            const SizedBox(width: 5),
-            Flexible(
-              flex: 12,
-              fit: FlexFit.tight,
-              child: CustomReactiveInput(
-                  key: ValueKey('jugador_$index'),
-                  formControlName: 'nombre',
-                  labelText: "Nombre",
-                  textCapitalization: TextCapitalization.words),
+    super.build(context);
+    
+    return Row(
+      children: [
+        SizedBox(
+          width: 25,
+          child: Text(
+            '${widget.index + 1}',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontFamily: 'Poppins', color: Colors.grey.withValues(alpha: 0.6)),
+          ),
+        ),
+        const SizedBox(width: 5),
+        Expanded(
+          child: TextField(
+            controller: _controller,
+            textCapitalization: TextCapitalization.words,
+            decoration: InputDecoration(
+              labelText: "Nombre",
+              fillColor: AppThemes.inputColor,
+              filled: true,
+              labelStyle: TextStyle(color: AppThemes.labelInputColor, fontFamily: 'Poppins'),
+              floatingLabelStyle: TextStyle(
+                color: AppThemes.colorQuinto,
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Poppins',
+              ),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.3)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: AppThemes.colorQuinto),
+              ),
             ),
-            const SizedBox(width: 10),
-            Visibility(
-              visible: index >= 2,
-              child: CustomIconButtom(
-                  onTap: () => formPartidaProvider.removeJugadorToList(index),
-                  icon: Icons.remove,
-                  size: IconSize.min,
-                  iconSize: 25,
-                  backgroundColor: const Color(0xFFAF4C4C),
-                  splashColor: const Color(0xFF7A2E2E)),
-            )
-          ],
-        ));
+          ),
+        ),
+        const SizedBox(width: 10),
+        if (widget.index >= 2)
+          CustomIconButtom(
+            onTap: () => _provider.removeJugadorToList(widget.index),
+            icon: Icons.remove,
+            size: IconSize.min,
+            iconSize: 25,
+            backgroundColor: const Color(0xFFAF4C4C),
+            splashColor: const Color(0xFF7A2E2E),
+          ),
+      ],
+    );
   }
 }
