@@ -1,16 +1,17 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:game_score/services/dynamic_icon_service.dart';
 import 'package:game_score/services/purchase_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PremiumProvider extends ChangeNotifier {
-  // 🔧 FLAG DE PRUEBAS: Cambiar a true para simular versión premium
-  static const bool kTestPremium = false;
+  // 🔧 FLAG DE PRUEBAS: Cambiar a true para simular versión premium (solo funciona en debug)
+  static const bool _kTestPremium = false;
 
   bool _isPremium = false;
   bool _isLoading = true;
 
-  bool get isPremium => kTestPremium || _isPremium;
+  bool get isPremium => (kDebugMode && _kTestPremium) || _isPremium;
   bool get isLoading => _isLoading;
 
   // Límites para versión FREE

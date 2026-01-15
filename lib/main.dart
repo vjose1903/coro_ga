@@ -5,6 +5,7 @@ import 'package:game_score/routes/app_routes.dart';
 import 'package:game_score/screens/screens.dart';
 import 'package:game_score/services/app_integrity_service.dart';
 import 'package:game_score/services/purchase_service.dart';
+import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/widgets/custom_splash_screen.dart';
 import 'package:game_score/widgets/piracy_blocker.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -103,7 +104,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     if (Preferences.isPremium) {
       logoPath = "assets/img/logo_pro.png";
     } else {
-      logoPath = "assets/img/${Preferences.isDarkMode ? "logo_dark" : "logo_light"}.png";
+      logoPath = "assets/img/logo_dark.png";
     }
 
     Widget myAppWithSplash = CustomSplashScreen(
@@ -113,7 +114,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       imageSrc: logoPath,
       text: "CARGANDO...",
       textStyle: const TextStyle(fontSize: 30.0, fontFamily: "Poppins"),
-      backgroundColor: Preferences.isDarkMode ? const Color(0xff020036) : const Color(0xFFF0F0F0),
+      backgroundColor: AppThemes.colorSexto,
     );
 
     SystemChrome.setPreferredOrientations([

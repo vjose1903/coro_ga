@@ -7,6 +7,10 @@ class GoogleAdsProvider extends ChangeNotifier {
   InterstitialAd? interstitialAd;
   Function? onCloseFunction_;
 
+  RewardedAd? rewardedAd;
+  Function? onRewardedCloseFunction_;
+  Function? onRewardEarnedFunction_;
+
   loadInterstitialAd() {
     if (interstitialAd == null) {
       InterstitialAd.load(
@@ -49,5 +53,58 @@ class GoogleAdsProvider extends ChangeNotifier {
   cleanInterstitialAd() {
     if (interstitialAd != null) interstitialAd!.dispose();
     if (interstitialAd != null) interstitialAd = null;
+  }
+
+  loadRewardedAd(RewardedAdLocation location) {
+    if (rewardedAd == null) {
+      RewardedAd.load(
+        adUnitId: AdHelper.getRewardedAdUnitId(location),
+        request: const AdRequest(),
+        rewardedAdLoadCallback: RewardedAdLoadCallback(
+          onAdLoaded: (ad) {
+            ad.fullScreenContentCallback = FullScreenContentCallback(
+              onAdFailedToShowFullScreenContent: (ad, error) {
+                cleanRewardedAd();
+              },
+              onAdDismissedFullScreenContent: (ad) {
+                onRewardedCloseFunction_?.call();
+                cleanRewardedAd();
+              },
+            );
+
+            rewardedAd = ad;
+          },
+          onAdFailedToLoad: (err) {
+            Fun.logColor(color: Colores.red, body: 'Failed to load a rewarded ad: ${err.message}');
+            onRewardedCloseFunction_?.call();
+            cleanRewardedAd();
+          },
+        ),
+      );
+    }
+  }
+
+  showRewardedAd({
+    required Function onCloseFunction,
+    required Function onRewardEarned,
+  }) {
+    if (rewardedAd != null) {
+      onRewardedCloseFunction_ = onCloseFunction;
+      onRewardEarnedFunction_ = onRewardEarned;
+      rewardedAd!.show(
+        onUserEarnedReward: (ad, reward) {
+          onRewardEarnedFunction_?.call();
+        },
+      );
+    } else {
+      onCloseFunction();
+    }
+  }
+
+  cleanRewardedAd() {
+    if (rewardedAd != null) rewardedAd!.dispose();
+    rewardedAd = null;
+    onRewardedCloseFunction_ = null;
+    onRewardEarnedFunction_ = null;
   }
 }

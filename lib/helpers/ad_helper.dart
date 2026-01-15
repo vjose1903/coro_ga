@@ -2,10 +2,15 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:game_score/widgets/widgets.dart';
 
+enum RewardedAdLocation {
+  revancha,
+}
+
 class AdHelper {
   // IDs de prueba de Google (solo para desarrollo)
   static const String _testBannerId = 'ca-app-pub-3940256099942544/6300978111';
   static const String _testInterstitialId = 'ca-app-pub-3940256099942544/1033173712';
+  static const String _testRewardedId = 'ca-app-pub-3940256099942544/5224354917';
 
   // IDs de producción desde variables de entorno (--dart-define)
   static const String _bannerHome = String.fromEnvironment('AD_BANNER_HOME');
@@ -15,6 +20,9 @@ class AdHelper {
   static const String _bannerEditarEntidad = String.fromEnvironment('AD_BANNER_EDITAR_ENTIDAD');
   static const String _bannerPageTransition = String.fromEnvironment('AD_BANNER_PAGE_TRANSITION');
   static const String _interstitial = String.fromEnvironment('AD_INTERSTITIAL');
+  
+  // Rewarded Ads por ubicación
+  static const String _rewardedRevancha = String.fromEnvironment('AD_REWARDED_REVANCHA');
 
   /// Retorna el Ad Unit ID correcto según el entorno (debug/release)
   static String getBannerAdUnitId(AdLocation location) {
@@ -29,6 +37,26 @@ class AdHelper {
   static String getInterstitialAdUnitId() {
     if (kDebugMode) return _testInterstitialId;
     return _interstitial.isNotEmpty ? _interstitial : _testInterstitialId;
+  }
+
+  /// Retorna el Rewarded Ad Unit ID correcto según el entorno y ubicación
+  static String getRewardedAdUnitId(RewardedAdLocation location) {
+    if (kDebugMode) return _testRewardedId;
+
+    final productionId = _getProductionRewardedId(location);
+    return productionId.isNotEmpty ? productionId : _testRewardedId;
+  }
+
+  static String _getProductionRewardedId(RewardedAdLocation location) {
+    if (Platform.isAndroid) {
+      switch (location) {
+        case RewardedAdLocation.revancha:
+          return _rewardedRevancha;
+      }
+    } else if (Platform.isIOS) {
+      return '';
+    }
+    return '';
   }
 
   static String _getProductionBannerId(AdLocation location) {

@@ -1,4 +1,4 @@
-import 'package:game_score/providers/premium_provider.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum PrefsType { bool, string, int, double, undefined }
@@ -63,8 +63,11 @@ class Preferences {
   // ==============================================================
   // ==============================================================
 
+  // 🔧 FLAG DE PRUEBAS: Cambiar a true para simular versión premium (solo funciona en debug)
+  static const bool _kTestPremium = false;
+
   static bool get isPremium {
-    return PremiumProvider.kTestPremium || (_prefs.getBool('isPremium') ?? false);
+    return (kDebugMode && _kTestPremium) || (_prefs.getBool('isPremium') ?? false);
   }
 
   static set isPremium(bool value) {

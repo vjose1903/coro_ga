@@ -10,6 +10,7 @@ import 'package:game_score/screens/screens.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
+import 'package:game_score/helpers/ad_helper.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:widget_and_text_animator/widget_and_text_animator.dart';
@@ -37,7 +38,9 @@ class _GanadorScreenState extends State<GanadorScreen> {
   @override
   Widget build(BuildContext context) {
     GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
+    PremiumProvider premiumProvider = context.read<PremiumProvider>();
     googleAdsProvider.loadInterstitialAd();
+    if (!premiumProvider.isPremium) googleAdsProvider.loadRewardedAd(RewardedAdLocation.revancha);
 
     final routeArgs = ModalRoute.of(context)!.settings.arguments as Map;
     final String partida = routeArgs['partida'];
@@ -118,13 +121,20 @@ class _GanadorScreenState extends State<GanadorScreen> {
 
                   WidgetAnimator(
                     incomingEffect: WidgetTransitionEffects.outgoingScaleUp(
-                        delay: const Duration(seconds: 2, milliseconds: 800), duration: const Duration(seconds: 1)),
+                        delay: const Duration(seconds: 2, milliseconds: 500), duration: const Duration(seconds: 1)),
                     child: ElevatedButton(
                       style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.green[400])),
                       onPressed: () => revanchaFunction(),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        child: Text("Revancha", style: TextStyle(fontSize: 15, fontFamily: 'Poppins', fontWeight: FontWeight.bold, letterSpacing: 2)),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text("Revancha", style: TextStyle(fontSize: 15, fontFamily: 'Poppins', fontWeight: FontWeight.bold, letterSpacing: 2)),
+                            if (!premiumProvider.isPremium)
+                              const Text("ver anuncio", style: TextStyle(fontSize: 10, fontFamily: 'Poppins', fontWeight: FontWeight.normal)),
+                          ],
+                        ),
                       ),
                     ),
                   )
@@ -138,6 +148,13 @@ class _GanadorScreenState extends State<GanadorScreen> {
   revanchaFunction() async {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
+    PremiumProvider premiumProvider = context.read<PremiumProvider>();
+
+    void startNewGame(Partida newPartida) {
+      partidaProvider.changePartidaEnTurno(newPartida);
+      Navigator.pushReplacementNamed(context, 'partida');
+    }
+
     MyLoading.show();
     for (Jugador jugador in partidaProvider.partidaEnTurno!.jugadores!) {
       jugador.puntuacion = 0;
@@ -148,10 +165,14 @@ class _GanadorScreenState extends State<GanadorScreen> {
     if (!response.hasError!) {
       final newPartida = response.data;
 
-      googleAdsProvider.showInterstitialAd(onCloseFunction: () {
-        partidaProvider.changePartidaEnTurno(newPartida);
-        Navigator.pushReplacementNamed(context, 'partida');
-      });
+      if (!premiumProvider.isPremium) {
+        googleAdsProvider.showRewardedAd(
+          onCloseFunction: () => startNewGame(newPartida),
+          onRewardEarned: () {},
+        );
+      } else {
+        startNewGame(newPartida);
+      }
     } else {
       Toast.show(type: ToastType.error, context: context, message: "Error renovando partida.");
       Navigator.pushReplacementNamed(context, 'home');

@@ -31,14 +31,14 @@ class AppIntegrityService {
     'com.amazon.venezia',            // Amazon App Store (si publicas ahí)
   ];
 
-  // ⚠️ SOLO PARA PRUEBAS - Cambiar a true para simular piratería
+  // ⚠️ SOLO PARA PRUEBAS - Cambiar a true para simular piratería (solo funciona en debug)
   static const bool _simulatePiracy = false;
 
   /// Verifica la integridad de la app
   /// Retorna true si la app es legítima
   Future<bool> verifyIntegrity() async {
-    // Para probar el bloqueador, cambia _simulatePiracy a true
-    if (_simulatePiracy) {
+    // Para probar el bloqueador, cambia _simulatePiracy a true (solo funciona en debug)
+    if (kDebugMode && _simulatePiracy) {
       debugPrint('🏴‍☠️ AppIntegrity: SIMULANDO PIRATERÍA');
       _failureReason = 'Simulación de prueba';
       _isVerified = false;
