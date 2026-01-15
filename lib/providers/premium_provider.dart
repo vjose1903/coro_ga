@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:game_score/services/dynamic_icon_service.dart';
 import 'package:game_score/services/purchase_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -61,10 +60,6 @@ class PremiumProvider extends ChangeNotifier {
     _isPremium = value;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isPremium', value);
-    
-    // Cambiar el icono de la app según el estado premium
-    await DynamicIconService.instance.updateIconForPremiumStatus(value);
-    
     notifyListeners();
   }
 

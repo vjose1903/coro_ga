@@ -111,9 +111,12 @@ class PurchaseService {
       await _loadProducts();
     }
 
-    final product = _products.firstWhere(
+    final product = _products.cast<ProductDetails>().firstWhere(
       (p) => p.id == premiumProductId,
-      orElse: () => _products.isNotEmpty ? _products.first : throw Exception('No hay productos'),
+      orElse: () {
+        if (_products.isEmpty) throw Exception('No hay productos');
+        return _products.first;
+      },
     );
 
     final purchaseParam = PurchaseParam(productDetails: product);
@@ -160,7 +163,7 @@ class PurchaseService {
   // Precio formateado del producto premium
   String get premiumPrice {
     if (_products.isEmpty) return '\$6.99'; // Precio por defecto
-    final product = _products.firstWhere(
+    final product = _products.cast<ProductDetails>().firstWhere(
       (p) => p.id == premiumProductId,
       orElse: () => _products.first,
     );
