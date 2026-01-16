@@ -54,8 +54,9 @@ class PartidasDefaultAlert extends StatelessWidget {
                           Toast.show(
                               type: ToastType.info,
                               context: context,
-                              message:
-                                  "La versión gratis solo permite ${PremiumProvider.freeMaxPredefinedGames} partidas predefinidas. ¡Desbloquea PRO para más!");
+                              message: "La versión gratis solo permite ${PremiumProvider.freeMaxPredefinedGames} partidas predefinidas.",
+                              actionLabel: "Obtener PRO",
+                              onAction: () => Navigator.pushNamed(context, 'premium'));
                           return;
                         }
 
@@ -141,12 +142,12 @@ class PartidasScrollView extends StatelessWidget {
   Widget build(BuildContext context) {
     PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.watch<PartidaPredefinidaProvider>();
 
-    return FutureBuilder(
+    return FutureBuilder<List<Widget>>(
       future: getPartidas(context, formPartidaPredefinidaProvider),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<List<Widget>> snapshot) {
         reordenarDataBase() async {
-          for (var index = 0; index < snapshot.data.length; index++) {
-            PartidaPredefinida partidaPredefinida = snapshot.data[index].partidaPredefinida;
+          for (var index = 0; index < snapshot.data!.length; index++) {
+            PartidaPredefinida partidaPredefinida = (snapshot.data![index] as ReordenableItem).partidaPredefinida;
             partidaPredefinida.orden = index + 1;
             final partidaEdit = partidaPredefinida.toMap();
             await PartidaPredefinida.edit(id: partidaPredefinida.id!, partidaEdit: partidaEdit);
@@ -155,7 +156,7 @@ class PartidasScrollView extends StatelessWidget {
 
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator(color: AppThemes.colorTercero));
-        } else if (!snapshot.hasData || snapshot.data.isEmpty) {
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
               child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -168,22 +169,38 @@ class PartidasScrollView extends StatelessWidget {
           return Consumer(builder: (BuildContext context, value, Widget? child) {
             ReorderableProvider reorderableProvider = context.watch<ReorderableProvider>();
 
-            return SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.all(10),
-              child: ReorderableWrap(
-                  enableReorder: reorderableProvider.isReording,
-                  needsLongPressDraggable: false,
-                  runSpacing: 15,
-                  spacing: 8,
-                  maxMainAxisCount: 3,
-                  scrollPhysics: const BouncingScrollPhysics(),
-                  onReorder: (oldIndex, newIndex) {
-                    reorderableProvider.onReorder(oldIndex: oldIndex, newIndex: newIndex, reordenableList: snapshot.data);
-                    reordenarDataBase();
-                  },
-                  onNoReorder: (index) => reordenarDataBase(),
-                  children: snapshot.data),
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                const double spacing = 8;
+                const double padding = 10;
+                final double itemWidth = (constraints.maxWidth - (padding * 2) - (spacing * 2)) / 3;
+
+                return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.all(padding),
+                  child: ReorderableWrap(
+                      enableReorder: reorderableProvider.isReording,
+                      needsLongPressDraggable: false,
+                      runSpacing: 15,
+                      spacing: spacing,
+                      maxMainAxisCount: 3,
+                      scrollPhysics: const BouncingScrollPhysics(),
+                      onReorder: (oldIndex, newIndex) {
+                        reorderableProvider.onReorder(oldIndex: oldIndex, newIndex: newIndex, reordenableList: snapshot.data);
+                        reordenarDataBase();
+                      },
+                      onNoReorder: (index) => reordenarDataBase(),
+                      children: snapshot.data!.map<Widget>((widget) {
+                        if (widget is ReordenableItem) {
+                          return ReordenableItem(
+                            partidaPredefinida: widget.partidaPredefinida,
+                            itemWidth: itemWidth,
+                          );
+                        }
+                        return widget;
+                      }).toList()),
+                );
+              },
             );
           });
         }
@@ -201,8 +218,9 @@ Future<List<Widget>> getPartidas(BuildContext context, PartidaPredefinidaProvide
 }
 
 class ReordenableItem extends StatelessWidget {
-  const ReordenableItem({Key? key, required this.partidaPredefinida}) : super(key: key);
+  const ReordenableItem({Key? key, required this.partidaPredefinida, this.itemWidth}) : super(key: key);
   final PartidaPredefinida partidaPredefinida;
+  final double? itemWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -226,7 +244,7 @@ class ReordenableItem extends StatelessWidget {
                       : patchFormPartida(context: context, partida: partidaPredefinida),
                   onLongPress: () => reorderableProvider.isReording = true,
                   child: SizedBox(
-                    width: ResponsiveApp.size.width * 0.25,
+                    width: itemWidth ?? ResponsiveApp.size.width * 0.25,
                     height: 90,
                     child: Center(
                       child: Padding(

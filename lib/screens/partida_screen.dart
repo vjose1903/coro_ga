@@ -131,8 +131,9 @@ class JugadoresCard extends StatelessWidget {
                         Toast.show(
                             type: ToastType.info,
                             context: context,
-                            message:
-                                "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores. ¡Desbloquea PRO para más!");
+                            message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores.",
+                            actionLabel: "Obtener PRO",
+                            onAction: () => Navigator.pushNamed(context, 'premium'));
                         return;
                       }
 

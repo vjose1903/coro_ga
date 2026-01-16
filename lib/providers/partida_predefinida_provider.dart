@@ -51,9 +51,9 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
 
   resetForm() async {
     form.reset();
-
     form.control("maxPuntuacion").value = 1;
     form.control("cantidadJugadores").value = 2;
+    partidaPredefinidaEditar = null;
     notifyListeners();
 
     return Future.delayed(const Duration(milliseconds: 10));

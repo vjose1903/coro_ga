@@ -9,6 +9,8 @@ class Toast {
     required BuildContext context,
     String? title,
     String? message,
+    String? actionLabel,
+    VoidCallback? onAction,
   }) {
     ToastificationType toastType;
 
@@ -60,12 +62,41 @@ class Toast {
       title: title != null
           ? Text(title, style: const TextStyle(fontWeight: FontWeight.bold))
           : null,
-      description: message != null ? Text(message) : null,
-      autoCloseDuration: const Duration(seconds: 4),
+      description: message != null
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(message),
+                if (onAction != null && actionLabel != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: GestureDetector(
+                      onTap: () {
+                        toastification.dismissAll();
+                        onAction();
+                      },
+                      child: Text(
+                        actionLabel,
+                        style: TextStyle(
+                          color: borderColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          decoration: TextDecoration.underline,
+                          decorationColor: borderColor,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            )
+          : null,
+      autoCloseDuration: Duration(seconds: onAction != null ? 6 : 4),
       showProgressBar: false,
       dragToClose: true,
       backgroundColor: backgroundColor,
       borderSide: BorderSide(color: borderColor, width: 1),
+      applyBlurEffect: false,
     );
   }
 

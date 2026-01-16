@@ -92,8 +92,9 @@ class _MainHomeState extends State<MainHome> {
                     Toast.show(
                         type: ToastType.info,
                         context: context,
-                        message:
-                            "La versión gratis solo permite ${PremiumProvider.freeMaxGames} partidas simultáneas. ¡Desbloquea PRO para más!");
+                        message: "La versión gratis solo permite ${PremiumProvider.freeMaxGames} partidas simultáneas.",
+                        actionLabel: "Obtener PRO",
+                        onAction: () => Navigator.pushNamed(context, 'premium'));
                   }
                 },
                 child: const Icon(Icons.add, size: 30, color: Colors.white)),
@@ -368,11 +369,10 @@ class _MenuState extends State<_Menu> {
                 return _ConfigGroup(
                   child: InkWell(
                     onTap: () {
-                      // Guardar el navigator antes de cerrar
                       final navigator = Navigator.of(context);
-                      // Cerrar el SlideUp
-                      widget.panelController.collapse();
-                      // Navegar después de un pequeño delay
+                      final slideUpProvider = context.read<SlideUpProvider>();
+                      // Cerrar el SlideUp correctamente (limpia estado y backdrop)
+                      slideUpProvider.closeSlideUp(controller: widget.panelController);
                       Future.delayed(const Duration(milliseconds: 300), () {
                         navigator.pushNamed('premium');
                       });

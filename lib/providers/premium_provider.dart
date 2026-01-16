@@ -16,7 +16,7 @@ class PremiumProvider extends ChangeNotifier {
   // Límites para versión FREE
   static const int freeMaxPlayers = 3;
   static const int freeMaxGames = 2;
-  static const int freeMaxPredefinedGames = 2;
+  static const int freeMaxPredefinedGames = 4;
   static const int freeMaxHistory = 10;
 
   PremiumProvider() {

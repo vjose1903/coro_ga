@@ -115,7 +115,9 @@ class FormPartidaPredefinida extends StatelessWidget {
                                   Toast.show(
                                       type: ToastType.info,
                                       context: context,
-                                      message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores. ¡Desbloquea PRO para más!");
+                                      message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores.",
+                                      actionLabel: "Obtener PRO",
+                                      onAction: () => Navigator.pushNamed(context, 'premium'));
                                   return;
                                 }
 
@@ -139,7 +141,10 @@ class FormPartidaPredefinida extends StatelessWidget {
                             backgroundColor: Colors.red[400],
                             label: "Volver",
                             textColor: Colors.white,
-                            onTap: () => DialogNavigator.of(context).pop()),
+                            onTap: () {
+                              context.read<PartidaPredefinidaProvider>().resetForm();
+                              DialogNavigator.of(context).pop();
+                            }),
 
                         const SizedBox(width: 10),
                         // CREAR ==========================================
