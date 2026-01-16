@@ -3,7 +3,7 @@ description: Aplicación para anotar puntuaciones de juegos favoritos.
 
 publish_to: "none"
 
-version: 2.0.0
+version: 2.0.3
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -38,6 +38,8 @@ dependencies:
   flutter_easyloading: ^3.0.5
   package_info_plus: ^8.3.0
   in_app_purchase: ^3.2.0
+  upgrader: ^11.3.0
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:

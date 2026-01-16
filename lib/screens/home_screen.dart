@@ -11,6 +11,7 @@ import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
+import 'package:game_score/widgets/force_update_modal.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -40,6 +41,11 @@ class _MainHomeState extends State<MainHome> {
   void initState() {
     super.initState();
     panelController = SlidingUpPanelController();
+    
+    // Verificar actualización al iniciar
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ForceUpdateModal.showIfNeeded(context);
+    });
   }
 
   void openMenuSlideUp() {
