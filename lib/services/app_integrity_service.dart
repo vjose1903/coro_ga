@@ -21,6 +21,8 @@ class AppIntegrityService {
   // Package names permitidos (tu app normal y versión pro si la tienes)
   static const List<String> _allowedPackageNames = [
     'com.inSpot.coro_games',      // App principal
+    'com.inSpot.corogames',      // App principal
+    'com.inSpot.coroGames',      // App principal
     'com.inSpot.coro_games.pro',  // Versión pro si existe
   ];
 
@@ -28,7 +30,6 @@ class AppIntegrityService {
   static const List<String> _allowedInstallers = [
     'com.android.vending',           // Google Play Store
     'com.google.android.feedback',   // Google Play Store (alternativo)
-    'com.amazon.venezia',            // Amazon App Store (si publicas ahí)
   ];
 
   // ⚠️ SOLO PARA PRUEBAS - Cambiar a true para simular piratería (solo funciona en debug)
