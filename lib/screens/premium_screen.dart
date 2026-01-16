@@ -30,20 +30,6 @@ class PremiumScreen extends StatelessWidget {
                       icon: Icons.arrow_back_ios_new,
                       onTap: () => Navigator.pop(context),
                     ),
-                    const Spacer(),
-                    TextButton(
-                      onPressed: () => _restorePurchases(context),
-                      style: TextButton.styleFrom(
-                        overlayColor: AppThemes.colorTercero,
-                      ),
-                      child: Text(
-                        'Restaurar compras',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          color: AppThemes.colorPrimero,
-                        ),
-                      ),
-                    ),
                   ],
                 ),
                 const SizedBox(height: 30),
@@ -216,31 +202,27 @@ class PremiumScreen extends StatelessWidget {
   }
 
   void _buyPremium(BuildContext context) async {
-    final success = await PurchaseService.instance.buyPremium();
-    if (!success) {
-      Toast.show(
-        type: ToastType.error,
-        context: context,
-        message: 'No se pudo completar la compra. Intenta de nuevo.',
-      );
-    }
-  }
-
-  void _restorePurchases(BuildContext context) async {
     final premiumProvider = context.read<PremiumProvider>();
+    
+    // Primero intentar restaurar compras anteriores
     await premiumProvider.checkAndRestorePurchases();
     
     if (premiumProvider.isPremium) {
       Toast.show(
         type: ToastType.success,
         context: context,
-        message: '¡Compras restauradas! Ya eres Premium.',
+        message: '¡Compra restaurada! Ya eres Premium.',
       );
-    } else {
+      return;
+    }
+    
+    // Si no hay compras anteriores, iniciar nueva compra
+    final success = await PurchaseService.instance.buyPremium();
+    if (!success) {
       Toast.show(
-        type: ToastType.info,
+        type: ToastType.error,
         context: context,
-        message: 'No se encontraron compras anteriores.',
+        message: 'No se pudo completar la compra. Intenta de nuevo.',
       );
     }
   }

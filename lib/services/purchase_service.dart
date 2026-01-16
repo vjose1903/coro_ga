@@ -20,6 +20,9 @@ class PurchaseService {
   StreamSubscription<List<PurchaseDetails>>? _subscription;
   List<ProductDetails> _products = [];
   Function(bool)? _onPurchaseComplete;
+  
+  // Para manejar restauración de compras
+  bool _restoredPurchaseFound = false;
 
   bool _isAvailable = false;
   bool get isAvailable => _isAvailable;
@@ -82,6 +85,11 @@ class PurchaseService {
       if (valid) {
         debugPrint('Compra verificada: ${purchase.productID}');
         _onPurchaseComplete?.call(true);
+        
+        // Si estamos en proceso de restauración, marcar como encontrada
+        if (purchase.status == PurchaseStatus.restored) {
+          _restoredPurchaseFound = true;
+        }
       } else {
         debugPrint('Compra inválida');
         _onPurchaseComplete?.call(false);
@@ -134,14 +142,15 @@ class PurchaseService {
     if (!_isAvailable) return false;
 
     try {
+      _restoredPurchaseFound = false;
+      
       await _iap.restorePurchases();
       
-      // Esperar un momento para que se procesen las compras restauradas
-      await Future.delayed(const Duration(seconds: 2));
+      // Esperar un momento para que se procesen las compras restauradas del stream
+      await Future.delayed(const Duration(seconds: 3));
       
-      // Verificar si hay compras activas
-      // En iOS/Android, el stream de compras se actualiza con las restauraciones
-      return false; // El estado real se maneja en _onPurchaseUpdated
+      // Devolver si se encontró alguna compra restaurada
+      return _restoredPurchaseFound;
     } catch (e) {
       debugPrint('Error restaurando compras: $e');
       return false;
