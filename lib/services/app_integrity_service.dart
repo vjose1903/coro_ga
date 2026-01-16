@@ -38,6 +38,13 @@ class AppIntegrityService {
   /// Verifica la integridad de la app
   /// Retorna true si la app es legítima
   Future<bool> verifyIntegrity() async {
+    // En iOS no es necesario verificar (no hay instalación fuera del App Store)
+    if (Platform.isIOS) {
+      _isVerified = true;
+      _hasChecked = true;
+      return true;
+    }
+
     // Para probar el bloqueador, cambia _simulatePiracy a true (solo funciona en debug)
     if (kDebugMode && _simulatePiracy) {
       debugPrint('🏴‍☠️ AppIntegrity: SIMULANDO PIRATERÍA');
