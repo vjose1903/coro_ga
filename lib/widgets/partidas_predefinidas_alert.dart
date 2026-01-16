@@ -21,9 +21,11 @@ class PartidasDefaultAlert extends StatelessWidget {
     PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
     formPartidaPredefinidaProvider.getPartidasPredefinidas();
 
-    return Consumer(
-      builder: (BuildContext context, value, Widget? child) {
-        return Padding(
+    return Consumer<ReorderableProvider>(
+      builder: (BuildContext context, reorderableProvider, Widget? child) {
+        return PopScope(
+          canPop: !reorderableProvider.isReording,
+          child: Padding(
           padding: const EdgeInsets.all(15),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,23 +114,29 @@ class PartidasDefaultAlert extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              Align(
-                alignment: Alignment.centerRight,
-                child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(Colors.red[400]),
-                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
+              Consumer<ReorderableProvider>(
+                builder: (context, reorderableProvider, child) {
+                  return Visibility(
+                    visible: !reorderableProvider.isReording,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: WidgetStateProperty.all(Colors.red[400]),
+                            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            reorderableProvider.isReording = false;
+                          },
+                          child: const Text('Cerrar', style: TextStyle(fontFamily: "Poppins", color: Colors.white))),
                     ),
-                    onPressed: () {
-                      ReorderableProvider reorderableProvider = context.read<ReorderableProvider>();
-
-                      Navigator.pop(context);
-                      reorderableProvider.isReording = false;
-                    },
-                    child: const Text('Cerrar', style: TextStyle(fontFamily: "Poppins", color: Colors.white))),
+                  );
+                },
               ),
             ],
           ),
+        ),
         );
       },
     );
