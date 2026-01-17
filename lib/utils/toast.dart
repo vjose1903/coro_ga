@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:toastification/toastification.dart';
 
 enum ToastType { error, success, warning, info }
@@ -29,28 +30,38 @@ class Toast {
         break;
     }
 
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Colores de fondo según tipo
+    // Colores y configuración según tipo
     Color backgroundColor;
     Color borderColor;
-    
+    Color iconColor;
+    IconData iconData;
+
     switch (type) {
       case ToastType.info:
-        backgroundColor = isDarkMode ? const Color(0xFF2A4A6F) : const Color(0xFFE3F2FD);
-        borderColor = isDarkMode ? const Color(0xFF1976D2) : const Color(0xFF1976D2);
+        backgroundColor = isDark ? const Color(0xFF1A3A5C) : const Color(0xFFE8F4FD);
+        borderColor = const Color(0xFF42A5F5);
+        iconColor = const Color(0xFF1E88E5);
+        iconData = FontAwesomeIcons.circleInfo;
         break;
       case ToastType.error:
-        backgroundColor = isDarkMode ? const Color(0xFF5C2A2A) : const Color(0xFFFFEBEE);
-        borderColor = isDarkMode ? const Color(0xFFD32F2F) : const Color(0xFFD32F2F);
+        backgroundColor = isDark ? const Color(0xFF4A1F1F) : const Color(0xFFFDECEC);
+        borderColor = const Color(0xFFEF5350);
+        iconColor = const Color(0xFFE53935);
+        iconData = FontAwesomeIcons.circleXmark;
         break;
       case ToastType.success:
-        backgroundColor = isDarkMode ? const Color(0xFF2A4D2A) : const Color(0xFFE8F5E9);
-        borderColor = isDarkMode ? const Color(0xFF388E3C) : const Color(0xFF388E3C);
+        backgroundColor = isDark ? const Color(0xFF1F3D1F) : const Color(0xFFEDF7ED);
+        borderColor = const Color(0xFF66BB6A);
+        iconColor = const Color(0xFF43A047);
+        iconData = FontAwesomeIcons.circleCheck;
         break;
       case ToastType.warning:
-        backgroundColor = isDarkMode ? const Color(0xFF5C4A2A) : const Color(0xFFFFF3E0);
-        borderColor = isDarkMode ? const Color(0xFFF57C00) : const Color(0xFFF57C00);
+        backgroundColor = isDark ? const Color(0xFF4A3A1F) : const Color(0xFFFFF8E6);
+        borderColor = const Color(0xFFFFB74D);
+        iconColor = const Color(0xFFFFA726);
+        iconData = FontAwesomeIcons.triangleExclamation;
         break;
     }
 
@@ -59,31 +70,78 @@ class Toast {
       type: toastType,
       style: ToastificationStyle.minimal,
       alignment: Alignment.bottomCenter,
+      icon: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: iconColor.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Center(
+          child: FaIcon(iconData, size: 18, color: iconColor),
+        ),
+      ),
       title: title != null
-          ? Text(title, style: const TextStyle(fontWeight: FontWeight.bold))
+          ? Text(
+              title,
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+                color: isDark ? Colors.white : Colors.black87,
+              ),
+            )
           : null,
       description: message != null
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(message),
+                Text(
+                  message,
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 13,
+                    color: isDark ? Colors.white70 : Colors.black54,
+                  ),
+                ),
                 if (onAction != null && actionLabel != null)
                   Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: GestureDetector(
-                      onTap: () {
-                        toastification.dismissAll();
-                        onAction();
-                      },
-                      child: Text(
-                        actionLabel,
-                        style: TextStyle(
-                          color: borderColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                          decoration: TextDecoration.underline,
-                          decorationColor: borderColor,
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          toastification.dismissAll();
+                          onAction();
+                        },
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [iconColor, iconColor.withValues(alpha: 0.8)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: iconColor.withValues(alpha: 0.3),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            actionLabel,
+                            style: const TextStyle(
+                              fontFamily: 'Poppins',
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 12,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -95,8 +153,20 @@ class Toast {
       showProgressBar: false,
       dragToClose: true,
       backgroundColor: backgroundColor,
-      borderSide: BorderSide(color: borderColor, width: 1),
+      borderSide: BorderSide(color: borderColor.withValues(alpha: 0.5), width: 1.5),
+      borderRadius: BorderRadius.circular(14),
+      boxShadow: [
+        BoxShadow(
+          color: isDark
+              ? Colors.black.withValues(alpha: 0.3)
+              : Colors.black.withValues(alpha: 0.1),
+          blurRadius: 12,
+          offset: const Offset(0, 4),
+        ),
+      ],
       applyBlurEffect: false,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
     );
   }
 
@@ -116,4 +186,3 @@ class Toast {
     show(type: ToastType.warning, context: context, title: title, message: message);
   }
 }
-

@@ -2,11 +2,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:game_score/providers/providers.dart';
+import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:provider/provider.dart';
 
-class Layout extends StatelessWidget {
-  Layout({
+class Layout extends StatefulWidget {
+  const Layout({
     Key? key,
     required this.bodyContent,
     required this.panelController,
@@ -22,19 +23,43 @@ class Layout extends StatelessWidget {
   final Widget? appBarLeading;
   final Widget? appBarTrailing;
   final bool? hasFooter;
-  final double maxPanelHeightFraction; // Fracción máxima de la pantalla (0.0 a 1.0)
+  final double maxPanelHeightFraction;
 
   final PanelController panelController;
 
-  final boxDecoration = const BoxDecoration(
+  @override
+  State<Layout> createState() => _LayoutState();
+}
+
+class _LayoutState extends State<Layout> {
+  late final ScrollController _panelScrollController;
+
+  // Gradiente moderno para el fondo
+  static const boxDecoration = BoxDecoration(
     gradient: LinearGradient(
-      transform: GradientRotation(-0.5),
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      stops: [0.005, 0.3],
-      colors: [Color(0xFF2429AA), Color(0xFF08134F)],
+      transform: GradientRotation(-0.4),
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      stops: [0.0, 0.4, 1.0],
+      colors: [
+        Color(0xFF3D47D9),
+        Color(0xFF1A237E),
+        Color(0xFF0D1442),
+      ],
     ),
   );
+
+  @override
+  void initState() {
+    super.initState();
+    _panelScrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _panelScrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,44 +68,65 @@ class Layout extends StatelessWidget {
     final screenHeight = mediaQuery.size.height;
     final keyboardHeight = mediaQuery.viewInsets.bottom;
     final topPadding = mediaQuery.padding.top;
-    
-    final fraction = slideUpProvider.maxHeightFraction ?? maxPanelHeightFraction;
+
+    final fraction = slideUpProvider.maxHeightFraction ?? widget.maxPanelHeightFraction;
     final visibleHeight = screenHeight - keyboardHeight;
     final minTopMargin = topPadding + 80;
-    
-    // maxHeight: el menor entre (altura deseada, 85% visible, espacio disponible)
+
     final maxHeight = max(100.0, min(
       screenHeight * fraction,
-      min(visibleHeight * maxPanelHeightFraction, visibleHeight - minTopMargin),
+      min(visibleHeight * widget.maxPanelHeightFraction, visibleHeight - minTopMargin),
     ));
+
+    final isDark = Preferences.isDarkMode;
 
     return Padding(
       padding: EdgeInsets.only(bottom: keyboardHeight),
       child: SlidingUpPanel(
-        controller: panelController,
+        controller: widget.panelController,
+        scrollController: _panelScrollController,
         minHeight: 0,
         maxHeight: maxHeight,
         backdropEnabled: true,
         parallaxEnabled: true,
-        backdropOpacity: 0.6,
+        backdropOpacity: 0.7,
         backdropTapClosesPanel: slideUpProvider.closeOnOutsideClick,
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
         ),
         boxShadow: [
-          BoxShadow(blurRadius: 7, spreadRadius: 1, color: Colors.black.withValues(alpha: 0.4))
+          BoxShadow(
+            blurRadius: 20,
+            spreadRadius: 2,
+            color: Colors.black.withValues(alpha: 0.5),
+          ),
+          if (!isDark)
+            BoxShadow(
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+              color: Colors.white.withValues(alpha: 0.1),
+            ),
         ],
         color: AppThemes.themeColor_2,
         onPanelClosed: () {
           cleanSlideUp(slideUpProvider, true);
         },
-        panelBuilder: () => _WeSlideContent(panelController: panelController),
+        panelBuilder: () => _SlideUpContent(
+          panelController: widget.panelController,
+          scrollController: _panelScrollController,
+        ),
         body: Stack(
           children: [
             Container(decoration: boxDecoration),
-            _AppBar(title: appBarTitle, leading: appBarLeading, trailing: appBarTrailing),
-            _Body(child: bodyContent),
+            // Efecto de partículas/decoración sutil
+            _BackgroundDecoration(),
+            _AppBar(
+              title: widget.appBarTitle,
+              leading: widget.appBarLeading,
+              trailing: widget.appBarTrailing,
+            ),
+            _Body(child: widget.bodyContent),
           ],
         ),
       ),
@@ -90,8 +136,51 @@ class Layout extends StatelessWidget {
   cleanSlideUp(SlideUpProvider slideUpProvider, [isListener = false]) {
     if (slideUpProvider.body != null) slideUpProvider.body = null;
     FocusManager.instance.primaryFocus?.unfocus();
-    slideUpProvider.closeSlideUp(controller: panelController, isListener: isListener);
+    slideUpProvider.closeSlideUp(controller: widget.panelController, isListener: isListener);
   }
+}
+
+// Decoración de fondo sutil
+class _BackgroundDecoration extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: IgnorePointer(
+        child: CustomPaint(
+          painter: _CirclesPainter(),
+        ),
+      ),
+    );
+  }
+}
+
+class _CirclesPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.03)
+      ..style = PaintingStyle.fill;
+
+    // Círculos decorativos sutiles
+    canvas.drawCircle(
+      Offset(size.width * 0.9, size.height * 0.1),
+      80,
+      paint,
+    );
+    canvas.drawCircle(
+      Offset(size.width * 0.1, size.height * 0.3),
+      60,
+      paint,
+    );
+    canvas.drawCircle(
+      Offset(size.width * 0.8, size.height * 0.6),
+      40,
+      paint..color = Colors.white.withValues(alpha: 0.02),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _AppBar extends StatelessWidget {
@@ -105,16 +194,35 @@ class _AppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            if (leading != null) Container(margin: const EdgeInsets.only(right: 5), child: leading!),
+            if (leading != null)
+              Container(
+                margin: const EdgeInsets.only(right: 12),
+                child: leading!,
+              ),
             if (title != null)
               Expanded(
-                child: Text(title!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white, fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 20, letterSpacing: 2)),
+                child: Text(
+                  title!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    letterSpacing: 1.5,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black26,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             if (trailing != null) trailing!
           ],
@@ -127,23 +235,30 @@ class _AppBar extends StatelessWidget {
 class _Body extends StatelessWidget {
   const _Body({Key? key, required this.child}) : super(key: key);
   final Widget child;
+
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
-    final appBarHeight = topPadding + 60;
-    
+    final appBarHeight = topPadding + 65;
+
     return Column(
       children: [
         SizedBox(height: appBarHeight),
         Expanded(
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(topLeft: Radius.circular(70)),
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(topLeft: Radius.circular(70)),
-                color: AppThemes.themeColor_1,
-              ),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.only(topLeft: Radius.circular(50)),
+              color: AppThemes.themeColor_1,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.2),
+                  blurRadius: 20,
+                  offset: const Offset(0, -5),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(topLeft: Radius.circular(50)),
               child: child,
             ),
           ),
@@ -153,10 +268,15 @@ class _Body extends StatelessWidget {
   }
 }
 
-class _WeSlideContent extends StatelessWidget {
-  const _WeSlideContent({Key? key, required this.panelController}) : super(key: key);
+class _SlideUpContent extends StatelessWidget {
+  const _SlideUpContent({
+    Key? key,
+    required this.panelController,
+    required this.scrollController,
+  }) : super(key: key);
 
   final PanelController panelController;
+  final ScrollController scrollController;
 
   @override
   Widget build(BuildContext context) {
@@ -164,35 +284,82 @@ class _WeSlideContent extends StatelessWidget {
     ThemeProvider themeProvider = context.watch<ThemeProvider>();
 
     return Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-          color: AppThemes.themeColor_2,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
         ),
-        child: Padding(
-            padding: const EdgeInsets.only(right: 10, left: 10, bottom: 20),
-            child: Stack(
-              alignment: AlignmentDirectional.topCenter,
-              children: [
-                Positioned(
-                    top: -17,
-                    child: Icon(
-                      Icons.remove_rounded,
-                      size: 60,
-                      color: Colors.grey.withValues(alpha: 0.5),
-                    )),
-                Column(
-                  children: [
-                    Container(height: 25),
-                    Expanded(
-                      child: KeyedSubtree(
-                        key: ValueKey('body_${themeProvider.isDarkMode}'),
-                        child: slideUpProvider.body ?? Container(),
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            )));
+        color: AppThemes.themeColor_2,
+      ),
+      child: Column(
+        children: [
+          // Handle del panel
+          _PanelHandle(),
+          // Contenido
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(right: 12, left: 12, bottom: 16),
+              child: KeyedSubtree(
+                key: ValueKey('body_${themeProvider.isDarkMode}'),
+                child: SlideUpScrollController(
+                  scrollController: scrollController,
+                  child: slideUpProvider.body ?? const SizedBox.shrink(),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
+}
+
+// Handle del panel modernizado
+class _PanelHandle extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Preferences.isDarkMode;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Container(
+        width: 40,
+        height: 5,
+        decoration: BoxDecoration(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.2)
+              : Colors.grey.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            if (!isDark)
+              BoxShadow(
+                color: Colors.white.withValues(alpha: 0.5),
+                offset: const Offset(0, 1),
+                blurRadius: 1,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// InheritedWidget para proporcionar el ScrollController del SlideUp a los widgets hijos
+class SlideUpScrollController extends InheritedWidget {
+  const SlideUpScrollController({
+    Key? key,
+    required this.scrollController,
+    required Widget child,
+  }) : super(key: key, child: child);
+
+  final ScrollController scrollController;
+
+  static ScrollController? of(BuildContext context) {
+    final result = context.dependOnInheritedWidgetOfExactType<SlideUpScrollController>();
+    return result?.scrollController;
+  }
+
+  @override
+  bool updateShouldNotify(SlideUpScrollController oldWidget) => scrollController != oldWidget.scrollController;
 }

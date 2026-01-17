@@ -7,22 +7,44 @@ import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-class PartidaScreen extends StatelessWidget {
+class PartidaScreen extends StatefulWidget {
   const PartidaScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    PanelController panelController = PanelController();
-    GoogleBannerAd anuncio = GoogleBannerAd(location: AdLocation.partida);
+  State<PartidaScreen> createState() => _PartidaScreenState();
+}
 
+class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProviderStateMixin {
+  late final PanelController panelController;
+  late final AnimationController _fabAnimController;
+  late final GoogleBannerAd anuncio;
+
+  @override
+  void initState() {
+    super.initState();
+    panelController = PanelController();
+    anuncio = GoogleBannerAd(location: AdLocation.partida);
+    _fabAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => _fabAnimController.forward());
+  }
+
+  @override
+  void dispose() {
+    _fabAnimController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
-        // Watch para que se reconstruya cuando cambie el estado del SlideUp
         context.watch<SlideUpProvider>();
 
         return Scaffold(
@@ -30,12 +52,32 @@ class PartidaScreen extends StatelessWidget {
           floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
           floatingActionButton: Visibility(
             visible: !panelController.isAttached || panelController.isPanelClosed,
-            child: FloatingActionButton(
-              shape: const CircleBorder(),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, 'formulario');
-              },
-              child: const Icon(Icons.add, size: 30, color: Colors.white),
+            child: ScaleTransition(
+              scale: CurvedAnimation(parent: _fabAnimController, curve: Curves.elasticOut),
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppThemes.colorTercero.withValues(alpha: 0.4),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: FloatingActionButton(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  shape: const CircleBorder(),
+                  onPressed: () => Navigator.pushReplacementNamed(context, 'formulario'),
+                  child: const Icon(Icons.add_rounded, size: 32, color: Colors.white),
+                ),
+              ),
             ),
           ),
           bottomNavigationBar: BottomBar(
@@ -80,8 +122,7 @@ class _Body extends StatelessWidget {
 }
 
 class JugadoresCard extends StatelessWidget {
-  const JugadoresCard({Key? key, required this.panelController})
-      : super(key: key);
+  const JugadoresCard({Key? key, required this.panelController}) : super(key: key);
   final PanelController panelController;
 
   @override
@@ -91,74 +132,107 @@ class JugadoresCard extends StatelessWidget {
       final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
       jugadorProvider.formJugador.reset();
       slideUpProvider.openSlideUp(
-          controller: panelController, 
-          bodyContent: const AddJugadorPartida(),
-      );
+          controller: panelController,
+          bodyContent: const AddJugadorPartida());
     }
 
     return Expanded(
-        child: Material(
-      color: AppThemes.themeColor_2,
-      borderRadius: BorderRadius.circular(12),
-      shadowColor: AppThemes.colorQuinto.withValues(alpha: 0.3),
-      elevation: 7,
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CustomIconButtom(
-                    onTap: () {
-                      final SlideUpProvider slideUpProvider =
-                          context.read<SlideUpProvider>();
-                      slideUpProvider.openSlideUp(
-                          controller: panelController,
-                          bodyContent:
-                              HistorialGeneral(panelController: panelController));
-                    },
-                    icon: Icons.history,
-                    iconSize: 25,
-                    size: IconSize.min),
-                CustomIconButtom(
-                    onTap: () {
-                      final PartidaProvider partidaProvider =
-                          context.read<PartidaProvider>();
-                      final PremiumProvider premiumProvider =
-                          context.read<PremiumProvider>();
-
-                      if (!premiumProvider.canAddPlayer(
-                          partidaProvider.partidaEnTurno!.jugadores!.length)) {
-                        Toast.show(
-                            type: ToastType.info,
-                            context: context,
-                            message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores.",
-                            actionLabel: "Obtener PRO",
-                            onAction: () => Navigator.pushNamed(context, 'premium'));
-                        return;
-                      }
-
-                      openSlideUp();
-                    },
-                    icon: Icons.add,
-                    iconSize: 25,
-                    size: IconSize.min),
-              ],
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppThemes.themeColor_2,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Preferences.isDarkMode
+                ? Colors.white.withValues(alpha: 0.08)
+                : Colors.grey.withValues(alpha: 0.15),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppThemes.colorCuarto.withValues(alpha: Preferences.isDarkMode ? 0.2 : 0.1),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
-            const SizedBox(height: 10),
-            Expanded(
-                child: Container(
-              decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(12),
-                      bottomRight: Radius.circular(12))),
-              child: JugadoresList(panelController: panelController),
-            ))
           ],
         ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            children: [
+              // Header con botones
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _ActionButton(
+                    icon: Icons.history_rounded,
+                    onTap: () {
+                      final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
+                      slideUpProvider.openSlideUp(
+                          controller: panelController,
+                          bodyContent: HistorialGeneral(panelController: panelController));
+                    },
+                  ),
+                  _ActionButton(
+                    icon: Icons.person_add_rounded,
+                    isPrimary: true,
+                    onTap: openSlideUp,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              // Lista de jugadores
+              Expanded(child: JugadoresList(panelController: panelController)),
+            ],
+          ),
+        ),
       ),
-    ));
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  final bool isPrimary;
+
+  const _ActionButton({
+    required this.icon,
+    required this.onTap,
+    this.isPrimary = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            gradient: isPrimary
+                ? LinearGradient(
+                    colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
+                  )
+                : null,
+            color: isPrimary
+                ? null
+                : (Preferences.isDarkMode
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : Colors.grey.withValues(alpha: 0.1)),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            icon,
+            size: 18,
+            color: isPrimary
+                ? Colors.white
+                : (Preferences.isDarkMode ? Colors.white70 : Colors.grey[700]),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -205,107 +279,174 @@ class JugadoresList extends StatelessWidget {
 }
 
 class JugadorInfo extends StatelessWidget {
-  const JugadorInfo(
-      {Key? key, required this.jugador, required this.panelController})
-      : super(key: key);
+  const JugadorInfo({Key? key, required this.jugador, required this.panelController}) : super(key: key);
   final Jugador jugador;
   final PanelController panelController;
 
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+    final estado = partidaProvider.partidaEnTurno!.getJugadorEstatus(jugador);
 
-    Color fontNombreColor = Preferences.isDarkMode
-        ? const Color(0xD26776E6)
-        : const Color(0xE30B4DBF);
-    Color? fontPuntuacionColor = Preferences.isDarkMode
-        ? Colors.white.withValues(alpha: 0.8)
-        : const Color(0xDF062864);
-    Color? iconEstadoColor = Preferences.isDarkMode
-        ? Colors.white.withValues(alpha: 0.2)
-        : AppThemes.colorCuarto.withValues(alpha: 0.3);
-
-    Map iconEstado = {
-      Estado.ganador: Icons.arrow_upward,
-      Estado.perdedor: Icons.arrow_downward,
-      Estado.empate: Icons.swap_horiz_outlined,
-      Estado.not: Icons.compare_arrows_rounded
+    // Colores según estado
+    final Map<String, Map<String, dynamic>> estadoConfig = {
+      Estado.ganador: {
+        'icon': Icons.trending_up_rounded,
+        'color': Colors.green,
+        'bgColor': Colors.green.withValues(alpha: 0.1),
+      },
+      Estado.perdedor: {
+        'icon': Icons.trending_down_rounded,
+        'color': Colors.red[400],
+        'bgColor': Colors.red.withValues(alpha: 0.1),
+      },
+      Estado.empate: {
+        'icon': Icons.swap_horiz_rounded,
+        'color': Colors.amber[700],
+        'bgColor': Colors.amber.withValues(alpha: 0.1),
+      },
+      Estado.not: {
+        'icon': Icons.remove_rounded,
+        'color': Colors.grey,
+        'bgColor': Colors.grey.withValues(alpha: 0.1),
+      },
     };
 
-    return _CardBackGround(
-        function: () {
-          final JugadorProvider jugadorProvider =
-              context.read<JugadorProvider>();
-          final SlideUpProvider slideUpProvider =
-              context.read<SlideUpProvider>();
-          jugadorProvider.changeJugadorEnTurno(jugador);
-          slideUpProvider.openSlideUp(
-              controller: panelController,
-              bodyContent: PuntuacionForm(panelController: panelController));
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                jugador.nombre!,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.start,
-                style: TextStyle(
-                    fontFamily: "Poppins",
-                    fontSize: 15,
-                    color: fontNombreColor),
-              ),
-              Expanded(
-                  child: Center(
-                      child: Text(
-                jugador.puntuacion.toString(),
-                textAlign: TextAlign.start,
-                style: TextStyle(
-                    fontFamily: "Poppins",
-                    fontSize: 40,
-                    color: fontPuntuacionColor,
-                    fontWeight: FontWeight.bold),
-              ))),
-              Align(
-                  alignment: Alignment.centerRight,
-                  child: Icon(
-                      iconEstado[partidaProvider.partidaEnTurno!
-                          .getJugadorEstatus(jugador)],
-                      color: iconEstadoColor,
-                      size: 18))
-            ],
-          ),
-        ));
+    final config = estadoConfig[estado] ?? estadoConfig[Estado.not]!;
+
+    return _JugadorCard(
+      jugador: jugador,
+      estado: estado,
+      config: config,
+      onTap: () {
+        final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
+        final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
+        jugadorProvider.changeJugadorEnTurno(jugador);
+        slideUpProvider.openSlideUp(
+            controller: panelController,
+            bodyContent: PuntuacionForm(panelController: panelController));
+      },
+    );
   }
 }
 
-class _CardBackGround extends StatelessWidget {
-  _CardBackGround({Key? key, required this.child, this.function})
-      : super(key: key);
-  final boxDecoration = BoxDecoration(
-      color: Preferences.isDarkMode
-          ? const Color(0x7921233C)
-          : const Color(0x7BA1A6DE),
-      borderRadius: BorderRadius.circular(15));
-  final Widget child;
-  final Function? function;
+class _JugadorCard extends StatelessWidget {
+  final Jugador jugador;
+  final String estado;
+  final Map<String, dynamic> config;
+  final VoidCallback onTap;
+
+  const _JugadorCard({
+    required this.jugador,
+    required this.estado,
+    required this.config,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(15),
+    final bool isWinner = estado == Estado.ganador;
+    final bool isLoser = estado == Estado.perdedor;
+
+    return Container(
+      height: 140,
+      width: ResponsiveApp.size.width * 0.4,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: Preferences.isDarkMode
+              ? [const Color(0xFF2A2D3E), const Color(0xFF1F2130)]
+              : [const Color(0xFFE8ECFF), const Color(0xFFD4DBFF)],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isWinner
+              ? Colors.green.withValues(alpha: 0.4)
+              : isLoser
+                  ? Colors.red.withValues(alpha: 0.3)
+                  : (Preferences.isDarkMode
+                      ? Colors.white.withValues(alpha: 0.1)
+                      : AppThemes.colorPrimero.withValues(alpha: 0.2)),
+          width: isWinner || isLoser ? 2 : 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isWinner
+                ? Colors.green.withValues(alpha: 0.2)
+                : isLoser
+                    ? Colors.red.withValues(alpha: 0.15)
+                    : AppThemes.colorCuarto.withValues(alpha: 0.15),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => function != null ? function!() : null,
-          child: Container(
-            height: 130,
-            width: ResponsiveApp.size.width * 0.4,
-            decoration: boxDecoration,
-            child: child,
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Nombre
+                Text(
+                  jugador.nombre!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Preferences.isDarkMode
+                        ? AppThemes.colorPrimero
+                        : AppThemes.colorTercero,
+                  ),
+                ),
+                // Puntuación
+                Expanded(
+                  child: Center(
+                    child: ShaderMask(
+                      shaderCallback: (bounds) => LinearGradient(
+                        colors: isWinner
+                            ? [Colors.green[400]!, Colors.green[600]!]
+                            : isLoser
+                                ? [Colors.red[300]!, Colors.red[500]!]
+                                : [AppThemes.colorPrimero, AppThemes.colorTercero],
+                      ).createShader(bounds),
+                      child: Text(
+                        jugador.puntuacion.toString(),
+                        style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 42,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                // Icono de estado
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: config['bgColor'],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      config['icon'],
+                      size: 14,
+                      color: config['color'],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -391,50 +532,71 @@ class _NavigationBarState extends State<NavigationBar> {
 }
 
 class _Chip extends StatelessWidget {
-  const _Chip({Key? key, required this.partida, required this.scrollToGame})
-      : super(key: key);
+  const _Chip({Key? key, required this.partida, required this.scrollToGame}) : super(key: key);
   final Partida? partida;
   final Function scrollToGame;
-  Color getChipColor(Partida partida, PartidaProvider partidaProvider) {
-    Color colorChipSelected =
-        Preferences.isDarkMode ? AppThemes.colorCuarto : AppThemes.colorTercero;
-    Color colorChip = Preferences.isDarkMode
-        ? const Color(0xE1494949)
-        : const Color(0xDF787A84);
-
-    Color color = colorChipSelected;
-    if (partida.id != partidaProvider.partidaEnTurno!.id) color = colorChip;
-
-    return color;
-  }
 
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+    final bool isSelected = partida!.id == partidaProvider.partidaEnTurno!.id;
+
     return Center(
-      child: Material(
-        borderRadius: BorderRadius.circular(20),
-        color: getChipColor(partida!, partidaProvider),
-        elevation: 5,
-        child: ClipRRect(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        decoration: BoxDecoration(
+          gradient: isSelected
+              ? LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
+                )
+              : null,
+          color: isSelected
+              ? null
+              : (Preferences.isDarkMode
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : Colors.grey.withValues(alpha: 0.15)),
+          borderRadius: BorderRadius.circular(25),
+          border: isSelected
+              ? null
+              : Border.all(
+                  color: Preferences.isDarkMode
+                      ? Colors.white.withValues(alpha: 0.1)
+                      : Colors.grey.withValues(alpha: 0.2),
+                ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: AppThemes.colorTercero.withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : null,
+        ),
+        child: Material(
+          color: Colors.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(25),
             onTap: () {
-              if (partidaProvider.partidaEnTurno?.id != partida!.id) {
+              if (!isSelected) {
                 partidaProvider.changePartidaEnTurno(partida!);
                 scrollToGame(context);
               }
             },
-            child: SizedBox(
-              height: 35,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Center(
-                    child: Text(partida!.nombre!,
-                        style: const TextStyle(
-                            fontFamily: "Poppins",
-                            color: Colors.white,
-                            fontSize: 15))),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+              child: Text(
+                partida!.nombre!,
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  color: isSelected
+                      ? Colors.white
+                      : (Preferences.isDarkMode ? Colors.white70 : Colors.grey[700]),
+                  fontSize: 14,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
               ),
             ),
           ),

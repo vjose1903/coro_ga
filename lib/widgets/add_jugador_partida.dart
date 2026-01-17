@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
@@ -27,7 +28,7 @@ class AddJugadorPartida extends StatelessWidget {
 }
 
 class AddJugador extends StatefulWidget {
-  AddJugador({Key? key, required this.pageController, required this.anuncio}) : super(key: key);
+  const AddJugador({Key? key, required this.pageController, required this.anuncio}) : super(key: key);
 
   final PageController pageController;
   final GoogleBannerAd anuncio;
@@ -41,89 +42,321 @@ class _AddJugadorState extends State<AddJugador> {
 
   rebuildWidget() {
     Fun.logColor(color: Colores.magenta, body: "mounted: $mounted");
-    if (mounted) {
-      setState(() {});
-    }
+    if (mounted) setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
+    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+    final isDark = Preferences.isDarkMode;
     FormGroup form = jugadorProvider.formJugador;
 
-    final Color titleColor = Preferences.isDarkMode ? Colors.grey.withValues(alpha: 0.9) : AppThemes.colorQuinto.withValues(alpha: 0.7);
+    final int cantJugadores = partidaProvider.partidaEnTurno?.jugadores?.length ?? 0;
+
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
-      controller: ScrollController(),
       child: SizedBox(
         height: (ResponsiveApp.size.height - (ResponsiveApp.size.height * 0.22)),
         child: Column(
           children: [
-            // Titulo
-            Align(
-                alignment: Alignment.topLeft, child: Text("Nuevo jugador", style: TextStyle(fontFamily: "Poppins", fontSize: 16, color: titleColor))),
-            const SizedBox(height: 5),
-            //
+            // Header
+            _AddJugadorHeader(cantJugadores: cantJugadores),
+            const SizedBox(height: 16),
+            
             // Input Nombre
             ReactiveForm(
               formGroup: form,
-              child: Column(children: const <Widget>[
-                CustomReactiveInput(formControlName: 'nombre', labelText: "nombre", textCapitalization: TextCapitalization.words)
+              child: const Column(children: <Widget>[
+                CustomReactiveInput(formControlName: 'nombre', labelText: "Nombre del jugador", textCapitalization: TextCapitalization.words)
               ]),
             ),
-            const SizedBox(height: 10),
-            Align(
-                alignment: Alignment.topLeft,
-                child: Text("Jugadores actuales", style: TextStyle(fontFamily: "Poppins", fontSize: 12, color: titleColor))),
-            const SizedBox(height: 5),
-            // Jugadores Actuales
-            //
-            JugadoresActuales(pageController: widget.pageController, jugadoresController: jugadoresController, rebuildWidget: rebuildWidget),
-            const SizedBox(height: 20),
-            // Boton
-            //
-            ElevatedButton(
-              onPressed: () async {
-                final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-                final PremiumProvider premiumProvider = context.read<PremiumProvider>();
-                
-                if (!premiumProvider.canAddPlayer(partidaProvider.partidaEnTurno!.jugadores!.length)) {
-                  Toast.show(
-                      type: ToastType.info,
-                      context: context,
-                      message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores.",
-                      actionLabel: "Obtener PRO",
-                      onAction: () => Navigator.pushNamed(context, 'premium'));
-                  return;
-                }
-                
-                if (form.valid) {
-                  final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-
-                  Jugador nuevoJugador = Jugador.fromMap(form.value);
-
-                  partidaProvider.addJugadorToPartida(context, jugador: nuevoJugador, partida: partidaProvider.partidaEnTurno!).then((value) async {
-                    form.reset();
-                    rebuildWidget();
-
-                    await Future.delayed(const Duration(milliseconds: 50));
-
-                    jugadoresController.animateTo(jugadoresController.position.maxScrollExtent,
-                        duration: const Duration(seconds: 1), curve: Curves.easeOutCubic);
-                  });
-                } else {
-                  Toast.show(type: ToastType.error, context: context, message: "Debe de introducir el nombre del nuevo jugador");
-                }
-              },
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: Text("Agregar", style: TextStyle(fontSize: 15, fontFamily: 'Poppins')),
+            const SizedBox(height: 16),
+            
+            // Sección jugadores actuales
+            _SectionTitle(
+              title: "Jugadores actuales",
+              icon: FontAwesomeIcons.users,
+              count: cantJugadores,
+            ),
+            const SizedBox(height: 8),
+            
+            // Lista de jugadores
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppThemes.themeColor_1,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: JugadoresActuales(
+                    pageController: widget.pageController,
+                    jugadoresController: jugadoresController,
+                    rebuildWidget: rebuildWidget,
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 10),
-            // ANUNCIOS ==========================================
+            const SizedBox(height: 16),
+            
+            // Botón Agregar
+            _AddButton(
+              onTap: () => _agregarJugador(context, form),
+            ),
+            const SizedBox(height: 12),
+            
+            // Anuncios
             widget.anuncio
           ],
+        ),
+      ),
+    );
+  }
+
+  void _agregarJugador(BuildContext context, FormGroup form) async {
+    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+    final PremiumProvider premiumProvider = context.read<PremiumProvider>();
+
+    if (!premiumProvider.canAddPlayer(partidaProvider.partidaEnTurno!.jugadores!.length)) {
+      Toast.show(
+          type: ToastType.info,
+          context: context,
+          message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores.",
+          actionLabel: "Obtener PRO",
+          onAction: () => Navigator.pushNamed(context, 'premium'));
+      return;
+    }
+
+    if (form.valid) {
+      Jugador nuevoJugador = Jugador.fromMap(form.value);
+
+      partidaProvider.addJugadorToPartida(context, jugador: nuevoJugador, partida: partidaProvider.partidaEnTurno!).then((value) async {
+        form.reset();
+        rebuildWidget();
+
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        jugadoresController.animateTo(jugadoresController.position.maxScrollExtent,
+            duration: const Duration(seconds: 1), curve: Curves.easeOutCubic);
+      });
+    } else {
+      Toast.show(type: ToastType.error, context: context, message: "Debe introducir el nombre del nuevo jugador");
+    }
+  }
+}
+
+// ============================================
+// WIDGETS PRIVADOS
+// ============================================
+
+class _AddJugadorHeader extends StatelessWidget {
+  const _AddJugadorHeader({required this.cantJugadores});
+
+  final int cantJugadores;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Preferences.isDarkMode;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? [Colors.white.withValues(alpha: 0.08), Colors.white.withValues(alpha: 0.03)]
+              : [AppThemes.colorPrimero.withValues(alpha: 0.08), AppThemes.colorPrimero.withValues(alpha: 0.03)],
+        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isDark ? Colors.white.withValues(alpha: 0.1) : AppThemes.colorPrimero.withValues(alpha: 0.15),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.white.withValues(alpha: isDark ? 0.05 : 0.8),
+            blurRadius: 4,
+            offset: const Offset(-2, -2),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+            blurRadius: 4,
+            offset: const Offset(2, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Icono
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF4CAF50), Color(0xFF43A047)],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: const Center(
+              child: FaIcon(
+                FontAwesomeIcons.userPlus,
+                color: Colors.white,
+                size: 18,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+
+          // Información
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Jugadores",
+                  style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : AppThemes.colorQuinto,
+                  ),
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  "$cantJugadores jugador${cantJugadores != 1 ? 'es' : ''} en la partida",
+                  style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 11,
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({
+    required this.title,
+    required this.icon,
+    required this.count,
+  });
+
+  final String title;
+  final IconData icon;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Preferences.isDarkMode;
+
+    return Row(
+      children: [
+        FaIcon(
+          icon,
+          size: 12,
+          color: isDark ? Colors.grey[500] : Colors.grey[600],
+        ),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: TextStyle(
+            fontFamily: "Poppins",
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: isDark ? Colors.grey[400] : Colors.grey[700],
+          ),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          decoration: BoxDecoration(
+            color: AppThemes.colorPrimero.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Text(
+            "$count",
+            style: TextStyle(
+              fontFamily: "Poppins",
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: AppThemes.colorPrimero,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _AddButton extends StatelessWidget {
+  const _AddButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFF4CAF50), Color(0xFF43A047)],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FaIcon(
+                FontAwesomeIcons.plus,
+                color: Colors.white,
+                size: 16,
+              ),
+              SizedBox(width: 10),
+              Text(
+                "Agregar Jugador",
+                style: TextStyle(
+                  fontFamily: "Poppins",
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
