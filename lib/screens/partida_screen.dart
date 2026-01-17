@@ -32,7 +32,9 @@ class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProvider
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) => _fabAnimController.forward());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 300), () => _fabAnimController.forward());
+    });
   }
 
   @override
@@ -71,6 +73,7 @@ class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProvider
                   ],
                 ),
                 child: FloatingActionButton(
+                  heroTag: null,
                   backgroundColor: Colors.transparent,
                   elevation: 0,
                   shape: const CircleBorder(),

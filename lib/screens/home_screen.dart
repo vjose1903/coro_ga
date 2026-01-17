@@ -50,7 +50,7 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
     
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ForceUpdateModal.showIfNeeded(context);
-      _fabAnimController.forward();
+      Future.delayed(const Duration(milliseconds: 300), () => _fabAnimController.forward());
     });
   }
 
@@ -91,6 +91,7 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
           floatingActionButton: Visibility(
             visible: !panelController.isAttached || panelController.isPanelClosed,
             child: ScaleTransition(
+              
               scale: CurvedAnimation(parent: _fabAnimController, curve: Curves.elasticOut),
               child: Container(
                 decoration: BoxDecoration(
@@ -109,6 +110,7 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
                   ],
                 ),
                 child: FloatingActionButton(
+                  heroTag: null,
                   backgroundColor: Colors.transparent,
                   elevation: 0,
                   shape: const CircleBorder(),
