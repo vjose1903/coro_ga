@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/providers/premium_provider.dart';
 import 'package:game_score/services/purchase_service.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -56,9 +57,9 @@ class PremiumScreen extends StatelessWidget {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ).createShader(bounds),
-                      child: const Text(
-                        'Coro Games PRO',
-                        style: TextStyle(
+                      child: Text(
+                        AppLocalizations.of(context)!.coroGamesPro,
+                        style: const TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -72,7 +73,7 @@ class PremiumScreen extends StatelessWidget {
                   FadeInUp(
                     delay: const Duration(milliseconds: 300),
                     child: Text(
-                      'Desbloquea todo el potencial',
+                      AppLocalizations.of(context)!.unlockFullPotential,
                       style: TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 15,
@@ -85,32 +86,32 @@ class PremiumScreen extends StatelessWidget {
                   // Features
                   _FeatureItem(
                     icon: FontAwesomeIcons.userGroup,
-                    title: 'Jugadores ilimitados',
-                    description: 'Sin límite de jugadores por partida',
+                    title: AppLocalizations.of(context)!.unlimitedPlayers,
+                    description: AppLocalizations.of(context)!.unlimitedPlayersDesc,
                     delay: 400,
                   ),
                   _FeatureItem(
                     icon: FontAwesomeIcons.gamepad,
-                    title: 'Partidas ilimitadas',
-                    description: 'Crea todas las partidas que quieras',
+                    title: AppLocalizations.of(context)!.unlimitedGames,
+                    description: AppLocalizations.of(context)!.unlimitedGamesDesc,
                     delay: 500,
                   ),
                   _FeatureItem(
                     icon: FontAwesomeIcons.gamepad,
-                    title: 'Partidas predefinidas',
-                    description: 'Guarda configuraciones ilimitadas',
+                    title: AppLocalizations.of(context)!.predefinedGamesFeature,
+                    description: AppLocalizations.of(context)!.predefinedGamesDesc,
                     delay: 600,
                   ),
                   _FeatureItem(
                     icon: FontAwesomeIcons.clockRotateLeft,
-                    title: 'Historial completo',
-                    description: 'Accede a todo el historial de jugadas',
+                    title: AppLocalizations.of(context)!.fullHistory,
+                    description: AppLocalizations.of(context)!.fullHistoryDesc,
                     delay: 700,
                   ),
                   _FeatureItem(
                     icon: FontAwesomeIcons.ban,
-                    title: 'Sin anuncios',
-                    description: 'Disfruta sin interrupciones',
+                    title: AppLocalizations.of(context)!.noAds,
+                    description: AppLocalizations.of(context)!.noAdsDesc,
                     delay: 800,
                   ),
 
@@ -140,7 +141,7 @@ class PremiumScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Pago único • Sin suscripción',
+                          AppLocalizations.of(context)!.oneTimePayment,
                           style: TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 12,
@@ -169,7 +170,7 @@ class PremiumScreen extends StatelessWidget {
       Toast.show(
         type: ToastType.success,
         context: context,
-        message: '¡Compra restaurada! Ya eres Premium.',
+        message: AppLocalizations.of(context)!.purchaseRestored,
       );
       return;
     }
@@ -179,7 +180,7 @@ class PremiumScreen extends StatelessWidget {
       Toast.show(
         type: ToastType.error,
         context: context,
-        message: 'No se pudo completar la compra. Intenta de nuevo.',
+        message: AppLocalizations.of(context)!.purchaseFailed,
       );
     }
   }
@@ -456,7 +457,7 @@ class _AlreadyPremiumCard extends StatelessWidget {
             ),
             const SizedBox(width: 14),
             Text(
-              '¡Ya eres Premium!',
+              AppLocalizations.of(context)!.alreadyPremium,
               style: TextStyle(
                 fontFamily: 'Poppins',
                 fontSize: 18,
@@ -511,9 +512,9 @@ class _BuyButton extends StatelessWidget {
                   children: [
                     FaIcon(FontAwesomeIcons.crown, size: 18, color: Colors.white),
                     const SizedBox(width: 10),
-                    const Text(
-                      'Obtener PRO',
-                      style: TextStyle(
+                    Text(
+                      AppLocalizations.of(context)!.getPro,
+                      style: const TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 20,
                         fontWeight: FontWeight.bold,

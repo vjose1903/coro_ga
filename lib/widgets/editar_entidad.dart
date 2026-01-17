@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_score/helpers/helpers.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -30,12 +31,17 @@ class EditarEntidad extends StatelessWidget {
     dynamic entidad;
     IconData icon;
 
+    final l10n = AppLocalizations.of(context)!;
+    String tipoLabel;
+    
     if (partida != null) {
       tipo = "Partida";
+      tipoLabel = l10n.editGame;
       entidad = partida;
       icon = FontAwesomeIcons.gamepad;
     } else {
       tipo = "Jugador";
+      tipoLabel = l10n.editPlayer;
       entidad = jugador;
       icon = FontAwesomeIcons.user;
     }
@@ -49,14 +55,15 @@ class EditarEntidad extends StatelessWidget {
         children: [
           // Header con avatar e información
           _EditHeader(
-            tipo: tipo,
+            tipo: tipoLabel,
             nombre: entidad?.nombre ?? "",
             icon: icon,
+            noNameLabel: l10n.noName,
           ),
           const SizedBox(height: 16),
           
           // Formulario
-          if (tipo == "Partida") EditPartida(form: form) else EditJugador(form: form),
+          if (tipo == "Partida") EditPartida(form: form, partida: partida!) else EditJugador(form: form),
           const SizedBox(height: 16),
           
           // Botones de acción
@@ -65,7 +72,7 @@ class EditarEntidad extends StatelessWidget {
               // CANCELAR
               Expanded(
                 child: _ActionButton(
-                  label: "Cancelar",
+                  label: l10n.cancel,
                   icon: FontAwesomeIcons.xmark,
                   isDestructive: true,
                   onTap: () async {
@@ -82,7 +89,7 @@ class EditarEntidad extends StatelessWidget {
               // ACEPTAR
               Expanded(
                 child: _ActionButton(
-                  label: "Guardar",
+                  label: l10n.save,
                   icon: FontAwesomeIcons.check,
                   isPrimary: true,
                   onTap: () {
@@ -129,17 +136,18 @@ class EditJugador extends StatelessWidget {
     return Expanded(
         child: ReactiveForm(
       formGroup: form,
-      child: Column(children: const <Widget>[
-        CustomReactiveInput(formControlName: 'nombre', labelText: "nombre", textCapitalization: TextCapitalization.words)
+      child: Column(children: <Widget>[
+        CustomReactiveInput(formControlName: 'nombre', labelText: AppLocalizations.of(context)!.name, textCapitalization: TextCapitalization.words)
       ]),
     ));
   }
 }
 
 class EditPartida extends StatelessWidget {
-  const EditPartida({Key? key, required this.form}) : super(key: key);
+  const EditPartida({Key? key, required this.form, required this.partida}) : super(key: key);
 
   final FormGroup form;
+  final Partida partida;
 
   @override
   Widget build(BuildContext context) {
@@ -147,12 +155,15 @@ class EditPartida extends StatelessWidget {
       builder: (BuildContext context, value, Widget? child) {
         final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
         final dynamic tipoPartida = formPartidaProvider.form.control('tipo').value;
+        final bool canEditConfig = partida.isSinIniciar;
 
+        final l10n = AppLocalizations.of(context)!;
+        
         return Expanded(
             child: ReactiveForm(
           formGroup: form,
           child: Column(children: <Widget>[
-            const CustomReactiveInput(formControlName: 'nombre', labelText: "nombre", textCapitalization: TextCapitalization.words),
+            CustomReactiveInput(formControlName: 'nombre', labelText: l10n.name, textCapitalization: TextCapitalization.words),
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -161,16 +172,16 @@ class EditPartida extends StatelessWidget {
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 500),
                   curve: Curves.easeOut,
-                  // height: 45,
                   width: tipoPartida == '' ? ResponsiveApp.size.width - 21 : ResponsiveApp.size.width * 0.46,
                   child: CustomReactiveDropDown(
                     formControlName: 'tipo',
-                    labelText: "Tipo",
-                    items: const [
-                      DropdownMenuItem(value: "Rondas", child: Text("Rondas")),
-                      DropdownMenuItem(value: "Puntuación", child: Text("Puntuación"))
+                    labelText: l10n.type,
+                    enabled: canEditConfig,
+                    items: [
+                      DropdownMenuItem(value: "Rondas", child: Text(l10n.rounds)),
+                      DropdownMenuItem(value: "Puntuación", child: Text(l10n.score))
                     ],
-                    onChanged: (value) => formPartidaProvider.changeTipo(value),
+                    onChanged: canEditConfig ? (value) => formPartidaProvider.changeTipo(value) : null,
                   ),
                 ),
                 AnimatedContainer(
@@ -179,8 +190,9 @@ class EditPartida extends StatelessWidget {
                     width: tipoPartida == '' ? 0.01 : ResponsiveApp.size.width * 0.46,
                     child: CustomReactiveInput(
                         formControlName: 'maxPuntuacion',
-                        labelText: tipoPartida == "Rondas" ? "Cant. rondas" : "Puntuación Máxima",
-                        inputType: TextInputType.number)),
+                        labelText: tipoPartida == "Rondas" ? l10n.roundCount : l10n.maxScoreFull,
+                        inputType: TextInputType.number,
+                        enabled: canEditConfig)),
               ],
             ),
           ]),
@@ -212,7 +224,7 @@ aceptarFunction(BuildContext context, dynamic entidad,
         if (panelController != null) slideUpProvider.closeSlideUp(controller: panelController);
       });
     } else {
-      Toast.show(type: ToastType.error, context: context, message: "El nombre de la partida no puede estar vacio.");
+      Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.gameNameCannotBeEmpty);
     }
   } else {
     if (form.valid) {
@@ -226,7 +238,7 @@ aceptarFunction(BuildContext context, dynamic entidad,
         resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
       });
     } else {
-      Toast.show(type: ToastType.error, context: context, message: "El nombre del jugador no puede estar vacio.");
+      Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.playerNameCannotBeEmpty);
     }
   }
 }
@@ -240,11 +252,13 @@ class _EditHeader extends StatelessWidget {
     required this.tipo,
     required this.nombre,
     required this.icon,
+    required this.noNameLabel,
   });
 
   final String tipo;
   final String nombre;
   final IconData icon;
+  final String noNameLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -317,7 +331,7 @@ class _EditHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Editar $tipo",
+                  tipo,
                   style: TextStyle(
                     fontFamily: "Poppins",
                     fontSize: 11,
@@ -327,7 +341,7 @@ class _EditHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 1),
                 Text(
-                  nombre.isNotEmpty ? nombre : "Sin nombre",
+                  nombre.isNotEmpty ? nombre : noNameLabel,
                   style: TextStyle(
                     fontFamily: "Poppins",
                     fontSize: 16,

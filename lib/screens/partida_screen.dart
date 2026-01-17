@@ -111,6 +111,21 @@ class _Body extends StatelessWidget {
           icon: Icons.arrow_back_ios_new,
           onTap: () => Navigator.pop(context),
         ),
+        appBarTrailing: CustomIconButtom(
+          iconSize: 22,
+          iconColor: Colors.white,
+          icon: Icons.edit_outlined,
+          onTap: () {
+            final FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
+            final SlideUpProvider slideUp = context.read<SlideUpProvider>();
+            formPartidaProvider.form.patchValue(partida.toMap());
+            partidaProvider.partidaEditar = partida;
+            slideUp.openSlideUp(
+                controller: panelController,
+                maxHeightFraction: 0.5,
+                bodyContent: EditarEntidad(panelController: panelController));
+          },
+        ),
         bodyContent: Container(
             margin: const EdgeInsets.only(top: 40, bottom: 90),
             padding: const EdgeInsets.symmetric(horizontal: 25),

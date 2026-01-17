@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_score/helpers/helpers.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -58,27 +59,30 @@ class _AddJugadorState extends State<AddJugador> {
       physics: const BouncingScrollPhysics(),
       child: SizedBox(
         height: (ResponsiveApp.size.height - (ResponsiveApp.size.height * 0.22)),
-        child: Column(
-          children: [
-            // Header
-            _AddJugadorHeader(cantJugadores: cantJugadores),
-            const SizedBox(height: 16),
-            
-            // Input Nombre
-            ReactiveForm(
-              formGroup: form,
-              child: const Column(children: <Widget>[
-                CustomReactiveInput(formControlName: 'nombre', labelText: "Nombre del jugador", textCapitalization: TextCapitalization.words)
-              ]),
-            ),
-            const SizedBox(height: 16),
-            
-            // Sección jugadores actuales
-            _SectionTitle(
-              title: "Jugadores actuales",
-              icon: FontAwesomeIcons.users,
-              count: cantJugadores,
-            ),
+        child: Builder(
+          builder: (context) {
+            final l10n = AppLocalizations.of(context)!;
+            return Column(
+              children: [
+                // Header
+                _AddJugadorHeader(cantJugadores: cantJugadores),
+                const SizedBox(height: 16),
+                
+                // Input Nombre
+                ReactiveForm(
+                  formGroup: form,
+                  child: Column(children: <Widget>[
+                    CustomReactiveInput(formControlName: 'nombre', labelText: l10n.playerName, textCapitalization: TextCapitalization.words)
+                  ]),
+                ),
+                const SizedBox(height: 16),
+                
+                // Sección jugadores actuales
+                _SectionTitle(
+                  title: l10n.currentPlayers,
+                  icon: FontAwesomeIcons.users,
+                  count: cantJugadores,
+                ),
             const SizedBox(height: 8),
             
             // Lista de jugadores
@@ -110,8 +114,10 @@ class _AddJugadorState extends State<AddJugador> {
             const SizedBox(height: 12),
             
             // Anuncios
-            widget.anuncio
-          ],
+                widget.anuncio
+              ],
+            );
+          },
         ),
       ),
     );
@@ -121,12 +127,14 @@ class _AddJugadorState extends State<AddJugador> {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
+    final l10n = AppLocalizations.of(context)!;
+    
     if (!premiumProvider.canAddPlayer(partidaProvider.partidaEnTurno!.jugadores!.length)) {
       Toast.show(
           type: ToastType.info,
           context: context,
-          message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores.",
-          actionLabel: "Obtener PRO",
+          message: l10n.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
+          actionLabel: l10n.getPro,
           onAction: () => Navigator.pushNamed(context, 'premium'));
       return;
     }
@@ -144,7 +152,7 @@ class _AddJugadorState extends State<AddJugador> {
             duration: const Duration(seconds: 1), curve: Curves.easeOutCubic);
       });
     } else {
-      Toast.show(type: ToastType.error, context: context, message: "Debe introducir el nombre del nuevo jugador");
+      Toast.show(type: ToastType.error, context: context, message: l10n.enterNewPlayerName);
     }
   }
 }
@@ -222,29 +230,34 @@ class _AddJugadorHeader extends StatelessWidget {
 
           // Información
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Jugadores",
-                  style: TextStyle(
-                    fontFamily: "Poppins",
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppThemes.colorQuinto,
-                  ),
-                ),
-                const SizedBox(height: 1),
-                Text(
-                  "$cantJugadores jugador${cantJugadores != 1 ? 'es' : ''} en la partida",
-                  style: TextStyle(
-                    fontFamily: "Poppins",
-                    fontSize: 11,
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+            child: Builder(
+              builder: (context) {
+                final l10n = AppLocalizations.of(context)!;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.players,
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : AppThemes.colorQuinto,
+                      ),
+                    ),
+                    const SizedBox(height: 1),
+                    Text(
+                      l10n.playersInGame(cantJugadores),
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 11,
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ],
@@ -337,18 +350,18 @@ class _AddButton extends StatelessWidget {
               ),
             ],
           ),
-          child: const Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              FaIcon(
+              const FaIcon(
                 FontAwesomeIcons.plus,
                 color: Colors.white,
                 size: 16,
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Text(
-                "Agregar Jugador",
-                style: TextStyle(
+                AppLocalizations.of(context)!.addPlayer,
+                style: const TextStyle(
                   fontFamily: "Poppins",
                   fontSize: 15,
                   fontWeight: FontWeight.w600,

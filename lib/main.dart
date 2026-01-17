@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/routes/app_routes.dart';
 import 'package:game_score/screens/screens.dart';
@@ -50,6 +52,7 @@ void main() async {
     ChangeNotifierProvider(create: (_) => PageEditarProvider()),
     ChangeNotifierProvider(create: (_) => PartidaPredefinidaProvider()),
     ChangeNotifierProvider(create: (_) => ThemeProvider(isDarkMode_: initInDarkMode)),
+    ChangeNotifierProvider(create: (_) => LocaleProvider()),
     ChangeNotifierProvider.value(value: premiumProvider),
   ], child: const MyApp()));
 }
@@ -114,6 +117,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     ThemeProvider themeProvider = context.watch<ThemeProvider>();
+    LocaleProvider localeProvider = context.watch<LocaleProvider>();
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -125,6 +129,18 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Coro Games',
+          // Configuración de idiomas
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('es'),
+            Locale('en'),
+          ],
+          locale: localeProvider.locale,
           home: const HomeScreen(),
           builder: EasyLoading.init(
             builder: (context, child) => child ?? const SizedBox.shrink(),

@@ -7,6 +7,11 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 class MyLoading {
   MyLoading({Key? key});
 
+  static String _getLoadingText() {
+    final lang = Preferences.languageCode;
+    return lang == 'en' ? 'Loading...' : 'Cargando...';
+  }
+
   static show({String? message}) async {
     final isDark = Preferences.isDarkMode;
 
@@ -49,7 +54,7 @@ class MyLoading {
 
     EasyLoading.show(
       maskType: EasyLoadingMaskType.custom,
-      status: message ?? 'Cargando...',
+      status: message ?? _getLoadingText(),
       indicator: _buildLoadingIndicator(isDark),
     );
   }

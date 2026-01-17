@@ -1,9 +1,11 @@
 import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
+import 'package:game_score/utils/l10n_helper.dart';
 
 class PartidaCard extends StatefulWidget {
   const PartidaCard({
@@ -36,6 +38,8 @@ class _PartidaCardState extends State<PartidaCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Container(
       decoration: BoxDecoration(
         color: AppThemes.themeColor_2,
@@ -64,13 +68,13 @@ class _PartidaCardState extends State<PartidaCard> {
           trailingActions: <SwipeAction>[
             SwipeAction(
                 icon: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 22),
-                title: "Borrar",
+                title: l10n.delete,
                 style: const TextStyle(fontFamily: 'Poppins', fontSize: 12),
                 onTap: (CompletionHandler handler) async => widget.functionBorrar(handler),
                 color: Colors.red[400]!),
             SwipeAction(
                 icon: const Icon(Icons.edit_outlined, color: Colors.white, size: 22),
-                title: "Editar",
+                title: l10n.edit,
                 style: const TextStyle(fontFamily: 'Poppins', fontSize: 12),
                 onTap: (CompletionHandler handler) async {
                   widget.functionEditar();
@@ -114,7 +118,7 @@ class _PartidaCardState extends State<PartidaCard> {
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
-                                  widget.partida.tipo!,
+                                  L10n.getGameType(context, widget.partida.tipo),
                                   style: TextStyle(
                                     fontFamily: 'Poppins',
                                     fontWeight: FontWeight.w600,
@@ -210,16 +214,18 @@ class EstadoPartida extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     if (partida.isSinIniciar) {
       return _EstadoChip(
         icon: Icons.play_arrow_rounded,
-        label: "Iniciando",
+        label: l10n.starting,
         color: Colors.blue,
       );
     } else if (partida.isEmpate) {
       return _EstadoChip(
         icon: Icons.swap_horiz_rounded,
-        label: "Empate",
+        label: l10n.tie,
         color: Colors.amber[700]!,
       );
     } else {
@@ -267,6 +273,11 @@ class _GanadorPerdedor extends StatelessWidget {
   const _GanadorPerdedor({Key? key, required this.partida}) : super(key: key);
   final Partida partida;
 
+  String _getTranslatedName(BuildContext context, String name) {
+    if (name == Estado.empate) return AppLocalizations.of(context)!.tie;
+    return name;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -274,7 +285,7 @@ class _GanadorPerdedor extends StatelessWidget {
         Flexible(
           child: _PlayerStatus(
             icon: Icons.trending_up_rounded,
-            name: partida.getGandorOrPerdedor(tipo: Estado.ganador),
+            name: _getTranslatedName(context, partida.getGandorOrPerdedor(tipo: Estado.ganador)),
             color: Colors.green,
           ),
         ),
@@ -282,7 +293,7 @@ class _GanadorPerdedor extends StatelessWidget {
         Flexible(
           child: _PlayerStatus(
             icon: Icons.trending_down_rounded,
-            name: partida.getGandorOrPerdedor(tipo: Estado.perdedor),
+            name: _getTranslatedName(context, partida.getGandorOrPerdedor(tipo: Estado.perdedor)),
             color: Colors.red[400]!,
           ),
         ),

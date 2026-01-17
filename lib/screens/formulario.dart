@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:game_score/helpers/helpers.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
@@ -38,11 +39,13 @@ class _FormularioScreenState extends State<FormularioScreen> {
 
     googleAdsProvider.loadInterstitialAd();
 
+    final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Layout(
         panelController: PanelController(),
-        appBarTitle: "Crear nueva partida",
+        appBarTitle: l10n.createNewGame,
         appBarLeading: CustomIconButtom(
           iconSize: 25,
           iconColor: Colors.white,
@@ -110,9 +113,9 @@ class _Body extends StatelessWidget {
                   const SizedBox(height: 14),
 
                   // Nombre de la partida
-                  const CustomReactiveInput(
+                  CustomReactiveInput(
                       formControlName: 'nombre',
-                      labelText: "Nombre de la partida",
+                      labelText: AppLocalizations.of(context)!.gameName,
                       textCapitalization: TextCapitalization.words),
                   const SizedBox(height: 14),
 
@@ -129,12 +132,12 @@ class _Body extends StatelessWidget {
                             : ResponsiveApp.size.width * 0.43,
                         child: CustomReactiveDropDown(
                           formControlName: 'tipo',
-                          labelText: "Tipo",
-                          items: const [
+                          labelText: AppLocalizations.of(context)!.type,
+                          items: [
                             DropdownMenuItem(
-                                value: "Rondas", child: Text("Rondas")),
+                                value: "Rondas", child: Text(AppLocalizations.of(context)!.rounds)),
                             DropdownMenuItem(
-                                value: "Puntuación", child: Text("Puntuación"))
+                                value: "Puntuación", child: Text(AppLocalizations.of(context)!.score))
                           ],
                           onChanged: (value) =>
                               formPartidaProvider.changeTipo(value),
@@ -149,8 +152,8 @@ class _Body extends StatelessWidget {
                           child: CustomReactiveInput(
                               formControlName: 'maxPuntuacion',
                               labelText: tipoPartida == "Rondas"
-                                  ? "Cant. rondas"
-                                  : "Punt. Máxima",
+                                  ? AppLocalizations.of(context)!.roundCount
+                                  : AppLocalizations.of(context)!.maxScore,
                               inputType: TextInputType.number)),
                     ],
                   ),
@@ -223,13 +226,13 @@ class _Body extends StatelessWidget {
         Toast.show(
             type: ToastType.error,
             context: context,
-            message: "Error registrando partida.");
+            message: AppLocalizations.of(context)!.errorRegisteringGame);
       }
     } else {
       Toast.show(
           type: ToastType.warning,
           context: context,
-          message: "Revisar todos los campos de texto.");
+          message: AppLocalizations.of(context)!.checkAllFields);
     }
   }
 }
@@ -277,7 +280,7 @@ class _PlantillasButton extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                "Predefinidas",
+                AppLocalizations.of(context)!.predefined,
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 12,
@@ -331,7 +334,7 @@ class _JugadoresSection extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             Text(
-              'Jugadores',
+              AppLocalizations.of(context)!.players,
               style: TextStyle(
                 fontFamily: 'Poppins',
                 fontSize: 16,
@@ -370,11 +373,12 @@ class _JugadoresSection extends StatelessWidget {
     final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
     if (!premiumProvider.canAddPlayer(formPartidaProvider.jugadores.length)) {
+      final l10n = AppLocalizations.of(context)!;
       Toast.show(
           type: ToastType.info,
           context: context,
-          message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores.",
-          actionLabel: "Obtener PRO",
+          message: l10n.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
+          actionLabel: l10n.getPro,
           onAction: () => Navigator.pushNamed(context, 'premium'));
       return;
     }
@@ -395,7 +399,7 @@ class _JugadoresSection extends StatelessWidget {
       Toast.show(
           type: ToastType.info,
           context: context,
-          message: "Máximo de jugadores alcanzados");
+          message: AppLocalizations.of(context)!.maxPlayersReached);
     }
   }
 }
@@ -477,7 +481,7 @@ class _CreateButton extends StatelessWidget {
               FaIcon(FontAwesomeIcons.plus, size: 16, color: Colors.white),
               const SizedBox(width: 10),
               Text(
-                "Crear Partida",
+                AppLocalizations.of(context)!.createGame,
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 16,
@@ -602,7 +606,7 @@ class _JugadorInputState extends State<_JugadorInput>
               color: isDark ? Colors.white : AppThemes.colorCuarto,
             ),
             decoration: InputDecoration(
-              labelText: "nombre",
+              labelText: AppLocalizations.of(context)!.name,
               fillColor: AppThemes.inputColor,
               filled: true,
               labelStyle: TextStyle(

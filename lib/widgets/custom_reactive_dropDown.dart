@@ -38,13 +38,14 @@ class CustomReactiveDropDown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ReactiveDropdownField<dynamic>(
+    return IgnorePointer(
+      ignoring: !enabled,
+      child: ReactiveDropdownField<dynamic>(
         key: key,
         formControlName: "tipo",
         items: items,
-        
         autofocus: autoFocus!,
-        onChanged: (value) => onChanged != null ? onChanged!(value) : null,
+        onChanged: enabled ? (value) => onChanged != null ? onChanged!(value) : null : null,
         decoration: InputDecoration(
           labelText: labelText,
           hintText: hintText,
@@ -71,6 +72,7 @@ class CustomReactiveDropDown extends StatelessWidget {
         showErrors: (control) => control.invalid && (control.touched || control.dirty),
         validationMessages: {
               'required': (error) => "Campo requerido.",
-            });
+            }),
+    );
   }
 }

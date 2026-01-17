@@ -1,0 +1,189 @@
+{
+  "@@locale": "es",
+  
+  "appTitle": "Coro Games",
+  
+  "myGames": "Mis Partidas",
+  "configuration": "Configuración",
+  
+  "emptyGamesTitle": "¡Comienza tu primera partida!",
+  "emptyGamesSubtitle": "Presiona el botón + para crear\nuna nueva partida",
+  "swipeToEditOrDelete": "Desliza para editar o borrar",
+  "loadingGames": "Cargando partidas...",
+  "loading": "Cargando...",
+  
+  "freeVersionLimitGames": "La versión gratis solo permite {count} partidas simultáneas.",
+  "@freeVersionLimitGames": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "freeVersionLimitPlayers": "La versión gratis solo permite {count} jugadores.",
+  "@freeVersionLimitPlayers": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "freeVersionLimitPredefined": "La versión gratis solo permite {count} partidas predefinidas.",
+  "@freeVersionLimitPredefined": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "getPro": "Obtener PRO",
+  
+  "appearance": "Apariencia",
+  "systemTheme": "Tema del sistema",
+  "syncWithDevice": "Sincronizar con el dispositivo",
+  "lightTheme": "Claro",
+  "darkTheme": "Oscuro",
+  
+  "youArePro": "Eres PRO",
+  "active": "Activo",
+  "allFeaturesUnlocked": "Todas las funciones desbloqueadas",
+  "noAdsUnlimitedGames": "Sin anuncios • Partidas ilimitadas",
+  "simulatePremiumDev": "Simular Premium (Dev)",
+  
+  "createNewGame": "Crear nueva partida",
+  "predefined": "Predefinidas",
+  "gameName": "Nombre de la partida",
+  "type": "Tipo",
+  "rounds": "Rondas",
+  "score": "Puntuación",
+  "roundCount": "Cant. rondas",
+  "maxScore": "Punt. Máxima",
+  "players": "Jugadores",
+  "createGame": "Crear Partida",
+  "errorRegisteringGame": "Error registrando partida.",
+  "checkAllFields": "Revisar todos los campos de texto.",
+  "maxPlayersReached": "Máximo de jugadores alcanzados",
+  "name": "nombre",
+  
+  "predefinedGames": "Partidas Predefinidas",
+  "dragToReorder": "Arrastra para reordenar",
+  "tapToSelect": "Toca para seleccionar",
+  "done": "Listo",
+  "close": "Cerrar",
+  "noPredefinedGames": "Sin partidas predefinidas",
+  "tapPlusToCreate": "Toca + para crear una",
+  
+  "confirm": "Confirmar",
+  "cancel": "Cancelar",
+  "accept": "Aceptar",
+  "delete": "Borrar",
+  "confirmDeleteGame": "Seguro que desea eliminar la partida: {name}",
+  "@confirmDeleteGame": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "confirmDeletePredefined": "Seguro que desea eliminar la partida predefinida: {name}",
+  "@confirmDeletePredefined": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "confirmDeleteScore": "¿Seguro que desea eliminar la puntuación {score} del jugador {player}?",
+  "@confirmDeleteScore": {
+    "placeholders": {
+      "score": {"type": "int"},
+      "player": {"type": "String"}
+    }
+  },
+  
+  "playerScore": "Puntuación: {score}",
+  "@playerScore": {
+    "placeholders": {
+      "score": {"type": "int"}
+    }
+  },
+  "increase": "Aumentar",
+  "decrease": "Reducir",
+  "scoreLabel": "Puntuación",
+  "noScoresRegistered": "No hay puntuaciones registradas",
+  "noRoundsRegistered": "No tiene rondas registradas",
+  "minScoreWarning": "La puntuación minima debe de ser 0.",
+  "minRoundWarning": "La ronda minima debe de ser 0.",
+  "scoreMustBeGreaterThanZero": "Puntuación debe de ser mayor a 0",
+  "enterScoreToContinue": "Debe introducir una puntutación para continuar",
+  "warning": "AVISO",
+  
+  "increased": "Aumentar",
+  "decreased": "Reducir",
+  
+  "coroGamesPro": "Coro Games PRO",
+  "unlockFullPotential": "Desbloquea todo el potencial",
+  "unlimitedPlayers": "Jugadores ilimitados",
+  "unlimitedPlayersDesc": "Sin límite de jugadores por partida",
+  "unlimitedGames": "Partidas ilimitadas",
+  "unlimitedGamesDesc": "Crea todas las partidas que quieras",
+  "predefinedGamesFeature": "Partidas predefinidas",
+  "predefinedGamesDesc": "Guarda configuraciones ilimitadas",
+  "fullHistory": "Historial completo",
+  "fullHistoryDesc": "Accede a todo el historial de jugadas",
+  "noAds": "Sin anuncios",
+  "noAdsDesc": "Disfruta sin interrupciones",
+  "alreadyPremium": "¡Ya eres Premium!",
+  "oneTimePayment": "Pago único • Sin suscripción",
+  "purchaseRestored": "¡Compra restaurada! Ya eres Premium.",
+  "purchaseFailed": "No se pudo completar la compra. Intenta de nuevo.",
+  
+  "gameType_rounds": "Rondas",
+  "gameType_score": "Puntuación",
+  
+  "language": "Idioma",
+  "languageSpanish": "Español",
+  "languageEnglish": "English",
+  
+  "starting": "Iniciando",
+  "gameStarting": "Partida Iniciando",
+  "tie": "Empate",
+  "winning": "Ganando",
+  "losing": "Perdiendo",
+  "edit": "Editar",
+  
+  "newPredefinedGame": "Nueva Partida",
+  "editPredefinedGame": "Editar Partida",
+  "configureYourPredefined": "Configura tu partida predefinida",
+  "modifyGameData": "Modifica los datos de la partida",
+  "playerCount": "Cantidad de jugadores",
+  "back": "Volver",
+  "save": "Guardar",
+  "create": "Crear",
+  
+  "editGame": "Editar Partida",
+  "editPlayer": "Editar Jugador",
+  "noName": "Sin nombre",
+  "gameNameCannotBeEmpty": "El nombre de la partida no puede estar vacio.",
+  "playerNameCannotBeEmpty": "El nombre del jugador no puede estar vacio.",
+  
+  "addPlayer": "Agregar Jugador",
+  "playerName": "Nombre del jugador",
+  "currentPlayers": "Jugadores actuales",
+  "playersInGame": "{count} jugador{count, plural, =1{} other{es}} en la partida",
+  "@playersInGame": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "enterNewPlayerName": "Debe introducir el nombre del nuevo jugador",
+  
+  "winner": "GANADOR",
+  "rematch": "Revancha",
+  "watchAd": "ver anuncio",
+  "errorRenewingGame": "Error renovando partida.",
+  
+  "maxScoreFull": "Puntuación Máxima",
+  
+  "selectPlayer": "Seleccione un jugador",
+  "generalHistory": "Historial General",
+  "records": "{count} registro{count, plural, =1{} other{s}}",
+  "@records": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "selectedPlayer": "Jugador seleccionado",
+  "noRecords": "No hay registros"
+}
+

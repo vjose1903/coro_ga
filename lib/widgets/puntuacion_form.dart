@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/screens/ganador.dart';
@@ -134,7 +135,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                 Expanded(
                   child: _ActionScoreButton(
                     icon: Icons.add_rounded,
-                    label: "Aumentar",
+                    label: AppLocalizations.of(context)!.increase,
                     color: Colors.green,
                     onTap: () {
                       String puntuacion = partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? puntuacionController.text : "1";
@@ -171,7 +172,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                 Expanded(
                   child: _ActionScoreButton(
                     icon: Icons.remove_rounded,
-                    label: "Reducir",
+                    label: AppLocalizations.of(context)!.decrease,
                     color: Colors.red[400]!,
                     onTap: () {
                       String puntuacion = partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? puntuacionController.text : "1";
@@ -206,9 +207,10 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
       int puntuacion_actual = jugador.puntuacion!;
 
       if (tipo == "reducir" && puntuacion_actual - puntuacionInt < 0) {
+        final l10n = AppLocalizations.of(context)!;
         String msgErrorReducir =
-            partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? "La puntuación minima debe de ser 0." : "La ronda minima debe de ser 0.";
-        Toast.show(type: ToastType.warning, context: context, title: "AVISO", message: msgErrorReducir);
+            partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? l10n.minScoreWarning : l10n.minRoundWarning;
+        Toast.show(type: ToastType.warning, context: context, title: l10n.warning, message: msgErrorReducir);
 
         return puntuacion_actual;
       } else {
@@ -220,9 +222,10 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
         return response.data.puntuacion;
       }
     } else {
-      String msg = puntuacion == "0" ? "Puntuación debe de ser mayor a 0" : "Debe introducir una puntutación para continuar";
+      final l10n = AppLocalizations.of(context)!;
+      String msg = puntuacion == "0" ? l10n.scoreMustBeGreaterThanZero : l10n.enterScoreToContinue;
 
-      Toast.show(type: ToastType.warning, context: context, title: "AVISO", message: msg);
+      Toast.show(type: ToastType.warning, context: context, title: l10n.warning, message: msg);
       return 0;
     }
   }
@@ -237,7 +240,8 @@ class _ListHistorial extends StatelessWidget {
     final PartidaProvider? partidaProvider = context.read<PartidaProvider?>();
     final JugadorProvider? jugadorProvider = context.watch<JugadorProvider?>();
     final Jugador? jugador = jugadorProvider?.jugadorEnTurno;
-    final msgNoRgistros = partidaProvider!.partidaEnTurno!.tipo == "Puntuación" ? "No hay puntuaciones registradas" : "No tiene rondas registradas";
+    final l10n = AppLocalizations.of(context)!;
+    final msgNoRgistros = partidaProvider!.partidaEnTurno!.tipo == "Puntuación" ? l10n.noScoresRegistered : l10n.noRoundsRegistered;
 
     if (jugador == null) return Container();
 
@@ -330,13 +334,14 @@ class _HistorialItemState extends State<_HistorialItem> {
         trailingActions: [
           SwipeAction(
             icon: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 20),
-            title: "Borrar",
+            title: AppLocalizations.of(context)!.delete,
             style: const TextStyle(fontFamily: 'Poppins', fontSize: 11),
             onTap: (CompletionHandler handler) async {
+            final l10n = AppLocalizations.of(context)!;
             CustomAlertDialog.show(
               context,
-              title: "Confirmar",
-              menssage: "¿Seguro que desea eliminar la puntuación ${widget.historial.puntuacion} del jugador ${widget.jugadorNombre}?",
+              title: l10n.confirm,
+              menssage: l10n.confirmDeleteScore(widget.historial.puntuacion!, widget.jugadorNombre),
               dialogType: DialogType.error,
               buttonsList: [
                 CustomActionsButtons.cancelButton({
@@ -398,7 +403,7 @@ class _HistorialItemState extends State<_HistorialItem> {
                   ],
                 ),
                 Text(
-                  widget.historial.tipo!.capitalize(),
+                  L10n.getActionType(context, widget.historial.tipo),
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 11,
@@ -473,7 +478,7 @@ class _KeyboardSection extends StatelessWidget {
               color: isDark ? Colors.white : AppThemes.colorQuinto,
             ),
             decoration: InputDecoration(
-              labelText: 'Puntuación',
+              labelText: AppLocalizations.of(context)!.scoreLabel,
               fillColor: AppThemes.inputDisabledColor,
               filled: true,
               contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -613,7 +618,7 @@ class _JugadorHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Puntuación: $puntuacion',
+                  AppLocalizations.of(context)!.playerScore(puntuacion),
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 12,

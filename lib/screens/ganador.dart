@@ -3,6 +3,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/partida_provider.dart';
 import 'package:game_score/providers/providers.dart';
@@ -83,63 +84,69 @@ class _GanadorScreenState extends State<GanadorScreen> {
                               transitionDuration: const Duration(milliseconds: 500)));
                     });
                   })),
-          Container(
-              margin: const EdgeInsets.only(top: 150),
-              width: double.infinity,
-              child: Column(
-                children: [
-                  TextAnimator("GANADOR",
-                      initialDelay: const Duration(seconds: 1),
-                      incomingEffect: WidgetTransitionEffects.incomingOffsetThenScaleAndStep(duration: const Duration(milliseconds: 800)),
-                      style: TextStyle(color: ganadorColor, fontFamily: 'Poppins', fontSize: 30, fontWeight: FontWeight.bold, letterSpacing: 3)),
-                  TextAnimator(partida,
-                      initialDelay: const Duration(seconds: 1, milliseconds: 800),
-                      incomingEffect: WidgetTransitionEffects.incomingScaleDown(duration: const Duration(seconds: 1)),
-                      style: TextStyle(color: partidaColor, fontFamily: 'Poppins', fontSize: 20)),
-                  //
-                  const SizedBox(height: 20),
+          Builder(
+            builder: (context) {
+              final l10n = AppLocalizations.of(context)!;
+              return Container(
+                margin: const EdgeInsets.only(top: 150),
+                width: double.infinity,
+                child: Column(
+                  children: [
+                    TextAnimator(l10n.winner,
+                        initialDelay: const Duration(seconds: 1),
+                        incomingEffect: WidgetTransitionEffects.incomingOffsetThenScaleAndStep(duration: const Duration(milliseconds: 800)),
+                        style: TextStyle(color: ganadorColor, fontFamily: 'Poppins', fontSize: 30, fontWeight: FontWeight.bold, letterSpacing: 3)),
+                    TextAnimator(partida,
+                        initialDelay: const Duration(seconds: 1, milliseconds: 800),
+                        incomingEffect: WidgetTransitionEffects.incomingScaleDown(duration: const Duration(seconds: 1)),
+                        style: TextStyle(color: partidaColor, fontFamily: 'Poppins', fontSize: 20)),
+                    //
+                    const SizedBox(height: 20),
 
-                  SizedBox(
-                    height: 300,
-                    child: Bounce(
-                        delay: const Duration(seconds: 1),
-                        infinite: true,
-                        child: const LottieAnimation(animationJson: 'assets/animations/trophy.json')),
-                  ),
+                    SizedBox(
+                      height: 300,
+                      child: Bounce(
+                          delay: const Duration(seconds: 1),
+                          infinite: true,
+                          child: const LottieAnimation(animationJson: 'assets/animations/trophy.json')),
+                    ),
 
-                  const SizedBox(height: 10),
+                    const SizedBox(height: 10),
 
-                  TextAnimator(jugador,
-                      spaceDelay: const Duration(milliseconds: 0),
-                      characterDelay: const Duration(milliseconds: 180),
-                      incomingEffect: WidgetTransitionEffects.incomingScaleUp(),
-                      atRestEffect: WidgetRestingEffects.pulse(effectStrength: 0.8),
-                      initialDelay: const Duration(seconds: 2),
-                      style: TextStyle(color: ganadorColor, fontFamily: 'Poppins', fontSize: 30, fontWeight: FontWeight.bold, letterSpacing: 3)),
+                    TextAnimator(jugador,
+                        spaceDelay: const Duration(milliseconds: 0),
+                        characterDelay: const Duration(milliseconds: 180),
+                        incomingEffect: WidgetTransitionEffects.incomingScaleUp(),
+                        atRestEffect: WidgetRestingEffects.pulse(effectStrength: 0.8),
+                        initialDelay: const Duration(seconds: 2),
+                        style: TextStyle(color: ganadorColor, fontFamily: 'Poppins', fontSize: 30, fontWeight: FontWeight.bold, letterSpacing: 3)),
 
-                  const SizedBox(height: 40),
+                    const SizedBox(height: 40),
 
-                  WidgetAnimator(
-                    incomingEffect: WidgetTransitionEffects.outgoingScaleUp(
-                        delay: const Duration(seconds: 2, milliseconds: 500), duration: const Duration(seconds: 1)),
-                    child: ElevatedButton(
-                      style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.green[400])),
-                      onPressed: () => revanchaFunction(),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text("Revancha", style: TextStyle(fontSize: 15, fontFamily: 'Poppins', fontWeight: FontWeight.bold, letterSpacing: 2)),
-                            if (!premiumProvider.isPremium)
-                              const Text("ver anuncio", style: TextStyle(fontSize: 10, fontFamily: 'Poppins', fontWeight: FontWeight.normal)),
-                          ],
+                    WidgetAnimator(
+                      incomingEffect: WidgetTransitionEffects.outgoingScaleUp(
+                          delay: const Duration(seconds: 2, milliseconds: 500), duration: const Duration(seconds: 1)),
+                      child: ElevatedButton(
+                        style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.green[400])),
+                        onPressed: () => revanchaFunction(),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(l10n.rematch, style: const TextStyle(fontSize: 15, fontFamily: 'Poppins', fontWeight: FontWeight.bold, letterSpacing: 2)),
+                              if (!premiumProvider.isPremium)
+                                Text(l10n.watchAd, style: const TextStyle(fontSize: 10, fontFamily: 'Poppins', fontWeight: FontWeight.normal)),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  )
-                ],
-              )),
+                    )
+                  ],
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
@@ -174,7 +181,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
         startNewGame(newPartida);
       }
     } else {
-      Toast.show(type: ToastType.error, context: context, message: "Error renovando partida.");
+      Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.errorRenewingGame);
       Navigator.pushReplacementNamed(context, 'home');
     }
   }

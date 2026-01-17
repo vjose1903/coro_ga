@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_shake_animated/flutter_shake_animated.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_score/helpers/helpers.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -83,11 +84,12 @@ class PartidasDefaultAlert extends StatelessWidget {
     PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
     if (!premiumProvider.canCreatePredefinedGame(partidaPredefinidaProvider.partidasPredefinidas.length)) {
+      final l10n = AppLocalizations.of(context)!;
       Toast.show(
           type: ToastType.info,
           context: context,
-          message: "La versión gratis solo permite ${PremiumProvider.freeMaxPredefinedGames} partidas predefinidas.",
-          actionLabel: "Obtener PRO",
+          message: l10n.freeVersionLimitPredefined(PremiumProvider.freeMaxPredefinedGames),
+          actionLabel: l10n.getPro,
           onAction: () => Navigator.pushNamed(context, 'premium'));
       return;
     }
@@ -169,28 +171,33 @@ class _PredefinidaHeader extends StatelessWidget {
 
           // Título
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Partidas Predefinidas",
-                  style: TextStyle(
-                    fontFamily: "Poppins",
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppThemes.colorQuinto,
-                  ),
-                ),
-                Text(
-                  isReordering ? "Arrastra para reordenar" : "Toca para seleccionar",
-                  style: TextStyle(
-                    fontFamily: "Poppins",
-                    fontSize: 11,
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+            child: Builder(
+              builder: (context) {
+                final l10n = AppLocalizations.of(context)!;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.predefinedGames,
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : AppThemes.colorQuinto,
+                      ),
+                    ),
+                    Text(
+                      isReordering ? l10n.dragToReorder : l10n.tapToSelect,
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 11,
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
 
@@ -264,9 +271,9 @@ class _DoneButton extends StatelessWidget {
               ),
             ],
           ),
-          child: const Text(
-            "Listo",
-            style: TextStyle(
+          child: Text(
+            AppLocalizations.of(context)!.done,
+            style: const TextStyle(
               fontFamily: 'Poppins',
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -307,14 +314,14 @@ class _CloseButton extends StatelessWidget {
                 ),
               ],
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                FaIcon(FontAwesomeIcons.xmark, color: Colors.white, size: 14),
-                SizedBox(width: 8),
+                const FaIcon(FontAwesomeIcons.xmark, color: Colors.white, size: 14),
+                const SizedBox(width: 8),
                 Text(
-                  "Cerrar",
-                  style: TextStyle(
+                  AppLocalizations.of(context)!.close,
+                  style: const TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -352,6 +359,7 @@ class PartidasScrollView extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator(color: AppThemes.colorPrimero));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          final l10n = AppLocalizations.of(context)!;
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -370,7 +378,7 @@ class PartidasScrollView extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Sin partidas predefinidas',
+                  l10n.noPredefinedGames,
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 14,
@@ -380,7 +388,7 @@ class PartidasScrollView extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Toca + para crear una',
+                  l10n.tapPlusToCreate,
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 12,
@@ -535,7 +543,7 @@ class ReordenableItem extends StatelessWidget {
                         bottom: 4,
                         right: 6,
                         child: Text(
-                          partidaPredefinida.tipo ?? '',
+                          L10n.getGameType(context, partidaPredefinida.tipo),
                           style: TextStyle(
                             fontFamily: "Poppins",
                             fontSize: 8,
@@ -590,10 +598,11 @@ class ReordenableItem extends StatelessWidget {
 
   deletePartidaPredefinida(BuildContext context, PartidaPredefinida partida) {
     PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
+    final l10n = AppLocalizations.of(context)!;
 
     CustomAlertDialog.show(context,
-        menssage: "Seguro que desea eliminar la partida predefinida: ${partida.nombre}",
-        title: "Confirmar",
+        menssage: l10n.confirmDeletePredefined(partida.nombre!),
+        title: l10n.confirm,
         dialogType: DialogType.error,
         buttonsList: [
           CustomActionsButtons.cancelButton({"onTap": () => Navigator.pop(context)}),

@@ -63,6 +63,18 @@ class Preferences {
   // ==============================================================
   // ==============================================================
 
+  // Idioma: 'system' = usar idioma del dispositivo, 'es' = español, 'en' = inglés
+  static String get languageCode {
+    return _prefs.getString('languageCode') ?? 'system';
+  }
+
+  static set languageCode(String value) {
+    _prefs.setString('languageCode', value);
+  }
+
+  // ==============================================================
+  // ==============================================================
+
   // 🔧 FLAG DE PRUEBAS: Cambiar a true para simular versión premium (solo funciona en debug)
   static const bool _kTestPremium = false;
 

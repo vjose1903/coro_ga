@@ -1,6 +1,7 @@
 import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -39,9 +40,9 @@ class FormPartidaPredefinida extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Nombre
-                    const CustomReactiveInput(
+                    CustomReactiveInput(
                       formControlName: 'nombre',
-                      labelText: "Nombre de la partida",
+                      labelText: AppLocalizations.of(context)!.gameName,
                       textCapitalization: TextCapitalization.words,
                     ),
                     const SizedBox(height: 14),
@@ -52,10 +53,10 @@ class FormPartidaPredefinida extends StatelessWidget {
                         Expanded(
                           child: CustomReactiveDropDown(
                             formControlName: 'tipo',
-                            labelText: "Tipo",
-                            items: const [
-                              DropdownMenuItem(value: "Rondas", child: Text("Rondas")),
-                              DropdownMenuItem(value: "Puntuación", child: Text("Puntuación"))
+                            labelText: AppLocalizations.of(context)!.type,
+                            items: [
+                              DropdownMenuItem(value: "Rondas", child: Text(AppLocalizations.of(context)!.rounds)),
+                              DropdownMenuItem(value: "Puntuación", child: Text(AppLocalizations.of(context)!.score))
                             ],
                             onChanged: (value) => formPartidaPredefinidaProvider.changeTipo(value),
                           ),
@@ -65,7 +66,7 @@ class FormPartidaPredefinida extends StatelessWidget {
                           Expanded(
                             child: CustomReactiveInput(
                               formControlName: 'maxPuntuacion',
-                              labelText: tipoPartida == "Rondas" ? "Cant. rondas" : "Punt. Máxima",
+                              labelText: tipoPartida == "Rondas" ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScore,
                               inputType: TextInputType.number,
                             ),
                           ),
@@ -82,11 +83,12 @@ class FormPartidaPredefinida extends StatelessWidget {
                         PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
                         if (!premiumProvider.canAddPlayer(formPartidaPredefinidaProvider.cantidadJugadores)) {
+                          final l10n = AppLocalizations.of(context)!;
                           Toast.show(
                               type: ToastType.info,
                               context: context,
-                              message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores.",
-                              actionLabel: "Obtener PRO",
+                              message: l10n.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
+                              actionLabel: l10n.getPro,
                               onAction: () => Navigator.pushNamed(context, 'premium'));
                           return;
                         }
@@ -97,31 +99,36 @@ class FormPartidaPredefinida extends StatelessWidget {
                     const SizedBox(height: 30),
 
                     // Botones de acción
-                    Row(
-                      children: [
-                        // Volver
-                        Expanded(
-                          child: _ActionButton(
-                            label: "Volver",
-                            icon: FontAwesomeIcons.arrowLeft,
-                            isDestructive: true,
-                            onTap: () {
-                              context.read<PartidaPredefinidaProvider>().resetForm();
-                              DialogNavigator.of(context).pop();
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        // Crear/Guardar
-                        Expanded(
-                          child: _ActionButton(
-                            label: isEditing ? "Guardar" : "Crear",
-                            icon: isEditing ? FontAwesomeIcons.floppyDisk : FontAwesomeIcons.plus,
-                            isPrimary: true,
-                            onTap: () => crearEditarPartida(context: context, form: form),
-                          ),
-                        ),
-                      ],
+                    Builder(
+                      builder: (context) {
+                        final l10n = AppLocalizations.of(context)!;
+                        return Row(
+                          children: [
+                            // Volver
+                            Expanded(
+                              child: _ActionButton(
+                                label: l10n.back,
+                                icon: FontAwesomeIcons.arrowLeft,
+                                isDestructive: true,
+                                onTap: () {
+                                  context.read<PartidaPredefinidaProvider>().resetForm();
+                                  DialogNavigator.of(context).pop();
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            // Crear/Guardar
+                            Expanded(
+                              child: _ActionButton(
+                                label: isEditing ? l10n.save : l10n.create,
+                                icon: isEditing ? FontAwesomeIcons.floppyDisk : FontAwesomeIcons.plus,
+                                isPrimary: true,
+                                onTap: () => crearEditarPartida(context: context, form: form),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                     const SizedBox(height: 10),
                   ],
@@ -159,10 +166,10 @@ class FormPartidaPredefinida extends StatelessWidget {
           googleAdsProvider.loadInterstitialAd();
         });
       } else {
-        Toast.show(type: ToastType.error, context: context, message: "Error registrando partida.");
+        Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.errorRegisteringGame);
       }
     } else {
-      Toast.show(type: ToastType.warning, context: context, message: "Revisar todos los campos de texto.");
+      Toast.show(type: ToastType.warning, context: context, message: AppLocalizations.of(context)!.checkAllFields);
     }
   }
 }
@@ -235,27 +242,32 @@ class _FormHeader extends StatelessWidget {
           const SizedBox(width: 12),
           // Texto
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isEditing ? "Editar Partida" : "Nueva Partida",
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                    color: isDark ? Colors.white : AppThemes.colorCuarto,
-                  ),
-                ),
-                Text(
-                  isEditing ? "Modifica los datos de la partida" : "Configura tu partida predefinida",
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 11,
-                    color: isDark ? Colors.white54 : Colors.black54,
-                  ),
-                ),
-              ],
+            child: Builder(
+              builder: (context) {
+                final l10n = AppLocalizations.of(context)!;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isEditing ? l10n.editPredefinedGame : l10n.newPredefinedGame,
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        color: isDark ? Colors.white : AppThemes.colorCuarto,
+                      ),
+                    ),
+                    Text(
+                      isEditing ? l10n.modifyGameData : l10n.configureYourPredefined,
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 11,
+                        color: isDark ? Colors.white54 : Colors.black54,
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ],
@@ -316,7 +328,7 @@ class _JugadoresCounter extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                "Cantidad de jugadores",
+                AppLocalizations.of(context)!.playerCount,
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 13,

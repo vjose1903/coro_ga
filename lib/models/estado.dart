@@ -1,6 +1,6 @@
 class Estado {
-  static String ganador = "Ganador";
-  static String perdedor = "Perdedor";
-  static String empate = "Empate";
-  static String not = "Not";
+  static String ganador = "ganador";
+  static String perdedor = "perdedor";
+  static String empate = "empate";
+  static String not = "not";
 }

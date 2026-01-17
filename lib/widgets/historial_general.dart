@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/screens/ganador.dart';
@@ -106,36 +107,41 @@ class _HistorialGeneralState extends State<HistorialGeneral> {
         ],
 
         // Botones de acción
-        Row(
-          children: [
-            Expanded(
-              child: _ActionScoreButton(
-                icon: Icons.add_rounded,
-                label: "Aumentar",
-                color: const Color(0xFF4CAF50),
-                onTap: () => _changePuntuacion(
-                  context: context,
-                  jugadorProvider: jugadorProvider,
-                  partidaProvider: partidaProvider,
-                  tipo: "aumentar",
+        Builder(
+          builder: (context) {
+            final l10n = AppLocalizations.of(context)!;
+            return Row(
+              children: [
+                Expanded(
+                  child: _ActionScoreButton(
+                    icon: Icons.add_rounded,
+                    label: l10n.increase,
+                    color: const Color(0xFF4CAF50),
+                    onTap: () => _changePuntuacion(
+                      context: context,
+                      jugadorProvider: jugadorProvider,
+                      partidaProvider: partidaProvider,
+                      tipo: "aumentar",
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _ActionScoreButton(
-                icon: Icons.remove_rounded,
-                label: "Reducir",
-                color: Colors.red[400]!,
-                onTap: () => _changePuntuacion(
-                  context: context,
-                  jugadorProvider: jugadorProvider,
-                  partidaProvider: partidaProvider,
-                  tipo: "reducir",
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _ActionScoreButton(
+                    icon: Icons.remove_rounded,
+                    label: l10n.decrease,
+                    color: Colors.red[400]!,
+                    onTap: () => _changePuntuacion(
+                      context: context,
+                      jugadorProvider: jugadorProvider,
+                      partidaProvider: partidaProvider,
+                      tipo: "reducir",
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ],
+              ],
+            );
+          },
         ),
       ],
     );
@@ -147,16 +153,18 @@ class _HistorialGeneralState extends State<HistorialGeneral> {
     required PartidaProvider partidaProvider,
     required String tipo,
   }) async {
+    final l10n = AppLocalizations.of(context)!;
+    
     if (jugadorSeleccionado == null) {
-      Toast.show(type: ToastType.warning, context: context, message: "Seleccione un jugador");
+      Toast.show(type: ToastType.warning, context: context, message: l10n.selectPlayer);
       return;
     }
 
     String puntuacion = partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? puntuacionController.text : "1";
 
     if (puntuacion.isEmpty || puntuacion == "0") {
-      String msg = puntuacion == "0" ? "Puntuación debe de ser mayor a 0" : "Debe introducir una puntuación";
-      Toast.show(type: ToastType.warning, context: context, title: "AVISO", message: msg);
+      String msg = puntuacion == "0" ? l10n.scoreMustBeGreaterThanZero : l10n.enterScoreToContinue;
+      Toast.show(type: ToastType.warning, context: context, title: l10n.warning, message: msg);
       return;
     }
 
@@ -165,9 +173,9 @@ class _HistorialGeneralState extends State<HistorialGeneral> {
 
     if (tipo == "reducir" && puntuacionActual - puntuacionInt < 0) {
       String msgError = partidaProvider.partidaEnTurno!.tipo == "Puntuación"
-          ? "La puntuación mínima debe de ser 0."
-          : "La ronda mínima debe de ser 0.";
-      Toast.show(type: ToastType.warning, context: context, title: "AVISO", message: msgError);
+          ? l10n.minScoreWarning
+          : l10n.minRoundWarning;
+      Toast.show(type: ToastType.warning, context: context, title: l10n.warning, message: msgError);
       return;
     }
 
@@ -300,29 +308,34 @@ class _HistorialHeader extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Historial General",
-                  style: TextStyle(
-                    fontFamily: "Poppins",
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppThemes.colorQuinto,
-                  ),
-                ),
-                const SizedBox(height: 1),
-                Text(
-                  "$cantRegistros registro${cantRegistros != 1 ? 's' : ''}",
-                  style: TextStyle(
-                    fontFamily: "Poppins",
-                    fontSize: 11,
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+            child: Builder(
+              builder: (context) {
+                final l10n = AppLocalizations.of(context)!;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.generalHistory,
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : AppThemes.colorQuinto,
+                      ),
+                    ),
+                    const SizedBox(height: 1),
+                    Text(
+                      l10n.records(cantRegistros),
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 11,
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ],
@@ -350,7 +363,7 @@ class _JugadorSelector extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Jugador seleccionado",
+          AppLocalizations.of(context)!.selectedPlayer,
           style: TextStyle(
             fontFamily: "Poppins",
             fontSize: 12,
@@ -480,7 +493,7 @@ class _ListHistorialGeneral extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              "No hay registros",
+              AppLocalizations.of(context)!.noRecords,
               style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.grey[500]),
             ),
           ],
@@ -649,10 +662,11 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
   }
 
   void _deleteHistorial(BuildContext context, CompletionHandler handler) {
+    final l10n = AppLocalizations.of(context)!;
     CustomAlertDialog.show(
       context,
-      title: "Confirmar",
-      menssage: "¿Seguro que desea eliminar la puntuación ${widget.historial.puntuacion} del jugador ${widget.jugador.nombre}?",
+      title: l10n.confirm,
+      menssage: l10n.confirmDeleteScore(widget.historial.puntuacion!, widget.jugador.nombre!),
       dialogType: DialogType.error,
       buttonsList: [
         CustomActionsButtons.cancelButton({
@@ -802,7 +816,7 @@ class _KeyboardSection extends StatelessWidget {
               color: isDark ? Colors.white : AppThemes.colorQuinto,
             ),
             decoration: InputDecoration(
-              labelText: 'Puntuación',
+              labelText: AppLocalizations.of(context)!.scoreLabel,
               fillColor: AppThemes.inputDisabledColor,
               filled: true,
               contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),

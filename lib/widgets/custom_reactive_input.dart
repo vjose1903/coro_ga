@@ -43,6 +43,7 @@ class CustomReactiveInput extends StatelessWidget {
         obscureText: obscureText,
         textCapitalization: textCapitalization!,
         maxLength: maxLength,
+        readOnly: !enabled,
         decoration: InputDecoration(
           labelText: labelText,
           hintText: hintText,

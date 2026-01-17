@@ -7,6 +7,7 @@ import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_score/helpers/helpers.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -80,10 +81,12 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
         context.watch<SlideUpProvider>();
         context.watch<ThemeProvider>();
 
+        final l10n = AppLocalizations.of(context)!;
+        
         return Scaffold(
           resizeToAvoidBottomInset: false,
           body: Layout(
-            appBarTitle: 'Mis Partidas',
+            appBarTitle: l10n.myGames,
             appBarTrailing: _AnimatedMenuButton(onTap: openMenuSlideUp),
             bodyContent: _Body(panelController: panelController),
             panelController: panelController,
@@ -124,8 +127,8 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
                       Toast.show(
                           type: ToastType.info,
                           context: context,
-                          message: "La versión gratis solo permite ${PremiumProvider.freeMaxGames} partidas simultáneas.",
-                          actionLabel: "Obtener PRO",
+                          message: l10n.freeVersionLimitGames(PremiumProvider.freeMaxGames),
+                          actionLabel: l10n.getPro,
                           onAction: () => Navigator.pushNamed(context, 'premium'));
                     }
                   },
@@ -149,24 +152,13 @@ class _AnimatedMenuButton extends StatefulWidget {
 }
 
 class _AnimatedMenuButtonState extends State<_AnimatedMenuButton> {
-  bool _isPressed = false;
-
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) => setState(() => _isPressed = false),
-      onTapCancel: () => setState(() => _isPressed = false),
+    return CustomIconButtom(
+      iconSize: 26,
+      iconColor: Colors.white,
+      icon: Icons.menu_rounded,
       onTap: widget.onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: _isPressed ? Colors.white.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Icon(Icons.menu_rounded, size: 26, color: Colors.white),
-      ),
     );
   }
 }
@@ -222,9 +214,10 @@ class ListPartidas extends StatelessWidget {
                 Navigator.pushNamed(context, 'partida');
               },
               functionBorrar: (handler) async {
+                final l10nDialog = AppLocalizations.of(context)!;
                 CustomAlertDialog.show(context,
-                    menssage: "Seguro que desea eliminar la partida: ${partida.nombre}",
-                    title: "Confirmar",
+                    menssage: l10nDialog.confirmDeleteGame(partida.nombre!),
+                    title: l10nDialog.confirm,
                     dialogType: DialogType.error,
                     buttonsList: [
                       CustomActionsButtons.cancelButton({
@@ -268,6 +261,8 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Center(
       child: FadeIn(
         duration: const Duration(milliseconds: 600),
@@ -300,7 +295,7 @@ class _EmptyState extends StatelessWidget {
               ),
               const SizedBox(height: 28),
               Text(
-                '¡Comienza tu primera partida!',
+                l10n.emptyGamesTitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Poppins',
@@ -311,7 +306,7 @@ class _EmptyState extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Presiona el botón + para crear\nuna nueva partida',
+                l10n.emptyGamesSubtitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Poppins',
@@ -337,7 +332,7 @@ class _EmptyState extends StatelessWidget {
                     Icon(Icons.swipe_left_rounded, size: 18, color: AppThemes.colorPrimero),
                     const SizedBox(width: 8),
                     Text(
-                      'Desliza para editar o borrar',
+                      l10n.swipeToEditOrDelete,
                       style: TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 12,
@@ -358,6 +353,8 @@ class _EmptyState extends StatelessWidget {
 class _LoadingState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -372,7 +369,7 @@ class _LoadingState extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            'Cargando partidas...',
+            l10n.loadingGames,
             style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 14,
@@ -420,12 +417,12 @@ class _MenuState extends State<_Menu> {
             // Sección de Tema
             _MenuSection(
               icon: Icons.palette_outlined,
-              title: 'Apariencia',
+              title: AppLocalizations.of(context)!.appearance,
               child: Column(
                 children: [
                   _ThemeToggleRow(
-                    title: 'Tema del sistema',
-                    subtitle: 'Sincronizar con el dispositivo',
+                    title: AppLocalizations.of(context)!.systemTheme,
+                    subtitle: AppLocalizations.of(context)!.syncWithDevice,
                     value: Preferences.isSystemMode,
                     onChanged: (value) {
                       Preferences.isSystemMode = value;
@@ -452,6 +449,14 @@ class _MenuState extends State<_Menu> {
                   ),
                 ],
               ),
+            ),
+            const SizedBox(height: 16),
+            
+            // Sección de Idioma
+            _MenuSection(
+              icon: Icons.language_rounded,
+              title: AppLocalizations.of(context)!.language,
+              child: _LanguageSwitcher(onChanged: () => setState(() {})),
             ),
             const SizedBox(height: 16),
             
@@ -555,7 +560,7 @@ class _MenuHeader extends StatelessWidget {
               ],
             ),
             Text(
-              "Configuración",
+              AppLocalizations.of(context)!.configuration,
               style: TextStyle(
                 color: Colors.grey[500],
                 fontFamily: 'Poppins',
@@ -685,6 +690,8 @@ class _ThemeSwitcher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -698,12 +705,12 @@ class _ThemeSwitcher extends StatelessWidget {
           children: [
             _ThemeOption(
               icon: Icons.wb_sunny_rounded,
-              label: 'Claro',
+              label: l10n.lightTheme,
               isSelected: !isDark,
             ),
             _ThemeOption(
               icon: Icons.nights_stay_rounded,
-              label: 'Oscuro',
+              label: l10n.darkTheme,
               isSelected: isDark,
             ),
           ],
@@ -828,51 +835,66 @@ class _PremiumCard extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Text(
-                            isPremium ? "Eres PRO" : "Obtener PRO",
-                            style: TextStyle(
-                              color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.bold,
-                              fontSize: 17,
-                            ),
-                          ),
+                          Builder(
+                          builder: (context) {
+                            final l10n = AppLocalizations.of(context)!;
+                            return Text(
+                              isPremium ? l10n.youArePro : l10n.getPro,
+                              style: TextStyle(
+                                color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17,
+                              ),
+                            );
+                          },
+                        ),
                           if (isPremium) ...[
                             const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: Colors.green.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.check_circle, size: 12, color: Colors.green),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    'Activo',
-                                    style: TextStyle(
-                                      color: Colors.green,
-                                      fontFamily: 'Poppins',
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                            Builder(
+                              builder: (context) {
+                                final l10n = AppLocalizations.of(context)!;
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green.withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
-                                ],
-                              ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.check_circle, size: 12, color: Colors.green),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        l10n.active,
+                                        style: const TextStyle(
+                                          color: Colors.green,
+                                          fontFamily: 'Poppins',
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ],
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        isPremium ? "Todas las funciones desbloqueadas" : "Sin anuncios • Partidas ilimitadas",
-                        style: TextStyle(
-                          color: Colors.grey[500],
-                          fontFamily: 'Poppins',
-                          fontSize: 12,
-                        ),
+                      Builder(
+                        builder: (context) {
+                          final l10n = AppLocalizations.of(context)!;
+                          return Text(
+                            isPremium ? l10n.allFeaturesUnlocked : l10n.noAdsUnlimitedGames,
+                            style: TextStyle(
+                              color: Colors.grey[500],
+                              fontFamily: 'Poppins',
+                              fontSize: 12,
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -922,6 +944,98 @@ class _PremiumCard extends StatelessWidget {
               ),
             ],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LanguageSwitcher extends StatelessWidget {
+  final VoidCallback onChanged;
+
+  const _LanguageSwitcher({required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    final localeProvider = context.watch<LocaleProvider>();
+    final l10n = AppLocalizations.of(context)!;
+    final currentCode = localeProvider.currentCode;
+    final isDark = Preferences.isDarkMode;
+
+    final languages = [
+      {'code': 'es', 'flag': '🇪🇸', 'name': l10n.languageSpanish},
+      {'code': 'en', 'flag': '🇺🇸', 'name': l10n.languageEnglish},
+    ];
+
+    final currentLang = languages.firstWhere(
+      (l) => l['code'] == currentCode,
+      orElse: () => languages[0],
+    );
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.2),
+        ),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: currentCode == 'system' ? 'es' : currentCode,
+          isExpanded: true,
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: isDark ? Colors.white70 : Colors.grey[700],
+          ),
+          dropdownColor: isDark ? const Color(0xFF2A2D3E) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          selectedItemBuilder: (context) {
+            return languages.map((lang) {
+              return Row(
+                children: [
+                  Text(lang['flag']!, style: const TextStyle(fontSize: 20)),
+                  const SizedBox(width: 10),
+                  Text(
+                    lang['code']!.toUpperCase(),
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white : AppThemes.colorCuarto,
+                    ),
+                  ),
+                ],
+              );
+            }).toList();
+          },
+          items: languages.map((lang) {
+            return DropdownMenuItem<String>(
+              value: lang['code'],
+              child: Row(
+                children: [
+                  Text(lang['flag']!, style: const TextStyle(fontSize: 20)),
+                  const SizedBox(width: 12),
+                  Text(
+                    lang['name']!,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: isDark ? Colors.white : AppThemes.colorCuarto,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+          onChanged: (value) {
+            if (value != null) {
+              localeProvider.setLocale(value);
+              onChanged();
+            }
+          },
         ),
       ),
     );
