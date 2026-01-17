@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:animate_do/animate_do.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
@@ -374,75 +375,97 @@ class _MenuState extends State<_Menu> {
             Consumer<PremiumProvider>(
               builder: (context, premiumProvider, child) {
                 return _ConfigGroup(
-                  child: InkWell(
-                    onTap: () {
-                      final navigator = Navigator.of(context);
-                      final slideUpProvider = context.read<SlideUpProvider>();
-                      // Cerrar el SlideUp correctamente (limpia estado y backdrop)
-                      slideUpProvider.closeSlideUp(controller: widget.panelController);
-                      Future.delayed(const Duration(milliseconds: 300), () {
-                        navigator.pushNamed('premium');
-                      });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                              color: AppThemes.colorTercero.withValues(alpha: Preferences.isDarkMode ? 0.3 : 0.1),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Image.asset(
-                              'assets/img/corona-pro.png',
-                              width: 36,
-                              height: 36,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  premiumProvider.isPremium
-                                      ? "Eres PRO"
-                                      : "Obtener PRO",
-                                  style: TextStyle(
-                                    color: Preferences.isDarkMode
-                                        ? Colors.white
-                                        : AppThemes.colorCuarto,
-                                    fontFamily: 'Poppins',
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
-                                  ),
+                  child: Column(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          final navigator = Navigator.of(context);
+                          final slideUpProvider = context.read<SlideUpProvider>();
+                          slideUpProvider.closeSlideUp(controller: widget.panelController);
+                          Future.delayed(const Duration(milliseconds: 300), () {
+                            navigator.pushNamed('premium');
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  color: AppThemes.colorTercero.withValues(alpha: Preferences.isDarkMode ? 0.3 : 0.1),
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                Text(
-                                  premiumProvider.isPremium
-                                      ? "Todas las funciones desbloqueadas"
-                                      : "Sin anuncios y funciones ilimitadas",
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontFamily: 'Poppins',
-                                    fontSize: 12,
-                                  ),
+                                child: Image.asset(
+                                  'assets/img/corona-pro.png',
+                                  width: 36,
+                                  height: 36,
                                 ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      premiumProvider.isPremium
+                                          ? "Eres PRO"
+                                          : "Obtener PRO",
+                                      style: TextStyle(
+                                        color: Preferences.isDarkMode
+                                            ? Colors.white
+                                            : AppThemes.colorCuarto,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      premiumProvider.isPremium
+                                          ? "Todas las funciones desbloqueadas"
+                                          : "Sin anuncios y funciones ilimitadas",
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontFamily: 'Poppins',
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Icon(
+                                premiumProvider.isPremium
+                                    ? Icons.check_circle
+                                    : Icons.arrow_forward_ios,
+                                color: premiumProvider.isPremium
+                                    ? Colors.green
+                                    : Colors.grey,
+                                size: 20,
+                              ),
+                            ],
                           ),
-                          Icon(
-                            premiumProvider.isPremium
-                                ? Icons.check_circle
-                                : Icons.arrow_forward_ios,
-                            color: premiumProvider.isPremium
-                                ? Colors.green
-                                : Colors.grey,
-                            size: 20,
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                      // Checkbox para simular premium (solo en desarrollo)
+                      if (kDebugMode)
+                        Row(
+                          children: [
+                            Checkbox(
+                              value: premiumProvider.simulatePremium,
+                              onChanged: (value) => premiumProvider.setSimulatePremium(value ?? false),
+                              activeColor: AppThemes.colorTercero,
+                            ),
+                            Text(
+                              "Simular Premium (Dev)",
+                              style: TextStyle(
+                                color: Colors.orange[700],
+                                fontFamily: 'Poppins',
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
                   ),
                 );
               },
