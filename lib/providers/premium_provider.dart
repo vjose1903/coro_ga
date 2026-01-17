@@ -4,13 +4,18 @@ import 'package:game_score/services/purchase_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PremiumProvider extends ChangeNotifier {
-  // 🔧 FLAG DE PRUEBAS: Cambiar a true para simular versión premium (solo funciona en debug)
-  static const bool _kTestPremium = false;
-
   bool _isPremium = false;
   bool _isLoading = true;
+  bool _simulatePremium = false; // Solo funciona en debug
 
-  bool get isPremium => (kDebugMode && _kTestPremium) || _isPremium;
+  bool get isPremium => (kDebugMode && _simulatePremium) || _isPremium;
+  bool get simulatePremium => _simulatePremium;
+
+  void setSimulatePremium(bool value) {
+    if (!kDebugMode) return;
+    _simulatePremium = value;
+    notifyListeners();
+  }
   bool get isLoading => _isLoading;
 
   // Límites para versión FREE

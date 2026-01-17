@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
@@ -27,17 +28,17 @@ class EditarEntidad extends StatelessWidget {
 
     late String tipo;
     dynamic entidad;
+    IconData icon;
 
     if (partida != null) {
       tipo = "Partida";
       entidad = partida;
+      icon = FontAwesomeIcons.gamepad;
     } else {
       tipo = "Jugador";
       entidad = jugador;
+      icon = FontAwesomeIcons.user;
     }
-
-    final Color titleColor = Preferences.isDarkMode ? Colors.grey.withValues(alpha: 0.9) : AppThemes.colorQuinto.withValues(alpha: 0.7);
-    final Color subTitleColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorQuinto.withValues(alpha: 0.9);
 
     FormGroup form = tipo == "Partida" ? formPartidaProvider.form : jugadorProvider.formJugador;
 
@@ -46,24 +47,27 @@ class EditarEntidad extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 10),
       child: Column(
         children: [
-          Row(
-            children: [
-              Text("Editar $tipo:", style: TextStyle(fontFamily: "Poppins", fontSize: 16, color: titleColor)),
-              const SizedBox(width: 7),
-              Text(entidad?.nombre ?? "", style: TextStyle(fontFamily: "Poppins", fontSize: 15, color: subTitleColor, fontWeight: FontWeight.bold)),
-            ],
+          // Header con avatar e información
+          _EditHeader(
+            tipo: tipo,
+            nombre: entidad?.nombre ?? "",
+            icon: icon,
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 16),
+          
+          // Formulario
           if (tipo == "Partida") EditPartida(form: form) else EditJugador(form: form),
-          const SizedBox(height: 10),
+          const SizedBox(height: 16),
+          
+          // Botones de acción
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              // CANCELAR ==========================================
-              ExpandedButtom(
-                  backgroundColor: Colors.red[400],
+              // CANCELAR
+              Expanded(
+                child: _ActionButton(
                   label: "Cancelar",
-                  textColor: Colors.white,
+                  icon: FontAwesomeIcons.xmark,
+                  isDestructive: true,
                   onTap: () async {
                     FocusManager.instance.primaryFocus?.unfocus();
                     if (panelController != null) slideUpProvider.closeSlideUp(controller: panelController!);
@@ -71,14 +75,16 @@ class EditarEntidad extends StatelessWidget {
                     resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
                     await Future.delayed(const Duration(milliseconds: 200));
                     form.reset();
-                  }),
-
-              const SizedBox(width: 10),
-              // ACEPTAR ==========================================
-              ExpandedButtom(
-                  backgroundColor: Colors.green[400],
-                  label: "Aceptar",
-                  textColor: Colors.white,
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              // ACEPTAR
+              Expanded(
+                child: _ActionButton(
+                  label: "Guardar",
+                  icon: FontAwesomeIcons.check,
+                  isPrimary: true,
                   onTap: () {
                     aceptarFunction(context, entidad,
                         form: form,
@@ -89,11 +95,13 @@ class EditarEntidad extends StatelessWidget {
                         tipo: tipo,
                         pageController: pageController,
                         panelController: panelController);
-                  }),
+                  },
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 10),
-          // ANUNCIOS ==========================================
+          const SizedBox(height: 12),
+          // ANUNCIOS
           GoogleBannerAd(location: AdLocation.editarEntidad)
         ],
       ),
@@ -220,5 +228,210 @@ aceptarFunction(BuildContext context, dynamic entidad,
     } else {
       Toast.show(type: ToastType.error, context: context, message: "El nombre del jugador no puede estar vacio.");
     }
+  }
+}
+
+// ============================================
+// WIDGETS PRIVADOS
+// ============================================
+
+class _EditHeader extends StatelessWidget {
+  const _EditHeader({
+    required this.tipo,
+    required this.nombre,
+    required this.icon,
+  });
+
+  final String tipo;
+  final String nombre;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Preferences.isDarkMode;
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? [Colors.white.withValues(alpha: 0.08), Colors.white.withValues(alpha: 0.03)]
+              : [AppThemes.colorPrimero.withValues(alpha: 0.08), AppThemes.colorPrimero.withValues(alpha: 0.03)],
+        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isDark ? Colors.white.withValues(alpha: 0.1) : AppThemes.colorPrimero.withValues(alpha: 0.15),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.white.withValues(alpha: isDark ? 0.05 : 0.8),
+            blurRadius: 4,
+            offset: const Offset(-2, -2),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+            blurRadius: 4,
+            offset: const Offset(2, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Avatar con icono
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppThemes.colorPrimero,
+                  AppThemes.colorPrimero.withValues(alpha: 0.7),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: AppThemes.colorPrimero.withValues(alpha: 0.3),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Center(
+              child: FaIcon(
+                icon,
+                color: Colors.white,
+                size: 18,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          
+          // Información
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Editar $tipo",
+                  style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 11,
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  nombre.isNotEmpty ? nombre : "Sin nombre",
+                  style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : AppThemes.colorQuinto,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  const _ActionButton({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+    this.isPrimary = false,
+    this.isDestructive = false,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+  final bool isPrimary;
+  final bool isDestructive;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Preferences.isDarkMode;
+    
+    Color textColor;
+    List<Color> gradientColors;
+    
+    if (isPrimary) {
+      gradientColors = [
+        const Color(0xFF4CAF50),
+        const Color(0xFF43A047),
+      ];
+      textColor = Colors.white;
+    } else if (isDestructive) {
+      gradientColors = [
+        const Color(0xFFEF5350),
+        const Color(0xFFE53935),
+      ];
+      textColor = Colors.white;
+    } else {
+      gradientColors = isDark
+          ? [Colors.white.withValues(alpha: 0.15), Colors.white.withValues(alpha: 0.1)]
+          : [Colors.grey[200]!, Colors.grey[300]!];
+      textColor = isDark ? Colors.white : AppThemes.colorQuinto;
+    }
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: gradientColors,
+            ),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: (isPrimary ? Colors.green : isDestructive ? Colors.red : Colors.black)
+                    .withValues(alpha: 0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FaIcon(
+                icon,
+                color: textColor,
+                size: 16,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  fontFamily: "Poppins",
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: textColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

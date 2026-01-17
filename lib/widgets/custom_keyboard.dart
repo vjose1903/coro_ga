@@ -49,19 +49,37 @@ class _Tecla extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color backColor = backgroundColor ?? (Preferences.isDarkMode ? const Color(0xff727272) : const Color(0xffFFFFFF));
+    final bool isTransparent = backgroundColor == Colors.transparent;
+    Color backColor = backgroundColor ?? (Preferences.isDarkMode ? const Color(0xff505050) : const Color(0xffFFFFFF));
+    
     return Container(
       margin: const EdgeInsets.all(5),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(5),
-        child: SizedBox(
-          height: 35,
-          child: Material(
-            color: backColor,
-            child: InkWell(
-              onTap: () => onChanged(label),
-              child: Center(child: _Simbolo(label: label, icon: icon, labelColor: labelColor)),
-            ),
+      decoration: isTransparent ? null : BoxDecoration(
+        color: backColor,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          // Sombra oscura sutil
+          BoxShadow(
+            color: Colors.black.withValues(alpha: Preferences.isDarkMode ? 0.15 : 0.08),
+            blurRadius: 3,
+            offset: const Offset(1, 1),
+          ),
+          // Sombra clara sutil
+          BoxShadow(
+            color: Colors.white.withValues(alpha: Preferences.isDarkMode ? 0.08 : 0.6),
+            blurRadius: 3,
+            offset: const Offset(-1, -1),
+          ),
+        ],
+      ),
+      child: SizedBox(
+        height: 38,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => onChanged(label),
+            borderRadius: BorderRadius.circular(10),
+            child: Center(child: _Simbolo(label: label, icon: icon, labelColor: labelColor)),
           ),
         ),
       ),

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/screens/ganador.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/widgets/widgets.dart';
+import 'package:game_score/widgets/layout.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +28,6 @@ class _HistorialGeneralState extends State<HistorialGeneral> {
   @override
   void initState() {
     super.initState();
-    // Scroll al final del historial al abrir
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (historialController.hasClients) {
         historialController.jumpTo(historialController.position.maxScrollExtent);
@@ -47,11 +48,11 @@ class _HistorialGeneralState extends State<HistorialGeneral> {
     final JugadorProvider jugadorProvider = context.watch<JugadorProvider>();
     final Partida partida = partidaProvider.partidaEnTurno!;
     final List<Jugador> jugadores = partida.jugadores ?? [];
+    final isDark = Preferences.isDarkMode;
 
-    // Inicializar jugador seleccionado
     jugadorSeleccionado ??= jugadores.isNotEmpty ? jugadores.first : null;
 
-    // Combinar todos los historiales con info del jugador
+    // Combinar todos los historiales
     List<_HistorialConJugador> todosHistoriales = [];
     for (var jugador in jugadores) {
       if (jugador.historialJugadas != null) {
@@ -60,112 +61,58 @@ class _HistorialGeneralState extends State<HistorialGeneral> {
         }
       }
     }
-
-    // Ordenar por id (orden cronológico)
     todosHistoriales.sort((a, b) => a.historial.id!.compareTo(b.historial.id!));
 
-    // Colores
-    Color titleColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorQuinto;
-    Color subTitleColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.5) : AppThemes.colorQuinto.withValues(alpha: 0.7);
-    Color dropdownColor = Preferences.isDarkMode ? AppThemes.themeColor_1 : Colors.white;
+    return Column(
+      children: [
+        // Header
+        _HistorialHeader(cantRegistros: todosHistoriales.length),
+        const SizedBox(height: 16),
 
-    return Padding(
-      padding: const EdgeInsets.all(15),
-      child: Column(
-        children: [
-          // TITULO
-          Row(
-            children: [
-              Icon(Icons.history, color: titleColor, size: 24),
-              const SizedBox(width: 10),
-              Text("Historial General",
-                  style: TextStyle(fontFamily: "Poppins", fontSize: 18, fontWeight: FontWeight.bold, color: titleColor)),
-            ],
-          ),
-          const SizedBox(height: 15),
+        // Selector de jugador
+        _JugadorSelector(
+          jugadores: jugadores,
+          jugadorSeleccionado: jugadorSeleccionado,
+          onChanged: (jugador) => setState(() => jugadorSeleccionado = jugador),
+        ),
+        const SizedBox(height: 12),
 
-          // SELECTOR DE JUGADOR
-          Column(
-            children: [
-              Align(alignment: Alignment.centerLeft, child: Text("Jugador Seleccionado:", style: TextStyle(fontFamily: "Poppins", fontSize: 16, color: subTitleColor))),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                decoration: BoxDecoration(
-                  color: dropdownColor,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [BoxShadow(blurRadius: 5, spreadRadius: 1, color: AppThemes.colorQuinto.withValues(alpha: 0.1))],
-                ),
-                child: DropdownButton<Jugador>(
-                  value: jugadorSeleccionado,
-                  isExpanded: true,
-                  underline: const SizedBox(),
-                  dropdownColor: dropdownColor,
-                  icon: Icon(Icons.arrow_drop_down, color: titleColor),
-                  items: jugadores.map((jugador) {
-                    return DropdownMenuItem<Jugador>(
-                      value: jugador,
-                      child: Text(jugador.nombre!, style: TextStyle(fontFamily: "Poppins", color: titleColor)),
-                    );
-                  }).toList(),
-                  onChanged: (Jugador? newJugador) {
-                    setState(() {
-                      jugadorSeleccionado = newJugador;
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-
-          // CAMPO PUNTUACION
-          if (partida.tipo == "Puntuación")
-            TextField(
-              controller: puntuacionController,
-              enabled: false,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Puntuación',
-                fillColor: AppThemes.inputDisabledColor,
-                filled: true,
-                labelStyle: TextStyle(color: AppThemes.labelInputDisabledColor, fontFamily: 'Poppins'),
+        // Lista de historial
+        Expanded(
+          flex: 2,
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppThemes.themeColor_1,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
               ),
             ),
-          if (partida.tipo == "Puntuación") const SizedBox(height: 10),
-
-          // LISTA DE HISTORIAL GENERAL
-          Expanded(
-            flex: 2,
-            child: Material(
-              borderRadius: BorderRadius.circular(10),
-              shadowColor: AppThemes.colorQuinto.withValues(alpha: 0.3),
-              elevation: 7,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Container(
-                  color: AppThemes.themeColor_1,
-                  child: _ListHistorialGeneral(
-                    historiales: todosHistoriales,
-                    historialController: historialController,
-                  ),
-                ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: _ListHistorialGeneral(
+                historiales: todosHistoriales,
+                historialController: historialController,
               ),
             ),
           ),
-          const SizedBox(height: 10),
+        ),
+        const SizedBox(height: 12),
 
-          // TECLADO
-          if (partida.tipo == "Puntuación") _Keyboard(puntuacionController: puntuacionController),
-          if (partida.tipo == "Puntuación") const SizedBox(height: 10),
+        // Teclado y campo de puntuación
+        if (partida.tipo == "Puntuación") ...[
+          _KeyboardSection(puntuacionController: puntuacionController),
+          const SizedBox(height: 12),
+        ],
 
-          // BOTONES AUMENTAR/REDUCIR
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ExpandedButtom(
-                backgroundColor: Colors.green[400],
+        // Botones de acción
+        Row(
+          children: [
+            Expanded(
+              child: _ActionScoreButton(
+                icon: Icons.add_rounded,
                 label: "Aumentar",
-                textColor: Colors.white,
+                color: const Color(0xFF4CAF50),
                 onTap: () => _changePuntuacion(
                   context: context,
                   jugadorProvider: jugadorProvider,
@@ -173,11 +120,13 @@ class _HistorialGeneralState extends State<HistorialGeneral> {
                   tipo: "aumentar",
                 ),
               ),
-              const SizedBox(width: 10),
-              ExpandedButtom(
-                backgroundColor: Colors.red[400],
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _ActionScoreButton(
+                icon: Icons.remove_rounded,
                 label: "Reducir",
-                textColor: Colors.white,
+                color: Colors.red[400]!,
                 onTap: () => _changePuntuacion(
                   context: context,
                   jugadorProvider: jugadorProvider,
@@ -185,10 +134,10 @@ class _HistorialGeneralState extends State<HistorialGeneral> {
                   tipo: "reducir",
                 ),
               ),
-            ],
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -285,6 +234,221 @@ class _HistorialConJugador {
   _HistorialConJugador({required this.jugador, required this.historial});
 }
 
+// ============================================
+// WIDGETS PRIVADOS
+// ============================================
+
+class _HistorialHeader extends StatelessWidget {
+  const _HistorialHeader({required this.cantRegistros});
+
+  final int cantRegistros;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Preferences.isDarkMode;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? [Colors.white.withValues(alpha: 0.08), Colors.white.withValues(alpha: 0.03)]
+              : [AppThemes.colorPrimero.withValues(alpha: 0.08), AppThemes.colorPrimero.withValues(alpha: 0.03)],
+        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isDark ? Colors.white.withValues(alpha: 0.1) : AppThemes.colorPrimero.withValues(alpha: 0.15),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.white.withValues(alpha: isDark ? 0.05 : 0.8),
+            blurRadius: 4,
+            offset: const Offset(-2, -2),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+            blurRadius: 4,
+            offset: const Offset(2, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: AppThemes.colorPrimero.withValues(alpha: 0.3),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: const Center(
+              child: FaIcon(FontAwesomeIcons.clockRotateLeft, color: Colors.white, size: 18),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Historial General",
+                  style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : AppThemes.colorQuinto,
+                  ),
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  "$cantRegistros registro${cantRegistros != 1 ? 's' : ''}",
+                  style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 11,
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _JugadorSelector extends StatelessWidget {
+  const _JugadorSelector({
+    required this.jugadores,
+    required this.jugadorSeleccionado,
+    required this.onChanged,
+  });
+
+  final List<Jugador> jugadores;
+  final Jugador? jugadorSeleccionado;
+  final Function(Jugador?) onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Preferences.isDarkMode;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Jugador seleccionado",
+          style: TextStyle(
+            fontFamily: "Poppins",
+            fontSize: 12,
+            color: isDark ? Colors.grey[400] : Colors.grey[600],
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            color: AppThemes.inputColor,
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: DropdownButton<Jugador>(
+            value: jugadorSeleccionado,
+            isExpanded: true,
+            underline: const SizedBox(),
+            dropdownColor: isDark ? AppThemes.themeColor_1 : Colors.white,
+            icon: Icon(
+              Icons.arrow_drop_down,
+              color: isDark ? Colors.grey[400] : Colors.grey[600],
+            ),
+            items: jugadores.map((jugador) {
+              return DropdownMenuItem<Jugador>(
+                value: jugador,
+                child: Row(
+                  children: [
+                    // Avatar
+                    Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: Text(
+                          jugador.nombre != null && jugador.nombre!.isNotEmpty
+                              ? jugador.nombre![0].toUpperCase()
+                              : '?',
+                          style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    // Nombre
+                    Expanded(
+                      child: Text(
+                        jugador.nombre!,
+                        style: TextStyle(
+                          fontFamily: "Poppins",
+                          fontSize: 14,
+                          color: isDark ? Colors.white : AppThemes.colorQuinto,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    // Puntuación con badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: isDark 
+                            ? AppThemes.colorPrimero.withValues(alpha: 0.3)
+                            : AppThemes.colorPrimero.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        "${jugador.puntuacion}",
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : AppThemes.colorPrimero,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                ),
+              );
+            }).toList(),
+            onChanged: onChanged,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _ListHistorialGeneral extends StatelessWidget {
   const _ListHistorialGeneral({Key? key, required this.historiales, required this.historialController}) : super(key: key);
 
@@ -293,111 +457,295 @@ class _ListHistorialGeneral extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Usar el scrollController del SlideUp si está disponible
+    final slideUpController = SlideUpScrollController.of(context);
+    final effectiveController = slideUpController ?? historialController;
+    
     if (historiales.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.history, size: 40, color: Colors.grey.withValues(alpha: 0.3)),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppThemes.colorPrimero.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: FaIcon(
+                FontAwesomeIcons.clockRotateLeft,
+                size: 24,
+                color: AppThemes.colorPrimero.withValues(alpha: 0.5),
+              ),
+            ),
             const SizedBox(height: 10),
-            Text("No hay puntuaciones registradas",
-                style: TextStyle(fontFamily: 'Poppins', fontSize: 15, color: Colors.grey[500]!.withValues(alpha: 0.4))),
+            Text(
+              "No hay registros",
+              style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.grey[500]),
+            ),
           ],
         ),
       );
     }
 
-    Map iconHistorial = {
-      "aumentar": {"icon": Icons.arrow_upward_rounded, "color": Colors.green[400]},
-      "reducir": {"icon": Icons.arrow_downward_rounded, "color": Colors.red[400]}
-    };
-
-    Color historialColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorQuinto.withValues(alpha: 0.7);
-    Color nombreColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.5) : AppThemes.colorTercero.withValues(alpha: 0.8);
-
     return ListView.separated(
-      controller: historialController,
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.all(5),
-      separatorBuilder: (_, __) => const Divider(),
+      controller: effectiveController,
+      physics: const ClampingScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      separatorBuilder: (_, __) => Divider(
+        color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.2),
+        height: 1,
+      ),
       itemCount: historiales.length,
       itemBuilder: (context, index) {
         final item = historiales[index];
-        final historial = item.historial;
-        final jugador = item.jugador;
-
-        return SwipeActionCell(
-          key: ValueKey(historial.id),
-          backgroundColor: Colors.transparent,
-          trailingActions: [
-            SwipeAction(
-              title: "Borrar",
-              onTap: (CompletionHandler handler) async {
-                CustomAlertDialog.show(
-                  context,
-                  title: "Confirmar",
-                  menssage: "¿Seguro que desea eliminar la puntuación ${historial.puntuacion} del jugador ${jugador.nombre}?",
-                  dialogType: DialogType.error,
-                  buttonsList: [
-                    CustomActionsButtons.cancelButton({
-                      "onTap": () {
-                        Navigator.pop(context);
-                        handler(false);
-                      }
-                    }),
-                    CustomActionsButtons.aceptarButton({
-                      "onTap": () async {
-                        Navigator.pop(context);
-                        final jugadorProvider = context.read<JugadorProvider>();
-                        final partidaProvider = context.read<PartidaProvider>();
-
-                        // Cambiar al jugador correspondiente para eliminar
-                        Jugador? jugadorAnterior = jugadorProvider.jugadorEnTurno;
-                        jugadorProvider.changeJugadorEnTurno(jugador);
-
-                        await jugadorProvider.deleteHistorial(historial: historial);
-                        partidaProvider.refresh();
-
-                        // Restaurar jugador anterior
-                        if (jugadorAnterior != null) {
-                          jugadorProvider.changeJugadorEnTurno(jugadorAnterior);
-                        }
-
-                        await handler(true);
-                      }
-                    }),
-                  ],
-                );
-              },
-              color: Colors.red,
-            ),
-          ],
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Puntuación
-                Text(historial.puntuacion.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: historialColor)),
-                // Nombre del jugador e icono
-                Row(
-                  children: [
-                    Text(jugador.nombre!, style: TextStyle(fontFamily: "Poppins", fontSize: 12, color: nombreColor)),
-                    const SizedBox(width: 8),
-                    Icon(iconHistorial[historial.tipo]["icon"], color: iconHistorial[historial.tipo]["color"], size: 22),
-                  ],
-                ),
-              ],
-            ),
-          ),
+        return _HistorialGeneralItem(
+          historial: item.historial,
+          jugador: item.jugador,
+          index: index,
         );
       },
     );
   }
 }
 
-class _Keyboard extends StatelessWidget {
-  const _Keyboard({Key? key, required this.puntuacionController}) : super(key: key);
+class _HistorialGeneralItem extends StatefulWidget {
+  const _HistorialGeneralItem({
+    required this.historial,
+    required this.jugador,
+    required this.index,
+  });
+
+  final HistorialJugada historial;
+  final Jugador jugador;
+  final int index;
+
+  @override
+  State<_HistorialGeneralItem> createState() => _HistorialGeneralItemState();
+}
+
+class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
+  late SwipeActionController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = SwipeActionController();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Preferences.isDarkMode;
+    final isAumentar = widget.historial.tipo == "aumentar";
+    final color = isAumentar ? const Color(0xFF4CAF50) : Colors.red[400]!;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: SwipeActionCell(
+        key: ValueKey(widget.historial.id),
+        index: widget.index,
+        controller: _controller,
+        backgroundColor: Colors.transparent,
+        trailingActions: [
+          SwipeAction(
+            content: Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                color: Colors.red[400],
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(8),
+                  bottomRight: Radius.circular(8),
+                ),
+              ),
+              child: const FaIcon(FontAwesomeIcons.trash, color: Colors.white, size: 18),
+            ),
+            onTap: (handler) => _deleteHistorial(context, handler),
+            color: Colors.transparent,
+          ),
+        ],
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onLongPress: () => _controller.openCellAt(index: widget.index, trailing: true),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Row(
+                children: [
+                  // Avatar del jugador
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Center(
+                      child: Text(
+                        widget.jugador.nombre != null && widget.jugador.nombre!.isNotEmpty
+                            ? widget.jugador.nombre![0].toUpperCase()
+                            : '?',
+                        style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  // Nombre
+                  Expanded(
+                    child: Text(
+                      widget.jugador.nombre!,
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: isDark ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorQuinto,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  // Puntuación
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isAumentar ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
+                          size: 14,
+                          color: color,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          "${isAumentar ? '+' : '-'}${widget.historial.puntuacion}",
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: color,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _deleteHistorial(BuildContext context, CompletionHandler handler) {
+    CustomAlertDialog.show(
+      context,
+      title: "Confirmar",
+      menssage: "¿Seguro que desea eliminar la puntuación ${widget.historial.puntuacion} del jugador ${widget.jugador.nombre}?",
+      dialogType: DialogType.error,
+      buttonsList: [
+        CustomActionsButtons.cancelButton({
+          "onTap": () {
+            Navigator.pop(context);
+            handler(false);
+          }
+        }),
+        CustomActionsButtons.aceptarButton({
+          "onTap": () async {
+            Navigator.pop(context);
+            final jugadorProvider = context.read<JugadorProvider>();
+            final partidaProvider = context.read<PartidaProvider>();
+
+            Jugador? jugadorAnterior = jugadorProvider.jugadorEnTurno;
+            jugadorProvider.changeJugadorEnTurno(widget.jugador);
+
+            await jugadorProvider.deleteHistorial(historial: widget.historial);
+            partidaProvider.refresh();
+
+            if (jugadorAnterior != null) {
+              jugadorProvider.changeJugadorEnTurno(jugadorAnterior);
+            }
+
+            await handler(true);
+          }
+        }),
+      ],
+    );
+  }
+}
+
+class _ActionScoreButton extends StatelessWidget {
+  const _ActionScoreButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [color, color.withValues(alpha: 0.8)],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: color.withValues(alpha: 0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: Colors.white, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontFamily: "Poppins",
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _KeyboardSection extends StatelessWidget {
+  const _KeyboardSection({Key? key, required this.puntuacionController}) : super(key: key);
 
   final TextEditingController puntuacionController;
 
@@ -420,14 +768,73 @@ class _Keyboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color backgroundColor = Preferences.isDarkMode ? const Color(0xff505050) : const Color(0xffF1F1F1);
+    final isDark = Preferences.isDarkMode;
+    
     return Container(
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [BoxShadow(blurRadius: 10, spreadRadius: 1, color: AppThemes.colorQuinto.withValues(alpha: 0.2), offset: const Offset(0, 4))],
+        color: isDark ? const Color(0xFF3A3A3A) : const Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 8,
+            color: AppThemes.colorCuarto.withValues(alpha: 0.1),
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
-      child: CustomKeyboard(onChanged: (value) => changePuntuacionValue(value), tipo: KeyboardType.number),
+      child: Column(
+        children: [
+          // Input de puntuación
+          TextField(
+            controller: puntuacionController,
+            enabled: false,
+            keyboardType: TextInputType.number,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : AppThemes.colorQuinto,
+            ),
+            decoration: InputDecoration(
+              labelText: 'Puntuación',
+              fillColor: AppThemes.inputDisabledColor,
+              filled: true,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              labelStyle: TextStyle(
+                color: AppThemes.labelInputDisabledColor, 
+                fontFamily: 'Poppins',
+              ),
+              floatingLabelStyle: TextStyle(
+                color: isDark ? Colors.grey[400] : AppThemes.colorQuinto,
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Poppins',
+              ),
+              border: UnderlineInputBorder(
+                borderSide: const BorderSide(color: Colors.transparent),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              enabledBorder: UnderlineInputBorder(
+                borderSide: const BorderSide(color: Colors.transparent),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              disabledBorder: UnderlineInputBorder(
+                borderSide: const BorderSide(color: Colors.transparent),
+                borderRadius: BorderRadius.circular(15),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Teclado
+          CustomKeyboard(onChanged: (value) => changePuntuacionValue(value), tipo: KeyboardType.number),
+        ],
+      ),
     );
   }
 }

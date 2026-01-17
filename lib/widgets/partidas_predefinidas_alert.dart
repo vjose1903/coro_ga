@@ -18,6 +18,7 @@ class PartidasDefaultAlert extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Preferences.isDarkMode;
     PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
     formPartidaPredefinidaProvider.getPartidasPredefinidas();
 
@@ -26,119 +27,305 @@ class PartidasDefaultAlert extends StatelessWidget {
         return PopScope(
           canPop: !reorderableProvider.isReording,
           child: Padding(
-          padding: const EdgeInsets.all(15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Partidas predefinidas",
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                _PredefinidaHeader(
+                  onAdd: () => _addPartidaPredefinida(context),
+                  isReordering: reorderableProvider.isReording,
+                  onDone: () => reorderableProvider.isReording = false,
+                ),
+                const SizedBox(height: 16),
+
+                // Lista de partidas
+                Flexible(
+                  child: Container(
+                    height: double.infinity,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      color: AppThemes.themeColor_1,
+                      border: Border.all(
+                        color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
+                      ),
+                    ),
+                    child: const PartidasScrollView(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Botón cerrar
+                Consumer<ReorderableProvider>(
+                  builder: (context, reorderableProvider, child) {
+                    return Visibility(
+                      visible: !reorderableProvider.isReording,
+                      child: _CloseButton(
+                        onTap: () {
+                          Navigator.pop(context);
+                          reorderableProvider.isReording = false;
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _addPartidaPredefinida(BuildContext context) {
+    PartidaPredefinidaProvider partidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
+    PremiumProvider premiumProvider = context.read<PremiumProvider>();
+
+    if (!premiumProvider.canCreatePredefinedGame(partidaPredefinidaProvider.partidasPredefinidas.length)) {
+      Toast.show(
+          type: ToastType.info,
+          context: context,
+          message: "La versión gratis solo permite ${PremiumProvider.freeMaxPredefinedGames} partidas predefinidas.",
+          actionLabel: "Obtener PRO",
+          onAction: () => Navigator.pushNamed(context, 'premium'));
+      return;
+    }
+
+    DialogNavigator.of(context).push(FluidDialogPage(
+      builder: (context) => const FormPartidaPredefinida(),
+    ));
+  }
+}
+
+class _PredefinidaHeader extends StatelessWidget {
+  const _PredefinidaHeader({
+    required this.onAdd,
+    required this.isReordering,
+    required this.onDone,
+  });
+
+  final VoidCallback onAdd;
+  final bool isReordering;
+  final VoidCallback onDone;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Preferences.isDarkMode;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? [Colors.white.withValues(alpha: 0.08), Colors.white.withValues(alpha: 0.03)]
+              : [AppThemes.colorPrimero.withValues(alpha: 0.08), AppThemes.colorPrimero.withValues(alpha: 0.03)],
+        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isDark ? Colors.white.withValues(alpha: 0.1) : AppThemes.colorPrimero.withValues(alpha: 0.15),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.white.withValues(alpha: isDark ? 0.05 : 0.8),
+            blurRadius: 4,
+            offset: const Offset(-2, -2),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+            blurRadius: 4,
+            offset: const Offset(2, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Icono
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: AppThemes.colorPrimero.withValues(alpha: 0.3),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: const Center(
+              child: FaIcon(FontAwesomeIcons.layerGroup, color: Colors.white, size: 18),
+            ),
+          ),
+          const SizedBox(width: 12),
+
+          // Título
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Partidas Predefinidas",
                   style: TextStyle(
-                      color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      letterSpacing: 2)),
-
-              const SizedBox(height: 15),
-
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                decoration: BoxDecoration(color: AppThemes.themeColor_4.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(15)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CustomIconButtom(
-                      onTap: () {
-                        PartidaPredefinidaProvider partidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
-                        PremiumProvider premiumProvider = context.read<PremiumProvider>();
-
-                        if (!premiumProvider.canCreatePredefinedGame(partidaPredefinidaProvider.partidasPredefinidas.length)) {
-                          Toast.show(
-                              type: ToastType.info,
-                              context: context,
-                              message: "La versión gratis solo permite ${PremiumProvider.freeMaxPredefinedGames} partidas predefinidas.",
-                              actionLabel: "Obtener PRO",
-                              onAction: () => Navigator.pushNamed(context, 'premium'));
-                          return;
-                        }
-
-                        DialogNavigator.of(context).push(FluidDialogPage(
-                          builder: (context) => const FormPartidaPredefinida(),
-                        ));
-                      },
-                      icon: Icons.add,
-                      size: IconSize.min,
-                      iconSize: 20,
-                      backgroundColor: const Color(0xFF4CAF50),
-                      splashColor: const Color(0xFF2E7A31),
-                    ),
-                    Consumer(
-                      builder: (BuildContext context, value, Widget? child) {
-                        ReorderableProvider reorderableProvider = context.watch<ReorderableProvider>();
-                        return Visibility(
-                          visible: reorderableProvider.isReording,
-                          child: FittedBox(
-                            fit: BoxFit.fitWidth,
-                            child: ClipRRect(
-                                borderRadius: BorderRadius.circular(50),
-                                child: Material(
-                                    color: Preferences.isDarkMode ? Colors.grey.withValues(alpha: 0.8) : Colors.grey[350],
-                                    child: InkWell(
-                                        onTap: () => reorderableProvider.isReording = false,
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
-                                          child: Text("Listo",
-                                              style: TextStyle(
-                                                  color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.7) : AppThemes.colorSexto,
-                                                  fontFamily: 'Poppins',
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w700,
-                                                  letterSpacing: 2)),
-                                        )))),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                    fontFamily: "Poppins",
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : AppThemes.colorQuinto,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-
-              Flexible(
-                child: Container(
-                  height: double.infinity,
-                  width: double.infinity,
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), color: AppThemes.themeColor_1),
-                  child: const PartidasScrollView(),
+                Text(
+                  isReordering ? "Arrastra para reordenar" : "Toca para seleccionar",
+                  style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 11,
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
+              ],
+            ),
+          ),
 
-              Consumer<ReorderableProvider>(
-                builder: (context, reorderableProvider, child) {
-                  return Visibility(
-                    visible: !reorderableProvider.isReording,
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: WidgetStateProperty.all(Colors.red[400]),
-                            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
-                          ),
-                          onPressed: () {
-                            Navigator.pop(context);
-                            reorderableProvider.isReording = false;
-                          },
-                          child: const Text('Cerrar', style: TextStyle(fontFamily: "Poppins", color: Colors.white))),
-                    ),
-                  );
-                },
+          // Botones
+          if (isReordering)
+            _DoneButton(onTap: onDone)
+          else
+            _AddButton(onTap: onAdd),
+        ],
+      ),
+    );
+  }
+}
+
+class _AddButton extends StatelessWidget {
+  const _AddButton({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF4CAF50), Color(0xFF43A047)],
+            ),
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
               ),
             ],
           ),
+          child: const FaIcon(FontAwesomeIcons.plus, color: Colors.white, size: 16),
         ),
-        );
-      },
+      ),
+    );
+  }
+}
+
+class _DoneButton extends StatelessWidget {
+  const _DoneButton({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: AppThemes.colorPrimero.withValues(alpha: 0.3),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: const Text(
+            "Listo",
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CloseButton extends StatelessWidget {
+  const _CloseButton({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFFEF5350), Color(0xFFE53935)],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.red.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FaIcon(FontAwesomeIcons.xmark, color: Colors.white, size: 14),
+                SizedBox(width: 8),
+                Text(
+                  "Cerrar",
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -163,16 +350,46 @@ class PartidasScrollView extends StatelessWidget {
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator(color: AppThemes.colorTercero));
+          return Center(child: CircularProgressIndicator(color: AppThemes.colorPrimero));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
-              child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              FaIcon(FontAwesomeIcons.gamepad, size: 40, color: Colors.grey.withValues(alpha: 0.7)),
-              Text('No hay partidas predefinidas', style: TextStyle(fontFamily: 'Poppins', fontSize: 18, color: Colors.grey[500]))
-            ],
-          ));
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppThemes.colorPrimero.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: FaIcon(
+                    FontAwesomeIcons.layerGroup,
+                    size: 32,
+                    color: AppThemes.colorPrimero.withValues(alpha: 0.5),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Sin partidas predefinidas',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[500],
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Toca + para crear una',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 12,
+                    color: Colors.grey[400],
+                  ),
+                ),
+              ],
+            ),
+          );
         } else {
           return Consumer(builder: (BuildContext context, value, Widget? child) {
             ReorderableProvider reorderableProvider = context.watch<ReorderableProvider>();
@@ -242,47 +459,129 @@ class ReordenableItem extends StatelessWidget {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(15),
+            Container(
+              width: itemWidth ?? ResponsiveApp.size.width * 0.25,
+              height: 90,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
+                ),
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.25),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
               child: Material(
-                color: AppThemes.colorSegundo,
+                color: Colors.transparent,
                 child: InkWell(
                   onTap: () => !reorderableProvider.isReording
                       ? selectPartidaPredefinida(context: context)
                       : patchFormPartida(context: context, partida: partidaPredefinida),
                   onLongPress: () => reorderableProvider.isReording = true,
-                  child: SizedBox(
-                    width: itemWidth ?? ResponsiveApp.size.width * 0.25,
-                    height: 90,
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(5),
-                        child: AutoSizeText(partidaPredefinida.nombre!,
+                  borderRadius: BorderRadius.circular(14),
+                  child: Stack(
+                    children: [
+                      // Nombre
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8, right: 8, top: 16, bottom: 18),
+                          child: AutoSizeText(
+                            partidaPredefinida.nombre!,
                             overflow: TextOverflow.ellipsis,
-                            maxLines: 3,
+                            maxLines: 2,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(fontFamily: "Poppins", fontWeight: FontWeight.bold)),
+                            style: const TextStyle(
+                              fontFamily: "Poppins",
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Cantidad de jugadores
+                      Positioned(
+                        top: 4,
+                        left: 6,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            FaIcon(
+                              FontAwesomeIcons.user,
+                              size: 8,
+                              color: Colors.white.withValues(alpha: 0.6),
+                            ),
+                            const SizedBox(width: 3),
+                            Text(
+                              '${partidaPredefinida.cantidadJugadores ?? 0}',
+                              style: TextStyle(
+                                fontFamily: "Poppins",
+                                fontSize: 9,
+                                color: Colors.white.withValues(alpha: 0.6),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Tipo de partida
+                      Positioned(
+                        bottom: 4,
+                        right: 6,
+                        child: Text(
+                          partidaPredefinida.tipo ?? '',
+                          style: TextStyle(
+                            fontFamily: "Poppins",
+                            fontSize: 8,
+                            color: Colors.white.withValues(alpha: 0.6),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Botón eliminar
+            if (reorderableProvider.isReording)
+              Positioned(
+                top: -6,
+                left: -6,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => deletePartidaPredefinida(context, partidaPredefinida),
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      width: 26,
+                      height: 26,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFEF5350), Color(0xFFE53935)],
+                        ),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.red.withValues(alpha: 0.4),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: FaIcon(FontAwesomeIcons.minus, color: Colors.white, size: 12),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-            Visibility(
-              visible: reorderableProvider.isReording,
-              child: Positioned(
-                top: -8,
-                left: -8,
-                child: CustomIconButtom(
-                    onTap: () => deletePartidaPredefinida(context, partidaPredefinida),
-                    icon: Icons.remove,
-                    size: IconSize.min,
-                    iconSize: 25,
-                    iconColor: Colors.white,
-                    backgroundColor: const Color(0xFFAF4C4C),
-                    splashColor: const Color(0xFF7A2E2E)),
-              ),
-            ),
           ],
         ),
       );

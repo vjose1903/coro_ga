@@ -2,49 +2,69 @@ import 'package:flutter/material.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
-import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/utils/utils.dart';
+import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:provider/provider.dart';
 
 class CustomEstadoPartida extends StatelessWidget {
-  const CustomEstadoPartida({Key? key, required}) : super(key: key);
+  const CustomEstadoPartida({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final partida = partidaProvider.partidaEnTurno!;
 
-    Map<String, dynamic> estadoPartida = {
-      "empate": {"label": "Empate", "icono": Icons.swap_horiz_outlined, "backgroundColor": Colors.yellow[300]},
-      "sinIniciar": {"label": "Iniciando", "icono": Icons.arrow_forward, "backgroundColor": Colors.blue[300]},
-    };
-
-    String partidaIs = partida.isSinIniciar ? "sinIniciar" : "empate";
-
-    if (partida.isSinIniciar || partida.isEmpate) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 50),
-        child: Container(
-          decoration: getDecoration(estadoPartida[partidaIs]["backgroundColor"]),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(estadoPartida[partidaIs]["icono"], color: Colors.black.withValues(alpha: 0.8)),
-                const SizedBox(width: 10),
-                Text(
-                  estadoPartida[partidaIs]["label"],
-                  style: TextStyle(fontFamily: "Poppins", fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black.withValues(alpha: 0.8)),
-                )
-              ],
-            ),
-          ),
-        ),
+    if (partida.isSinIniciar) {
+      return _EstadoChip(
+        icon: Icons.play_arrow_rounded,
+        label: "Partida Iniciando",
+        color: Colors.blue,
+      );
+    } else if (partida.isEmpate) {
+      return _EstadoChip(
+        icon: Icons.swap_horiz_rounded,
+        label: "Empate",
+        color: Colors.amber[700]!,
       );
     } else {
       return _GanadorPerdedor(partida: partida);
     }
+  }
+}
+
+class _EstadoChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  const _EstadoChip({required this.icon, required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 20, color: color),
+          const SizedBox(width: 10),
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -54,64 +74,91 @@ class _GanadorPerdedor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Map ganadorPerdedor = getGanadorPerdedorMap(partida);
-
-    return SizedBox(
-      height: 40,
-      child: ListView.separated(
-          separatorBuilder: (_, __) => const SizedBox(width: 10),
-          shrinkWrap: true,
-          scrollDirection: Axis.horizontal,
-          itemCount: ganadorPerdedor.length,
-          physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) {
-            List<String> estados = [Estado.ganador, Estado.perdedor];
-
-            return Container(
-              width: ResponsiveApp.size.width * 0.4,
-              decoration: getDecoration(ganadorPerdedor[estados[index]]["backgroundColor"]),
-              child: Padding(
-                padding: const EdgeInsets.all(5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(ganadorPerdedor[estados[index]]["icono"], color: Colors.black.withValues(alpha: 0.8), size: 18),
-                    const SizedBox(width: 5),
-                    Flexible(
-                        child: Text(
-                      ganadorPerdedor[estados[index]]["label"],
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontFamily: "Poppins", fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black.withValues(alpha: 0.8)),
-                    ))
-                  ],
-                ),
-              ),
-            );
-          }),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _PlayerStatusChip(
+          icon: Icons.trending_up_rounded,
+          label: partida.getGandorOrPerdedor(tipo: Estado.ganador),
+          color: Colors.green,
+          isWinner: true,
+        ),
+        const SizedBox(width: 12),
+        _PlayerStatusChip(
+          icon: Icons.trending_down_rounded,
+          label: partida.getGandorOrPerdedor(tipo: Estado.perdedor),
+          color: Colors.red[400]!,
+          isWinner: false,
+        ),
+      ],
     );
   }
 }
 
-BoxDecoration getDecoration(Color backgroundColor) {
-  return BoxDecoration(
-    color: backgroundColor,
-    borderRadius: BorderRadius.circular(10),
-    boxShadow: [BoxShadow(blurRadius: 5, spreadRadius: -1, offset: Offset(0, 5), color: AppThemes.colorQuinto.withValues(alpha: 0.3))],
-  );
-}
+class _PlayerStatusChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final bool isWinner;
 
-Map getGanadorPerdedorMap(Partida partida) {
-  return {
-    Estado.ganador: {
-      "label": partida.getGandorOrPerdedor(tipo: Estado.ganador),
-      "icono": Icons.arrow_upward,
-      "backgroundColor": Colors.green[300],
-    },
-    Estado.perdedor: {
-      "label": partida.getGandorOrPerdedor(tipo: Estado.perdedor),
-      "icono": Icons.arrow_downward,
-      "backgroundColor": Colors.red[300],
-    }
-  };
+  const _PlayerStatusChip({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.isWinner,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: ResponsiveApp.size.width * 0.38,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            color.withValues(alpha: 0.2),
+            color.withValues(alpha: 0.1),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withValues(alpha: 0.4), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.2),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 16, color: color),
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Preferences.isDarkMode ? color : color.withValues(alpha: 0.9),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
