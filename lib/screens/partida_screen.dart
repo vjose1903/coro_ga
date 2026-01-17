@@ -26,7 +26,6 @@ class PartidaScreen extends StatelessWidget {
         context.watch<SlideUpProvider>();
 
         return Scaffold(
-          resizeToAvoidBottomInset: false,
           body: _Body(panelController: panelController, anuncio: anuncio),
           floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
           floatingActionButton: Visibility(
@@ -68,7 +67,7 @@ class _Body extends StatelessWidget {
           onTap: () => Navigator.pop(context),
         ),
         bodyContent: Container(
-            margin: const EdgeInsets.only(top: 40, bottom: 40),
+            margin: const EdgeInsets.only(top: 40, bottom: 90),
             padding: const EdgeInsets.symmetric(horizontal: 25),
             child: Column(children: [
               const CustomEstadoPartida(),
