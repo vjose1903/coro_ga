@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -38,8 +38,9 @@ class _FormularioScreenState extends State<FormularioScreen> {
     googleAdsProvider.loadInterstitialAd();
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Layout(
-        panelController: SlidingUpPanelController(),
+        panelController: PanelController(),
         appBarTitle: "Crear nueva partida",
         appBarLeading: CustomIconButtom(
           iconSize: 25,

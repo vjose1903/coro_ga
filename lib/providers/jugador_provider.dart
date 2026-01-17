@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/providers/providers.dart';
@@ -78,7 +78,7 @@ class JugadorProvider extends ChangeNotifier {
   }
 
   Future<dynamic> deleteJugador(BuildContext context,
-      {required Jugador jugador, SlidingUpPanelController? panelController, required Function callBack}) async {
+      {required Jugador jugador, PanelController? panelController, required Function callBack}) async {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
 

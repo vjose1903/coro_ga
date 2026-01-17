@@ -1,7 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
@@ -17,7 +17,7 @@ class PartidaScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SlidingUpPanelController panelController = SlidingUpPanelController();
+    PanelController panelController = PanelController();
     GoogleBannerAd anuncio = GoogleBannerAd(location: AdLocation.partida);
 
     return Consumer(
@@ -26,10 +26,11 @@ class PartidaScreen extends StatelessWidget {
         context.watch<SlideUpProvider>();
 
         return Scaffold(
+          resizeToAvoidBottomInset: false,
           body: _Body(panelController: panelController, anuncio: anuncio),
           floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
           floatingActionButton: Visibility(
-            visible: panelController.status == SlidingUpPanelStatus.collapsed,
+            visible: !panelController.isAttached || panelController.isPanelClosed,
             child: FloatingActionButton(
               shape: const CircleBorder(),
               onPressed: () {
@@ -50,7 +51,7 @@ class _Body extends StatelessWidget {
   const _Body({Key? key, required this.panelController, required this.anuncio})
       : super(key: key);
 
-  final SlidingUpPanelController panelController;
+  final PanelController panelController;
   final GoogleBannerAd anuncio;
   @override
   Widget build(BuildContext context) {
@@ -82,7 +83,7 @@ class _Body extends StatelessWidget {
 class JugadoresCard extends StatelessWidget {
   const JugadoresCard({Key? key, required this.panelController})
       : super(key: key);
-  final SlidingUpPanelController panelController;
+  final PanelController panelController;
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +92,9 @@ class JugadoresCard extends StatelessWidget {
       final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
       jugadorProvider.formJugador.reset();
       slideUpProvider.openSlideUp(
-          controller: panelController, bodyContent: const AddJugadorPartida());
+          controller: panelController, 
+          bodyContent: const AddJugadorPartida(),
+      );
     }
 
     return Expanded(
@@ -163,7 +166,7 @@ class JugadoresCard extends StatelessWidget {
 class JugadoresList extends StatelessWidget {
   const JugadoresList({Key? key, required this.panelController})
       : super(key: key);
-  final SlidingUpPanelController panelController;
+  final PanelController panelController;
 
   @override
   Widget build(BuildContext context) {
@@ -207,7 +210,7 @@ class JugadorInfo extends StatelessWidget {
       {Key? key, required this.jugador, required this.panelController})
       : super(key: key);
   final Jugador jugador;
-  final SlidingUpPanelController panelController;
+  final PanelController panelController;
 
   @override
   Widget build(BuildContext context) {

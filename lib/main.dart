@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/routes/app_routes.dart';
 import 'package:game_score/screens/screens.dart';
 import 'package:game_score/services/app_integrity_service.dart';
 import 'package:game_score/services/purchase_service.dart';
-import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/widgets/custom_splash_screen.dart';
 import 'package:game_score/widgets/piracy_blocker.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
@@ -15,32 +14,31 @@ import 'package:flutter/services.dart';
 import 'shared_preferences/preferences.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  // Preservar el splash nativo mientras inicializamos
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  // Verificar integridad de la app (anti-piratería)
-  final isLegit = await AppIntegrityService.instance.verifyIntegrity();
-  
+  // ⚡ OPTIMIZACIÓN: Ejecutar operaciones críticas en paralelo
+  final results = await Future.wait<bool>([
+    Preferences.init().then((_) => true),
+    AppIntegrityService.instance.verifyIntegrity(),
+  ]);
+
+  final isLegit = results[1];
+
   if (!isLegit) {
-    // App pirata detectada - mostrar bloqueador
+    FlutterNativeSplash.remove();
     runApp(const PiracyBlocker());
     return;
   }
 
-  await MobileAds.instance.initialize();
-  await Preferences.init();
-
   final isPlatformDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
   bool initInDarkMode = Preferences.isSystemMode ? isPlatformDark : Preferences.isDarkMode;
 
-  // Crear PremiumProvider primero para pasarlo al PurchaseService
   final premiumProvider = PremiumProvider();
-  
-  // Inicializar servicio de compras
-  await PurchaseService.instance.initialize(
-    onPurchaseComplete: (success) {
-      if (success) premiumProvider.setPremium(true);
-    },
-  );
+
+  // ⚡ Inicializar ads y compras de forma DIFERIDA (no bloquear el arranque)
+  _initializeServicesDeferred(premiumProvider);
 
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => PartidaProvider()),
@@ -54,6 +52,19 @@ void main() async {
     ChangeNotifierProvider(create: (_) => ThemeProvider(isDarkMode_: initInDarkMode)),
     ChangeNotifierProvider.value(value: premiumProvider),
   ], child: const MyApp()));
+}
+
+/// Inicializa servicios pesados de forma diferida (sin bloquear el arranque)
+void _initializeServicesDeferred(PremiumProvider premiumProvider) {
+  // Ejecutar en paralelo después de que la UI se muestre
+  Future.wait([
+    MobileAds.instance.initialize(),
+    PurchaseService.instance.initialize(
+      onPurchaseComplete: (success) {
+        if (success) premiumProvider.setPremium(true);
+      },
+    ),
+  ]);
 }
 
 class MyApp extends StatefulWidget {
@@ -70,6 +81,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    
+    // Remover splash nativo cuando la UI esté lista (solo una vez)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FlutterNativeSplash.remove();
+    });
   }
 
   @override
@@ -99,24 +115,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     ThemeProvider themeProvider = context.watch<ThemeProvider>();
 
-    // Determinar qué logo usar
-    String logoPath;
-    if (Preferences.isPremium) {
-      logoPath = "assets/img/logo_pro.png";
-    } else {
-      logoPath = "assets/img/logo_dark.png";
-    }
-
-    Widget myAppWithSplash = CustomSplashScreen(
-      navigateRoute: const HomeScreen(),
-      duration: 1700,
-      imageSize: 280,
-      imageSrc: logoPath,
-      text: "CARGANDO...",
-      textStyle: const TextStyle(fontSize: 30.0, fontFamily: "Poppins"),
-      backgroundColor: AppThemes.colorSexto,
-    );
-
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -127,7 +125,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Coro Games',
-          home: myAppWithSplash,
+          home: const HomeScreen(),
           builder: EasyLoading.init(
             builder: (context, child) => child ?? const SizedBox.shrink(),
           ),

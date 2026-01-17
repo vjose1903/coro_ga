@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_score/helpers/helpers.dart';
@@ -35,12 +35,12 @@ class MainHome extends StatefulWidget {
 }
 
 class _MainHomeState extends State<MainHome> {
-  late final SlidingUpPanelController panelController;
+  late final PanelController panelController;
 
   @override
   void initState() {
     super.initState();
-    panelController = SlidingUpPanelController();
+    panelController = PanelController();
     
     // Verificar actualización al iniciar
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -71,6 +71,7 @@ class _MainHomeState extends State<MainHome> {
         context.watch<ThemeProvider>();
 
         return Scaffold(
+          resizeToAvoidBottomInset: false,
           body: Layout(
             appBarTitle: 'Mis Partidas',
             appBarTrailing: CustomIconButtom(
@@ -83,7 +84,7 @@ class _MainHomeState extends State<MainHome> {
             panelController: panelController,
           ),
           floatingActionButton: Visibility(
-            visible: panelController.status == SlidingUpPanelStatus.collapsed,
+            visible: !panelController.isAttached || panelController.isPanelClosed,
             child: FloatingActionButton(
                 shape: const CircleBorder(),
                 onPressed: () {
@@ -113,7 +114,7 @@ class _MainHomeState extends State<MainHome> {
 
 class _Body extends StatelessWidget {
   const _Body({Key? key, required this.panelController}) : super(key: key);
-  final SlidingUpPanelController panelController;
+  final PanelController panelController;
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +134,7 @@ class _Body extends StatelessWidget {
 class ListPartidas extends StatelessWidget {
   const ListPartidas({Key? key, required this.panelController})
       : super(key: key);
-  final SlidingUpPanelController panelController;
+  final PanelController panelController;
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
@@ -207,7 +208,7 @@ class ListPartidas extends StatelessWidget {
                     partidaProvider.partidaEditar = partida;
                     slideUp.openSlideUp(
                         controller: panelController,
-                        topMargin: 0.5,
+                        maxHeightFraction: 0.5,
                         bodyContent:
                             EditarEntidad(panelController: panelController)
                     );
@@ -233,7 +234,7 @@ class ListPartidas extends StatelessWidget {
 }
 
 class _Menu extends StatefulWidget {
-  final SlidingUpPanelController panelController;
+  final PanelController panelController;
 
   const _Menu({Key? key, required this.panelController}) : super(key: key);
 

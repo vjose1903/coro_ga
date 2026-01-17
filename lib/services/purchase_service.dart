@@ -14,7 +14,6 @@ class PurchaseService {
   // IDs alternativos para testing
   static const Set<String> _productIds = {
     premiumProductId,
-    'coro_games_premium',
   };
 
   StreamSubscription<List<PurchaseDetails>>? _subscription;

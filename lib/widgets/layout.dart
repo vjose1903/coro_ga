@@ -1,6 +1,6 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
-import 'package:game_score/helpers/helpers.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +14,7 @@ class Layout extends StatelessWidget {
     this.appBarLeading,
     this.appBarTrailing,
     this.hasFooter = false,
-    this.slideUpTopMargin = 0.07,
+    this.maxPanelHeightFraction = 0.85,
   }) : super(key: key);
 
   final Widget bodyContent;
@@ -22,9 +22,9 @@ class Layout extends StatelessWidget {
   final Widget? appBarLeading;
   final Widget? appBarTrailing;
   final bool? hasFooter;
-  final double slideUpTopMargin;
+  final double maxPanelHeightFraction; // Fracción máxima de la pantalla (0.0 a 1.0)
 
-  final SlidingUpPanelController panelController;
+  final PanelController panelController;
 
   final boxDecoration = const BoxDecoration(
     gradient: LinearGradient(
@@ -39,82 +39,52 @@ class Layout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final SlideUpProvider slideUpProvider = context.watch<SlideUpProvider>();
-    final double currentTopMargin = slideUpProvider.topMargin ?? slideUpTopMargin;
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final keyboardHeight = mediaQuery.viewInsets.bottom;
+    final topPadding = mediaQuery.padding.top;
+    
+    final fraction = slideUpProvider.maxHeightFraction ?? maxPanelHeightFraction;
+    final visibleHeight = screenHeight - keyboardHeight;
+    final minTopMargin = topPadding + 80;
+    
+    // maxHeight: el menor entre (altura deseada, 85% visible, espacio disponible)
+    final maxHeight = max(100.0, min(
+      screenHeight * fraction,
+      min(visibleHeight * maxPanelHeightFraction, visibleHeight - minTopMargin),
+    ));
 
-    final bool isExpanded = panelController.status == SlidingUpPanelStatus.expanded;
-
-    return Stack(
+    return Padding(
+      padding: EdgeInsets.only(bottom: keyboardHeight),
+      child: SlidingUpPanel(
+        controller: panelController,
+        minHeight: 0,
+        maxHeight: maxHeight,
+        backdropEnabled: true,
+        parallaxEnabled: true,
+        backdropOpacity: 0.6,
+        backdropTapClosesPanel: slideUpProvider.closeOnOutsideClick,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        boxShadow: [
+          BoxShadow(blurRadius: 7, spreadRadius: 1, color: Colors.black.withValues(alpha: 0.4))
+        ],
+        color: AppThemes.themeColor_2,
+        onPanelClosed: () {
+          cleanSlideUp(slideUpProvider, true);
+        },
+        panelBuilder: () => _WeSlideContent(panelController: panelController),
+        body: Stack(
           children: [
             Container(decoration: boxDecoration),
             _AppBar(title: appBarTitle, leading: appBarLeading, trailing: appBarTrailing),
             _Body(child: bodyContent),
-            // Backdrop visual con fade animation (cubre toda la pantalla, no se mueve)
-            IgnorePointer(
-              ignoring: true,
-              child: AnimatedOpacity(
-                opacity: isExpanded ? 1.0 : 0.0,
-                duration: const Duration(milliseconds: 300),
-                child: Container(
-                  color: Colors.black.withValues(alpha: 0.6),
-                ),
-              ),
-            ),
-            SlidingUpPanelWidget(
-              anchor: 0,
-              enableOnTap: false,
-              controlHeight: 0,
-              panelController: panelController,
-              dragDown: (details) {
-                // Fun.logColor(color: Colores.cyan, body: "dragDown");
-              },
-              dragStart: (details) {
-                // Fun.logColor(color: Colores.green, body: "dragStart");
-                FocusManager.instance.primaryFocus?.unfocus();
-              },
-              dragCancel: () {
-                if (panelController.status == SlidingUpPanelStatus.collapsed || panelController.status == SlidingUpPanelStatus.anchored) {
-                  cleanSlideUp(slideUpProvider, true);
-                }
-              },
-              dragUpdate: (details) {
-                // Fun.logColor(color: Colores.red, body: "dragUpdate");
-              },
-              dragEnd: (details) {
-                // Fun.logColor(color: Colores.yellow, body: "dragEnd");
-
-                if (panelController.status == SlidingUpPanelStatus.collapsed || panelController.status == SlidingUpPanelStatus.anchored) {
-                  cleanSlideUp(slideUpProvider, true);
-                }
-              },
-              child: Container(
-                margin: EdgeInsets.only(top: ResponsiveApp.size.height * currentTopMargin),
-                decoration: ShapeDecoration(
-                  shadows: [
-                    BoxShadow(blurRadius: 7, spreadRadius: 1, color: Colors.black.withValues(alpha: 0.4))
-                  ],
-                  color: AppThemes.themeColor_2,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-                  ),
-                ),
-                child: _WeSlideContent(panelController: panelController),
-              ),
-            ),
-            // GestureDetector para cerrar al tocar fuera (área superior del backdrop)
-            if (isExpanded && slideUpProvider.closeOnOutsideClick)
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                height: ResponsiveApp.size.height * currentTopMargin,
-                child: GestureDetector(
-                  onTap: () => cleanSlideUp(slideUpProvider),
-                  behavior: HitTestBehavior.opaque,
-                  child: Container(color: Colors.transparent),
-                ),
-              ),
           ],
-        );
+        ),
+      ),
+    );
   }
 
   cleanSlideUp(SlideUpProvider slideUpProvider, [isListener = false]) {
@@ -137,7 +107,6 @@ class _AppBar extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: Row(
-          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             if (leading != null) Container(margin: const EdgeInsets.only(right: 5), child: leading!),
             if (title != null)
@@ -160,11 +129,12 @@ class _Body extends StatelessWidget {
   final Widget child;
   @override
   Widget build(BuildContext context) {
-    final screenSize = ResponsiveApp.size;
+    final topPadding = MediaQuery.of(context).padding.top;
+    final appBarHeight = topPadding + 60;
+    
     return Column(
       children: [
-        SizedBox(height: screenSize.height * 0.125),
-        // SizedBox(height: 110),
+        SizedBox(height: appBarHeight),
         Expanded(
           child: ClipRRect(
             borderRadius: const BorderRadius.only(topLeft: Radius.circular(70)),
@@ -186,7 +156,7 @@ class _Body extends StatelessWidget {
 class _WeSlideContent extends StatelessWidget {
   const _WeSlideContent({Key? key, required this.panelController}) : super(key: key);
 
-  final SlidingUpPanelController panelController;
+  final PanelController panelController;
 
   @override
   Widget build(BuildContext context) {

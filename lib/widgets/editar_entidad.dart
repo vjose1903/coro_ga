@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
@@ -14,7 +14,7 @@ class EditarEntidad extends StatelessWidget {
   const EditarEntidad({Key? key, this.pageController, this.panelController}) : super(key: key);
 
   final PageController? pageController;
-  final SlidingUpPanelController? panelController;
+  final PanelController? panelController;
   @override
   Widget build(BuildContext context) {
     final JugadorProvider jugadorProvider = context.watch<JugadorProvider>();
@@ -189,7 +189,7 @@ aceptarFunction(BuildContext context, dynamic entidad,
     required PartidaProvider partidaProvider,
     required Function previusPage,
     required Function resetEntidadesEditar,
-    SlidingUpPanelController? panelController,
+    PanelController? panelController,
     PageController? pageController}) {
   if (tipo == "Partida") {
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();

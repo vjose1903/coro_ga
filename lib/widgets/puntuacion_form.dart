@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
@@ -12,7 +12,7 @@ import 'package:provider/provider.dart';
 
 class PuntuacionForm extends StatelessWidget {
   const PuntuacionForm({Key? key, required this.panelController}) : super(key: key);
-  final SlidingUpPanelController panelController;
+  final PanelController panelController;
   @override
   Widget build(BuildContext context) {
     final PageController pageController = PageController();
@@ -31,7 +31,7 @@ class PuntuacionForm extends StatelessWidget {
 
 class PuntuacionPage extends StatefulWidget {
   const PuntuacionPage({Key? key, required this.panelController, required this.pageController}) : super(key: key);
-  final SlidingUpPanelController panelController;
+  final PanelController panelController;
   final PageController pageController;
 
   @override
