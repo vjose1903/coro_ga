@@ -1,6 +1,7 @@
 import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -39,9 +40,9 @@ class FormPartidaPredefinida extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Nombre
-                    const CustomReactiveInput(
+                    CustomReactiveInput(
                       formControlName: 'nombre',
-                      labelText: "Nombre de la partida",
+                      labelText: AppLocalizations.of(context)!.gameName,
                       textCapitalization: TextCapitalization.words,
                     ),
                     const SizedBox(height: 14),
@@ -52,10 +53,10 @@ class FormPartidaPredefinida extends StatelessWidget {
                         Expanded(
                           child: CustomReactiveDropDown(
                             formControlName: 'tipo',
-                            labelText: "Tipo",
-                            items: const [
-                              DropdownMenuItem(value: "Rondas", child: Text("Rondas")),
-                              DropdownMenuItem(value: "Puntuación", child: Text("Puntuación"))
+                            labelText: AppLocalizations.of(context)!.type,
+                            items: [
+                              DropdownMenuItem(value: "Rondas", child: Text(AppLocalizations.of(context)!.rounds)),
+                              DropdownMenuItem(value: "Puntuación", child: Text(AppLocalizations.of(context)!.score))
                             ],
                             onChanged: (value) => formPartidaPredefinidaProvider.changeTipo(value),
                           ),
@@ -65,7 +66,7 @@ class FormPartidaPredefinida extends StatelessWidget {
                           Expanded(
                             child: CustomReactiveInput(
                               formControlName: 'maxPuntuacion',
-                              labelText: tipoPartida == "Rondas" ? "Cant. rondas" : "Punt. Máxima",
+                              labelText: tipoPartida == "Rondas" ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScore,
                               inputType: TextInputType.number,
                             ),
                           ),
@@ -85,8 +86,8 @@ class FormPartidaPredefinida extends StatelessWidget {
                           Toast.show(
                               type: ToastType.info,
                               context: context,
-                              message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores.",
-                              actionLabel: "Obtener PRO",
+                              message: AppLocalizations.of(context)!.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
+                              actionLabel: AppLocalizations.of(context)!.getPro,
                               onAction: () => Navigator.pushNamed(context, 'premium'));
                           return;
                         }
@@ -102,7 +103,7 @@ class FormPartidaPredefinida extends StatelessWidget {
                         // Volver
                         Expanded(
                           child: _ActionButton(
-                            label: "Volver",
+                            label: AppLocalizations.of(context)!.back,
                             icon: FontAwesomeIcons.arrowLeft,
                             isDestructive: true,
                             onTap: () {
@@ -115,7 +116,7 @@ class FormPartidaPredefinida extends StatelessWidget {
                         // Crear/Guardar
                         Expanded(
                           child: _ActionButton(
-                            label: isEditing ? "Guardar" : "Crear",
+                            label: isEditing ? AppLocalizations.of(context)!.save : AppLocalizations.of(context)!.create,
                             icon: isEditing ? FontAwesomeIcons.floppyDisk : FontAwesomeIcons.plus,
                             isPrimary: true,
                             onTap: () => crearEditarPartida(context: context, form: form),
@@ -159,10 +160,10 @@ class FormPartidaPredefinida extends StatelessWidget {
           googleAdsProvider.loadInterstitialAd();
         });
       } else {
-        Toast.show(type: ToastType.error, context: context, message: "Error registrando partida.");
+        Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.errorRegisteringGame);
       }
     } else {
-      Toast.show(type: ToastType.warning, context: context, message: "Revisar todos los campos de texto.");
+      Toast.show(type: ToastType.warning, context: context, message: AppLocalizations.of(context)!.checkAllFields);
     }
   }
 }
@@ -239,7 +240,7 @@ class _FormHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isEditing ? "Editar Partida" : "Nueva Partida",
+                  isEditing ? AppLocalizations.of(context)!.editPredefinedGame : AppLocalizations.of(context)!.newPredefinedGame,
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w600,
@@ -248,7 +249,7 @@ class _FormHeader extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  isEditing ? "Modifica los datos de la partida" : "Configura tu partida predefinida",
+                  isEditing ? AppLocalizations.of(context)!.modifyGameData : AppLocalizations.of(context)!.configureYourPredefined,
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 11,
@@ -316,7 +317,7 @@ class _JugadoresCounter extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                "Cantidad de jugadores",
+                AppLocalizations.of(context)!.playerCount,
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 13,

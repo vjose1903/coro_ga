@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_shake_animated/flutter_shake_animated.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_score/helpers/helpers.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -86,8 +87,8 @@ class PartidasDefaultAlert extends StatelessWidget {
       Toast.show(
           type: ToastType.info,
           context: context,
-          message: "La versión gratis solo permite ${PremiumProvider.freeMaxPredefinedGames} partidas predefinidas.",
-          actionLabel: "Obtener PRO",
+          message: AppLocalizations.of(context)!.freeVersionLimitPredefined(PremiumProvider.freeMaxPredefinedGames),
+          actionLabel: AppLocalizations.of(context)!.getPro,
           onAction: () => Navigator.pushNamed(context, 'premium'));
       return;
     }
@@ -173,7 +174,7 @@ class _PredefinidaHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Partidas Predefinidas",
+                  AppLocalizations.of(context)!.predefinedGames,
                   style: TextStyle(
                     fontFamily: "Poppins",
                     fontSize: 16,
@@ -182,7 +183,7 @@ class _PredefinidaHeader extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  isReordering ? "Arrastra para reordenar" : "Toca para seleccionar",
+                  isReordering ? AppLocalizations.of(context)!.dragToReorder : AppLocalizations.of(context)!.tapToSelect,
                   style: TextStyle(
                     fontFamily: "Poppins",
                     fontSize: 11,
@@ -264,9 +265,9 @@ class _DoneButton extends StatelessWidget {
               ),
             ],
           ),
-          child: const Text(
-            "Listo",
-            style: TextStyle(
+          child: Text(
+            AppLocalizations.of(context)!.done,
+            style: const TextStyle(
               fontFamily: 'Poppins',
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -307,14 +308,14 @@ class _CloseButton extends StatelessWidget {
                 ),
               ],
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                FaIcon(FontAwesomeIcons.xmark, color: Colors.white, size: 14),
-                SizedBox(width: 8),
+                const FaIcon(FontAwesomeIcons.xmark, color: Colors.white, size: 14),
+                const SizedBox(width: 8),
                 Text(
-                  "Cerrar",
-                  style: TextStyle(
+                  AppLocalizations.of(context)!.close,
+                  style: const TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -370,7 +371,7 @@ class PartidasScrollView extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Sin partidas predefinidas',
+                  AppLocalizations.of(context)!.noPredefinedGames,
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 14,
@@ -380,7 +381,7 @@ class PartidasScrollView extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Toca + para crear una',
+                  AppLocalizations.of(context)!.tapPlusToCreate,
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 12,
@@ -535,7 +536,7 @@ class ReordenableItem extends StatelessWidget {
                         bottom: 4,
                         right: 6,
                         child: Text(
-                          partidaPredefinida.tipo ?? '',
+                          L10n.getGameType(context, partidaPredefinida.tipo),
                           style: TextStyle(
                             fontFamily: "Poppins",
                             fontSize: 8,
@@ -590,14 +591,16 @@ class ReordenableItem extends StatelessWidget {
 
   deletePartidaPredefinida(BuildContext context, PartidaPredefinida partida) {
     PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
+    final l10n = AppLocalizations.of(context)!;
 
     CustomAlertDialog.show(context,
-        menssage: "Seguro que desea eliminar la partida predefinida: ${partida.nombre}",
-        title: "Confirmar",
+        menssage: l10n.confirmDeletePredefined(partida.nombre!),
+        title: l10n.confirm,
         dialogType: DialogType.error,
         buttonsList: [
-          CustomActionsButtons.cancelButton({"onTap": () => Navigator.pop(context)}),
+          CustomActionsButtons.cancelButton({"label": l10n.cancel, "onTap": () => Navigator.pop(context)}),
           CustomActionsButtons.aceptarButton({
+            "label": l10n.accept,
             "onTap": () {
               Navigator.pop(context);
               formPartidaPredefinidaProvider.deletePartidaPredefinida(context, partida: partida);
@@ -608,7 +611,7 @@ class ReordenableItem extends StatelessWidget {
 
   selectPartidaPredefinida({required BuildContext context}) {
     FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
-    formPartidaProvider.rellenarFormulario(partidaPredefinida);
+    formPartidaProvider.rellenarFormulario(partidaPredefinida, context: context);
     Navigator.pop(context);
   }
 

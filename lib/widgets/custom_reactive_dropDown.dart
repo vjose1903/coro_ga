@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/themes/app_themes.dart';
+import 'package:game_score/utils/l10n_helper.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 class CustomReactiveDropDown extends StatelessWidget {
@@ -70,7 +71,7 @@ class CustomReactiveDropDown extends StatelessWidget {
         ),
         showErrors: (control) => control.invalid && (control.touched || control.dirty),
         validationMessages: {
-              'required': (error) => "Campo requerido.",
+              'required': (error) => L10n.fieldRequired,
             });
   }
 }

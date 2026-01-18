@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
@@ -54,7 +55,7 @@ class ListJugadores extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              "Sin jugadores",
+              AppLocalizations.of(context)!.noPlayers,
               style: TextStyle(
                 fontFamily: 'Poppins',
                 fontSize: 12,

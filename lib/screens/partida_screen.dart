@@ -97,6 +97,8 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
+    final FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
+    final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
     Partida partida = partidaProvider.partidaEnTurno!;
     return Layout(
         panelController: panelController,
@@ -107,6 +109,20 @@ class _Body extends StatelessWidget {
           iconColor: Colors.white,
           icon: Icons.arrow_back_ios_new,
           onTap: () => Navigator.pop(context),
+        ),
+        appBarTrailing: CustomIconButtom(
+          iconSize: 22,
+          iconColor: Colors.white,
+          icon: Icons.edit_outlined,
+          onTap: () {
+            formPartidaProvider.form.patchValue(partida.toMap());
+            partidaProvider.partidaEditar = partida;
+            slideUpProvider.openSlideUp(
+              controller: panelController,
+              maxHeightFraction: 0.5,
+              bodyContent: EditarEntidad(panelController: panelController),
+            );
+          },
         ),
         bodyContent: Container(
             margin: const EdgeInsets.only(top: 40, bottom: 90),

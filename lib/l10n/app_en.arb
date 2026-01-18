@@ -1,0 +1,243 @@
+{
+  "@@locale": "en",
+  
+  "appTitle": "Coro Games",
+  
+  "myGames": "My Games",
+  "configuration": "Settings",
+  
+  "emptyGamesTitle": "Start your first game!",
+  "emptyGamesSubtitle": "Press the + button to create\na new game",
+  "swipeToEditOrDelete": "Swipe to edit or delete",
+  "loadingGames": "Loading games...",
+  "loading": "Loading...",
+  
+  "freeVersionLimitGames": "Free version only allows {count} simultaneous games.",
+  "@freeVersionLimitGames": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "freeVersionLimitPlayers": "Free version only allows {count} players.",
+  "@freeVersionLimitPlayers": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "freeVersionLimitPredefined": "Free version only allows {count} predefined games.",
+  "@freeVersionLimitPredefined": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "getPro": "Get PRO",
+  
+  "appearance": "Appearance",
+  "systemTheme": "System theme",
+  "syncWithDevice": "Sync with device",
+  "lightTheme": "Light",
+  "darkTheme": "Dark",
+  
+  "youArePro": "You are PRO",
+  "active": "Active",
+  "allFeaturesUnlocked": "All features unlocked",
+  "noAdsUnlimitedGames": "No ads • Unlimited games",
+  "simulatePremiumDev": "Simulate Premium (Dev)",
+  
+  "createNewGame": "Create new game",
+  "predefined": "Predefined",
+  "gameName": "Game name",
+  "type": "Type",
+  "rounds": "Rounds",
+  "score": "Score",
+  "roundCount": "Round count",
+  "maxScore": "Max score",
+  "players": "Players",
+  "createGame": "Create Game",
+  "errorRegisteringGame": "Error registering game.",
+  "checkAllFields": "Check all text fields.",
+  "maxPlayersReached": "Maximum players reached",
+  "name": "name",
+  
+  "predefinedGames": "Predefined Games",
+  "dragToReorder": "Drag to reorder",
+  "tapToSelect": "Tap to select",
+  "done": "Done",
+  "close": "Close",
+  "noPredefinedGames": "No predefined games",
+  "tapPlusToCreate": "Tap + to create one",
+  
+  "confirm": "Confirm",
+  "cancel": "Cancel",
+  "accept": "Accept",
+  "delete": "Delete",
+  "confirmDeleteGame": "Are you sure you want to delete the game: {name}",
+  "@confirmDeleteGame": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "confirmDeletePredefined": "Are you sure you want to delete the predefined game: {name}",
+  "@confirmDeletePredefined": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "confirmDeleteScore": "Are you sure you want to delete score {score} from player {player}?",
+  "@confirmDeleteScore": {
+    "placeholders": {
+      "score": {"type": "int"},
+      "player": {"type": "String"}
+    }
+  },
+  
+  "playerScore": "Score: {score}",
+  "@playerScore": {
+    "placeholders": {
+      "score": {"type": "int"}
+    }
+  },
+  "increase": "Increase",
+  "decrease": "Decrease",
+  "scoreLabel": "Score",
+  "noScoresRegistered": "No scores registered",
+  "noRoundsRegistered": "No rounds registered",
+  "minScoreWarning": "Minimum score must be 0.",
+  "minRoundWarning": "Minimum round must be 0.",
+  "scoreMustBeGreaterThanZero": "Score must be greater than 0",
+  "enterScoreToContinue": "You must enter a score to continue",
+  "warning": "WARNING",
+  
+  "increased": "Increase",
+  "decreased": "Decrease",
+  
+  "coroGamesPro": "Coro Games PRO",
+  "unlockFullPotential": "Unlock full potential",
+  "unlimitedPlayers": "Unlimited players",
+  "unlimitedPlayersDesc": "No player limit per game",
+  "unlimitedGames": "Unlimited games",
+  "unlimitedGamesDesc": "Create as many games as you want",
+  "predefinedGamesFeature": "Predefined games",
+  "predefinedGamesDesc": "Save unlimited configurations",
+  "fullHistory": "Full history",
+  "fullHistoryDesc": "Access complete play history",
+  "noAds": "No ads",
+  "noAdsDesc": "Enjoy without interruptions",
+  "alreadyPremium": "You are Premium!",
+  "oneTimePayment": "One-time payment • No subscription",
+  "purchaseRestored": "Purchase restored! You are Premium.",
+  "purchaseFailed": "Could not complete purchase. Try again.",
+  
+  "gameType_rounds": "Rounds",
+  "gameType_score": "Score",
+  
+  "language": "Language",
+  "languageSpanish": "Español",
+  "languageEnglish": "English",
+  
+  "starting": "Starting",
+  "gameStarting": "Game Starting",
+  "tie": "Tie",
+  "winning": "Winning",
+  "losing": "Losing",
+  "edit": "Edit",
+  "restart": "Restart",
+  "confirmRestartGame": "Are you sure you want to restart the game: {name}?",
+  "@confirmRestartGame": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  
+  "newPredefinedGame": "New Game",
+  "editPredefinedGame": "Edit Game",
+  "configureYourPredefined": "Configure your predefined game",
+  "modifyGameData": "Modify game data",
+  "playerCount": "Number of players",
+  "back": "Back",
+  "save": "Save",
+  "create": "Create",
+  
+  "editGame": "Edit Game",
+  "editPlayer": "Edit Player",
+  "noName": "No name",
+  "gameNameCannotBeEmpty": "Game name cannot be empty.",
+  "playerNameCannotBeEmpty": "Player name cannot be empty.",
+  
+  "addPlayer": "Add Player",
+  "playerName": "Player name",
+  "currentPlayers": "Current players",
+  "playersInGame": "{count} player{count, plural, =1{} other{s}} in the game",
+  "@playersInGame": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "enterNewPlayerName": "You must enter the new player's name",
+  
+  "winner": "WINNER",
+  "rematch": "Rematch",
+  "watchAd": "watch ad",
+  "errorRenewingGame": "Error renewing game.",
+  
+  "maxScoreFull": "Max Score",
+  
+  "selectPlayer": "Select a player",
+  "generalHistory": "General History",
+  "records": "{count} record{count, plural, =1{} other{s}}",
+  "@records": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "selectedPlayer": "Selected player",
+  "noRecords": "No records",
+  "noPlayers": "No players",
+  
+  "confirmDeletePlayer": "Are you sure you want to delete the player: {name}",
+  "@confirmDeletePlayer": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "errorDeletingPlayer": "Error deleting player: {name}",
+  "@errorDeletingPlayer": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "minPlayersWarning": "The number of players cannot be less than 2.",
+  "playerNumber": "Player {number}",
+  "@playerNumber": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  
+  "newVersionTitle": "New version available!",
+  "newVersionAvailable": "A new version of Coro Games is available. Update now to enjoy the latest improvements and features.",
+  "updateNow": "Update now",
+  "unauthorizedVersion": "Unauthorized Version",
+  "illegitimateCopy": "This copy of the app is not legitimate.\n\nPlease download the official version from Google Play Store to enjoy all features.",
+  "closeApp": "Close app",
+  
+  "errorEditingPlayer": "Could not edit the selected player.",
+  "errorDeletingHistory": "Error deleting history",
+  "noHistoryForGame": "The entered game has no history.",
+  "minTwoPlayers": "You must add at least 2 players to the game",
+  "noGamesRegistered": "No games registered.",
+  "errorDeletingGame": "Could not delete the selected game.",
+  "errorEditingGame": "Could not edit the selected game.",
+  "noPlayersForGame": "The entered game has no players.",
+  "errorDeletingPredefined": "Could not delete the selected predefined game.",
+  "errorEditingPredefined": "Could not edit the selected game.",
+  "errorInsertingHistory": "Error inserting play history.",
+  
+  "fieldRequired": "Required field.",
+  "minValue": "Minimum value is: {min}",
+  "@minValue": {
+    "placeholders": {
+      "min": {"type": "String"}
+    }
+  }
+}

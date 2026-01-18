@@ -6,10 +6,15 @@ class SlideUpProvider extends ChangeNotifier {
   double? _topMargin;
   double? _maxHeightFraction;
   bool _closeOnOutsideClick = true;
+  bool _isPanelFullyOpen = false;
+  
+  // Callbacks para scroll automático pendiente
+  final List<VoidCallback> _pendingScrollCallbacks = [];
 
   double? get topMargin => _topMargin;
   double? get maxHeightFraction => _maxHeightFraction;
   bool get closeOnOutsideClick => _closeOnOutsideClick;
+  bool get isPanelFullyOpen => _isPanelFullyOpen;
 
   void openSlideUp({
     required PanelController controller,
@@ -35,6 +40,35 @@ class SlideUpProvider extends ChangeNotifier {
     _topMargin = null;
     _maxHeightFraction = null;
     _closeOnOutsideClick = true;
+    _isPanelFullyOpen = false;
+    _pendingScrollCallbacks.clear();
     notifyListeners();
+  }
+  
+  /// Llamado cuando el panel está completamente abierto
+  void onPanelOpened() {
+    _isPanelFullyOpen = true;
+    // Ejecutar callbacks pendientes
+    for (final callback in _pendingScrollCallbacks) {
+      callback();
+    }
+    _pendingScrollCallbacks.clear();
+    notifyListeners();
+  }
+  
+  /// Llamado cuando el panel comienza a cerrarse
+  void onPanelClosing() {
+    _isPanelFullyOpen = false;
+    _pendingScrollCallbacks.clear();
+  }
+  
+  /// Registra un callback para ejecutar cuando el panel esté completamente abierto
+  /// Si el panel ya está abierto, ejecuta el callback inmediatamente
+  void executeWhenPanelOpen(VoidCallback callback) {
+    if (_isPanelFullyOpen) {
+      callback();
+    } else {
+      _pendingScrollCallbacks.add(callback);
+    }
   }
 }

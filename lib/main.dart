@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/routes/app_routes.dart';
 import 'package:game_score/screens/screens.dart';
@@ -36,6 +37,7 @@ void main() async {
   bool initInDarkMode = Preferences.isSystemMode ? isPlatformDark : Preferences.isDarkMode;
 
   final premiumProvider = PremiumProvider();
+  final localeProvider = LocaleProvider();
 
   // ⚡ Inicializar ads y compras de forma DIFERIDA (no bloquear el arranque)
   _initializeServicesDeferred(premiumProvider);
@@ -51,6 +53,7 @@ void main() async {
     ChangeNotifierProvider(create: (_) => PartidaPredefinidaProvider()),
     ChangeNotifierProvider(create: (_) => ThemeProvider(isDarkMode_: initInDarkMode)),
     ChangeNotifierProvider.value(value: premiumProvider),
+    ChangeNotifierProvider.value(value: localeProvider),
   ], child: const MyApp()));
 }
 
@@ -114,6 +117,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     ThemeProvider themeProvider = context.watch<ThemeProvider>();
+    final localeProvider = context.watch<LocaleProvider>();
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -125,6 +129,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Coro Games',
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: localeProvider.locale,
           home: const HomeScreen(),
           builder: EasyLoading.init(
             builder: (context, child) => child ?? const SizedBox.shrink(),

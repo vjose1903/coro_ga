@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_score/helpers/helpers.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
+import 'package:game_score/utils/alert_dialog.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
@@ -30,12 +32,13 @@ class EditarEntidad extends StatelessWidget {
     dynamic entidad;
     IconData icon;
 
+    final l10n = AppLocalizations.of(context)!;
     if (partida != null) {
-      tipo = "Partida";
+      tipo = l10n.editGame.split(' ').last;
       entidad = partida;
       icon = FontAwesomeIcons.gamepad;
     } else {
-      tipo = "Jugador";
+      tipo = l10n.editPlayer.split(' ').last;
       entidad = jugador;
       icon = FontAwesomeIcons.user;
     }
@@ -52,6 +55,15 @@ class EditarEntidad extends StatelessWidget {
             tipo: tipo,
             nombre: entidad?.nombre ?? "",
             icon: icon,
+            noNameLabel: AppLocalizations.of(context)!.noName,
+            partida: partida,
+            onRestart: partida != null && !partida.isSinIniciar
+                ? () async {
+                    await partida.restartPartida();
+                    partidaProvider.refresh();
+                    if (panelController != null) slideUpProvider.closeSlideUp(controller: panelController!);
+                  }
+                : null,
           ),
           const SizedBox(height: 16),
           
@@ -65,7 +77,7 @@ class EditarEntidad extends StatelessWidget {
               // CANCELAR
               Expanded(
                 child: _ActionButton(
-                  label: "Cancelar",
+                  label: l10n.cancel,
                   icon: FontAwesomeIcons.xmark,
                   isDestructive: true,
                   onTap: () async {
@@ -82,7 +94,7 @@ class EditarEntidad extends StatelessWidget {
               // ACEPTAR
               Expanded(
                 child: _ActionButton(
-                  label: "Guardar",
+                  label: l10n.save,
                   icon: FontAwesomeIcons.check,
                   isPrimary: true,
                   onTap: () {
@@ -129,8 +141,8 @@ class EditJugador extends StatelessWidget {
     return Expanded(
         child: ReactiveForm(
       formGroup: form,
-      child: Column(children: const <Widget>[
-        CustomReactiveInput(formControlName: 'nombre', labelText: "nombre", textCapitalization: TextCapitalization.words)
+      child: Column(children: <Widget>[
+        CustomReactiveInput(formControlName: 'nombre', labelText: AppLocalizations.of(context)!.name, textCapitalization: TextCapitalization.words)
       ]),
     ));
   }
@@ -152,37 +164,37 @@ class EditPartida extends StatelessWidget {
             child: ReactiveForm(
           formGroup: form,
           child: Column(children: <Widget>[
-            const CustomReactiveInput(formControlName: 'nombre', labelText: "nombre", textCapitalization: TextCapitalization.words),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.easeOut,
-                  // height: 45,
-                  width: tipoPartida == '' ? ResponsiveApp.size.width - 21 : ResponsiveApp.size.width * 0.46,
-                  child: CustomReactiveDropDown(
-                    formControlName: 'tipo',
-                    labelText: "Tipo",
-                    items: const [
-                      DropdownMenuItem(value: "Rondas", child: Text("Rondas")),
-                      DropdownMenuItem(value: "Puntuación", child: Text("Puntuación"))
-                    ],
-                    onChanged: (value) => formPartidaProvider.changeTipo(value),
-                  ),
-                ),
-                AnimatedContainer(
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeOut,
-                    width: tipoPartida == '' ? 0.01 : ResponsiveApp.size.width * 0.46,
-                    child: CustomReactiveInput(
-                        formControlName: 'maxPuntuacion',
-                        labelText: tipoPartida == "Rondas" ? "Cant. rondas" : "Puntuación Máxima",
-                        inputType: TextInputType.number)),
-              ],
-            ),
+                    CustomReactiveInput(formControlName: 'nombre', labelText: AppLocalizations.of(context)!.name, textCapitalization: TextCapitalization.words),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.easeOut,
+                          // height: 45,
+                          width: tipoPartida == '' ? ResponsiveApp.size.width - 21 : ResponsiveApp.size.width * 0.46,
+                          child: CustomReactiveDropDown(
+                            formControlName: 'tipo',
+                            labelText: AppLocalizations.of(context)!.type,
+                            items: [
+                              DropdownMenuItem(value: "Rondas", child: Text(AppLocalizations.of(context)!.rounds)),
+                              DropdownMenuItem(value: "Puntuación", child: Text(AppLocalizations.of(context)!.score))
+                            ],
+                            onChanged: (value) => formPartidaProvider.changeTipo(value),
+                          ),
+                        ),
+                        AnimatedContainer(
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.easeOut,
+                            width: tipoPartida == '' ? 0.01 : ResponsiveApp.size.width * 0.46,
+                            child: CustomReactiveInput(
+                                formControlName: 'maxPuntuacion',
+                                labelText: tipoPartida == "Rondas" ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScoreFull,
+                                inputType: TextInputType.number)),
+                      ],
+                    ),
           ]),
         ));
       },
@@ -212,7 +224,7 @@ aceptarFunction(BuildContext context, dynamic entidad,
         if (panelController != null) slideUpProvider.closeSlideUp(controller: panelController);
       });
     } else {
-      Toast.show(type: ToastType.error, context: context, message: "El nombre de la partida no puede estar vacio.");
+      Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.gameNameCannotBeEmpty);
     }
   } else {
     if (form.valid) {
@@ -226,7 +238,7 @@ aceptarFunction(BuildContext context, dynamic entidad,
         resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
       });
     } else {
-      Toast.show(type: ToastType.error, context: context, message: "El nombre del jugador no puede estar vacio.");
+      Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.playerNameCannotBeEmpty);
     }
   }
 }
@@ -240,15 +252,22 @@ class _EditHeader extends StatelessWidget {
     required this.tipo,
     required this.nombre,
     required this.icon,
+    required this.noNameLabel,
+    this.partida,
+    this.onRestart,
   });
 
   final String tipo;
   final String nombre;
   final IconData icon;
+  final String noNameLabel;
+  final Partida? partida;
+  final Future<void> Function()? onRestart;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
+    final l10n = AppLocalizations.of(context)!;
     
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -317,7 +336,7 @@ class _EditHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Editar $tipo",
+                  "${l10n.edit} $tipo",
                   style: TextStyle(
                     fontFamily: "Poppins",
                     fontSize: 11,
@@ -327,7 +346,7 @@ class _EditHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 1),
                 Text(
-                  nombre.isNotEmpty ? nombre : "Sin nombre",
+                  nombre.isNotEmpty ? nombre : l10n.noName,
                   style: TextStyle(
                     fontFamily: "Poppins",
                     fontSize: 16,
@@ -340,6 +359,70 @@ class _EditHeader extends StatelessWidget {
               ],
             ),
           ),
+          
+          // Botón reiniciar (solo si es partida y ya inició)
+          if (onRestart != null)
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  CustomAlertDialog.show(
+                    context,
+                    title: l10n.confirm,
+                    menssage: l10n.confirmRestartGame(partida!.nombre!),
+                    dialogType: DialogType.warning,
+                    buttonsList: [
+                      CustomActionsButtons.cancelButton({
+                        "label": l10n.cancel,
+                        "onTap": () => Navigator.pop(context),
+                      }),
+                      CustomActionsButtons.aceptarButton({
+                        "label": l10n.accept,
+                        "onTap": () async {
+                          Navigator.pop(context);
+                          await onRestart!();
+                        },
+                      }),
+                    ],
+                  );
+                },
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFFFFB300), Color(0xFFFF8F00)],
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFFFA000).withValues(alpha: 0.3),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.restart_alt_rounded, color: Colors.white, size: 16),
+                      const SizedBox(width: 4),
+                      Text(
+                        l10n.restart,
+                        style: const TextStyle(
+                          fontFamily: "Poppins",
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

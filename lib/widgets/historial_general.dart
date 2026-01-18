@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/screens/ganador.dart';
@@ -20,23 +21,14 @@ class HistorialGeneral extends StatefulWidget {
   State<HistorialGeneral> createState() => _HistorialGeneralState();
 }
 
-class _HistorialGeneralState extends State<HistorialGeneral> {
+class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScrollMixin {
   final TextEditingController puntuacionController = TextEditingController();
   final ScrollController historialController = ScrollController();
   Jugador? jugadorSeleccionado;
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (historialController.hasClients) {
-        historialController.jumpTo(historialController.position.maxScrollExtent);
-      }
-    });
-  }
-
-  @override
   void dispose() {
+    cancelPendingScroll();
     puntuacionController.dispose();
     historialController.dispose();
     super.dispose();
@@ -65,8 +57,11 @@ class _HistorialGeneralState extends State<HistorialGeneral> {
 
     return Column(
       children: [
-        // Header
-        _HistorialHeader(cantRegistros: todosHistoriales.length),
+        // Header - arrastrable para cerrar el panel
+        _HistorialHeader(
+          cantRegistros: todosHistoriales.length,
+          panelController: widget.panelController,
+        ),
         const SizedBox(height: 16),
 
         // Selector de jugador
@@ -78,21 +73,26 @@ class _HistorialGeneralState extends State<HistorialGeneral> {
         const SizedBox(height: 12),
 
         // Lista de historial
-        Expanded(
+        Flexible(
           flex: 2,
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppThemes.themeColor_1,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
-              ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height * 0.18,
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: _ListHistorialGeneral(
-                historiales: todosHistoriales,
-                historialController: historialController,
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppThemes.themeColor_1,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: _ListHistorialGeneral(
+                  historiales: todosHistoriales,
+                  historialController: historialController,
+                ),
               ),
             ),
           ),
@@ -111,7 +111,7 @@ class _HistorialGeneralState extends State<HistorialGeneral> {
             Expanded(
               child: _ActionScoreButton(
                 icon: Icons.add_rounded,
-                label: "Aumentar",
+                label: AppLocalizations.of(context)!.increase,
                 color: const Color(0xFF4CAF50),
                 onTap: () => _changePuntuacion(
                   context: context,
@@ -125,7 +125,7 @@ class _HistorialGeneralState extends State<HistorialGeneral> {
             Expanded(
               child: _ActionScoreButton(
                 icon: Icons.remove_rounded,
-                label: "Reducir",
+                label: AppLocalizations.of(context)!.decrease,
                 color: Colors.red[400]!,
                 onTap: () => _changePuntuacion(
                   context: context,
@@ -147,16 +147,18 @@ class _HistorialGeneralState extends State<HistorialGeneral> {
     required PartidaProvider partidaProvider,
     required String tipo,
   }) async {
+    final scrollController = getEffectiveController(context, historialController);
+    final l10n = AppLocalizations.of(context)!;
     if (jugadorSeleccionado == null) {
-      Toast.show(type: ToastType.warning, context: context, message: "Seleccione un jugador");
+      Toast.show(type: ToastType.warning, context: context, message: l10n.selectPlayer);
       return;
     }
 
     String puntuacion = partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? puntuacionController.text : "1";
 
     if (puntuacion.isEmpty || puntuacion == "0") {
-      String msg = puntuacion == "0" ? "Puntuación debe de ser mayor a 0" : "Debe introducir una puntuación";
-      Toast.show(type: ToastType.warning, context: context, title: "AVISO", message: msg);
+      String msg = puntuacion == "0" ? l10n.scoreMustBeGreaterThanZero : l10n.enterScoreToContinue;
+      Toast.show(type: ToastType.warning, context: context, title: l10n.warning, message: msg);
       return;
     }
 
@@ -165,9 +167,9 @@ class _HistorialGeneralState extends State<HistorialGeneral> {
 
     if (tipo == "reducir" && puntuacionActual - puntuacionInt < 0) {
       String msgError = partidaProvider.partidaEnTurno!.tipo == "Puntuación"
-          ? "La puntuación mínima debe de ser 0."
-          : "La ronda mínima debe de ser 0.";
-      Toast.show(type: ToastType.warning, context: context, title: "AVISO", message: msgError);
+          ? l10n.minScoreWarning
+          : l10n.minRoundWarning;
+      Toast.show(type: ToastType.warning, context: context, title: l10n.warning, message: msgError);
       return;
     }
 
@@ -213,16 +215,8 @@ class _HistorialGeneralState extends State<HistorialGeneral> {
         );
       }
 
-      // Scroll al final
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (historialController.hasClients) {
-          historialController.animateTo(
-            historialController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 600),
-            curve: Curves.easeOutCubic,
-          );
-        }
-      });
+      // Scroll al final usando el mixin
+      scheduleScrollToBottom(context, scrollController);
     }
   }
 }
@@ -239,15 +233,23 @@ class _HistorialConJugador {
 // ============================================
 
 class _HistorialHeader extends StatelessWidget {
-  const _HistorialHeader({required this.cantRegistros});
+  const _HistorialHeader({required this.cantRegistros, required this.panelController});
 
   final int cantRegistros;
+  final PanelController panelController;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
 
-    return Container(
+    return GestureDetector(
+      onVerticalDragUpdate: (details) {
+        // Si arrastra hacia abajo, cerrar el panel
+        if (details.delta.dy > 8 && panelController.isAttached) {
+          panelController.close();
+        }
+      },
+      child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -304,7 +306,7 @@ class _HistorialHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Historial General",
+                  AppLocalizations.of(context)!.generalHistory,
                   style: TextStyle(
                     fontFamily: "Poppins",
                     fontSize: 16,
@@ -314,7 +316,7 @@ class _HistorialHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 1),
                 Text(
-                  "$cantRegistros registro${cantRegistros != 1 ? 's' : ''}",
+                  AppLocalizations.of(context)!.records(cantRegistros),
                   style: TextStyle(
                     fontFamily: "Poppins",
                     fontSize: 11,
@@ -326,6 +328,7 @@ class _HistorialHeader extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }
@@ -350,7 +353,7 @@ class _JugadorSelector extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Jugador seleccionado",
+          AppLocalizations.of(context)!.selectedPlayer,
           style: TextStyle(
             fontFamily: "Poppins",
             fontSize: 12,
@@ -449,19 +452,36 @@ class _JugadorSelector extends StatelessWidget {
   }
 }
 
-class _ListHistorialGeneral extends StatelessWidget {
+class _ListHistorialGeneral extends StatefulWidget {
   const _ListHistorialGeneral({Key? key, required this.historiales, required this.historialController}) : super(key: key);
 
   final List<_HistorialConJugador> historiales;
   final ScrollController historialController;
 
   @override
+  State<_ListHistorialGeneral> createState() => _ListHistorialGeneralState();
+}
+
+class _ListHistorialGeneralState extends State<_ListHistorialGeneral> with SlideUpAutoScrollMixin {
+  bool _initialScrollScheduled = false;
+
+  @override
+  void dispose() {
+    cancelPendingScroll();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Usar el scrollController del SlideUp si está disponible
-    final slideUpController = SlideUpScrollController.of(context);
-    final effectiveController = slideUpController ?? historialController;
+    final effectiveController = getEffectiveController(context, widget.historialController);
     
-    if (historiales.isEmpty) {
+    // Scroll inicial al abrir el panel
+    if (!_initialScrollScheduled && widget.historiales.isNotEmpty) {
+      _initialScrollScheduled = true;
+      scheduleScrollToBottom(context, effectiveController);
+    }
+
+    if (widget.historiales.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -480,7 +500,7 @@ class _ListHistorialGeneral extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              "No hay registros",
+              AppLocalizations.of(context)!.noRecords,
               style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.grey[500]),
             ),
           ],
@@ -496,9 +516,9 @@ class _ListHistorialGeneral extends StatelessWidget {
         color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.2),
         height: 1,
       ),
-      itemCount: historiales.length,
+      itemCount: widget.historiales.length,
       itemBuilder: (context, index) {
-        final item = historiales[index];
+        final item = widget.historiales[index];
         return _HistorialGeneralItem(
           historial: item.historial,
           jugador: item.jugador,
@@ -649,19 +669,22 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
   }
 
   void _deleteHistorial(BuildContext context, CompletionHandler handler) {
+    final l10n = AppLocalizations.of(context)!;
     CustomAlertDialog.show(
       context,
-      title: "Confirmar",
-      menssage: "¿Seguro que desea eliminar la puntuación ${widget.historial.puntuacion} del jugador ${widget.jugador.nombre}?",
+      title: l10n.confirm,
+      menssage: l10n.confirmDeleteScore(widget.historial.puntuacion!.toInt(), widget.jugador.nombre!),
       dialogType: DialogType.error,
       buttonsList: [
         CustomActionsButtons.cancelButton({
+          "label": l10n.cancel,
           "onTap": () {
             Navigator.pop(context);
             handler(false);
           }
         }),
         CustomActionsButtons.aceptarButton({
+          "label": l10n.accept,
           "onTap": () async {
             Navigator.pop(context);
             final jugadorProvider = context.read<JugadorProvider>();
@@ -802,7 +825,7 @@ class _KeyboardSection extends StatelessWidget {
               color: isDark ? Colors.white : AppThemes.colorQuinto,
             ),
             decoration: InputDecoration(
-              labelText: 'Puntuación',
+              labelText: AppLocalizations.of(context)!.scoreLabel,
               fillColor: AppThemes.inputDisabledColor,
               filled: true,
               contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),

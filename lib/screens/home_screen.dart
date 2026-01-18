@@ -7,6 +7,7 @@ import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_score/helpers/helpers.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -80,10 +81,11 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
         context.watch<SlideUpProvider>();
         context.watch<ThemeProvider>();
 
+        final l10n = AppLocalizations.of(context)!;
         return Scaffold(
           resizeToAvoidBottomInset: false,
           body: Layout(
-            appBarTitle: 'Mis Partidas',
+            appBarTitle: l10n.myGames,
             appBarTrailing: _AnimatedMenuButton(onTap: openMenuSlideUp),
             bodyContent: _Body(panelController: panelController),
             panelController: panelController,
@@ -122,8 +124,8 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
                       Toast.show(
                           type: ToastType.info,
                           context: context,
-                          message: "La versión gratis solo permite ${PremiumProvider.freeMaxGames} partidas simultáneas.",
-                          actionLabel: "Obtener PRO",
+                          message: l10n.freeVersionLimitGames(PremiumProvider.freeMaxGames),
+                          actionLabel: l10n.getPro,
                           onAction: () => Navigator.pushNamed(context, 'premium'));
                     }
                   },
@@ -138,33 +140,17 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
   }
 }
 
-class _AnimatedMenuButton extends StatefulWidget {
+class _AnimatedMenuButton extends StatelessWidget {
   final VoidCallback onTap;
   const _AnimatedMenuButton({required this.onTap});
 
   @override
-  State<_AnimatedMenuButton> createState() => _AnimatedMenuButtonState();
-}
-
-class _AnimatedMenuButtonState extends State<_AnimatedMenuButton> {
-  bool _isPressed = false;
-
-  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) => setState(() => _isPressed = false),
-      onTapCancel: () => setState(() => _isPressed = false),
-      onTap: widget.onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: _isPressed ? Colors.white.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Icon(Icons.menu_rounded, size: 26, color: Colors.white),
-      ),
+    return CustomIconButtom(
+      iconSize: 26,
+      iconColor: Colors.white,
+      icon: Icons.menu_rounded,
+      onTap: onTap,
     );
   }
 }
@@ -220,18 +206,21 @@ class ListPartidas extends StatelessWidget {
                 Navigator.pushNamed(context, 'partida');
               },
               functionBorrar: (handler) async {
+                final l10n = AppLocalizations.of(context)!;
                 CustomAlertDialog.show(context,
-                    menssage: "Seguro que desea eliminar la partida: ${partida.nombre}",
-                    title: "Confirmar",
+                    menssage: l10n.confirmDeleteGame(partida.nombre!),
+                    title: l10n.confirm,
                     dialogType: DialogType.error,
                     buttonsList: [
                       CustomActionsButtons.cancelButton({
+                        "label": l10n.cancel,
                         "onTap": () {
                           Navigator.pop(context);
                           handler(false);
                         }
                       }),
                       CustomActionsButtons.aceptarButton({
+                        "label": l10n.accept,
                         "onTap": () => removePartida(context, handler, partidas, index)
                       })
                     ]);
@@ -245,6 +234,10 @@ class ListPartidas extends StatelessWidget {
                     controller: panelController,
                     maxHeightFraction: 0.5,
                     bodyContent: EditarEntidad(panelController: panelController));
+              },
+              functionReiniciar: () async {
+                await partida.restartPartida();
+                partidaProvider.refresh();
               },
               index: index,
             ),
@@ -297,54 +290,61 @@ class _EmptyState extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 28),
-              Text(
-                '¡Comienza tu primera partida!',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
-                  fontSize: 20,
-                  color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.9) : AppThemes.colorCuarto,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Presiona el botón + para crear\nuna nueva partida',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 14,
-                  height: 1.5,
-                  color: Colors.grey[500],
-                ),
-              ),
-              const SizedBox(height: 32),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                decoration: BoxDecoration(
-                  color: AppThemes.colorPrimero.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(
-                    color: AppThemes.colorPrimero.withValues(alpha: 0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+              Builder(builder: (context) {
+                final l10n = AppLocalizations.of(context)!;
+                return Column(
                   children: [
-                    Icon(Icons.swipe_left_rounded, size: 18, color: AppThemes.colorPrimero),
-                    const SizedBox(width: 8),
                     Text(
-                      'Desliza para editar o borrar',
+                      l10n.emptyGamesTitle,
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: 'Poppins',
-                        fontSize: 12,
-                        color: AppThemes.colorPrimero,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 20,
+                        color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.9) : AppThemes.colorCuarto,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      l10n.emptyGamesSubtitle,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 14,
+                        height: 1.5,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: AppThemes.colorPrimero.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(
+                          color: AppThemes.colorPrimero.withValues(alpha: 0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.swipe_left_rounded, size: 18, color: AppThemes.colorPrimero),
+                          const SizedBox(width: 8),
+                          Text(
+                            l10n.swipeToEditOrDelete,
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 12,
+                              color: AppThemes.colorPrimero,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
-                ),
-              ),
+                );
+              }),
             ],
           ),
         ),
@@ -356,6 +356,7 @@ class _EmptyState extends StatelessWidget {
 class _LoadingState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -370,7 +371,7 @@ class _LoadingState extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            'Cargando partidas...',
+            l10n.loadingGames,
             style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 14,
@@ -418,12 +419,12 @@ class _MenuState extends State<_Menu> {
             // Sección de Tema
             _MenuSection(
               icon: Icons.palette_outlined,
-              title: 'Apariencia',
+              title: AppLocalizations.of(context)!.appearance,
               child: Column(
                 children: [
                   _ThemeToggleRow(
-                    title: 'Tema del sistema',
-                    subtitle: 'Sincronizar con el dispositivo',
+                    title: AppLocalizations.of(context)!.systemTheme,
+                    subtitle: AppLocalizations.of(context)!.syncWithDevice,
                     value: Preferences.isSystemMode,
                     onChanged: (value) {
                       Preferences.isSystemMode = value;
@@ -450,6 +451,14 @@ class _MenuState extends State<_Menu> {
                   ),
                 ],
               ),
+            ),
+            const SizedBox(height: 16),
+            
+            // Sección de Idioma
+            _MenuSection(
+              icon: Icons.language_rounded,
+              title: AppLocalizations.of(context)!.language,
+              child: _LanguageSwitcher(),
             ),
             const SizedBox(height: 16),
             
@@ -520,7 +529,7 @@ class _MenuHeader extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  "Coro Games",
+                  AppLocalizations.of(context)!.appTitle,
                   style: TextStyle(
                     color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
                     fontFamily: 'Poppins',
@@ -553,7 +562,7 @@ class _MenuHeader extends StatelessWidget {
               ],
             ),
             Text(
-              "Configuración",
+              AppLocalizations.of(context)!.configuration,
               style: TextStyle(
                 color: Colors.grey[500],
                 fontFamily: 'Poppins',
@@ -696,12 +705,12 @@ class _ThemeSwitcher extends StatelessWidget {
           children: [
             _ThemeOption(
               icon: Icons.wb_sunny_rounded,
-              label: 'Claro',
+              label: AppLocalizations.of(context)!.lightTheme,
               isSelected: !isDark,
             ),
             _ThemeOption(
               icon: Icons.nights_stay_rounded,
-              label: 'Oscuro',
+              label: AppLocalizations.of(context)!.darkTheme,
               isSelected: isDark,
             ),
           ],
@@ -827,7 +836,7 @@ class _PremiumCard extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            isPremium ? "Eres PRO" : "Obtener PRO",
+                            isPremium ? AppLocalizations.of(context)!.youArePro : AppLocalizations.of(context)!.getPro,
                             style: TextStyle(
                               color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
                               fontFamily: 'Poppins',
@@ -843,14 +852,14 @@ class _PremiumCard extends StatelessWidget {
                                 color: Colors.green.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.check_circle, size: 12, color: Colors.green),
-                                  SizedBox(width: 4),
+                                  const Icon(Icons.check_circle, size: 12, color: Colors.green),
+                                  const SizedBox(width: 4),
                                   Text(
-                                    'Activo',
-                                    style: TextStyle(
+                                    AppLocalizations.of(context)!.active,
+                                    style: const TextStyle(
                                       color: Colors.green,
                                       fontFamily: 'Poppins',
                                       fontSize: 10,
@@ -865,7 +874,7 @@ class _PremiumCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        isPremium ? "Todas las funciones desbloqueadas" : "Sin anuncios • Partidas ilimitadas",
+                        isPremium ? AppLocalizations.of(context)!.allFeaturesUnlocked : AppLocalizations.of(context)!.noAdsUnlimitedGames,
                         style: TextStyle(
                           color: Colors.grey[500],
                           fontFamily: 'Poppins',
@@ -900,8 +909,8 @@ class _PremiumCard extends StatelessWidget {
                     Icon(Icons.bug_report_rounded, size: 18, color: Colors.orange[700]),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: Text(
-                        "Simular Premium (Dev)",
+                      child:                       Text(
+                        AppLocalizations.of(context)!.simulatePremiumDev,
                         style: TextStyle(
                           color: Colors.orange[700],
                           fontFamily: 'Poppins',
@@ -920,6 +929,80 @@ class _PremiumCard extends StatelessWidget {
               ),
             ],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LanguageSwitcher extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final localeProvider = context.watch<LocaleProvider>();
+    final l10n = AppLocalizations.of(context)!;
+    
+    final languages = [
+      {'code': 'es', 'flag': '🇪🇸', 'short': 'ES', 'name': l10n.languageSpanish},
+      {'code': 'en', 'flag': '🇺🇸', 'short': 'EN', 'name': l10n.languageEnglish},
+    ];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: Preferences.isDarkMode ? Colors.grey[800] : Colors.grey[200],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: localeProvider.currentCode,
+          isExpanded: true,
+          dropdownColor: Preferences.isDarkMode ? Colors.grey[850] : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[700],
+          ),
+          selectedItemBuilder: (context) {
+            return languages.map((lang) {
+              return Row(
+                children: [
+                  Text(lang['flag']!, style: const TextStyle(fontSize: 18)),
+                  const SizedBox(width: 10),
+                  Text(
+                    lang['short']!,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: Preferences.isDarkMode ? Colors.white : Colors.grey[800],
+                    ),
+                  ),
+                ],
+              );
+            }).toList();
+          },
+          items: languages.map((lang) {
+            return DropdownMenuItem<String>(
+              value: lang['code'],
+              child: Row(
+                children: [
+                  Text(lang['flag']!, style: const TextStyle(fontSize: 18)),
+                  const SizedBox(width: 10),
+                  Text(
+                    lang['name']!,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                      color: Preferences.isDarkMode ? Colors.white : Colors.grey[800],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+          onChanged: (code) {
+            if (code != null) localeProvider.setLocale(code);
+          },
         ),
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_score/helpers/helpers.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -67,15 +68,15 @@ class _AddJugadorState extends State<AddJugador> {
             // Input Nombre
             ReactiveForm(
               formGroup: form,
-              child: const Column(children: <Widget>[
-                CustomReactiveInput(formControlName: 'nombre', labelText: "Nombre del jugador", textCapitalization: TextCapitalization.words)
+              child: Column(children: <Widget>[
+                CustomReactiveInput(formControlName: 'nombre', labelText: AppLocalizations.of(context)!.playerName, textCapitalization: TextCapitalization.words)
               ]),
             ),
             const SizedBox(height: 16),
             
             // Sección jugadores actuales
             _SectionTitle(
-              title: "Jugadores actuales",
+              title: AppLocalizations.of(context)!.currentPlayers,
               icon: FontAwesomeIcons.users,
               count: cantJugadores,
             ),
@@ -125,8 +126,8 @@ class _AddJugadorState extends State<AddJugador> {
       Toast.show(
           type: ToastType.info,
           context: context,
-          message: "La versión gratis solo permite ${PremiumProvider.freeMaxPlayers} jugadores.",
-          actionLabel: "Obtener PRO",
+          message: AppLocalizations.of(context)!.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
+          actionLabel: AppLocalizations.of(context)!.getPro,
           onAction: () => Navigator.pushNamed(context, 'premium'));
       return;
     }
@@ -144,7 +145,7 @@ class _AddJugadorState extends State<AddJugador> {
             duration: const Duration(seconds: 1), curve: Curves.easeOutCubic);
       });
     } else {
-      Toast.show(type: ToastType.error, context: context, message: "Debe introducir el nombre del nuevo jugador");
+      Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.enterNewPlayerName);
     }
   }
 }
@@ -226,7 +227,7 @@ class _AddJugadorHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Jugadores",
+                  AppLocalizations.of(context)!.players,
                   style: TextStyle(
                     fontFamily: "Poppins",
                     fontSize: 16,
@@ -236,7 +237,7 @@ class _AddJugadorHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 1),
                 Text(
-                  "$cantJugadores jugador${cantJugadores != 1 ? 'es' : ''} en la partida",
+                  AppLocalizations.of(context)!.playersInGame(cantJugadores),
                   style: TextStyle(
                     fontFamily: "Poppins",
                     fontSize: 11,
@@ -337,18 +338,18 @@ class _AddButton extends StatelessWidget {
               ),
             ],
           ),
-          child: const Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              FaIcon(
+              const FaIcon(
                 FontAwesomeIcons.plus,
                 color: Colors.white,
                 size: 16,
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Text(
-                "Agregar Jugador",
-                style: TextStyle(
+                AppLocalizations.of(context)!.addPlayer,
+                style: const TextStyle(
                   fontFamily: "Poppins",
                   fontSize: 15,
                   fontWeight: FontWeight.w600,

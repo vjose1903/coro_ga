@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/services/version_service.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
@@ -9,6 +11,9 @@ class ForceUpdateModal extends StatelessWidget {
   const ForceUpdateModal({Key? key}) : super(key: key);
 
   static Future<void> showIfNeeded(BuildContext context, {bool forceShow = false}) async {
+    // En desarrollo solo mostrar si se pasa forceShow
+    if (kDebugMode && !forceShow) return;
+    
     final updateAvailable = await VersionService.instance.checkForUpdate();
     
     if ((updateAvailable || forceShow) && context.mounted) {
@@ -80,16 +85,21 @@ class ForceUpdateModal extends StatelessWidget {
                 // Título
                 FadeInDown(
                   delay: const Duration(milliseconds: 300),
-                  child: const Text(
-                    '¡Nueva versión disponible!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Poppins',
-                      color: Colors.white,
-                      letterSpacing: 0.5,
-                    ),
+                  child: Builder(
+                    builder: (context) {
+                      final l10n = AppLocalizations.of(context)!;
+                      return Text(
+                        l10n.newVersionTitle,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins',
+                          color: Colors.white,
+                          letterSpacing: 0.5,
+                        ),
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -97,15 +107,20 @@ class ForceUpdateModal extends StatelessWidget {
                 // Subtítulo
                 FadeIn(
                   delay: const Duration(milliseconds: 400),
-                  child: Text(
-                    'Hay una nueva versión de Coro Games disponible. Actualiza ahora para disfrutar de las últimas mejoras y funcionalidades.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontFamily: 'Poppins',
-                      color: Colors.white.withValues(alpha: 0.85),
-                      height: 1.5,
-                    ),
+                  child: Builder(
+                    builder: (context) {
+                      final l10n = AppLocalizations.of(context)!;
+                      return Text(
+                        l10n.newVersionAvailable,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontFamily: 'Poppins',
+                          color: Colors.white.withValues(alpha: 0.85),
+                          height: 1.5,
+                        ),
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -135,14 +150,19 @@ class ForceUpdateModal extends StatelessWidget {
                             color: AppThemes.colorCuarto,
                           ),
                           const SizedBox(width: 10),
-                          Text(
-                            'Actualizar ahora',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.w600,
-                              color: AppThemes.colorCuarto,
-                            ),
+                          Builder(
+                            builder: (context) {
+                              final l10n = AppLocalizations.of(context)!;
+                              return Text(
+                                l10n.updateNow,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.w600,
+                                  color: AppThemes.colorCuarto,
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),

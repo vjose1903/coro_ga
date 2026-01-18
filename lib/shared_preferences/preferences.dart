@@ -73,4 +73,18 @@ class Preferences {
   static set isPremium(bool value) {
     _prefs.setBool('isPremium', value);
   }
+
+  // ==============================================================
+  // ==============================================================
+
+  static String? _languageCode;
+
+  static String? get languageCode {
+    return _prefs.getString('languageCode') ?? _languageCode;
+  }
+
+  static set languageCode(String? value) {
+    _languageCode = value;
+    _prefs.setString('languageCode', value ?? '');
+  }
 }

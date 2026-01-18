@@ -3,6 +3,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/partida_provider.dart';
 import 'package:game_score/providers/providers.dart';
@@ -88,7 +89,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
               width: double.infinity,
               child: Column(
                 children: [
-                  TextAnimator("GANADOR",
+                  TextAnimator(AppLocalizations.of(context)!.winner,
                       initialDelay: const Duration(seconds: 1),
                       incomingEffect: WidgetTransitionEffects.incomingOffsetThenScaleAndStep(duration: const Duration(milliseconds: 800)),
                       style: TextStyle(color: ganadorColor, fontFamily: 'Poppins', fontSize: 30, fontWeight: FontWeight.bold, letterSpacing: 3)),
@@ -130,9 +131,9 @@ class _GanadorScreenState extends State<GanadorScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Text("Revancha", style: TextStyle(fontSize: 15, fontFamily: 'Poppins', fontWeight: FontWeight.bold, letterSpacing: 2)),
+                            Text(AppLocalizations.of(context)!.rematch, style: const TextStyle(fontSize: 15, fontFamily: 'Poppins', fontWeight: FontWeight.bold, letterSpacing: 2)),
                             if (!premiumProvider.isPremium)
-                              const Text("ver anuncio", style: TextStyle(fontSize: 10, fontFamily: 'Poppins', fontWeight: FontWeight.normal)),
+                              Text(AppLocalizations.of(context)!.watchAd, style: const TextStyle(fontSize: 10, fontFamily: 'Poppins', fontWeight: FontWeight.normal)),
                           ],
                         ),
                       ),
@@ -174,7 +175,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
         startNewGame(newPartida);
       }
     } else {
-      Toast.show(type: ToastType.error, context: context, message: "Error renovando partida.");
+      Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.errorRenewingGame);
       Navigator.pushReplacementNamed(context, 'home');
     }
   }

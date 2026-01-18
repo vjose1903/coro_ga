@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/helpers/helpers.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -12,17 +13,18 @@ class CustomEstadoPartida extends StatelessWidget {
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final partida = partidaProvider.partidaEnTurno!;
+    final l10n = AppLocalizations.of(context)!;
 
     if (partida.isSinIniciar) {
       return _EstadoChip(
         icon: Icons.play_arrow_rounded,
-        label: "Partida Iniciando",
+        label: l10n.gameStarting,
         color: Colors.blue,
       );
     } else if (partida.isEmpate) {
       return _EstadoChip(
         icon: Icons.swap_horiz_rounded,
-        label: "Empate",
+        label: l10n.tie,
         color: Colors.amber[700]!,
       );
     } else {
@@ -72,6 +74,11 @@ class _GanadorPerdedor extends StatelessWidget {
   const _GanadorPerdedor({Key? key, required this.partida}) : super(key: key);
   final Partida partida;
 
+  String _getTranslatedLabel(BuildContext context, String name) {
+    if (name == Estado.empate) return AppLocalizations.of(context)!.tie;
+    return name;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -79,14 +86,14 @@ class _GanadorPerdedor extends StatelessWidget {
       children: [
         _PlayerStatusChip(
           icon: Icons.trending_up_rounded,
-          label: partida.getGandorOrPerdedor(tipo: Estado.ganador),
+          label: _getTranslatedLabel(context, partida.getGandorOrPerdedorName(tipo: Estado.ganador)),
           color: Colors.green,
           isWinner: true,
         ),
         const SizedBox(width: 12),
         _PlayerStatusChip(
           icon: Icons.trending_down_rounded,
-          label: partida.getGandorOrPerdedor(tipo: Estado.perdedor),
+          label: _getTranslatedLabel(context, partida.getGandorOrPerdedorName(tipo: Estado.perdedor)),
           color: Colors.red[400]!,
           isWinner: false,
         ),

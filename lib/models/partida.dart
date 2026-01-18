@@ -58,9 +58,9 @@ class Partida extends DynamicClass {
   String getJugadorEstatus(Jugador jugador) {
     String estado = "";
 
-    if (jugador.nombre == getGandorOrPerdedor(tipo: Estado.ganador)) {
+    if (jugador.nombre == getGandorOrPerdedorName(tipo: Estado.ganador)) {
       estado = Estado.ganador;
-    } else if (jugador.nombre == getGandorOrPerdedor(tipo: Estado.perdedor)) {
+    } else if (jugador.nombre == getGandorOrPerdedorName(tipo: Estado.perdedor)) {
       estado = Estado.perdedor;
     } else {
       List<Jugador> empatados = jugadores!.where((judadorEnTurno) => judadorEnTurno.puntuacion == jugador.puntuacion).toList();
@@ -70,7 +70,7 @@ class Partida extends DynamicClass {
     return estado;
   }
 
-  getGandorOrPerdedor({required String tipo}) {
+  getGandorOrPerdedorName({required String tipo}) {
     List<Jugador> sortedArray = ordenarPorPuntuacion();
     Jugador selected = tipo == Estado.ganador ? sortedArray.last : sortedArray.first;
 
@@ -79,6 +79,35 @@ class Partida extends DynamicClass {
     }).toList();
 
     return empatados.isNotEmpty ? Estado.empate : selected.nombre;
+  }
+
+  /// Retorna {nombre, puntuacion} del ganador/perdedor o del empate
+  Map<String, dynamic> getGanadorOrPerdedor({required String tipo}) {
+    List<Jugador> sortedArray = ordenarPorPuntuacion();
+    Jugador selected = tipo == Estado.ganador ? sortedArray.last : sortedArray.first;
+
+    List<Jugador> empatados = jugadores!.where((judador) {
+      return judador.id != selected.id && judador.puntuacion == selected.puntuacion;
+    }).toList();
+
+    return {
+      'nombre': empatados.isNotEmpty ? Estado.empate : selected.nombre,
+      'puntuacion': selected.puntuacion,
+    };
+  }
+
+  Future<void> restartPartida() async {
+    if (jugadores == null) return;
+    for (var jugador in jugadores!) {
+      jugador.puntuacion = 0;
+      if (jugador.historialJugadas != null && jugador.historialJugadas!.isNotEmpty) {
+        for (var historial in jugador.historialJugadas!) {
+          await CrudHelper.deleteOne(tableName: HistorialJugada.tableName, id: historial.id!);
+        }
+        jugador.historialJugadas!.clear();
+      }
+      await CrudHelper.updateOne(tableName: Jugador.tableName, id: jugador.id!, newData: {"puntuacion": 0});
+    }
   }
 
   addJugador(Jugador jugador) {
@@ -149,7 +178,7 @@ class Partida extends DynamicClass {
     List<Jugador>? jugadores = partida.jugadores;
 
     if (jugadores == null) {
-      response.addMsg('Debe de agregar almenos 2 jugadores a la partida');
+      response.addMsg(L10n.minTwoPlayers);
       response.hasError = true;
       return response;
     }
@@ -203,7 +232,7 @@ class Partida extends DynamicClass {
       
       return partidasParsed;
     } else {
-      response.addMsg('No existen partidas registradas.');
+      response.addMsg(L10n.noGamesRegistered);
       return List<Partida>.from([]);
     }
   }
@@ -214,7 +243,7 @@ class Partida extends DynamicClass {
 
     final response = await CrudHelper.updateOne(tableName: Partida.tableName, id: partida.id, newData: tempPartidaMap);
 
-    if (response.hasError!) response.addMsg('No se pudo borrar la partida seleccionada.');
+    if (response.hasError!) response.addMsg(L10n.errorDeletingGame);
 
     return response;
   }
@@ -225,7 +254,7 @@ class Partida extends DynamicClass {
 
     final response = await CrudHelper.updateOne(tableName: Partida.tableName, id: partida.id, newData: tempPartidaMap);
 
-    if (response.hasError!) response.addMsg('No se pudo editar la partida seleccionada.');
+    if (response.hasError!) response.addMsg(L10n.errorEditingGame);
 
     return response;
   }
@@ -241,7 +270,7 @@ class Partida extends DynamicClass {
 
       partida.addJugadores(jugadoresParsed);
     } else {
-      response.addMsg('Partida ingresada no tiene jugadores.');
+      response.addMsg(L10n.noPlayersForGame);
     }
   }
 }

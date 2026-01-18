@@ -49,7 +49,7 @@ class MyLoading {
 
     EasyLoading.show(
       maskType: EasyLoadingMaskType.custom,
-      status: message ?? 'Cargando...',
+      status: message ?? _getLoadingText(),
       indicator: _buildLoadingIndicator(isDark),
     );
   }
@@ -83,5 +83,10 @@ class MyLoading {
 
   static close() {
     EasyLoading.dismiss();
+  }
+
+  static String _getLoadingText() {
+    final lang = Preferences.languageCode;
+    return lang == 'en' ? 'Loading...' : 'Cargando...';
   }
 }
