@@ -293,6 +293,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get edit => 'Edit';
 
   @override
+  String get restart => 'Restart';
+
+  @override
+  String confirmRestartGame(String name) {
+    return 'Are you sure you want to restart the game: $name?';
+  }
+
+  @override
   String get newPredefinedGame => 'New Game';
 
   @override
@@ -391,4 +399,88 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noRecords => 'No records';
+
+  @override
+  String get noPlayers => 'No players';
+
+  @override
+  String confirmDeletePlayer(String name) {
+    return 'Are you sure you want to delete the player: $name';
+  }
+
+  @override
+  String errorDeletingPlayer(String name) {
+    return 'Error deleting player: $name';
+  }
+
+  @override
+  String get minPlayersWarning =>
+      'The number of players cannot be less than 2.';
+
+  @override
+  String playerNumber(int number) {
+    return 'Player $number';
+  }
+
+  @override
+  String get newVersionTitle => 'New version available!';
+
+  @override
+  String get newVersionAvailable =>
+      'A new version of Coro Games is available. Update now to enjoy the latest improvements and features.';
+
+  @override
+  String get updateNow => 'Update now';
+
+  @override
+  String get unauthorizedVersion => 'Unauthorized Version';
+
+  @override
+  String get illegitimateCopy =>
+      'This copy of the app is not legitimate.\n\nPlease download the official version from Google Play Store to enjoy all features.';
+
+  @override
+  String get closeApp => 'Close app';
+
+  @override
+  String get errorEditingPlayer => 'Could not edit the selected player.';
+
+  @override
+  String get errorDeletingHistory => 'Error deleting history';
+
+  @override
+  String get noHistoryForGame => 'The entered game has no history.';
+
+  @override
+  String get minTwoPlayers => 'You must add at least 2 players to the game';
+
+  @override
+  String get noGamesRegistered => 'No games registered.';
+
+  @override
+  String get errorDeletingGame => 'Could not delete the selected game.';
+
+  @override
+  String get errorEditingGame => 'Could not edit the selected game.';
+
+  @override
+  String get noPlayersForGame => 'The entered game has no players.';
+
+  @override
+  String get errorDeletingPredefined =>
+      'Could not delete the selected predefined game.';
+
+  @override
+  String get errorEditingPredefined => 'Could not edit the selected game.';
+
+  @override
+  String get errorInsertingHistory => 'Error inserting play history.';
+
+  @override
+  String get fieldRequired => 'Required field.';
+
+  @override
+  String minValue(String min) {
+    return 'Minimum value is: $min';
+  }
 }

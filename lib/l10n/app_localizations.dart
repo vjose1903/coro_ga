@@ -100,711 +100,867 @@ abstract class AppLocalizations {
 
   /// No description provided for @appTitle.
   ///
-  /// In es, this message translates to:
+  /// In en, this message translates to:
   /// **'Coro Games'**
   String get appTitle;
 
   /// No description provided for @myGames.
   ///
-  /// In es, this message translates to:
-  /// **'Mis Partidas'**
+  /// In en, this message translates to:
+  /// **'My Games'**
   String get myGames;
 
   /// No description provided for @configuration.
   ///
-  /// In es, this message translates to:
-  /// **'Configuración'**
+  /// In en, this message translates to:
+  /// **'Settings'**
   String get configuration;
 
   /// No description provided for @emptyGamesTitle.
   ///
-  /// In es, this message translates to:
-  /// **'¡Comienza tu primera partida!'**
+  /// In en, this message translates to:
+  /// **'Start your first game!'**
   String get emptyGamesTitle;
 
   /// No description provided for @emptyGamesSubtitle.
   ///
-  /// In es, this message translates to:
-  /// **'Presiona el botón + para crear\nuna nueva partida'**
+  /// In en, this message translates to:
+  /// **'Press the + button to create\na new game'**
   String get emptyGamesSubtitle;
 
   /// No description provided for @swipeToEditOrDelete.
   ///
-  /// In es, this message translates to:
-  /// **'Desliza para editar o borrar'**
+  /// In en, this message translates to:
+  /// **'Swipe to edit or delete'**
   String get swipeToEditOrDelete;
 
   /// No description provided for @loadingGames.
   ///
-  /// In es, this message translates to:
-  /// **'Cargando partidas...'**
+  /// In en, this message translates to:
+  /// **'Loading games...'**
   String get loadingGames;
 
   /// No description provided for @loading.
   ///
-  /// In es, this message translates to:
-  /// **'Cargando...'**
+  /// In en, this message translates to:
+  /// **'Loading...'**
   String get loading;
 
   /// No description provided for @freeVersionLimitGames.
   ///
-  /// In es, this message translates to:
-  /// **'La versión gratis solo permite {count} partidas simultáneas.'**
+  /// In en, this message translates to:
+  /// **'Free version only allows {count} simultaneous games.'**
   String freeVersionLimitGames(int count);
 
   /// No description provided for @freeVersionLimitPlayers.
   ///
-  /// In es, this message translates to:
-  /// **'La versión gratis solo permite {count} jugadores.'**
+  /// In en, this message translates to:
+  /// **'Free version only allows {count} players.'**
   String freeVersionLimitPlayers(int count);
 
   /// No description provided for @freeVersionLimitPredefined.
   ///
-  /// In es, this message translates to:
-  /// **'La versión gratis solo permite {count} partidas predefinidas.'**
+  /// In en, this message translates to:
+  /// **'Free version only allows {count} predefined games.'**
   String freeVersionLimitPredefined(int count);
 
   /// No description provided for @getPro.
   ///
-  /// In es, this message translates to:
-  /// **'Obtener PRO'**
+  /// In en, this message translates to:
+  /// **'Get PRO'**
   String get getPro;
 
   /// No description provided for @appearance.
   ///
-  /// In es, this message translates to:
-  /// **'Apariencia'**
+  /// In en, this message translates to:
+  /// **'Appearance'**
   String get appearance;
 
   /// No description provided for @systemTheme.
   ///
-  /// In es, this message translates to:
-  /// **'Tema del sistema'**
+  /// In en, this message translates to:
+  /// **'System theme'**
   String get systemTheme;
 
   /// No description provided for @syncWithDevice.
   ///
-  /// In es, this message translates to:
-  /// **'Sincronizar con el dispositivo'**
+  /// In en, this message translates to:
+  /// **'Sync with device'**
   String get syncWithDevice;
 
   /// No description provided for @lightTheme.
   ///
-  /// In es, this message translates to:
-  /// **'Claro'**
+  /// In en, this message translates to:
+  /// **'Light'**
   String get lightTheme;
 
   /// No description provided for @darkTheme.
   ///
-  /// In es, this message translates to:
-  /// **'Oscuro'**
+  /// In en, this message translates to:
+  /// **'Dark'**
   String get darkTheme;
 
   /// No description provided for @youArePro.
   ///
-  /// In es, this message translates to:
-  /// **'Eres PRO'**
+  /// In en, this message translates to:
+  /// **'You are PRO'**
   String get youArePro;
 
   /// No description provided for @active.
   ///
-  /// In es, this message translates to:
-  /// **'Activo'**
+  /// In en, this message translates to:
+  /// **'Active'**
   String get active;
 
   /// No description provided for @allFeaturesUnlocked.
   ///
-  /// In es, this message translates to:
-  /// **'Todas las funciones desbloqueadas'**
+  /// In en, this message translates to:
+  /// **'All features unlocked'**
   String get allFeaturesUnlocked;
 
   /// No description provided for @noAdsUnlimitedGames.
   ///
-  /// In es, this message translates to:
-  /// **'Sin anuncios • Partidas ilimitadas'**
+  /// In en, this message translates to:
+  /// **'No ads • Unlimited games'**
   String get noAdsUnlimitedGames;
 
   /// No description provided for @simulatePremiumDev.
   ///
-  /// In es, this message translates to:
-  /// **'Simular Premium (Dev)'**
+  /// In en, this message translates to:
+  /// **'Simulate Premium (Dev)'**
   String get simulatePremiumDev;
 
   /// No description provided for @createNewGame.
   ///
-  /// In es, this message translates to:
-  /// **'Crear nueva partida'**
+  /// In en, this message translates to:
+  /// **'Create new game'**
   String get createNewGame;
 
   /// No description provided for @predefined.
   ///
-  /// In es, this message translates to:
-  /// **'Predefinidas'**
+  /// In en, this message translates to:
+  /// **'Predefined'**
   String get predefined;
 
   /// No description provided for @gameName.
   ///
-  /// In es, this message translates to:
-  /// **'Nombre de la partida'**
+  /// In en, this message translates to:
+  /// **'Game name'**
   String get gameName;
 
   /// No description provided for @type.
   ///
-  /// In es, this message translates to:
-  /// **'Tipo'**
+  /// In en, this message translates to:
+  /// **'Type'**
   String get type;
 
   /// No description provided for @rounds.
   ///
-  /// In es, this message translates to:
-  /// **'Rondas'**
+  /// In en, this message translates to:
+  /// **'Rounds'**
   String get rounds;
 
   /// No description provided for @score.
   ///
-  /// In es, this message translates to:
-  /// **'Puntuación'**
+  /// In en, this message translates to:
+  /// **'Score'**
   String get score;
 
   /// No description provided for @roundCount.
   ///
-  /// In es, this message translates to:
-  /// **'Cant. rondas'**
+  /// In en, this message translates to:
+  /// **'Round count'**
   String get roundCount;
 
   /// No description provided for @maxScore.
   ///
-  /// In es, this message translates to:
-  /// **'Punt. Máxima'**
+  /// In en, this message translates to:
+  /// **'Max score'**
   String get maxScore;
 
   /// No description provided for @players.
   ///
-  /// In es, this message translates to:
-  /// **'Jugadores'**
+  /// In en, this message translates to:
+  /// **'Players'**
   String get players;
 
   /// No description provided for @createGame.
   ///
-  /// In es, this message translates to:
-  /// **'Crear Partida'**
+  /// In en, this message translates to:
+  /// **'Create Game'**
   String get createGame;
 
   /// No description provided for @errorRegisteringGame.
   ///
-  /// In es, this message translates to:
-  /// **'Error registrando partida.'**
+  /// In en, this message translates to:
+  /// **'Error registering game.'**
   String get errorRegisteringGame;
 
   /// No description provided for @checkAllFields.
   ///
-  /// In es, this message translates to:
-  /// **'Revisar todos los campos de texto.'**
+  /// In en, this message translates to:
+  /// **'Check all text fields.'**
   String get checkAllFields;
 
   /// No description provided for @maxPlayersReached.
   ///
-  /// In es, this message translates to:
-  /// **'Máximo de jugadores alcanzados'**
+  /// In en, this message translates to:
+  /// **'Maximum players reached'**
   String get maxPlayersReached;
 
   /// No description provided for @name.
   ///
-  /// In es, this message translates to:
-  /// **'nombre'**
+  /// In en, this message translates to:
+  /// **'name'**
   String get name;
 
   /// No description provided for @predefinedGames.
   ///
-  /// In es, this message translates to:
-  /// **'Partidas Predefinidas'**
+  /// In en, this message translates to:
+  /// **'Predefined Games'**
   String get predefinedGames;
 
   /// No description provided for @dragToReorder.
   ///
-  /// In es, this message translates to:
-  /// **'Arrastra para reordenar'**
+  /// In en, this message translates to:
+  /// **'Drag to reorder'**
   String get dragToReorder;
 
   /// No description provided for @tapToSelect.
   ///
-  /// In es, this message translates to:
-  /// **'Toca para seleccionar'**
+  /// In en, this message translates to:
+  /// **'Tap to select'**
   String get tapToSelect;
 
   /// No description provided for @done.
   ///
-  /// In es, this message translates to:
-  /// **'Listo'**
+  /// In en, this message translates to:
+  /// **'Done'**
   String get done;
 
   /// No description provided for @close.
   ///
-  /// In es, this message translates to:
-  /// **'Cerrar'**
+  /// In en, this message translates to:
+  /// **'Close'**
   String get close;
 
   /// No description provided for @noPredefinedGames.
   ///
-  /// In es, this message translates to:
-  /// **'Sin partidas predefinidas'**
+  /// In en, this message translates to:
+  /// **'No predefined games'**
   String get noPredefinedGames;
 
   /// No description provided for @tapPlusToCreate.
   ///
-  /// In es, this message translates to:
-  /// **'Toca + para crear una'**
+  /// In en, this message translates to:
+  /// **'Tap + to create one'**
   String get tapPlusToCreate;
 
   /// No description provided for @confirm.
   ///
-  /// In es, this message translates to:
-  /// **'Confirmar'**
+  /// In en, this message translates to:
+  /// **'Confirm'**
   String get confirm;
 
   /// No description provided for @cancel.
   ///
-  /// In es, this message translates to:
-  /// **'Cancelar'**
+  /// In en, this message translates to:
+  /// **'Cancel'**
   String get cancel;
 
   /// No description provided for @accept.
   ///
-  /// In es, this message translates to:
-  /// **'Aceptar'**
+  /// In en, this message translates to:
+  /// **'Accept'**
   String get accept;
 
   /// No description provided for @delete.
   ///
-  /// In es, this message translates to:
-  /// **'Borrar'**
+  /// In en, this message translates to:
+  /// **'Delete'**
   String get delete;
 
   /// No description provided for @confirmDeleteGame.
   ///
-  /// In es, this message translates to:
-  /// **'Seguro que desea eliminar la partida: {name}'**
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete the game: {name}'**
   String confirmDeleteGame(String name);
 
   /// No description provided for @confirmDeletePredefined.
   ///
-  /// In es, this message translates to:
-  /// **'Seguro que desea eliminar la partida predefinida: {name}'**
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete the predefined game: {name}'**
   String confirmDeletePredefined(String name);
 
   /// No description provided for @confirmDeleteScore.
   ///
-  /// In es, this message translates to:
-  /// **'¿Seguro que desea eliminar la puntuación {score} del jugador {player}?'**
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete score {score} from player {player}?'**
   String confirmDeleteScore(int score, String player);
 
   /// No description provided for @playerScore.
   ///
-  /// In es, this message translates to:
-  /// **'Puntuación: {score}'**
+  /// In en, this message translates to:
+  /// **'Score: {score}'**
   String playerScore(int score);
 
   /// No description provided for @increase.
   ///
-  /// In es, this message translates to:
-  /// **'Aumentar'**
+  /// In en, this message translates to:
+  /// **'Increase'**
   String get increase;
 
   /// No description provided for @decrease.
   ///
-  /// In es, this message translates to:
-  /// **'Reducir'**
+  /// In en, this message translates to:
+  /// **'Decrease'**
   String get decrease;
 
   /// No description provided for @scoreLabel.
   ///
-  /// In es, this message translates to:
-  /// **'Puntuación'**
+  /// In en, this message translates to:
+  /// **'Score'**
   String get scoreLabel;
 
   /// No description provided for @noScoresRegistered.
   ///
-  /// In es, this message translates to:
-  /// **'No hay puntuaciones registradas'**
+  /// In en, this message translates to:
+  /// **'No scores registered'**
   String get noScoresRegistered;
 
   /// No description provided for @noRoundsRegistered.
   ///
-  /// In es, this message translates to:
-  /// **'No tiene rondas registradas'**
+  /// In en, this message translates to:
+  /// **'No rounds registered'**
   String get noRoundsRegistered;
 
   /// No description provided for @minScoreWarning.
   ///
-  /// In es, this message translates to:
-  /// **'La puntuación minima debe de ser 0.'**
+  /// In en, this message translates to:
+  /// **'Minimum score must be 0.'**
   String get minScoreWarning;
 
   /// No description provided for @minRoundWarning.
   ///
-  /// In es, this message translates to:
-  /// **'La ronda minima debe de ser 0.'**
+  /// In en, this message translates to:
+  /// **'Minimum round must be 0.'**
   String get minRoundWarning;
 
   /// No description provided for @scoreMustBeGreaterThanZero.
   ///
-  /// In es, this message translates to:
-  /// **'Puntuación debe de ser mayor a 0'**
+  /// In en, this message translates to:
+  /// **'Score must be greater than 0'**
   String get scoreMustBeGreaterThanZero;
 
   /// No description provided for @enterScoreToContinue.
   ///
-  /// In es, this message translates to:
-  /// **'Debe introducir una puntutación para continuar'**
+  /// In en, this message translates to:
+  /// **'You must enter a score to continue'**
   String get enterScoreToContinue;
 
   /// No description provided for @warning.
   ///
-  /// In es, this message translates to:
-  /// **'AVISO'**
+  /// In en, this message translates to:
+  /// **'WARNING'**
   String get warning;
 
   /// No description provided for @increased.
   ///
-  /// In es, this message translates to:
-  /// **'Aumentar'**
+  /// In en, this message translates to:
+  /// **'Increase'**
   String get increased;
 
   /// No description provided for @decreased.
   ///
-  /// In es, this message translates to:
-  /// **'Reducir'**
+  /// In en, this message translates to:
+  /// **'Decrease'**
   String get decreased;
 
   /// No description provided for @coroGamesPro.
   ///
-  /// In es, this message translates to:
+  /// In en, this message translates to:
   /// **'Coro Games PRO'**
   String get coroGamesPro;
 
   /// No description provided for @unlockFullPotential.
   ///
-  /// In es, this message translates to:
-  /// **'Desbloquea todo el potencial'**
+  /// In en, this message translates to:
+  /// **'Unlock full potential'**
   String get unlockFullPotential;
 
   /// No description provided for @unlimitedPlayers.
   ///
-  /// In es, this message translates to:
-  /// **'Jugadores ilimitados'**
+  /// In en, this message translates to:
+  /// **'Unlimited players'**
   String get unlimitedPlayers;
 
   /// No description provided for @unlimitedPlayersDesc.
   ///
-  /// In es, this message translates to:
-  /// **'Sin límite de jugadores por partida'**
+  /// In en, this message translates to:
+  /// **'No player limit per game'**
   String get unlimitedPlayersDesc;
 
   /// No description provided for @unlimitedGames.
   ///
-  /// In es, this message translates to:
-  /// **'Partidas ilimitadas'**
+  /// In en, this message translates to:
+  /// **'Unlimited games'**
   String get unlimitedGames;
 
   /// No description provided for @unlimitedGamesDesc.
   ///
-  /// In es, this message translates to:
-  /// **'Crea todas las partidas que quieras'**
+  /// In en, this message translates to:
+  /// **'Create as many games as you want'**
   String get unlimitedGamesDesc;
 
   /// No description provided for @predefinedGamesFeature.
   ///
-  /// In es, this message translates to:
-  /// **'Partidas predefinidas'**
+  /// In en, this message translates to:
+  /// **'Predefined games'**
   String get predefinedGamesFeature;
 
   /// No description provided for @predefinedGamesDesc.
   ///
-  /// In es, this message translates to:
-  /// **'Guarda configuraciones ilimitadas'**
+  /// In en, this message translates to:
+  /// **'Save unlimited configurations'**
   String get predefinedGamesDesc;
 
   /// No description provided for @fullHistory.
   ///
-  /// In es, this message translates to:
-  /// **'Historial completo'**
+  /// In en, this message translates to:
+  /// **'Full history'**
   String get fullHistory;
 
   /// No description provided for @fullHistoryDesc.
   ///
-  /// In es, this message translates to:
-  /// **'Accede a todo el historial de jugadas'**
+  /// In en, this message translates to:
+  /// **'Access complete play history'**
   String get fullHistoryDesc;
 
   /// No description provided for @noAds.
   ///
-  /// In es, this message translates to:
-  /// **'Sin anuncios'**
+  /// In en, this message translates to:
+  /// **'No ads'**
   String get noAds;
 
   /// No description provided for @noAdsDesc.
   ///
-  /// In es, this message translates to:
-  /// **'Disfruta sin interrupciones'**
+  /// In en, this message translates to:
+  /// **'Enjoy without interruptions'**
   String get noAdsDesc;
 
   /// No description provided for @alreadyPremium.
   ///
-  /// In es, this message translates to:
-  /// **'¡Ya eres Premium!'**
+  /// In en, this message translates to:
+  /// **'You are Premium!'**
   String get alreadyPremium;
 
   /// No description provided for @oneTimePayment.
   ///
-  /// In es, this message translates to:
-  /// **'Pago único • Sin suscripción'**
+  /// In en, this message translates to:
+  /// **'One-time payment • No subscription'**
   String get oneTimePayment;
 
   /// No description provided for @purchaseRestored.
   ///
-  /// In es, this message translates to:
-  /// **'¡Compra restaurada! Ya eres Premium.'**
+  /// In en, this message translates to:
+  /// **'Purchase restored! You are Premium.'**
   String get purchaseRestored;
 
   /// No description provided for @purchaseFailed.
   ///
-  /// In es, this message translates to:
-  /// **'No se pudo completar la compra. Intenta de nuevo.'**
+  /// In en, this message translates to:
+  /// **'Could not complete purchase. Try again.'**
   String get purchaseFailed;
 
   /// No description provided for @gameType_rounds.
   ///
-  /// In es, this message translates to:
-  /// **'Rondas'**
+  /// In en, this message translates to:
+  /// **'Rounds'**
   String get gameType_rounds;
 
   /// No description provided for @gameType_score.
   ///
-  /// In es, this message translates to:
-  /// **'Puntuación'**
+  /// In en, this message translates to:
+  /// **'Score'**
   String get gameType_score;
 
   /// No description provided for @language.
   ///
-  /// In es, this message translates to:
-  /// **'Idioma'**
+  /// In en, this message translates to:
+  /// **'Language'**
   String get language;
 
   /// No description provided for @languageSpanish.
   ///
-  /// In es, this message translates to:
+  /// In en, this message translates to:
   /// **'Español'**
   String get languageSpanish;
 
   /// No description provided for @languageEnglish.
   ///
-  /// In es, this message translates to:
+  /// In en, this message translates to:
   /// **'English'**
   String get languageEnglish;
 
   /// No description provided for @starting.
   ///
-  /// In es, this message translates to:
-  /// **'Iniciando'**
+  /// In en, this message translates to:
+  /// **'Starting'**
   String get starting;
 
   /// No description provided for @gameStarting.
   ///
-  /// In es, this message translates to:
-  /// **'Partida Iniciando'**
+  /// In en, this message translates to:
+  /// **'Game Starting'**
   String get gameStarting;
 
   /// No description provided for @tie.
   ///
-  /// In es, this message translates to:
-  /// **'Empate'**
+  /// In en, this message translates to:
+  /// **'Tie'**
   String get tie;
 
   /// No description provided for @winning.
   ///
-  /// In es, this message translates to:
-  /// **'Ganando'**
+  /// In en, this message translates to:
+  /// **'Winning'**
   String get winning;
 
   /// No description provided for @losing.
   ///
-  /// In es, this message translates to:
-  /// **'Perdiendo'**
+  /// In en, this message translates to:
+  /// **'Losing'**
   String get losing;
 
   /// No description provided for @edit.
   ///
-  /// In es, this message translates to:
-  /// **'Editar'**
+  /// In en, this message translates to:
+  /// **'Edit'**
   String get edit;
+
+  /// No description provided for @restart.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart'**
+  String get restart;
+
+  /// No description provided for @confirmRestartGame.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to restart the game: {name}?'**
+  String confirmRestartGame(String name);
 
   /// No description provided for @newPredefinedGame.
   ///
-  /// In es, this message translates to:
-  /// **'Nueva Partida'**
+  /// In en, this message translates to:
+  /// **'New Game'**
   String get newPredefinedGame;
 
   /// No description provided for @editPredefinedGame.
   ///
-  /// In es, this message translates to:
-  /// **'Editar Partida'**
+  /// In en, this message translates to:
+  /// **'Edit Game'**
   String get editPredefinedGame;
 
   /// No description provided for @configureYourPredefined.
   ///
-  /// In es, this message translates to:
-  /// **'Configura tu partida predefinida'**
+  /// In en, this message translates to:
+  /// **'Configure your predefined game'**
   String get configureYourPredefined;
 
   /// No description provided for @modifyGameData.
   ///
-  /// In es, this message translates to:
-  /// **'Modifica los datos de la partida'**
+  /// In en, this message translates to:
+  /// **'Modify game data'**
   String get modifyGameData;
 
   /// No description provided for @playerCount.
   ///
-  /// In es, this message translates to:
-  /// **'Cantidad de jugadores'**
+  /// In en, this message translates to:
+  /// **'Number of players'**
   String get playerCount;
 
   /// No description provided for @back.
   ///
-  /// In es, this message translates to:
-  /// **'Volver'**
+  /// In en, this message translates to:
+  /// **'Back'**
   String get back;
 
   /// No description provided for @save.
   ///
-  /// In es, this message translates to:
-  /// **'Guardar'**
+  /// In en, this message translates to:
+  /// **'Save'**
   String get save;
 
   /// No description provided for @create.
   ///
-  /// In es, this message translates to:
-  /// **'Crear'**
+  /// In en, this message translates to:
+  /// **'Create'**
   String get create;
 
   /// No description provided for @editGame.
   ///
-  /// In es, this message translates to:
-  /// **'Editar Partida'**
+  /// In en, this message translates to:
+  /// **'Edit Game'**
   String get editGame;
 
   /// No description provided for @editPlayer.
   ///
-  /// In es, this message translates to:
-  /// **'Editar Jugador'**
+  /// In en, this message translates to:
+  /// **'Edit Player'**
   String get editPlayer;
 
   /// No description provided for @noName.
   ///
-  /// In es, this message translates to:
-  /// **'Sin nombre'**
+  /// In en, this message translates to:
+  /// **'No name'**
   String get noName;
 
   /// No description provided for @gameNameCannotBeEmpty.
   ///
-  /// In es, this message translates to:
-  /// **'El nombre de la partida no puede estar vacio.'**
+  /// In en, this message translates to:
+  /// **'Game name cannot be empty.'**
   String get gameNameCannotBeEmpty;
 
   /// No description provided for @playerNameCannotBeEmpty.
   ///
-  /// In es, this message translates to:
-  /// **'El nombre del jugador no puede estar vacio.'**
+  /// In en, this message translates to:
+  /// **'Player name cannot be empty.'**
   String get playerNameCannotBeEmpty;
 
   /// No description provided for @addPlayer.
   ///
-  /// In es, this message translates to:
-  /// **'Agregar Jugador'**
+  /// In en, this message translates to:
+  /// **'Add Player'**
   String get addPlayer;
 
   /// No description provided for @playerName.
   ///
-  /// In es, this message translates to:
-  /// **'Nombre del jugador'**
+  /// In en, this message translates to:
+  /// **'Player name'**
   String get playerName;
 
   /// No description provided for @currentPlayers.
   ///
-  /// In es, this message translates to:
-  /// **'Jugadores actuales'**
+  /// In en, this message translates to:
+  /// **'Current players'**
   String get currentPlayers;
 
   /// No description provided for @playersInGame.
   ///
-  /// In es, this message translates to:
-  /// **'{count} jugador{count, plural, =1{} other{es}} en la partida'**
+  /// In en, this message translates to:
+  /// **'{count} player{count, plural, =1{} other{s}} in the game'**
   String playersInGame(int count);
 
   /// No description provided for @enterNewPlayerName.
   ///
-  /// In es, this message translates to:
-  /// **'Debe introducir el nombre del nuevo jugador'**
+  /// In en, this message translates to:
+  /// **'You must enter the new player\'s name'**
   String get enterNewPlayerName;
 
   /// No description provided for @winner.
   ///
-  /// In es, this message translates to:
-  /// **'GANADOR'**
+  /// In en, this message translates to:
+  /// **'WINNER'**
   String get winner;
 
   /// No description provided for @rematch.
   ///
-  /// In es, this message translates to:
-  /// **'Revancha'**
+  /// In en, this message translates to:
+  /// **'Rematch'**
   String get rematch;
 
   /// No description provided for @watchAd.
   ///
-  /// In es, this message translates to:
-  /// **'ver anuncio'**
+  /// In en, this message translates to:
+  /// **'watch ad'**
   String get watchAd;
 
   /// No description provided for @errorRenewingGame.
   ///
-  /// In es, this message translates to:
-  /// **'Error renovando partida.'**
+  /// In en, this message translates to:
+  /// **'Error renewing game.'**
   String get errorRenewingGame;
 
   /// No description provided for @maxScoreFull.
   ///
-  /// In es, this message translates to:
-  /// **'Puntuación Máxima'**
+  /// In en, this message translates to:
+  /// **'Max Score'**
   String get maxScoreFull;
 
   /// No description provided for @selectPlayer.
   ///
-  /// In es, this message translates to:
-  /// **'Seleccione un jugador'**
+  /// In en, this message translates to:
+  /// **'Select a player'**
   String get selectPlayer;
 
   /// No description provided for @generalHistory.
   ///
-  /// In es, this message translates to:
-  /// **'Historial General'**
+  /// In en, this message translates to:
+  /// **'General History'**
   String get generalHistory;
 
   /// No description provided for @records.
   ///
-  /// In es, this message translates to:
-  /// **'{count} registro{count, plural, =1{} other{s}}'**
+  /// In en, this message translates to:
+  /// **'{count} record{count, plural, =1{} other{s}}'**
   String records(int count);
 
   /// No description provided for @selectedPlayer.
   ///
-  /// In es, this message translates to:
-  /// **'Jugador seleccionado'**
+  /// In en, this message translates to:
+  /// **'Selected player'**
   String get selectedPlayer;
 
   /// No description provided for @noRecords.
   ///
-  /// In es, this message translates to:
-  /// **'No hay registros'**
+  /// In en, this message translates to:
+  /// **'No records'**
   String get noRecords;
+
+  /// No description provided for @noPlayers.
+  ///
+  /// In en, this message translates to:
+  /// **'No players'**
+  String get noPlayers;
+
+  /// No description provided for @confirmDeletePlayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete the player: {name}'**
+  String confirmDeletePlayer(String name);
+
+  /// No description provided for @errorDeletingPlayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting player: {name}'**
+  String errorDeletingPlayer(String name);
+
+  /// No description provided for @minPlayersWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'The number of players cannot be less than 2.'**
+  String get minPlayersWarning;
+
+  /// No description provided for @playerNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Player {number}'**
+  String playerNumber(int number);
+
+  /// No description provided for @newVersionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New version available!'**
+  String get newVersionTitle;
+
+  /// No description provided for @newVersionAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'A new version of Coro Games is available. Update now to enjoy the latest improvements and features.'**
+  String get newVersionAvailable;
+
+  /// No description provided for @updateNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Update now'**
+  String get updateNow;
+
+  /// No description provided for @unauthorizedVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Unauthorized Version'**
+  String get unauthorizedVersion;
+
+  /// No description provided for @illegitimateCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'This copy of the app is not legitimate.\n\nPlease download the official version from Google Play Store to enjoy all features.'**
+  String get illegitimateCopy;
+
+  /// No description provided for @closeApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Close app'**
+  String get closeApp;
+
+  /// No description provided for @errorEditingPlayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not edit the selected player.'**
+  String get errorEditingPlayer;
+
+  /// No description provided for @errorDeletingHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting history'**
+  String get errorDeletingHistory;
+
+  /// No description provided for @noHistoryForGame.
+  ///
+  /// In en, this message translates to:
+  /// **'The entered game has no history.'**
+  String get noHistoryForGame;
+
+  /// No description provided for @minTwoPlayers.
+  ///
+  /// In en, this message translates to:
+  /// **'You must add at least 2 players to the game'**
+  String get minTwoPlayers;
+
+  /// No description provided for @noGamesRegistered.
+  ///
+  /// In en, this message translates to:
+  /// **'No games registered.'**
+  String get noGamesRegistered;
+
+  /// No description provided for @errorDeletingGame.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete the selected game.'**
+  String get errorDeletingGame;
+
+  /// No description provided for @errorEditingGame.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not edit the selected game.'**
+  String get errorEditingGame;
+
+  /// No description provided for @noPlayersForGame.
+  ///
+  /// In en, this message translates to:
+  /// **'The entered game has no players.'**
+  String get noPlayersForGame;
+
+  /// No description provided for @errorDeletingPredefined.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete the selected predefined game.'**
+  String get errorDeletingPredefined;
+
+  /// No description provided for @errorEditingPredefined.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not edit the selected game.'**
+  String get errorEditingPredefined;
+
+  /// No description provided for @errorInsertingHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Error inserting play history.'**
+  String get errorInsertingHistory;
+
+  /// No description provided for @fieldRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Required field.'**
+  String get fieldRequired;
+
+  /// No description provided for @minValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum value is: {min}'**
+  String minValue(String min);
 }
 
 class _AppLocalizationsDelegate

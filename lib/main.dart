@@ -1,7 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:game_score/firebase_options.dart';
 import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/routes/app_routes.dart';
@@ -34,10 +36,14 @@ void main() async {
     return;
   }
 
-  final isPlatformDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
-  bool initInDarkMode = Preferences.isSystemMode ? isPlatformDark : Preferences.isDarkMode;
+  final isPlatformDark =
+      WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+          Brightness.dark;
+  bool initInDarkMode =
+      Preferences.isSystemMode ? isPlatformDark : Preferences.isDarkMode;
 
   final premiumProvider = PremiumProvider();
+  final localeProvider = LocaleProvider();
 
   // ⚡ Inicializar ads y compras de forma DIFERIDA (no bloquear el arranque)
   _initializeServicesDeferred(premiumProvider);
@@ -51,9 +57,10 @@ void main() async {
     ChangeNotifierProvider(create: (_) => ReorderableProvider()),
     ChangeNotifierProvider(create: (_) => PageEditarProvider()),
     ChangeNotifierProvider(create: (_) => PartidaPredefinidaProvider()),
-    ChangeNotifierProvider(create: (_) => ThemeProvider(isDarkMode_: initInDarkMode)),
-    ChangeNotifierProvider(create: (_) => LocaleProvider()),
+    ChangeNotifierProvider(
+        create: (_) => ThemeProvider(isDarkMode_: initInDarkMode)),
     ChangeNotifierProvider.value(value: premiumProvider),
+    ChangeNotifierProvider.value(value: localeProvider),
   ], child: const MyApp()));
 }
 
@@ -62,6 +69,9 @@ void _initializeServicesDeferred(PremiumProvider premiumProvider) {
   // Ejecutar en paralelo después de que la UI se muestre
   Future.wait([
     MobileAds.instance.initialize(),
+    Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    ),
     PurchaseService.instance.initialize(
       onPurchaseComplete: (success) {
         if (success) premiumProvider.setPremium(true);
@@ -84,7 +94,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    
+
     // Remover splash nativo cuando la UI esté lista (solo una vez)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FlutterNativeSplash.remove();
@@ -103,8 +113,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       ThemeProvider themeProvider = context.read<ThemeProvider>();
       _lastLifecycleState = state;
 
-      if (Preferences.isSystemMode && _lastLifecycleState == AppLifecycleState.resumed) {
-        bool isActualSystemDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
+      if (Preferences.isSystemMode &&
+          _lastLifecycleState == AppLifecycleState.resumed) {
+        bool isActualSystemDark =
+            WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+                Brightness.dark;
 
         if (isActualSystemDark != Preferences.isDarkMode) {
           Preferences.isDarkMode = isActualSystemDark;
@@ -117,7 +130,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     ThemeProvider themeProvider = context.watch<ThemeProvider>();
-    LocaleProvider localeProvider = context.watch<LocaleProvider>();
+    final localeProvider = context.watch<LocaleProvider>();
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -129,17 +142,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Coro Games',
-          // Configuración de idiomas
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('es'),
-            Locale('en'),
-          ],
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           locale: localeProvider.locale,
           home: const HomeScreen(),
           builder: EasyLoading.init(

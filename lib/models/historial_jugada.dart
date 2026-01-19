@@ -43,7 +43,7 @@ class HistorialJugada extends DynamicClass {
       historialJugada.id = res.data;
       response.data = historialJugada;
     } else {
-      response.addMsg('Error ingresando el historial de la jugada.');
+      response.addMsg(L10n.errorInsertingHistory);
       response.hasError = true;
     }
 

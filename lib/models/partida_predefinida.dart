@@ -82,7 +82,7 @@ class PartidaPredefinida extends DynamicClass {
 
       return partidasParsed;
     } else {
-      response.addMsg('No existen partidas registradas.');
+      response.addMsg(L10n.noGamesRegistered);
       return List<PartidaPredefinida>.from([]);
     }
   }
@@ -90,7 +90,7 @@ class PartidaPredefinida extends DynamicClass {
   static Future<SqlResponse> delete({required PartidaPredefinida partida}) async {
     final response = await CrudHelper.deleteOne(tableName: PartidaPredefinida.tableName, id: partida.id!);
 
-    if (response.hasError!) response.addMsg('No se pudo borrar la partida predefinida seleccionada.');
+    if (response.hasError!) response.addMsg(L10n.errorDeletingPredefined);
 
     return response;
   }
@@ -98,7 +98,7 @@ class PartidaPredefinida extends DynamicClass {
   static Future<SqlResponse> edit({required int id, required Map<String, dynamic> partidaEdit}) async {
     final response = await CrudHelper.updateOne(tableName: PartidaPredefinida.tableName, id: id, newData: partidaEdit);
 
-    if (response.hasError!) response.addMsg('No se pudo editar la partida seleccionada.');
+    if (response.hasError!) response.addMsg(L10n.errorEditingPredefined);
 
     return response;
   }

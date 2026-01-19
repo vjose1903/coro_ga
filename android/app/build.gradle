@@ -1,5 +1,8 @@
 plugins {
     id 'com.android.application'
+    // START: FlutterFire Configuration
+    id 'com.google.gms.google-services'
+    // END: FlutterFire Configuration
     id 'org.jetbrains.kotlin.android'
     id 'dev.flutter.flutter-gradle-plugin'
 }
@@ -50,8 +53,8 @@ android {
         applicationId "com.inSpot.coro_games"
         minSdkVersion flutter.minSdkVersion
         targetSdk 36
-        versionCode 25
-        versionName "2.0.5"
+        versionCode 27
+        versionName "2.0.7"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }

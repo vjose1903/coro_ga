@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/providers/providers.dart';
@@ -81,19 +82,22 @@ class JugadorProvider extends ChangeNotifier {
       {required Jugador jugador, PanelController? panelController, required Function callBack}) async {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
+    final l10n = AppLocalizations.of(context)!;
 
     CustomAlertDialog.show(context,
-        menssage: "Seguro que desea eliminar el jugador: ${jugador.nombre}",
-        title: "Confirmar",
+        menssage: l10n.confirmDeletePlayer(jugador.nombre!),
+        title: l10n.confirm,
         dialogType: DialogType.error,
         buttonsList: [
           CustomActionsButtons.cancelButton({
+            "label": l10n.cancel,
             "onTap": () {
               Navigator.pop(context);
               callBack({"tipo": "cancelar"});
             }
           }),
           CustomActionsButtons.aceptarButton({
+            "label": l10n.accept,
             "onTap": () async {
               Navigator.pop(context);
 

@@ -7,11 +7,6 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 class MyLoading {
   MyLoading({Key? key});
 
-  static String _getLoadingText() {
-    final lang = Preferences.languageCode;
-    return lang == 'en' ? 'Loading...' : 'Cargando...';
-  }
-
   static show({String? message}) async {
     final isDark = Preferences.isDarkMode;
 
@@ -21,9 +16,7 @@ class MyLoading {
       ..loadingStyle = EasyLoadingStyle.custom
       ..indicatorSize = 60.0
       ..radius = 16.0
-      ..backgroundColor = isDark
-          ? const Color(0xFF1E1E2E).withValues(alpha: 0.95)
-          : Colors.white.withValues(alpha: 0.95)
+      ..backgroundColor = isDark ? const Color(0xFF1E1E2E).withValues(alpha: 0.95) : Colors.white.withValues(alpha: 0.95)
       ..textColor = isDark ? Colors.white : AppThemes.colorCuarto
       ..textStyle = TextStyle(
         fontFamily: 'Poppins',
@@ -37,9 +30,7 @@ class MyLoading {
       ..dismissOnTap = false
       ..boxShadow = [
         BoxShadow(
-          color: isDark
-              ? Colors.black.withValues(alpha: 0.4)
-              : Colors.black.withValues(alpha: 0.15),
+          color: isDark ? Colors.black.withValues(alpha: 0.4) : Colors.black.withValues(alpha: 0.15),
           blurRadius: 20,
           offset: const Offset(0, 8),
         ),
@@ -88,5 +79,10 @@ class MyLoading {
 
   static close() {
     EasyLoading.dismiss();
+  }
+
+  static String _getLoadingText() {
+    final lang = Preferences.languageCode;
+    return lang == 'en' ? 'Loading...' : 'Cargando...';
   }
 }

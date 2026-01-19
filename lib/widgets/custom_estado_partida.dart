@@ -98,9 +98,9 @@ class _GanadorPerdedor extends StatelessWidget {
   const _GanadorPerdedor({Key? key, required this.partida}) : super(key: key);
   final Partida partida;
 
-  String _getTranslatedLabel(BuildContext context, String label) {
-    if (label == Estado.empate) return AppLocalizations.of(context)!.tie;
-    return label;
+  String _getTranslatedLabel(BuildContext context, String name) {
+    if (name == Estado.empate) return AppLocalizations.of(context)!.tie;
+    return name;
   }
 
   @override
@@ -110,14 +110,14 @@ class _GanadorPerdedor extends StatelessWidget {
       children: [
         _PlayerStatusChip(
           icon: Icons.trending_up_rounded,
-          label: _getTranslatedLabel(context, partida.getGandorOrPerdedor(tipo: Estado.ganador)),
+          label: _getTranslatedLabel(context, partida.getGandorOrPerdedorName(tipo: Estado.ganador)),
           color: Colors.green,
           isWinner: true,
         ),
         const SizedBox(width: 12),
         _PlayerStatusChip(
           icon: Icons.trending_down_rounded,
-          label: _getTranslatedLabel(context, partida.getGandorOrPerdedor(tipo: Estado.perdedor)),
+          label: _getTranslatedLabel(context, partida.getGandorOrPerdedorName(tipo: Estado.perdedor)),
           color: Colors.red[400]!,
           isWinner: false,
         ),

@@ -64,7 +64,7 @@ class Jugador extends DynamicClass {
 
     final response = await CrudHelper.updateOne(tableName: Jugador.tableName, id: jugador.id, newData: tempJugadorMap);
 
-    if (response.hasError!) response.addMsg('No se pudo editar el jugador seleccionado.');
+    if (response.hasError!) response.addMsg(L10n.errorEditingPlayer);
 
     return response;
   }
@@ -103,7 +103,7 @@ class Jugador extends DynamicClass {
       response.data = {"newPuntuacion": newPuntuacion};
     } else {
       response.hasError = true;
-      response.addMsg('Error eliminando el historial');
+      response.addMsg(L10n.errorDeletingHistory);
     }
 
     return response;
@@ -120,7 +120,7 @@ class Jugador extends DynamicClass {
       final historialesParsed = List<HistorialJugada>.from(response.data.map((x) => HistorialJugada.fromMap(x)));
       jugador.addHistoriales(historialesParsed);
     } else {
-      response.addMsg('Partida ingresada no tiene historiales.');
+      response.addMsg(L10n.noHistoryForGame);
     }
   }
 
@@ -134,12 +134,12 @@ class Jugador extends DynamicClass {
           final responseHistorial = await CrudHelper.deleteOne(tableName: HistorialJugada.tableName, id: historial.id!);
 
           if (responseHistorial.hasError! && response.messages == null) {
-            response.addMsg('Algunos historiales de jugadas, no pudieron ser eliminados');
+            response.addMsg(L10n.someHistoryNotDeleted);
           }
         }
       }
     } else {
-      response.addMsg("Error eliminando al jugador: $nombre");
+      response.addMsg(L10n.errorDeletingPlayerName(nombre!));
     }
 
     return response;

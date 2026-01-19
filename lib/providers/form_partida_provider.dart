@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/partida_predefinida.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
@@ -11,12 +12,15 @@ class FormPartidaProvider extends ChangeNotifier {
     'jugadores': fb.array([])
   });
 
-  void rellenarFormulario(PartidaPredefinida partidaPredefinida) async {
+  void rellenarFormulario(PartidaPredefinida partidaPredefinida, {BuildContext? context}) async {
     await resetForm(restoreJugadores: false);
     form.patchValue(partidaPredefinida.toMap());
 
     for (var index = 0; index < partidaPredefinida.cantidadJugadores!; index++) {
-      addJugadorToList(name: "Jugador ${index + 1}");
+      String playerName = context != null 
+          ? AppLocalizations.of(context)!.playerNumber(index + 1)
+          : "Player ${index + 1}";
+      addJugadorToList(name: playerName);
     }
 
     notifyListeners();

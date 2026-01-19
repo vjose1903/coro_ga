@@ -141,6 +141,13 @@
   "winning": "Ganando",
   "losing": "Perdiendo",
   "edit": "Editar",
+  "restart": "Reiniciar",
+  "confirmRestartGame": "¿Seguro que desea reiniciar la partida: {name}?",
+  "@confirmRestartGame": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   
   "newPredefinedGame": "Nueva Partida",
   "editPredefinedGame": "Editar Partida",
@@ -184,6 +191,54 @@
     }
   },
   "selectedPlayer": "Jugador seleccionado",
-  "noRecords": "No hay registros"
+  "noRecords": "No hay registros",
+  "noPlayers": "Sin jugadores",
+  
+  "confirmDeletePlayer": "Seguro que desea eliminar el jugador: {name}",
+  "@confirmDeletePlayer": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "errorDeletingPlayer": "Error eliminando al jugador: {name}",
+  "@errorDeletingPlayer": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "minPlayersWarning": "La cantidad de jugadores no puede ser menor a 2.",
+  "playerNumber": "Jugador {number}",
+  "@playerNumber": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  
+  "newVersionTitle": "¡Nueva versión disponible!",
+  "newVersionAvailable": "Hay una nueva versión de Coro Games disponible. Actualiza ahora para disfrutar de las últimas mejoras y funcionalidades.",
+  "updateNow": "Actualizar ahora",
+  "unauthorizedVersion": "Versión No Autorizada",
+  "illegitimateCopy": "Esta copia de la aplicación no es legítima.\n\nPor favor, descarga la versión oficial desde Google Play Store para disfrutar de todas las funciones.",
+  "closeApp": "Cerrar aplicación",
+  
+  "errorEditingPlayer": "No se pudo editar el jugador seleccionado.",
+  "errorDeletingHistory": "Error eliminando el historial",
+  "noHistoryForGame": "Partida ingresada no tiene historiales.",
+  "minTwoPlayers": "Debe de agregar almenos 2 jugadores a la partida",
+  "noGamesRegistered": "No existen partidas registradas.",
+  "errorDeletingGame": "No se pudo borrar la partida seleccionada.",
+  "errorEditingGame": "No se pudo editar la partida seleccionada.",
+  "noPlayersForGame": "Partida ingresada no tiene jugadores.",
+  "errorDeletingPredefined": "No se pudo borrar la partida predefinida seleccionada.",
+  "errorEditingPredefined": "No se pudo editar la partida seleccionada.",
+  "errorInsertingHistory": "Error ingresando el historial de la jugada.",
+  
+  "fieldRequired": "Campo requerido.",
+  "minValue": "Valor mínimo es: {min}",
+  "@minValue": {
+    "placeholders": {
+      "min": {"type": "String"}
+    }
+  }
 }
 

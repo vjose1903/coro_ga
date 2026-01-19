@@ -59,32 +59,30 @@ class _AddJugadorState extends State<AddJugador> {
       physics: const BouncingScrollPhysics(),
       child: SizedBox(
         height: (ResponsiveApp.size.height - (ResponsiveApp.size.height * 0.22)),
-        child: Builder(
-          builder: (context) {
-            final l10n = AppLocalizations.of(context)!;
-            return Column(
-              children: [
-                // Header
-                _AddJugadorHeader(cantJugadores: cantJugadores),
-                const SizedBox(height: 16),
-                
-                // Input Nombre
-                ReactiveForm(
-                  formGroup: form,
-                  child: Column(children: <Widget>[
-                    CustomReactiveInput(formControlName: 'nombre', labelText: l10n.playerName, textCapitalization: TextCapitalization.words)
-                  ]),
-                ),
-                const SizedBox(height: 16),
-                
-                // Sección jugadores actuales
-                _SectionTitle(
-                  title: l10n.currentPlayers,
-                  icon: FontAwesomeIcons.users,
-                  count: cantJugadores,
-                ),
+        child: Column(
+          children: [
+            // Header
+            _AddJugadorHeader(cantJugadores: cantJugadores),
+            const SizedBox(height: 16),
+
+            // Input Nombre
+            ReactiveForm(
+              formGroup: form,
+              child: Column(children: <Widget>[
+                CustomReactiveInput(
+                    formControlName: 'nombre', labelText: AppLocalizations.of(context)!.playerName, textCapitalization: TextCapitalization.words)
+              ]),
+            ),
+            const SizedBox(height: 16),
+
+            // Sección jugadores actuales
+            _SectionTitle(
+              title: AppLocalizations.of(context)!.currentPlayers,
+              icon: FontAwesomeIcons.users,
+              count: cantJugadores,
+            ),
             const SizedBox(height: 8),
-            
+
             // Lista de jugadores
             Expanded(
               child: Container(
@@ -106,18 +104,16 @@ class _AddJugadorState extends State<AddJugador> {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Botón Agregar
             _AddButton(
               onTap: () => _agregarJugador(context, form),
             ),
             const SizedBox(height: 12),
-            
+
             // Anuncios
-                widget.anuncio
-              ],
-            );
-          },
+            widget.anuncio
+          ],
         ),
       ),
     );
@@ -127,14 +123,12 @@ class _AddJugadorState extends State<AddJugador> {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
-    final l10n = AppLocalizations.of(context)!;
-    
     if (!premiumProvider.canAddPlayer(partidaProvider.partidaEnTurno!.jugadores!.length)) {
       Toast.show(
           type: ToastType.info,
           context: context,
-          message: l10n.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
-          actionLabel: l10n.getPro,
+          message: AppLocalizations.of(context)!.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
+          actionLabel: AppLocalizations.of(context)!.getPro,
           onAction: () => Navigator.pushNamed(context, 'premium'));
       return;
     }
@@ -148,11 +142,10 @@ class _AddJugadorState extends State<AddJugador> {
 
         await Future.delayed(const Duration(milliseconds: 50));
 
-        jugadoresController.animateTo(jugadoresController.position.maxScrollExtent,
-            duration: const Duration(seconds: 1), curve: Curves.easeOutCubic);
+        jugadoresController.animateTo(jugadoresController.position.maxScrollExtent, duration: const Duration(seconds: 1), curve: Curves.easeOutCubic);
       });
     } else {
-      Toast.show(type: ToastType.error, context: context, message: l10n.enterNewPlayerName);
+      Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.enterNewPlayerName);
     }
   }
 }
@@ -230,34 +223,29 @@ class _AddJugadorHeader extends StatelessWidget {
 
           // Información
           Expanded(
-            child: Builder(
-              builder: (context) {
-                final l10n = AppLocalizations.of(context)!;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.players,
-                      style: TextStyle(
-                        fontFamily: "Poppins",
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : AppThemes.colorQuinto,
-                      ),
-                    ),
-                    const SizedBox(height: 1),
-                    Text(
-                      l10n.playersInGame(cantJugadores),
-                      style: TextStyle(
-                        fontFamily: "Poppins",
-                        fontSize: 11,
-                        color: isDark ? Colors.grey[400] : Colors.grey[600],
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                );
-              },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.players,
+                  style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : AppThemes.colorQuinto,
+                  ),
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  AppLocalizations.of(context)!.playersInGame(cantJugadores),
+                  style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 11,
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ),
         ],

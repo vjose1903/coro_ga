@@ -296,6 +296,14 @@ class AppLocalizationsEs extends AppLocalizations {
   String get edit => 'Editar';
 
   @override
+  String get restart => 'Reiniciar';
+
+  @override
+  String confirmRestartGame(String name) {
+    return '¿Seguro que desea reiniciar la partida: $name?';
+  }
+
+  @override
   String get newPredefinedGame => 'Nueva Partida';
 
   @override
@@ -397,4 +405,91 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get noRecords => 'No hay registros';
+
+  @override
+  String get noPlayers => 'Sin jugadores';
+
+  @override
+  String confirmDeletePlayer(String name) {
+    return 'Seguro que desea eliminar el jugador: $name';
+  }
+
+  @override
+  String errorDeletingPlayer(String name) {
+    return 'Error eliminando al jugador: $name';
+  }
+
+  @override
+  String get minPlayersWarning =>
+      'La cantidad de jugadores no puede ser menor a 2.';
+
+  @override
+  String playerNumber(int number) {
+    return 'Jugador $number';
+  }
+
+  @override
+  String get newVersionTitle => '¡Nueva versión disponible!';
+
+  @override
+  String get newVersionAvailable =>
+      'Hay una nueva versión de Coro Games disponible. Actualiza ahora para disfrutar de las últimas mejoras y funcionalidades.';
+
+  @override
+  String get updateNow => 'Actualizar ahora';
+
+  @override
+  String get unauthorizedVersion => 'Versión No Autorizada';
+
+  @override
+  String get illegitimateCopy =>
+      'Esta copia de la aplicación no es legítima.\n\nPor favor, descarga la versión oficial desde Google Play Store para disfrutar de todas las funciones.';
+
+  @override
+  String get closeApp => 'Cerrar aplicación';
+
+  @override
+  String get errorEditingPlayer => 'No se pudo editar el jugador seleccionado.';
+
+  @override
+  String get errorDeletingHistory => 'Error eliminando el historial';
+
+  @override
+  String get noHistoryForGame => 'Partida ingresada no tiene historiales.';
+
+  @override
+  String get minTwoPlayers =>
+      'Debe de agregar almenos 2 jugadores a la partida';
+
+  @override
+  String get noGamesRegistered => 'No existen partidas registradas.';
+
+  @override
+  String get errorDeletingGame => 'No se pudo borrar la partida seleccionada.';
+
+  @override
+  String get errorEditingGame => 'No se pudo editar la partida seleccionada.';
+
+  @override
+  String get noPlayersForGame => 'Partida ingresada no tiene jugadores.';
+
+  @override
+  String get errorDeletingPredefined =>
+      'No se pudo borrar la partida predefinida seleccionada.';
+
+  @override
+  String get errorEditingPredefined =>
+      'No se pudo editar la partida seleccionada.';
+
+  @override
+  String get errorInsertingHistory =>
+      'Error ingresando el historial de la jugada.';
+
+  @override
+  String get fieldRequired => 'Campo requerido.';
+
+  @override
+  String minValue(String min) {
+    return 'Valor mínimo es: $min';
+  }
 }

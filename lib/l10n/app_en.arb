@@ -13,8 +13,23 @@
   "loading": "Loading...",
   
   "freeVersionLimitGames": "Free version only allows {count} simultaneous games.",
+  "@freeVersionLimitGames": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "freeVersionLimitPlayers": "Free version only allows {count} players.",
+  "@freeVersionLimitPlayers": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "freeVersionLimitPredefined": "Free version only allows {count} predefined games.",
+  "@freeVersionLimitPredefined": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "getPro": "Get PRO",
   
   "appearance": "Appearance",
@@ -57,10 +72,31 @@
   "accept": "Accept",
   "delete": "Delete",
   "confirmDeleteGame": "Are you sure you want to delete the game: {name}",
+  "@confirmDeleteGame": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "confirmDeletePredefined": "Are you sure you want to delete the predefined game: {name}",
+  "@confirmDeletePredefined": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "confirmDeleteScore": "Are you sure you want to delete score {score} from player {player}?",
+  "@confirmDeleteScore": {
+    "placeholders": {
+      "score": {"type": "int"},
+      "player": {"type": "String"}
+    }
+  },
   
   "playerScore": "Score: {score}",
+  "@playerScore": {
+    "placeholders": {
+      "score": {"type": "int"}
+    }
+  },
   "increase": "Increase",
   "decrease": "Decrease",
   "scoreLabel": "Score",
@@ -105,6 +141,13 @@
   "winning": "Winning",
   "losing": "Losing",
   "edit": "Edit",
+  "restart": "Restart",
+  "confirmRestartGame": "Are you sure you want to restart the game: {name}?",
+  "@confirmRestartGame": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   
   "newPredefinedGame": "New Game",
   "editPredefinedGame": "Edit Game",
@@ -125,6 +168,11 @@
   "playerName": "Player name",
   "currentPlayers": "Current players",
   "playersInGame": "{count} player{count, plural, =1{} other{s}} in the game",
+  "@playersInGame": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "enterNewPlayerName": "You must enter the new player's name",
   
   "winner": "WINNER",
@@ -137,7 +185,59 @@
   "selectPlayer": "Select a player",
   "generalHistory": "General History",
   "records": "{count} record{count, plural, =1{} other{s}}",
+  "@records": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "selectedPlayer": "Selected player",
-  "noRecords": "No records"
+  "noRecords": "No records",
+  "noPlayers": "No players",
+  
+  "confirmDeletePlayer": "Are you sure you want to delete the player: {name}",
+  "@confirmDeletePlayer": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "errorDeletingPlayer": "Error deleting player: {name}",
+  "@errorDeletingPlayer": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "minPlayersWarning": "The number of players cannot be less than 2.",
+  "playerNumber": "Player {number}",
+  "@playerNumber": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  
+  "newVersionTitle": "New version available!",
+  "newVersionAvailable": "A new version of Coro Games is available. Update now to enjoy the latest improvements and features.",
+  "updateNow": "Update now",
+  "unauthorizedVersion": "Unauthorized Version",
+  "illegitimateCopy": "This copy of the app is not legitimate.\n\nPlease download the official version from Google Play Store to enjoy all features.",
+  "closeApp": "Close app",
+  
+  "errorEditingPlayer": "Could not edit the selected player.",
+  "errorDeletingHistory": "Error deleting history",
+  "noHistoryForGame": "The entered game has no history.",
+  "minTwoPlayers": "You must add at least 2 players to the game",
+  "noGamesRegistered": "No games registered.",
+  "errorDeletingGame": "Could not delete the selected game.",
+  "errorEditingGame": "Could not edit the selected game.",
+  "noPlayersForGame": "The entered game has no players.",
+  "errorDeletingPredefined": "Could not delete the selected predefined game.",
+  "errorEditingPredefined": "Could not edit the selected game.",
+  "errorInsertingHistory": "Error inserting play history.",
+  
+  "fieldRequired": "Required field.",
+  "minValue": "Minimum value is: {min}",
+  "@minValue": {
+    "placeholders": {
+      "min": {"type": "String"}
+    }
+  }
 }
-

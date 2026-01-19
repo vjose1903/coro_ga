@@ -87,8 +87,8 @@ class FormPartidaPredefinida extends StatelessWidget {
                           Toast.show(
                               type: ToastType.info,
                               context: context,
-                              message: l10n.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
-                              actionLabel: l10n.getPro,
+                              message: AppLocalizations.of(context)!.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
+                              actionLabel: AppLocalizations.of(context)!.getPro,
                               onAction: () => Navigator.pushNamed(context, 'premium'));
                           return;
                         }
@@ -99,36 +99,31 @@ class FormPartidaPredefinida extends StatelessWidget {
                     const SizedBox(height: 30),
 
                     // Botones de acción
-                    Builder(
-                      builder: (context) {
-                        final l10n = AppLocalizations.of(context)!;
-                        return Row(
-                          children: [
-                            // Volver
-                            Expanded(
-                              child: _ActionButton(
-                                label: l10n.back,
-                                icon: FontAwesomeIcons.arrowLeft,
-                                isDestructive: true,
-                                onTap: () {
-                                  context.read<PartidaPredefinidaProvider>().resetForm();
-                                  DialogNavigator.of(context).pop();
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            // Crear/Guardar
-                            Expanded(
-                              child: _ActionButton(
-                                label: isEditing ? l10n.save : l10n.create,
-                                icon: isEditing ? FontAwesomeIcons.floppyDisk : FontAwesomeIcons.plus,
-                                isPrimary: true,
-                                onTap: () => crearEditarPartida(context: context, form: form),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
+                    Row(
+                      children: [
+                        // Volver
+                        Expanded(
+                          child: _ActionButton(
+                            label: AppLocalizations.of(context)!.back,
+                            icon: FontAwesomeIcons.arrowLeft,
+                            isDestructive: true,
+                            onTap: () {
+                              context.read<PartidaPredefinidaProvider>().resetForm();
+                              DialogNavigator.of(context).pop();
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        // Crear/Guardar
+                        Expanded(
+                          child: _ActionButton(
+                            label: isEditing ? AppLocalizations.of(context)!.save : AppLocalizations.of(context)!.create,
+                            icon: isEditing ? FontAwesomeIcons.floppyDisk : FontAwesomeIcons.plus,
+                            isPrimary: true,
+                            onTap: () => crearEditarPartida(context: context, form: form),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 10),
                   ],
@@ -242,32 +237,27 @@ class _FormHeader extends StatelessWidget {
           const SizedBox(width: 12),
           // Texto
           Expanded(
-            child: Builder(
-              builder: (context) {
-                final l10n = AppLocalizations.of(context)!;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      isEditing ? l10n.editPredefinedGame : l10n.newPredefinedGame,
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                        color: isDark ? Colors.white : AppThemes.colorCuarto,
-                      ),
-                    ),
-                    Text(
-                      isEditing ? l10n.modifyGameData : l10n.configureYourPredefined,
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 11,
-                        color: isDark ? Colors.white54 : Colors.black54,
-                      ),
-                    ),
-                  ],
-                );
-              },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isEditing ? AppLocalizations.of(context)!.editPredefinedGame : AppLocalizations.of(context)!.newPredefinedGame,
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    color: isDark ? Colors.white : AppThemes.colorCuarto,
+                  ),
+                ),
+                Text(
+                  isEditing ? AppLocalizations.of(context)!.modifyGameData : AppLocalizations.of(context)!.configureYourPredefined,
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 11,
+                    color: isDark ? Colors.white54 : Colors.black54,
+                  ),
+                ),
+              ],
             ),
           ),
         ],

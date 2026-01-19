@@ -73,10 +73,12 @@ class _LayoutState extends State<Layout> {
     final visibleHeight = screenHeight - keyboardHeight;
     final minTopMargin = topPadding + 80;
 
-    final maxHeight = max(100.0, min(
-      screenHeight * fraction,
-      min(visibleHeight * widget.maxPanelHeightFraction, visibleHeight - minTopMargin),
-    ));
+    final maxHeight = max(
+        100.0,
+        min(
+          screenHeight * fraction,
+          min(visibleHeight * widget.maxPanelHeightFraction, visibleHeight - minTopMargin),
+        ));
 
     final isDark = Preferences.isDarkMode;
 
@@ -109,6 +111,15 @@ class _LayoutState extends State<Layout> {
             ),
         ],
         color: AppThemes.themeColor_2,
+        onPanelOpened: () {
+          slideUpProvider.onPanelOpened();
+        },
+        onPanelSlide: (position) {
+          // Si el panel está bajando (posición < 1), marcar que no está completamente abierto
+          if (position < 1.0 && slideUpProvider.isPanelFullyOpen) {
+            slideUpProvider.onPanelClosing();
+          }
+        },
         onPanelClosed: () {
           cleanSlideUp(slideUpProvider, true);
         },
@@ -136,6 +147,11 @@ class _LayoutState extends State<Layout> {
   cleanSlideUp(SlideUpProvider slideUpProvider, [isListener = false]) {
     if (slideUpProvider.body != null) slideUpProvider.body = null;
     FocusManager.instance.primaryFocus?.unfocus();
+
+    // Limpiar entidades en edición al cerrar el panel
+    context.read<JugadorProvider>().jugadorEditar = null;
+    context.read<PartidaProvider>().partidaEditar = null;
+
     slideUpProvider.closeSlideUp(controller: widget.panelController, isListener: isListener);
   }
 }
@@ -327,9 +343,7 @@ class _PanelHandle extends StatelessWidget {
         width: 40,
         height: 5,
         decoration: BoxDecoration(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.2)
-              : Colors.grey.withValues(alpha: 0.3),
+          color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             if (!isDark)
@@ -362,4 +376,95 @@ class SlideUpScrollController extends InheritedWidget {
 
   @override
   bool updateShouldNotify(SlideUpScrollController oldWidget) => scrollController != oldWidget.scrollController;
+}
+
+/// Mixin para widgets que necesitan scroll automático dentro del SlideUpPanel
+/// Coordina el estado del panel con el scroll del ListView
+mixin SlideUpAutoScrollMixin<T extends StatefulWidget> on State<T> {
+  ScrollController? _autoScrollController;
+  bool _scrollPending = false;
+  int _retryCount = 0;
+  static const int _maxRetries = 50; // Máximo ~1s de reintentos
+
+  /// Obtiene el ScrollController del panel o usa el fallback proporcionado
+  ScrollController getEffectiveController(BuildContext context, ScrollController fallback) {
+    return SlideUpScrollController.of(context) ?? fallback;
+  }
+
+  /// Programa un scroll al final de la lista
+  /// Se ejecuta solo cuando:
+  /// 1. El panel está completamente abierto
+  /// 2. El contenido del ListView está listo (hasContentDimensions && maxScrollExtent > 0)
+  void scheduleScrollToBottom(BuildContext context, ScrollController controller) {
+    _autoScrollController = controller;
+    _scrollPending = true;
+    _retryCount = 0;
+
+    final slideUpProvider = context.read<SlideUpProvider>();
+
+    // Esperar a que el panel esté completamente abierto
+    slideUpProvider.executeWhenPanelOpen(() {
+      if (!mounted || !_scrollPending) return;
+      // Delay adicional después de que el panel está abierto
+      Future.delayed(const Duration(milliseconds: 150), () {
+        if (!mounted || !_scrollPending) return;
+        _executeScrollWhenReady();
+      });
+    });
+  }
+
+  /// Ejecuta el scroll cuando el controller tiene contenido
+  void _executeScrollWhenReady() {
+    if (!mounted || _autoScrollController == null || !_scrollPending) return;
+
+    final controller = _autoScrollController!;
+
+    // Verificar si el controller tiene posición y contenido
+    if (!controller.hasClients) {
+      _scheduleRetry();
+      return;
+    }
+
+    final position = controller.position;
+
+    // Verificar si el contenido está listo
+    if (!position.hasContentDimensions || position.maxScrollExtent <= 0) {
+      _scheduleRetry();
+      return;
+    }
+
+    // Contenido listo, ejecutar scroll
+    _scrollPending = false;
+    _retryCount = 0;
+    controller.animateTo(
+      position.maxScrollExtent,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
+  }
+
+  /// Programa un reintento con límite
+  void _scheduleRetry() {
+    if (!mounted || !_scrollPending) return;
+
+    _retryCount++;
+    if (_retryCount >= _maxRetries) {
+      // Límite de reintentos alcanzado, desistir
+      _scrollPending = false;
+      _retryCount = 0;
+      return;
+    }
+
+    // Reintentar después de un pequeño delay
+    Future.delayed(const Duration(milliseconds: 20), () {
+      if (mounted && _scrollPending) _executeScrollWhenReady();
+    });
+  }
+
+  /// Cancela cualquier scroll pendiente
+  void cancelPendingScroll() {
+    _scrollPending = false;
+    _retryCount = 0;
+    _autoScrollController = null;
+  }
 }

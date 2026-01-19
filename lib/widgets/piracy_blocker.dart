@@ -1,9 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:game_score/shared_preferences/preferences.dart';
 
 /// Widget que bloquea toda la app si se detecta piratería
 class PiracyBlocker extends StatelessWidget {
   const PiracyBlocker({Key? key}) : super(key: key);
+
+  String get _unauthorizedTitle {
+    return Preferences.languageCode == 'en' ? 'Unauthorized Version' : 'Versión No Autorizada';
+  }
+
+  String get _illegitimateMessage {
+    return Preferences.languageCode == 'en' 
+        ? 'This copy of the app is not legitimate.\n\nPlease download the official version from Google Play Store to enjoy all features.'
+        : 'Esta copia de la aplicación no es legítima.\n\nPor favor, descarga la versión oficial desde Google Play Store para disfrutar de todas las funciones.';
+  }
+
+  String get _closeAppText {
+    return Preferences.languageCode == 'en' ? 'Close app' : 'Cerrar aplicación';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +42,9 @@ class PiracyBlocker extends StatelessWidget {
                   const SizedBox(height: 32),
                   
                   // Título
-                  const Text(
-                    'Versión No Autorizada',
-                    style: TextStyle(
+                  Text(
+                    _unauthorizedTitle,
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -41,8 +56,7 @@ class PiracyBlocker extends StatelessWidget {
                   
                   // Mensaje
                   Text(
-                    'Esta copia de la aplicación no es legítima.\n\n'
-                    'Por favor, descarga la versión oficial desde Google Play Store para disfrutar de todas las funciones.',
+                    _illegitimateMessage,
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[400],
@@ -63,9 +77,9 @@ class PiracyBlocker extends StatelessWidget {
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    child: const Text(
-                      'Cerrar aplicación',
-                      style: TextStyle(
+                    child: Text(
+                      _closeAppText,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontFamily: 'Poppins',
                         color: Colors.white,

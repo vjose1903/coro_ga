@@ -1,15 +1,16 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:sliding_up_panel2/sliding_up_panel2.dart';
-import 'package:game_score/helpers/helpers.dart';
-import 'package:game_score/models/models.dart';
-import 'package:game_score/providers/providers.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
+
+import '../helpers/helpers.dart';
+import '../models/models.dart';
+import '../providers/providers.dart';
+import '../shared_preferences/preferences.dart';
+import '../themes/app_themes.dart';
+import '../widgets/widgets.dart';
 
 class PartidaScreen extends StatefulWidget {
   const PartidaScreen({Key? key}) : super(key: key);
@@ -83,8 +84,7 @@ class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProvider
               ),
             ),
           ),
-          bottomNavigationBar: BottomBar(
-              panelController: panelController, child: const NavigationBar()),
+          bottomNavigationBar: BottomBar(panelController: panelController, child: const NavigationBar()),
         );
       },
     );
@@ -92,14 +92,15 @@ class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProvider
 }
 
 class _Body extends StatelessWidget {
-  const _Body({Key? key, required this.panelController, required this.anuncio})
-      : super(key: key);
+  const _Body({Key? key, required this.panelController, required this.anuncio}) : super(key: key);
 
   final PanelController panelController;
   final GoogleBannerAd anuncio;
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
+    final FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
+    final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
     Partida partida = partidaProvider.partidaEnTurno!;
     return Layout(
         panelController: panelController,
@@ -116,14 +117,13 @@ class _Body extends StatelessWidget {
           iconColor: Colors.white,
           icon: Icons.edit_outlined,
           onTap: () {
-            final FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
-            final SlideUpProvider slideUp = context.read<SlideUpProvider>();
             formPartidaProvider.form.patchValue(partida.toMap());
             partidaProvider.partidaEditar = partida;
-            slideUp.openSlideUp(
-                controller: panelController,
-                maxHeightFraction: 0.5,
-                bodyContent: EditarEntidad(panelController: panelController));
+            slideUpProvider.openSlideUp(
+              controller: panelController,
+              maxHeightFraction: 0.5,
+              bodyContent: EditarEntidad(panelController: panelController),
+            );
           },
         ),
         bodyContent: Container(
@@ -149,9 +149,7 @@ class JugadoresCard extends StatelessWidget {
       final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
       final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
       jugadorProvider.formJugador.reset();
-      slideUpProvider.openSlideUp(
-          controller: panelController,
-          bodyContent: const AddJugadorPartida());
+      slideUpProvider.openSlideUp(controller: panelController, bodyContent: const AddJugadorPartida());
     }
 
     return Expanded(
@@ -160,9 +158,7 @@ class JugadoresCard extends StatelessWidget {
           color: AppThemes.themeColor_2,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: Preferences.isDarkMode
-                ? Colors.white.withValues(alpha: 0.08)
-                : Colors.grey.withValues(alpha: 0.15),
+            color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
             width: 1,
           ),
           boxShadow: [
@@ -185,13 +181,11 @@ class JugadoresCard extends StatelessWidget {
                     icon: Icons.history_rounded,
                     onTap: () {
                       final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
-                      slideUpProvider.openSlideUp(
-                          controller: panelController,
-                          bodyContent: HistorialGeneral(panelController: panelController));
+                      slideUpProvider.openSlideUp(controller: panelController, bodyContent: HistorialGeneral(panelController: panelController));
                     },
                   ),
                   _ActionButton(
-                    icon: Icons.person_add_rounded,
+                    icon: Icons.manage_accounts_rounded,
                     isPrimary: true,
                     onTap: openSlideUp,
                   ),
@@ -234,19 +228,13 @@ class _ActionButton extends StatelessWidget {
                     colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
                   )
                 : null,
-            color: isPrimary
-                ? null
-                : (Preferences.isDarkMode
-                    ? Colors.white.withValues(alpha: 0.08)
-                    : Colors.grey.withValues(alpha: 0.1)),
+            color: isPrimary ? null : (Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.1)),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(
             icon,
             size: 18,
-            color: isPrimary
-                ? Colors.white
-                : (Preferences.isDarkMode ? Colors.white70 : Colors.grey[700]),
+            color: isPrimary ? Colors.white : (Preferences.isDarkMode ? Colors.white70 : Colors.grey[700]),
           ),
         ),
       ),
@@ -255,8 +243,7 @@ class _ActionButton extends StatelessWidget {
 }
 
 class JugadoresList extends StatelessWidget {
-  const JugadoresList({Key? key, required this.panelController})
-      : super(key: key);
+  const JugadoresList({Key? key, required this.panelController}) : super(key: key);
   final PanelController panelController;
 
   @override
@@ -283,12 +270,9 @@ class JugadoresList extends StatelessWidget {
             return partidaProvider.isChangePartida
                 ? ElasticIn(
                     key: ValueKey('${partida.id}_${jugador.id}'),
-                    delay: Duration(
-                        milliseconds: 100 * index), // Reducido de 100ms a 50ms
-                    child: JugadorInfo(
-                        jugador: jugador, panelController: panelController))
-                : JugadorInfo(
-                    jugador: jugador, panelController: panelController);
+                    delay: Duration(milliseconds: 100 * index), // Reducido de 100ms a 50ms
+                    child: JugadorInfo(jugador: jugador, panelController: panelController))
+                : JugadorInfo(jugador: jugador, panelController: panelController);
           }).toList(),
         ),
       ),
@@ -340,9 +324,7 @@ class JugadorInfo extends StatelessWidget {
         final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
         final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
         jugadorProvider.changeJugadorEnTurno(jugador);
-        slideUpProvider.openSlideUp(
-            controller: panelController,
-            bodyContent: PuntuacionForm(panelController: panelController));
+        slideUpProvider.openSlideUp(controller: panelController, bodyContent: PuntuacionForm(panelController: panelController));
       },
     );
   }
@@ -373,9 +355,7 @@ class _JugadorCard extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: Preferences.isDarkMode
-              ? [const Color(0xFF2A2D3E), const Color(0xFF1F2130)]
-              : [const Color(0xFFE8ECFF), const Color(0xFFD4DBFF)],
+          colors: Preferences.isDarkMode ? [const Color(0xFF2A2D3E), const Color(0xFF1F2130)] : [const Color(0xFFE8ECFF), const Color(0xFFD4DBFF)],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
@@ -383,9 +363,7 @@ class _JugadorCard extends StatelessWidget {
               ? Colors.green.withValues(alpha: 0.4)
               : isLoser
                   ? Colors.red.withValues(alpha: 0.3)
-                  : (Preferences.isDarkMode
-                      ? Colors.white.withValues(alpha: 0.1)
-                      : AppThemes.colorPrimero.withValues(alpha: 0.2)),
+                  : (Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.1) : AppThemes.colorPrimero.withValues(alpha: 0.2)),
           width: isWinner || isLoser ? 2 : 1,
         ),
         boxShadow: [
@@ -419,9 +397,7 @@ class _JugadorCard extends StatelessWidget {
                     fontFamily: 'Poppins',
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Preferences.isDarkMode
-                        ? AppThemes.colorPrimero
-                        : AppThemes.colorTercero,
+                    color: Preferences.isDarkMode ? AppThemes.colorPrimero : AppThemes.colorTercero,
                   ),
                 ),
                 // Puntuación
@@ -491,13 +467,10 @@ class _NavigationBarState extends State<NavigationBar> {
     itemScrollController = ItemScrollController();
     itemPositionsListener = ItemPositionsListener.create();
 
-    SchedulerBinding.instance
-        .addPostFrameCallback((_) => scrollToGame(context));
+    SchedulerBinding.instance.addPostFrameCallback((_) => scrollToGame(context));
 
     itemPositionsListener.itemPositions.addListener(() {
-      visibleIndeces = itemPositionsListener.itemPositions.value
-          .map((item) => item.index)
-          .toList();
+      visibleIndeces = itemPositionsListener.itemPositions.value.map((item) => item.index).toList();
     });
   }
 
@@ -509,20 +482,15 @@ class _NavigationBarState extends State<NavigationBar> {
   void scrollToGame(BuildContext context) {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
 
-    final int selectedIndex = partidaProvider.partidas.indexWhere(
-        (partida) => partida.id == partidaProvider.partidaEnTurno!.id);
+    final int selectedIndex = partidaProvider.partidas.indexWhere((partida) => partida.id == partidaProvider.partidaEnTurno!.id);
 
     // Usar post frame callback en lugar de delay
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (partidaProvider.partidas.length > 3 &&
           visibleIndeces.isNotEmpty &&
-          ((selectedIndex <= visibleIndeces.first) ||
-              (selectedIndex >= visibleIndeces.last))) {
+          ((selectedIndex <= visibleIndeces.first) || (selectedIndex >= visibleIndeces.last))) {
         itemScrollController.scrollTo(
-            index: selectedIndex,
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOutCubic,
-            alignment: 0.4);
+            index: selectedIndex, duration: const Duration(milliseconds: 500), curve: Curves.easeInOutCubic, alignment: 0.4);
       }
     });
   }
@@ -541,8 +509,7 @@ class _NavigationBarState extends State<NavigationBar> {
           physics: const BouncingScrollPhysics(),
           itemCount: partidas.length,
           padding: const EdgeInsets.only(left: 20, right: 150),
-          itemBuilder: (context, index) =>
-              _Chip(partida: partidas[index], scrollToGame: scrollToGame));
+          itemBuilder: (context, index) => _Chip(partida: partidas[index], scrollToGame: scrollToGame));
     } else {
       return Container();
     }
@@ -570,18 +537,12 @@ class _Chip extends StatelessWidget {
                   colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
                 )
               : null,
-          color: isSelected
-              ? null
-              : (Preferences.isDarkMode
-                  ? Colors.white.withValues(alpha: 0.1)
-                  : Colors.grey.withValues(alpha: 0.15)),
+          color: isSelected ? null : (Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.15)),
           borderRadius: BorderRadius.circular(25),
           border: isSelected
               ? null
               : Border.all(
-                  color: Preferences.isDarkMode
-                      ? Colors.white.withValues(alpha: 0.1)
-                      : Colors.grey.withValues(alpha: 0.2),
+                  color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.2),
                 ),
           boxShadow: isSelected
               ? [
@@ -609,9 +570,7 @@ class _Chip extends StatelessWidget {
                 partida!.nombre!,
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  color: isSelected
-                      ? Colors.white
-                      : (Preferences.isDarkMode ? Colors.white70 : Colors.grey[700]),
+                  color: isSelected ? Colors.white : (Preferences.isDarkMode ? Colors.white70 : Colors.grey[700]),
                   fontSize: 14,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),

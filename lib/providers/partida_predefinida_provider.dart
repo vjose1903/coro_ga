@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/utils/utils.dart';
@@ -37,7 +38,8 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
       if (actualCantidad > 2) {
         form.control("cantidadJugadores").value -= 1;
       } else {
-        Toast.show(type: ToastType.warning, context: context, message: "La cantidad de jugadores no puede ser menor a 2.");
+        final l10n = AppLocalizations.of(context)!;
+        Toast.show(type: ToastType.warning, context: context, message: l10n.minPlayersWarning);
       }
     }
     notifyListeners();

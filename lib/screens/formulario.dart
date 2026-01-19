@@ -40,7 +40,6 @@ class _FormularioScreenState extends State<FormularioScreen> {
     googleAdsProvider.loadInterstitialAd();
 
     final l10n = AppLocalizations.of(context)!;
-    
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Layout(
@@ -377,8 +376,8 @@ class _JugadoresSection extends StatelessWidget {
       Toast.show(
           type: ToastType.info,
           context: context,
-          message: l10n.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
-          actionLabel: l10n.getPro,
+          message: AppLocalizations.of(context)!.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
+          actionLabel: AppLocalizations.of(context)!.getPro,
           onAction: () => Navigator.pushNamed(context, 'premium'));
       return;
     }

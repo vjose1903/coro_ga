@@ -88,8 +88,8 @@ class PartidasDefaultAlert extends StatelessWidget {
       Toast.show(
           type: ToastType.info,
           context: context,
-          message: l10n.freeVersionLimitPredefined(PremiumProvider.freeMaxPredefinedGames),
-          actionLabel: l10n.getPro,
+          message: AppLocalizations.of(context)!.freeVersionLimitPredefined(PremiumProvider.freeMaxPredefinedGames),
+          actionLabel: AppLocalizations.of(context)!.getPro,
           onAction: () => Navigator.pushNamed(context, 'premium'));
       return;
     }
@@ -171,33 +171,28 @@ class _PredefinidaHeader extends StatelessWidget {
 
           // Título
           Expanded(
-            child: Builder(
-              builder: (context) {
-                final l10n = AppLocalizations.of(context)!;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.predefinedGames,
-                      style: TextStyle(
-                        fontFamily: "Poppins",
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : AppThemes.colorQuinto,
-                      ),
-                    ),
-                    Text(
-                      isReordering ? l10n.dragToReorder : l10n.tapToSelect,
-                      style: TextStyle(
-                        fontFamily: "Poppins",
-                        fontSize: 11,
-                        color: isDark ? Colors.grey[400] : Colors.grey[600],
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                );
-              },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.predefinedGames,
+                  style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : AppThemes.colorQuinto,
+                  ),
+                ),
+                Text(
+                  isReordering ? AppLocalizations.of(context)!.dragToReorder : AppLocalizations.of(context)!.tapToSelect,
+                  style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 11,
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ),
 
@@ -378,7 +373,7 @@ class PartidasScrollView extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  l10n.noPredefinedGames,
+                  AppLocalizations.of(context)!.noPredefinedGames,
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 14,
@@ -388,7 +383,7 @@ class PartidasScrollView extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  l10n.tapPlusToCreate,
+                  AppLocalizations.of(context)!.tapPlusToCreate,
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 12,
@@ -605,8 +600,9 @@ class ReordenableItem extends StatelessWidget {
         title: l10n.confirm,
         dialogType: DialogType.error,
         buttonsList: [
-          CustomActionsButtons.cancelButton({"onTap": () => Navigator.pop(context)}),
+          CustomActionsButtons.cancelButton({"label": l10n.cancel, "onTap": () => Navigator.pop(context)}),
           CustomActionsButtons.aceptarButton({
+            "label": l10n.accept,
             "onTap": () {
               Navigator.pop(context);
               formPartidaPredefinidaProvider.deletePartidaPredefinida(context, partida: partida);
@@ -617,7 +613,7 @@ class ReordenableItem extends StatelessWidget {
 
   selectPartidaPredefinida({required BuildContext context}) {
     FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
-    formPartidaProvider.rellenarFormulario(partidaPredefinida);
+    formPartidaProvider.rellenarFormulario(partidaPredefinida, context: context);
     Navigator.pop(context);
   }
 

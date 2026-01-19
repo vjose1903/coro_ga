@@ -7,6 +7,7 @@ import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
+import 'package:game_score/utils/alert_dialog.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
@@ -27,26 +28,23 @@ class EditarEntidad extends StatelessWidget {
     Jugador? jugador = jugadorProvider.jugadorEditar;
     Partida? partida = partidaProvider.partidaEditar;
 
+    final bool isPartida = partida != null;
     late String tipo;
     dynamic entidad;
     IconData icon;
 
     final l10n = AppLocalizations.of(context)!;
-    String tipoLabel;
-    
-    if (partida != null) {
-      tipo = "Partida";
-      tipoLabel = l10n.editGame;
+    if (isPartida) {
+      tipo = l10n.editGame.split(' ').last;
       entidad = partida;
       icon = FontAwesomeIcons.gamepad;
     } else {
-      tipo = "Jugador";
-      tipoLabel = l10n.editPlayer;
+      tipo = l10n.editPlayer.split(' ').last;
       entidad = jugador;
       icon = FontAwesomeIcons.user;
     }
 
-    FormGroup form = tipo == "Partida" ? formPartidaProvider.form : jugadorProvider.formJugador;
+    FormGroup form = isPartida ? formPartidaProvider.form : jugadorProvider.formJugador;
 
     return Container(
       height: double.infinity,
@@ -55,17 +53,25 @@ class EditarEntidad extends StatelessWidget {
         children: [
           // Header con avatar e información
           _EditHeader(
-            tipo: tipoLabel,
+            tipo: tipo,
             nombre: entidad?.nombre ?? "",
             icon: icon,
-            noNameLabel: l10n.noName,
+            noNameLabel: AppLocalizations.of(context)!.noName,
+            partida: partida,
+            onRestart: partida != null && !partida.isSinIniciar
+                ? () async {
+                    await partida.restartPartida();
+                    partidaProvider.refresh();
+                    if (panelController != null) slideUpProvider.closeSlideUp(controller: panelController!);
+                  }
+                : null,
           ),
           const SizedBox(height: 16),
-          
+
           // Formulario
-          if (tipo == "Partida") EditPartida(form: form, partida: partida!) else EditJugador(form: form),
+          if (isPartida) EditPartida(form: form) else EditJugador(form: form),
           const SizedBox(height: 16),
-          
+
           // Botones de acción
           Row(
             children: [
@@ -81,7 +87,8 @@ class EditarEntidad extends StatelessWidget {
                     if (pageController != null) previusPage(pageController);
                     resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
                     await Future.delayed(const Duration(milliseconds: 200));
-                    form.reset();
+                    jugadorProvider.formJugador.reset();
+                    formPartidaProvider.form.reset();
                   },
                 ),
               ),
@@ -99,7 +106,7 @@ class EditarEntidad extends StatelessWidget {
                         partidaProvider: partidaProvider,
                         previusPage: previusPage,
                         resetEntidadesEditar: resetEntidadesEditar,
-                        tipo: tipo,
+                        isPartida: isPartida,
                         pageController: pageController,
                         panelController: panelController);
                   },
@@ -144,10 +151,9 @@ class EditJugador extends StatelessWidget {
 }
 
 class EditPartida extends StatelessWidget {
-  const EditPartida({Key? key, required this.form, required this.partida}) : super(key: key);
+  const EditPartida({Key? key, required this.form}) : super(key: key);
 
   final FormGroup form;
-  final Partida partida;
 
   @override
   Widget build(BuildContext context) {
@@ -155,15 +161,13 @@ class EditPartida extends StatelessWidget {
       builder: (BuildContext context, value, Widget? child) {
         final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
         final dynamic tipoPartida = formPartidaProvider.form.control('tipo').value;
-        final bool canEditConfig = partida.isSinIniciar;
 
-        final l10n = AppLocalizations.of(context)!;
-        
         return Expanded(
             child: ReactiveForm(
           formGroup: form,
           child: Column(children: <Widget>[
-            CustomReactiveInput(formControlName: 'nombre', labelText: l10n.name, textCapitalization: TextCapitalization.words),
+            CustomReactiveInput(
+                formControlName: 'nombre', labelText: AppLocalizations.of(context)!.name, textCapitalization: TextCapitalization.words),
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -172,16 +176,16 @@ class EditPartida extends StatelessWidget {
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 500),
                   curve: Curves.easeOut,
+                  // height: 45,
                   width: tipoPartida == '' ? ResponsiveApp.size.width - 21 : ResponsiveApp.size.width * 0.46,
                   child: CustomReactiveDropDown(
                     formControlName: 'tipo',
-                    labelText: l10n.type,
-                    enabled: canEditConfig,
+                    labelText: AppLocalizations.of(context)!.type,
                     items: [
-                      DropdownMenuItem(value: "Rondas", child: Text(l10n.rounds)),
-                      DropdownMenuItem(value: "Puntuación", child: Text(l10n.score))
+                      DropdownMenuItem(value: "Rondas", child: Text(AppLocalizations.of(context)!.rounds)),
+                      DropdownMenuItem(value: "Puntuación", child: Text(AppLocalizations.of(context)!.score))
                     ],
-                    onChanged: canEditConfig ? (value) => formPartidaProvider.changeTipo(value) : null,
+                    onChanged: (value) => formPartidaProvider.changeTipo(value),
                   ),
                 ),
                 AnimatedContainer(
@@ -190,9 +194,8 @@ class EditPartida extends StatelessWidget {
                     width: tipoPartida == '' ? 0.01 : ResponsiveApp.size.width * 0.46,
                     child: CustomReactiveInput(
                         formControlName: 'maxPuntuacion',
-                        labelText: tipoPartida == "Rondas" ? l10n.roundCount : l10n.maxScoreFull,
-                        inputType: TextInputType.number,
-                        enabled: canEditConfig)),
+                        labelText: tipoPartida == "Rondas" ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScoreFull,
+                        inputType: TextInputType.number)),
               ],
             ),
           ]),
@@ -204,14 +207,14 @@ class EditPartida extends StatelessWidget {
 
 aceptarFunction(BuildContext context, dynamic entidad,
     {required FormGroup form,
-    required String tipo,
+    required bool isPartida,
     required JugadorProvider jugadorProvider,
     required PartidaProvider partidaProvider,
     required Function previusPage,
     required Function resetEntidadesEditar,
     PanelController? panelController,
     PageController? pageController}) {
-  if (tipo == "Partida") {
+  if (isPartida) {
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
     if (form.valid) {
       FocusManager.instance.primaryFocus?.unfocus();
@@ -253,17 +256,22 @@ class _EditHeader extends StatelessWidget {
     required this.nombre,
     required this.icon,
     required this.noNameLabel,
+    this.partida,
+    this.onRestart,
   });
 
   final String tipo;
   final String nombre;
   final IconData icon;
   final String noNameLabel;
+  final Partida? partida;
+  final Future<void> Function()? onRestart;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
-    
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
@@ -324,14 +332,14 @@ class _EditHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          
+
           // Información
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  tipo,
+                  "${l10n.edit} $tipo",
                   style: TextStyle(
                     fontFamily: "Poppins",
                     fontSize: 11,
@@ -341,7 +349,7 @@ class _EditHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 1),
                 Text(
-                  nombre.isNotEmpty ? nombre : noNameLabel,
+                  nombre.isNotEmpty ? nombre : l10n.noName,
                   style: TextStyle(
                     fontFamily: "Poppins",
                     fontSize: 16,
@@ -354,6 +362,70 @@ class _EditHeader extends StatelessWidget {
               ],
             ),
           ),
+
+          // Botón reiniciar (solo si es partida y ya inició)
+          if (onRestart != null)
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  CustomAlertDialog.show(
+                    context,
+                    title: l10n.confirm,
+                    menssage: l10n.confirmRestartGame(partida!.nombre!),
+                    dialogType: DialogType.warning,
+                    buttonsList: [
+                      CustomActionsButtons.cancelButton({
+                        "label": l10n.cancel,
+                        "onTap": () => Navigator.pop(context),
+                      }),
+                      CustomActionsButtons.aceptarButton({
+                        "label": l10n.accept,
+                        "onTap": () async {
+                          Navigator.pop(context);
+                          await onRestart!();
+                        },
+                      }),
+                    ],
+                  );
+                },
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFFFFB300), Color(0xFFFF8F00)],
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFFFA000).withValues(alpha: 0.3),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.restart_alt_rounded, color: Colors.white, size: 16),
+                      const SizedBox(width: 4),
+                      Text(
+                        l10n.restart,
+                        style: const TextStyle(
+                          fontFamily: "Poppins",
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -378,10 +450,10 @@ class _ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
-    
+
     Color textColor;
     List<Color> gradientColors;
-    
+
     if (isPrimary) {
       gradientColors = [
         const Color(0xFF4CAF50),
@@ -395,9 +467,7 @@ class _ActionButton extends StatelessWidget {
       ];
       textColor = Colors.white;
     } else {
-      gradientColors = isDark
-          ? [Colors.white.withValues(alpha: 0.15), Colors.white.withValues(alpha: 0.1)]
-          : [Colors.grey[200]!, Colors.grey[300]!];
+      gradientColors = isDark ? [Colors.white.withValues(alpha: 0.15), Colors.white.withValues(alpha: 0.1)] : [Colors.grey[200]!, Colors.grey[300]!];
       textColor = isDark ? Colors.white : AppThemes.colorQuinto;
     }
 
@@ -417,7 +487,11 @@ class _ActionButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: (isPrimary ? Colors.green : isDestructive ? Colors.red : Colors.black)
+                color: (isPrimary
+                        ? Colors.green
+                        : isDestructive
+                            ? Colors.red
+                            : Colors.black)
                     .withValues(alpha: 0.2),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
