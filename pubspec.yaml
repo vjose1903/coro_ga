@@ -11,7 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  firebase_core: ^4.3.0
+  firebase_analytics: ^12.1.0
   cupertino_icons: ^1.0.8
   flutter_custom_clippers: ^2.1.0
   font_awesome_flutter: ^10.8.0

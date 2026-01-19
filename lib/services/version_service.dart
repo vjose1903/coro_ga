@@ -15,7 +15,7 @@ class VersionService {
 
   // App IDs
   static const String _androidPackageId = 'com.inSpot.coro_games';
-  static const String _iosAppId = '6478162656';
+  static const String _iosAppId = '6757870526';
 
   bool get updateAvailable => _updateAvailable;
   String? get storeUrl => _storeUrl;
@@ -55,14 +55,14 @@ class VersionService {
       final url = Uri.parse('https://itunes.apple.com/lookup?id=$_iosAppId&country=us');
       final client = HttpClient();
       client.connectionTimeout = const Duration(seconds: 10);
-      
+
       final request = await client.getUrl(url);
       final response = await request.close();
-      
+
       if (response.statusCode == 200) {
         final body = await response.transform(utf8.decoder).join();
         final json = jsonDecode(body);
-        
+
         if (json['resultCount'] > 0) {
           final result = json['results'][0];
           _storeVersion = result['version'];
@@ -81,14 +81,14 @@ class VersionService {
       final url = Uri.parse('https://play.google.com/store/apps/details?id=$_androidPackageId&hl=en&gl=US');
       final client = HttpClient();
       client.connectionTimeout = const Duration(seconds: 10);
-      
+
       final request = await client.getUrl(url);
       request.headers.set('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
       final response = await request.close();
-      
+
       if (response.statusCode == 200) {
         final body = await response.transform(utf8.decoder).join();
-        
+
         // Múltiples patrones para extraer la versión de Play Store
         final patterns = [
           RegExp(r'\[\[\["(\d+\.\d+\.?\d*)"\]\]'),
@@ -96,7 +96,7 @@ class VersionService {
           RegExp(r'Current Version[^>]*>(\d+\.\d+\.?\d*)<'),
           RegExp(r'\["(\d+\.\d+\.?\d*)"\],"ANDROID"'),
         ];
-        
+
         for (final pattern in patterns) {
           final match = pattern.firstMatch(body);
           if (match != null) {
@@ -105,7 +105,7 @@ class VersionService {
             break;
           }
         }
-        
+
         _storeUrl = 'https://play.google.com/store/apps/details?id=$_androidPackageId';
       }
       client.close();
@@ -132,7 +132,7 @@ class VersionService {
 
   String getStoreUrl() {
     if (_storeUrl != null) return _storeUrl!;
-    
+
     if (Platform.isAndroid) {
       return 'https://play.google.com/store/apps/details?id=$_androidPackageId';
     } else if (Platform.isIOS) {

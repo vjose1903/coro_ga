@@ -44,7 +44,7 @@ class PartidaProvider extends ChangeNotifier {
       int indexPartida = partidas.indexWhere((item) => item.id == partidaEnTurno!.id);
       partidas[indexPartida] = partidaEnTurno!;
     }
-    // notifyListeners();
+    notifyListeners();
   }
 
   Future<SqlResponse> newPartida(Partida partida, BuildContext context) async {

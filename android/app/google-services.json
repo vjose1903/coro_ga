@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "58765253590",
+    "project_id": "coro-games-1903",
+    "storage_bucket": "coro-games-1903.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:58765253590:android:1300edae6ea1b1b71e6277",
+        "android_client_info": {
+          "package_name": "com.inSpot.coro_games"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAl7QYMYGxXNFN7rYppCLxy9_PeNxzeXpQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      },
+      "admob_app_id": "ca-app-pub-7138392349989063~7695311863"
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -29,7 +29,7 @@ class ListJugadores extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+    final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
     final PageEditarProvider pageEditarProvider = context.read<PageEditarProvider>();
 
@@ -70,7 +70,7 @@ class ListJugadores extends StatelessWidget {
     // Usar el scrollController del SlideUp si está disponible
     final slideUpController = SlideUpScrollController.of(context);
     final effectiveController = slideUpController ?? jugadoresController;
-    
+
     return ListView.builder(
       key: UniqueKey(),
       controller: effectiveController,
@@ -190,9 +190,7 @@ class _JugadorItem extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      jugador.nombre != null && jugador.nombre!.isNotEmpty 
-                          ? jugador.nombre![0].toUpperCase() 
-                          : '?',
+                      jugador.nombre != null && jugador.nombre!.isNotEmpty ? jugador.nombre![0].toUpperCase() : '?',
                       style: const TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 14,
@@ -203,7 +201,7 @@ class _JugadorItem extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
-                
+
                 // Nombre
                 Expanded(
                   child: Text(
@@ -218,7 +216,7 @@ class _JugadorItem extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                
+
                 // Puntuación
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -236,14 +234,14 @@ class _JugadorItem extends StatelessWidget {
                     ),
                   ),
                 ),
-                
+
                 // Botón editar
                 const SizedBox(width: 8),
                 _MiniButton(
                   icon: FontAwesomeIcons.penToSquare,
                   onTap: onEdit,
                 ),
-                
+
                 // Botón eliminar
                 if (canDelete) ...[
                   const SizedBox(width: 6),
@@ -276,9 +274,7 @@ class _MiniButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
-    final color = isDestructive 
-        ? Colors.red[400]! 
-        : (isDark ? Colors.grey[400]! : Colors.grey[600]!);
+    final color = isDestructive ? Colors.red[400]! : (isDark ? Colors.grey[400]! : Colors.grey[600]!);
 
     return Material(
       color: Colors.transparent,
@@ -288,8 +284,8 @@ class _MiniButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(9),
           decoration: BoxDecoration(
-            color: isDestructive 
-                ? Colors.red.withValues(alpha: 0.1) 
+            color: isDestructive
+                ? Colors.red.withValues(alpha: 0.1)
                 : (isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey.withValues(alpha: 0.1)),
             borderRadius: BorderRadius.circular(8),
           ),

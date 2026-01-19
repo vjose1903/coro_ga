@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
-import 'package:game_score/l10n/app_localizations.dart';
-import 'package:game_score/models/models.dart';
-import 'package:game_score/providers/providers.dart';
-import 'package:game_score/screens/ganador.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/widgets/widgets.dart';
-import 'package:game_score/widgets/layout.dart';
-import 'package:game_score/utils/utils.dart';
 import 'package:provider/provider.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
+
+import '../l10n/app_localizations.dart';
+import '../models/models.dart';
+import '../providers/providers.dart';
+import '../screens/ganador.dart';
+import '../shared_preferences/preferences.dart';
+import '../themes/app_themes.dart';
+import '../utils/utils.dart';
+import 'widgets.dart';
 
 class PuntuacionForm extends StatelessWidget {
   const PuntuacionForm({Key? key, required this.panelController}) : super(key: key);
@@ -93,9 +93,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> with SlideUpAutoScrollM
                     color: AppThemes.themeColor_1,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: Preferences.isDarkMode
-                          ? Colors.white.withValues(alpha: 0.08)
-                          : Colors.grey.withValues(alpha: 0.15),
+                      color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
                       width: 1,
                     ),
                     boxShadow: [
@@ -119,6 +117,27 @@ class _PuntuacionPageState extends State<PuntuacionPage> with SlideUpAutoScrollM
             if (partidaProvider.partidaEnTurno!.tipo == "Puntuación") const SizedBox(height: 10),
             Row(
               children: [
+                // REDUCIR
+                Expanded(
+                  child: _ActionScoreButton(
+                    icon: Icons.remove_rounded,
+                    label: AppLocalizations.of(context)!.decrease,
+                    color: Colors.red[400]!,
+                    onTap: () {
+                      final scrollController = getEffectiveController(context, historialController);
+                      String puntuacion = partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? puntuacionController.text : "1";
+
+                      changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: "reducir", context: context)
+                          .then((newPuntuacion) {
+                        if (newPuntuacion != 0) {
+                          puntuacionController.text = "";
+                          scheduleScrollToBottom(context, scrollController);
+                        }
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
                 // AUMENTAR
                 Expanded(
                   child: _ActionScoreButton(
@@ -145,26 +164,6 @@ class _PuntuacionPageState extends State<PuntuacionPage> with SlideUpAutoScrollM
                                         FadeTransition(opacity: animation, child: child),
                                     transitionDuration: const Duration(milliseconds: 400)));
                           }
-                          scheduleScrollToBottom(context, scrollController);
-                        }
-                      });
-                    },
-                  ),
-                ),
-                const SizedBox(width: 12),
-                // REDUCIR
-                Expanded(
-                  child: _ActionScoreButton(
-                    icon: Icons.remove_rounded,
-                    label: AppLocalizations.of(context)!.decrease,
-                    color: Colors.red[400]!,
-                    onTap: () {
-                      final scrollController = getEffectiveController(context, historialController);
-                      String puntuacion = partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? puntuacionController.text : "1";
-                      changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: "reducir", context: context)
-                          .then((newPuntuacion) {
-                        if (newPuntuacion != 0) {
-                          puntuacionController.text = "";
                           scheduleScrollToBottom(context, scrollController);
                         }
                       });
@@ -198,8 +197,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> with SlideUpAutoScrollM
 
       if (tipo == "reducir" && puntuacion_actual - puntuacionInt < 0) {
         final l10n = AppLocalizations.of(context)!;
-        String msgErrorReducir =
-            partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? l10n.minScoreWarning : l10n.minRoundWarning;
+        String msgErrorReducir = partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? l10n.minScoreWarning : l10n.minRoundWarning;
         Toast.show(type: ToastType.warning, context: context, title: l10n.warning, message: msgErrorReducir);
 
         return puntuacion_actual;
@@ -242,7 +240,7 @@ class _ListHistorialState extends State<_ListHistorial> with SlideUpAutoScrollMi
   @override
   Widget build(BuildContext context) {
     final effectiveController = getEffectiveController(context, widget.historialController);
-    
+
     final PartidaProvider? partidaProvider = context.read<PartidaProvider?>();
     final JugadorProvider? jugadorProvider = context.watch<JugadorProvider?>();
     final Jugador? jugador = jugadorProvider?.jugadorEnTurno;
@@ -347,86 +345,86 @@ class _HistorialItemState extends State<_HistorialItem> {
             title: AppLocalizations.of(context)!.delete,
             style: const TextStyle(fontFamily: 'Poppins', fontSize: 11),
             onTap: (CompletionHandler handler) async {
-            final l10n = AppLocalizations.of(context)!;
-            CustomAlertDialog.show(
-              context,
-              title: l10n.confirm,
-              menssage: l10n.confirmDeleteScore(widget.historial.puntuacion!.toInt(), widget.jugadorNombre),
-              dialogType: DialogType.error,
-              buttonsList: [
-                CustomActionsButtons.cancelButton({
-                  "label": l10n.cancel,
-                  "onTap": () {
-                    Navigator.pop(context);
-                    handler(false);
-                  }
-                }),
-                CustomActionsButtons.aceptarButton({
-                  "label": l10n.accept,
-                  "onTap": () async {
-                    Navigator.pop(context);
-                    final jugadorProvider = context.read<JugadorProvider>();
-                    final partidaProvider = context.read<PartidaProvider>();
-                    await jugadorProvider.deleteHistorial(historial: widget.historial);
-                    partidaProvider.refresh();
-                    await handler(true);
-                  }
-                }),
-              ],
-            );
-          },
-          color: Colors.red[400]!,
-        ),
-      ],
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onLongPress: () => _swipeController.openCellAt(index: widget.index, trailing: true),
-          borderRadius: BorderRadius.circular(8),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: (isAumentar ? Colors.green : Colors.red).withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(8),
+              final l10n = AppLocalizations.of(context)!;
+              CustomAlertDialog.show(
+                context,
+                title: l10n.confirm,
+                menssage: l10n.confirmDeleteScore(widget.historial.puntuacion!.toInt(), widget.jugadorNombre),
+                dialogType: DialogType.error,
+                buttonsList: [
+                  CustomActionsButtons.cancelButton({
+                    "label": l10n.cancel,
+                    "onTap": () {
+                      Navigator.pop(context);
+                      handler(false);
+                    }
+                  }),
+                  CustomActionsButtons.aceptarButton({
+                    "label": l10n.accept,
+                    "onTap": () async {
+                      Navigator.pop(context);
+                      final jugadorProvider = context.read<JugadorProvider>();
+                      final partidaProvider = context.read<PartidaProvider>();
+                      await jugadorProvider.deleteHistorial(historial: widget.historial);
+                      partidaProvider.refresh();
+                      await handler(true);
+                    }
+                  }),
+                ],
+              );
+            },
+            color: Colors.red[400]!,
+          ),
+        ],
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onLongPress: () => _swipeController.openCellAt(index: widget.index, trailing: true),
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: (isAumentar ? Colors.green : Colors.red).withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          isAumentar ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                          color: isAumentar ? Colors.green : Colors.red[400],
+                          size: 16,
+                        ),
                       ),
-                      child: Icon(
-                        isAumentar ? Icons.trending_up_rounded : Icons.trending_down_rounded,
-                        color: isAumentar ? Colors.green : Colors.red[400],
-                        size: 16,
+                      const SizedBox(width: 12),
+                      Text(
+                        "${isAumentar ? '+' : '-'}${widget.historial.puntuacion}",
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: isAumentar ? Colors.green : Colors.red[400],
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      "${isAumentar ? '+' : '-'}${widget.historial.puntuacion}",
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: isAumentar ? Colors.green : Colors.red[400],
-                      ),
-                    ),
-                  ],
-                ),
-                Text(
-                  L10n.getActionType(context, widget.historial.tipo),
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 11,
-                    color: Colors.grey[500],
+                    ],
                   ),
-                ),
-              ],
+                  Text(
+                    L10n.getActionType(context, widget.historial.tipo),
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 11,
+                      color: Colors.grey[500],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -457,7 +455,7 @@ class _KeyboardSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
-    
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -495,7 +493,7 @@ class _KeyboardSection extends StatelessWidget {
               filled: true,
               contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               labelStyle: TextStyle(
-                color: AppThemes.labelInputDisabledColor, 
+                color: AppThemes.labelInputDisabledColor,
                 fontFamily: 'Poppins',
               ),
               floatingLabelStyle: TextStyle(
@@ -548,7 +546,7 @@ class _JugadorHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
-    
+
     return GestureDetector(
       onVerticalDragUpdate: (details) {
         // Si arrastra hacia abajo, cerrar el panel
@@ -557,115 +555,115 @@ class _JugadorHeader extends StatelessWidget {
         }
       },
       child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [Colors.white.withValues(alpha: 0.08), Colors.white.withValues(alpha: 0.03)]
-              : [AppThemes.colorPrimero.withValues(alpha: 0.08), AppThemes.colorPrimero.withValues(alpha: 0.03)],
-        ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: isDark ? Colors.white.withValues(alpha: 0.1) : AppThemes.colorPrimero.withValues(alpha: 0.15),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.white.withValues(alpha: isDark ? 0.05 : 0.8),
-            blurRadius: 4,
-            offset: const Offset(-2, -2),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDark
+                ? [Colors.white.withValues(alpha: 0.08), Colors.white.withValues(alpha: 0.03)]
+                : [AppThemes.colorPrimero.withValues(alpha: 0.08), AppThemes.colorPrimero.withValues(alpha: 0.03)],
           ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
-            blurRadius: 4,
-            offset: const Offset(2, 2),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isDark ? Colors.white.withValues(alpha: 0.1) : AppThemes.colorPrimero.withValues(alpha: 0.15),
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Avatar con inicial
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppThemes.colorPrimero,
-                  AppThemes.colorPrimero.withValues(alpha: 0.7),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: AppThemes.colorPrimero.withValues(alpha: 0.3),
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
-                ),
-              ],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.white.withValues(alpha: isDark ? 0.05 : 0.8),
+              blurRadius: 4,
+              offset: const Offset(-2, -2),
             ),
-            child: Center(
-              child: Text(
-                nombre.isNotEmpty ? nombre[0].toUpperCase() : '?',
-                style: const TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          
-          // Información
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  nombre,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppThemes.colorQuinto,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  AppLocalizations.of(context)!.playerScore(puntuacion),
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 12,
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          // Botones
-          _MiniIconButton(
-            icon: Icons.edit_outlined,
-            onTap: onEdit,
-          ),
-          if (canDelete) ...[
-            const SizedBox(width: 8),
-            _MiniIconButton(
-              icon: Icons.delete_outline_rounded,
-              onTap: onDelete,
-              isDestructive: true,
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+              blurRadius: 4,
+              offset: const Offset(2, 2),
             ),
           ],
-        ],
-      ),
+        ),
+        child: Row(
+          children: [
+            // Avatar con inicial
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppThemes.colorPrimero,
+                    AppThemes.colorPrimero.withValues(alpha: 0.7),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppThemes.colorPrimero.withValues(alpha: 0.3),
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Text(
+                  nombre.isNotEmpty ? nombre[0].toUpperCase() : '?',
+                  style: const TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+
+            // Información
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    nombre,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : AppThemes.colorQuinto,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    AppLocalizations.of(context)!.playerScore(puntuacion),
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 12,
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Botones
+            _MiniIconButton(
+              icon: Icons.edit_outlined,
+              onTap: onEdit,
+            ),
+            if (canDelete) ...[
+              const SizedBox(width: 8),
+              _MiniIconButton(
+                icon: Icons.delete_outline_rounded,
+                onTap: onDelete,
+                isDestructive: true,
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -694,17 +692,13 @@ class _MiniIconButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: isDestructive
                 ? Colors.red.withValues(alpha: 0.1)
-                : (Preferences.isDarkMode
-                    ? Colors.white.withValues(alpha: 0.1)
-                    : Colors.grey.withValues(alpha: 0.15)),
+                : (Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.15)),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(
             icon,
             size: 18,
-            color: isDestructive
-                ? Colors.red[400]
-                : (Preferences.isDarkMode ? Colors.white70 : Colors.grey[700]),
+            color: isDestructive ? Colors.red[400] : (Preferences.isDarkMode ? Colors.white70 : Colors.grey[700]),
           ),
         ),
       ),

@@ -73,10 +73,12 @@ class _LayoutState extends State<Layout> {
     final visibleHeight = screenHeight - keyboardHeight;
     final minTopMargin = topPadding + 80;
 
-    final maxHeight = max(100.0, min(
-      screenHeight * fraction,
-      min(visibleHeight * widget.maxPanelHeightFraction, visibleHeight - minTopMargin),
-    ));
+    final maxHeight = max(
+        100.0,
+        min(
+          screenHeight * fraction,
+          min(visibleHeight * widget.maxPanelHeightFraction, visibleHeight - minTopMargin),
+        ));
 
     final isDark = Preferences.isDarkMode;
 
@@ -145,6 +147,11 @@ class _LayoutState extends State<Layout> {
   cleanSlideUp(SlideUpProvider slideUpProvider, [isListener = false]) {
     if (slideUpProvider.body != null) slideUpProvider.body = null;
     FocusManager.instance.primaryFocus?.unfocus();
+
+    // Limpiar entidades en edición al cerrar el panel
+    context.read<JugadorProvider>().jugadorEditar = null;
+    context.read<PartidaProvider>().partidaEditar = null;
+
     slideUpProvider.closeSlideUp(controller: widget.panelController, isListener: isListener);
   }
 }
@@ -336,9 +343,7 @@ class _PanelHandle extends StatelessWidget {
         width: 40,
         height: 5,
         decoration: BoxDecoration(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.2)
-              : Colors.grey.withValues(alpha: 0.3),
+          color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             if (!isDark)
@@ -380,12 +385,12 @@ mixin SlideUpAutoScrollMixin<T extends StatefulWidget> on State<T> {
   bool _scrollPending = false;
   int _retryCount = 0;
   static const int _maxRetries = 50; // Máximo ~1s de reintentos
-  
+
   /// Obtiene el ScrollController del panel o usa el fallback proporcionado
   ScrollController getEffectiveController(BuildContext context, ScrollController fallback) {
     return SlideUpScrollController.of(context) ?? fallback;
   }
-  
+
   /// Programa un scroll al final de la lista
   /// Se ejecuta solo cuando:
   /// 1. El panel está completamente abierto
@@ -394,9 +399,9 @@ mixin SlideUpAutoScrollMixin<T extends StatefulWidget> on State<T> {
     _autoScrollController = controller;
     _scrollPending = true;
     _retryCount = 0;
-    
+
     final slideUpProvider = context.read<SlideUpProvider>();
-    
+
     // Esperar a que el panel esté completamente abierto
     slideUpProvider.executeWhenPanelOpen(() {
       if (!mounted || !_scrollPending) return;
@@ -407,27 +412,27 @@ mixin SlideUpAutoScrollMixin<T extends StatefulWidget> on State<T> {
       });
     });
   }
-  
+
   /// Ejecuta el scroll cuando el controller tiene contenido
   void _executeScrollWhenReady() {
     if (!mounted || _autoScrollController == null || !_scrollPending) return;
-    
+
     final controller = _autoScrollController!;
-    
+
     // Verificar si el controller tiene posición y contenido
     if (!controller.hasClients) {
       _scheduleRetry();
       return;
     }
-    
+
     final position = controller.position;
-    
+
     // Verificar si el contenido está listo
     if (!position.hasContentDimensions || position.maxScrollExtent <= 0) {
       _scheduleRetry();
       return;
     }
-    
+
     // Contenido listo, ejecutar scroll
     _scrollPending = false;
     _retryCount = 0;
@@ -437,11 +442,11 @@ mixin SlideUpAutoScrollMixin<T extends StatefulWidget> on State<T> {
       curve: Curves.easeOut,
     );
   }
-  
+
   /// Programa un reintento con límite
   void _scheduleRetry() {
     if (!mounted || !_scrollPending) return;
-    
+
     _retryCount++;
     if (_retryCount >= _maxRetries) {
       // Límite de reintentos alcanzado, desistir
@@ -449,13 +454,13 @@ mixin SlideUpAutoScrollMixin<T extends StatefulWidget> on State<T> {
       _retryCount = 0;
       return;
     }
-    
+
     // Reintentar después de un pequeño delay
     Future.delayed(const Duration(milliseconds: 20), () {
       if (mounted && _scrollPending) _executeScrollWhenReady();
     });
   }
-  
+
   /// Cancela cualquier scroll pendiente
   void cancelPendingScroll() {
     _scrollPending = false;
