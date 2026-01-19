@@ -12,23 +12,29 @@ class BottomBar extends StatelessWidget {
   final Widget? child;
   final PanelController? panelController;
 
+  static const double _maxHeight = 65.0;
+
   @override
   Widget build(BuildContext context) {
     Color backgroundColor = Preferences.isDarkMode ? const Color(0xEB333333) : const Color(0xFFC4D0E5);
     final SlideUpProvider slideUpProvider = context.watch<SlideUpProvider>();
 
-    double getHeight(PanelController panelController) {
-      return (panelController.isAttached && panelController.isPanelOpen) ? 0 : 65;
-    }
+    // Usar la posición del panel para animar la altura suavemente
+    // panelPosition va de 0 (cerrado) a 1 (abierto)
+    final double height = panelController != null ? _maxHeight * (1 - slideUpProvider.panelPosition) : _maxHeight;
 
     return Container(
-      height: panelController != null ? getHeight(panelController!) : 65,
+      height: height,
       width: double.infinity,
       color: backgroundColor,
-      child: Padding(
-        padding: const EdgeInsets.all(1),
-        child: child ?? Container(),
-      ),
+      child: height > 0
+          ? ClipRect(
+              child: Padding(
+                padding: const EdgeInsets.all(1),
+                child: child ?? Container(),
+              ),
+            )
+          : null,
     );
   }
 }

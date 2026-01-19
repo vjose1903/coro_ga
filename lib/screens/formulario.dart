@@ -26,8 +26,7 @@ class _FormularioScreenState extends State<FormularioScreen> {
     super.initState();
 
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      if (Preferences.isFirstTimeOpen)
-        context.read<PartidaPredefinidaProvider>().seed();
+      if (Preferences.isFirstTimeOpen) context.read<PartidaPredefinidaProvider>().seed();
 
       openDefaultsPartidasDialog(context);
     });
@@ -54,16 +53,14 @@ class _FormularioScreenState extends State<FormularioScreen> {
             Navigator.pop(context, 'home');
           },
         ),
-        bodyContent: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(), child: _Body()),
+        bodyContent: SingleChildScrollView(physics: const BouncingScrollPhysics(), child: _Body()),
       ),
     );
   }
 }
 
 openDefaultsPartidasDialog(BuildContext context) {
-  final PartidaPredefinidaProvider formPartidaPredefinidaProvider =
-      context.read<PartidaPredefinidaProvider>();
+  final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
   formPartidaPredefinidaProvider.resetForm();
 
   FluidAlerts.show(context,
@@ -82,17 +79,14 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (BuildContext context, value, Widget? child) {
-      final FormPartidaProvider formPartidaProvider =
-          context.watch<FormPartidaProvider>();
+      final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
       final form = formPartidaProvider.form;
       final isDark = Preferences.isDarkMode;
 
       final dynamic tipoPartida = form.control('tipo').value;
 
       return Container(
-          height: ((ResponsiveApp.size.height -
-                  (ResponsiveApp.size.height * 0.125)) -
-              80),
+          height: ((ResponsiveApp.size.height - (ResponsiveApp.size.height * 0.125)) - 80),
           margin: const EdgeInsets.only(top: 15, bottom: 40),
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: ReactiveForm(
@@ -113,9 +107,7 @@ class _Body extends StatelessWidget {
 
                   // Nombre de la partida
                   CustomReactiveInput(
-                      formControlName: 'nombre',
-                      labelText: AppLocalizations.of(context)!.gameName,
-                      textCapitalization: TextCapitalization.words),
+                      formControlName: 'nombre', labelText: AppLocalizations.of(context)!.gameName, textCapitalization: TextCapitalization.words),
                   const SizedBox(height: 14),
 
                   // Tipo y puntuación
@@ -126,33 +118,24 @@ class _Body extends StatelessWidget {
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 500),
                         curve: Curves.easeOut,
-                        width: tipoPartida == '' || tipoPartida == null
-                            ? ResponsiveApp.size.width - 42
-                            : ResponsiveApp.size.width * 0.43,
+                        width: tipoPartida == '' || tipoPartida == null ? ResponsiveApp.size.width - 42 : ResponsiveApp.size.width * 0.43,
                         child: CustomReactiveDropDown(
                           formControlName: 'tipo',
                           labelText: AppLocalizations.of(context)!.type,
                           items: [
-                            DropdownMenuItem(
-                                value: "Rondas", child: Text(AppLocalizations.of(context)!.rounds)),
-                            DropdownMenuItem(
-                                value: "Puntuación", child: Text(AppLocalizations.of(context)!.score))
+                            DropdownMenuItem(value: "Rondas", child: Text(AppLocalizations.of(context)!.rounds)),
+                            DropdownMenuItem(value: "Puntuación", child: Text(AppLocalizations.of(context)!.score))
                           ],
-                          onChanged: (value) =>
-                              formPartidaProvider.changeTipo(value),
+                          onChanged: (value) => formPartidaProvider.changeTipo(value),
                         ),
                       ),
                       AnimatedContainer(
                           duration: const Duration(milliseconds: 500),
                           curve: Curves.easeOut,
-                          width: tipoPartida == '' || tipoPartida == null
-                              ? 0.01
-                              : ResponsiveApp.size.width * 0.43,
+                          width: tipoPartida == '' || tipoPartida == null ? 0.01 : ResponsiveApp.size.width * 0.43,
                           child: CustomReactiveInput(
                               formControlName: 'maxPuntuacion',
-                              labelText: tipoPartida == "Rondas"
-                                  ? AppLocalizations.of(context)!.roundCount
-                                  : AppLocalizations.of(context)!.maxScore,
+                              labelText: tipoPartida == "Rondas" ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScore,
                               inputType: TextInputType.number)),
                     ],
                   ),
@@ -170,16 +153,12 @@ class _Body extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: isDark
-                                ? Colors.white.withValues(alpha: 0.04)
-                                : Colors.white.withValues(alpha: 0.7),
+                            color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.white.withValues(alpha: 0.7),
                             offset: const Offset(-2, -2),
                             blurRadius: 4,
                           ),
                           BoxShadow(
-                            color: isDark
-                                ? Colors.black.withValues(alpha: 0.3)
-                                : Colors.black.withValues(alpha: 0.08),
+                            color: isDark ? Colors.black.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.08),
                             offset: const Offset(2, 2),
                             blurRadius: 4,
                           ),
@@ -222,16 +201,10 @@ class _Body extends StatelessWidget {
           formPartidaProvider.resetForm();
         });
       } else {
-        Toast.show(
-            type: ToastType.error,
-            context: context,
-            message: AppLocalizations.of(context)!.errorRegisteringGame);
+        Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.errorRegisteringGame);
       }
     } else {
-      Toast.show(
-          type: ToastType.warning,
-          context: context,
-          message: AppLocalizations.of(context)!.checkAllFields);
+      Toast.show(type: ToastType.warning, context: context, message: AppLocalizations.of(context)!.checkAllFields);
     }
   }
 }
@@ -303,8 +276,7 @@ class _JugadoresSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FormPartidaProvider formPartidaProvider =
-        context.watch<FormPartidaProvider>();
+    final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
     final isDark = Preferences.isDarkMode;
 
     return Row(
@@ -387,18 +359,13 @@ class _JugadoresSection extends StatelessWidget {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (jugadoresController.hasClients) {
-        jugadoresController.animateTo(
-            jugadoresController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 800),
-            curve: Curves.easeOutCubic);
+        jugadoresController.animateTo(jugadoresController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 800), curve: Curves.easeOutCubic);
       }
     });
 
     if (formPartidaProvider.jugadores.length == 20) {
-      Toast.show(
-          type: ToastType.info,
-          context: context,
-          message: AppLocalizations.of(context)!.maxPlayersReached);
+      Toast.show(type: ToastType.info, context: context, message: AppLocalizations.of(context)!.maxPlayersReached);
     }
   }
 }
@@ -502,33 +469,35 @@ class _Inputs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final jugadoresLength = context.select<FormPartidaProvider, int>(
-        (provider) => provider.jugadores.length);
+    final jugadoresLength = context.select<FormPartidaProvider, int>((provider) => provider.jugadores.length);
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
     return ListView.separated(
       controller: jugadoresController,
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+      padding: EdgeInsets.only(top: 12, left: 12, right: 12, bottom: 12 + keyboardHeight),
       addAutomaticKeepAlives: true,
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemCount: jugadoresLength,
-      itemBuilder: (_, index) => _JugadorInput(index: index),
+      itemBuilder: (_, index) => _JugadorInput(index: index, scrollController: jugadoresController),
     );
   }
 }
 
 class _JugadorInput extends StatefulWidget {
-  const _JugadorInput({required this.index});
+  const _JugadorInput({required this.index, required this.scrollController});
   final int index;
+  final ScrollController scrollController;
 
   @override
   State<_JugadorInput> createState() => _JugadorInputState();
 }
 
-class _JugadorInputState extends State<_JugadorInput>
-    with AutomaticKeepAliveClientMixin {
+class _JugadorInputState extends State<_JugadorInput> with AutomaticKeepAliveClientMixin {
   late final TextEditingController _controller;
   late final FormPartidaProvider _provider;
+  late final FocusNode _focusNode;
+  final GlobalKey _inputKey = GlobalKey();
 
   @override
   bool get wantKeepAlive => true;
@@ -544,18 +513,48 @@ class _JugadorInputState extends State<_JugadorInput>
     }
   }
 
+  void _onFocusChange() {
+    if (_focusNode.hasFocus && _inputKey.currentContext != null) {
+      Future.delayed(const Duration(milliseconds: 400), () {
+        if (mounted && _inputKey.currentContext != null && widget.scrollController.hasClients) {
+          final RenderBox? renderBox = _inputKey.currentContext?.findRenderObject() as RenderBox?;
+          if (renderBox != null) {
+            final position = renderBox.localToGlobal(Offset.zero);
+            final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+            final screenHeight = MediaQuery.of(context).size.height;
+            final itemBottom = position.dy + renderBox.size.height;
+            final visibleBottom = screenHeight - keyboardHeight;
+
+            if (itemBottom > visibleBottom - 50) {
+              final scrollOffset = widget.scrollController.offset + (itemBottom - visibleBottom) + 80;
+              widget.scrollController.animateTo(
+                scrollOffset.clamp(0, widget.scrollController.position.maxScrollExtent),
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOut,
+              );
+            }
+          }
+        }
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _provider = context.read<FormPartidaProvider>();
     _controller = TextEditingController(text: _formControl.value ?? '');
     _controller.addListener(_syncToForm);
+    _focusNode = FocusNode();
+    _focusNode.addListener(_onFocusChange);
   }
 
   @override
   void dispose() {
     _controller.removeListener(_syncToForm);
     _controller.dispose();
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -596,8 +595,10 @@ class _JugadorInputState extends State<_JugadorInput>
         const SizedBox(width: 10),
         // Input
         Expanded(
+          key: _inputKey,
           child: TextField(
             controller: _controller,
+            focusNode: _focusNode,
             textCapitalization: TextCapitalization.words,
             style: TextStyle(
               fontFamily: 'Poppins',

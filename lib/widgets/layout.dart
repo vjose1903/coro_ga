@@ -115,6 +115,8 @@ class _LayoutState extends State<Layout> {
           slideUpProvider.onPanelOpened();
         },
         onPanelSlide: (position) {
+          // Actualizar la posición del panel para animar el BottomBar
+          slideUpProvider.updatePanelPosition(position);
           // Si el panel está bajando (posición < 1), marcar que no está completamente abierto
           if (position < 1.0 && slideUpProvider.isPanelFullyOpen) {
             slideUpProvider.onPanelClosing();
