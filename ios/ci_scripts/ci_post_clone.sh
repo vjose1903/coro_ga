@@ -16,6 +16,19 @@ flutter precache --ios
 # Install Flutter dependencies.
 flutter pub get
 
+# Install CocoaPods using Homebrew.
+HOMEBREW_NO_AUTO_UPDATE=1 # disable homebrew's automatic updates.
+brew install cocoapods
+
+# Install CocoaPods dependencies.
+cd ios && pod install
+
+# Return to root directory
+cd $CI_PRIMARY_REPOSITORY_PATH
+
+# Clean previous build artifacts to avoid permission issues
+flutter clean
+
 # Build Flutter app with dart-define variables for AdMob
 flutter build ios --release --no-codesign \
   --dart-define=AD_IOS_BANNER_HOME="$AD_IOS_BANNER_HOME" \
@@ -25,12 +38,5 @@ flutter build ios --release --no-codesign \
   --dart-define=AD_IOS_BANNER_EDITAR_ENTIDAD="$AD_IOS_BANNER_EDITAR_ENTIDAD" \
   --dart-define=AD_IOS_INTERSTITIAL="$AD_IOS_INTERSTITIAL" \
   --dart-define=AD_IOS_REWARDED_REVANCHA="$AD_IOS_REWARDED_REVANCHA"
-
-# Install CocoaPods using Homebrew.
-HOMEBREW_NO_AUTO_UPDATE=1 # disable homebrew's automatic updates.
-brew install cocoapods
-
-# Install CocoaPods dependencies.
-cd ios && pod install # run `pod install` in the `ios` directory.
 
 exit 0
