@@ -35,7 +35,24 @@ class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProvider
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(milliseconds: 300), () => _fabAnimController.forward());
+      _showPendingAdIfNeeded();
     });
+  }
+
+  /// Muestra el anuncio intersticial si estaba pendiente (después de navegación)
+  void _showPendingAdIfNeeded() {
+    final googleAdsProvider = context.read<GoogleAdsProvider>();
+    if (googleAdsProvider.showAdAfterNavigation) {
+      googleAdsProvider.clearAdAfterNavigation();
+      // Esperar a que la pantalla esté completamente cargada antes de mostrar
+      Future.delayed(const Duration(milliseconds: 800), () {
+        if (mounted) {
+          googleAdsProvider.showInterstitialAd(onCloseFunction: () {
+            googleAdsProvider.loadInterstitialAd();
+          });
+        }
+      });
+    }
   }
 
   @override
@@ -133,8 +150,10 @@ class _Body extends StatelessWidget {
               const CustomEstadoPartida(),
               const SizedBox(height: 20),
               JugadoresCard(panelController: panelController),
-              const SizedBox(height: 20),
-              anuncio
+              const SizedBox(height: 25),
+              // Anuncio separado de la lista de jugadores
+              anuncio,
+              const SizedBox(height: 15),
             ])));
   }
 }
@@ -149,7 +168,7 @@ class JugadoresCard extends StatelessWidget {
       final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
       final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
       jugadorProvider.formJugador.reset();
-      slideUpProvider.openSlideUp(controller: panelController, bodyContent: const AddJugadorPartida());
+      slideUpProvider.openSlideUp(controller: panelController, bodyContent: AddJugadorPartida(panelController: panelController));
     }
 
     return Expanded(

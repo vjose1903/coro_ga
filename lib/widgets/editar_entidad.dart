@@ -10,14 +10,16 @@ import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/alert_dialog.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
+import 'package:game_score/widgets/slide_up_header.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 class EditarEntidad extends StatelessWidget {
-  const EditarEntidad({Key? key, this.pageController, this.panelController}) : super(key: key);
+  const EditarEntidad({Key? key, this.pageController, this.panelController, this.onClose}) : super(key: key);
 
   final PageController? pageController;
   final PanelController? panelController;
+  final VoidCallback? onClose;
   @override
   Widget build(BuildContext context) {
     final JugadorProvider jugadorProvider = context.watch<JugadorProvider>();
@@ -57,6 +59,7 @@ class EditarEntidad extends StatelessWidget {
             nombre: entidad?.nombre ?? "",
             icon: icon,
             noNameLabel: AppLocalizations.of(context)!.noName,
+            panelController: panelController,
             partida: partida,
             onRestart: partida != null && !partida.isSinIniciar
                 ? () async {
@@ -83,8 +86,13 @@ class EditarEntidad extends StatelessWidget {
                   isDestructive: true,
                   onTap: () async {
                     FocusManager.instance.primaryFocus?.unfocus();
-                    if (panelController != null) slideUpProvider.closeSlideUp(controller: panelController!);
-                    if (pageController != null) previusPage(pageController);
+                    if (onClose != null) {
+                      onClose!();
+                    } else if (pageController != null) {
+                      previusPage(pageController);
+                    } else if (panelController != null) {
+                      slideUpProvider.closeSlideUp(controller: panelController!);
+                    }
                     resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
                     await Future.delayed(const Duration(milliseconds: 200));
                     jugadorProvider.formJugador.reset();
@@ -108,14 +116,15 @@ class EditarEntidad extends StatelessWidget {
                         resetEntidadesEditar: resetEntidadesEditar,
                         isPartida: isPartida,
                         pageController: pageController,
-                        panelController: panelController);
+                        panelController: panelController,
+                        onClose: onClose);
                   },
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          // ANUNCIOS
+          const SizedBox(height: 25),
+          // Anuncio separado de los botones de acción
           GoogleBannerAd(location: AdLocation.editarEntidad)
         ],
       ),
@@ -127,7 +136,7 @@ class EditarEntidad extends StatelessWidget {
   }
 
   resetEntidadesEditar({required JugadorProvider jugadorProvider, required PartidaProvider partidaProvider}) async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 300));
     jugadorProvider.jugadorEditar = null;
     partidaProvider.partidaEditar = null;
   }
@@ -213,7 +222,8 @@ aceptarFunction(BuildContext context, dynamic entidad,
     required Function previusPage,
     required Function resetEntidadesEditar,
     PanelController? panelController,
-    PageController? pageController}) {
+    PageController? pageController,
+    VoidCallback? onClose}) {
   if (isPartida) {
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
     if (form.valid) {
@@ -237,7 +247,11 @@ aceptarFunction(BuildContext context, dynamic entidad,
         partidaProvider.refresh();
 
         form.reset();
-        previusPage(pageController);
+        if (onClose != null) {
+          onClose();
+        } else {
+          previusPage(pageController);
+        }
         resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
       });
     } else {
@@ -256,6 +270,7 @@ class _EditHeader extends StatelessWidget {
     required this.nombre,
     required this.icon,
     required this.noNameLabel,
+    this.panelController,
     this.partida,
     this.onRestart,
   });
@@ -264,6 +279,7 @@ class _EditHeader extends StatelessWidget {
   final String nombre;
   final IconData icon;
   final String noNameLabel;
+  final PanelController? panelController;
   final Partida? partida;
   final Future<void> Function()? onRestart;
 
@@ -271,6 +287,151 @@ class _EditHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
     final l10n = AppLocalizations.of(context)!;
+
+    final content = Row(
+      children: [
+        // Avatar con icono
+        Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppThemes.colorPrimero,
+                AppThemes.colorPrimero.withValues(alpha: 0.7),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: AppThemes.colorPrimero.withValues(alpha: 0.3),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Center(
+            child: FaIcon(
+              icon,
+              color: Colors.white,
+              size: 18,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+
+        // Información
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "${l10n.edit} $tipo",
+                style: TextStyle(
+                  fontFamily: "Poppins",
+                  fontSize: 11,
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 1),
+              Text(
+                nombre.isNotEmpty ? nombre : l10n.noName,
+                style: TextStyle(
+                  fontFamily: "Poppins",
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : AppThemes.colorQuinto,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+
+        // Botón reiniciar (solo si es partida y ya inició)
+        if (onRestart != null)
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                CustomAlertDialog.show(
+                  context,
+                  title: l10n.confirm,
+                  menssage: l10n.confirmRestartGame(partida!.nombre!),
+                  dialogType: DialogType.warning,
+                  buttonsList: [
+                    CustomActionsButtons.cancelButton({
+                      "label": l10n.cancel,
+                      "onTap": () => Navigator.pop(context),
+                    }),
+                    CustomActionsButtons.aceptarButton({
+                      "label": l10n.accept,
+                      "onTap": () async {
+                        Navigator.pop(context);
+                        await onRestart!();
+                      },
+                    }),
+                  ],
+                );
+              },
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFFFFB300), Color(0xFFFF8F00)],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFFA000).withValues(alpha: 0.3),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.restart_alt_rounded, color: Colors.white, size: 16),
+                    const SizedBox(width: 4),
+                    Text(
+                      l10n.restart,
+                      style: const TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+
+    if (panelController != null) return SlideUpHeader(panelController: panelController!, child: content);
+    return _HeaderContainer(child: content);
+  }
+}
+
+/// Container base para headers sin panelController (mantiene el mismo estilo)
+class _HeaderContainer extends StatelessWidget {
+  const _HeaderContainer({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Preferences.isDarkMode;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -299,135 +460,7 @@ class _EditHeader extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          // Avatar con icono
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppThemes.colorPrimero,
-                  AppThemes.colorPrimero.withValues(alpha: 0.7),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: AppThemes.colorPrimero.withValues(alpha: 0.3),
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Center(
-              child: FaIcon(
-                icon,
-                color: Colors.white,
-                size: 18,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-
-          // Información
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "${l10n.edit} $tipo",
-                  style: TextStyle(
-                    fontFamily: "Poppins",
-                    fontSize: 11,
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 1),
-                Text(
-                  nombre.isNotEmpty ? nombre : l10n.noName,
-                  style: TextStyle(
-                    fontFamily: "Poppins",
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppThemes.colorQuinto,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-
-          // Botón reiniciar (solo si es partida y ya inició)
-          if (onRestart != null)
-            Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  CustomAlertDialog.show(
-                    context,
-                    title: l10n.confirm,
-                    menssage: l10n.confirmRestartGame(partida!.nombre!),
-                    dialogType: DialogType.warning,
-                    buttonsList: [
-                      CustomActionsButtons.cancelButton({
-                        "label": l10n.cancel,
-                        "onTap": () => Navigator.pop(context),
-                      }),
-                      CustomActionsButtons.aceptarButton({
-                        "label": l10n.accept,
-                        "onTap": () async {
-                          Navigator.pop(context);
-                          await onRestart!();
-                        },
-                      }),
-                    ],
-                  );
-                },
-                borderRadius: BorderRadius.circular(10),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [Color(0xFFFFB300), Color(0xFFFF8F00)],
-                    ),
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFFFFA000).withValues(alpha: 0.3),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.restart_alt_rounded, color: Colors.white, size: 16),
-                      const SizedBox(width: 4),
-                      Text(
-                        l10n.restart,
-                        style: const TextStyle(
-                          fontFamily: "Poppins",
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
+      child: child,
     );
   }
 }

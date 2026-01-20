@@ -5,36 +5,33 @@ import 'package:game_score/models/models.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/providers/providers.dart';
-import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/layout.dart';
 import 'package:provider/provider.dart';
 
 class JugadoresActuales extends StatelessWidget {
-  const JugadoresActuales({Key? key, required this.pageController, required this.jugadoresController, required this.rebuildWidget}) : super(key: key);
-  final PageController pageController;
+  const JugadoresActuales({Key? key, required this.jugadoresController, required this.rebuildWidget, required this.onEditJugador}) : super(key: key);
   final Function rebuildWidget;
   final ScrollController jugadoresController;
+  final Function(Jugador) onEditJugador;
 
   @override
   Widget build(BuildContext context) {
-    return ListJugadores(pageController: pageController, jugadoresController: jugadoresController, rebuildWidget: rebuildWidget);
+    return ListJugadores(jugadoresController: jugadoresController, rebuildWidget: rebuildWidget, onEditJugador: onEditJugador);
   }
 }
 
 class ListJugadores extends StatelessWidget {
-  const ListJugadores({Key? key, required this.pageController, required this.jugadoresController, required this.rebuildWidget}) : super(key: key);
-  final PageController pageController;
+  const ListJugadores({Key? key, required this.jugadoresController, required this.rebuildWidget, required this.onEditJugador}) : super(key: key);
   final ScrollController jugadoresController;
   final Function rebuildWidget;
+  final Function(Jugador) onEditJugador;
 
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
-    final PageEditarProvider pageEditarProvider = context.read<PageEditarProvider>();
 
     List<Jugador> jugadores = partidaProvider.partidaEnTurno!.jugadoresSort;
-    final double actualPage = pageEditarProvider.getActualPage();
 
     if (jugadores.isEmpty) {
       return Center(
@@ -72,7 +69,6 @@ class ListJugadores extends StatelessWidget {
     final effectiveController = slideUpController ?? jugadoresController;
 
     return ListView.builder(
-      key: UniqueKey(),
       controller: effectiveController,
       physics: const ClampingScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -80,29 +76,11 @@ class ListJugadores extends StatelessWidget {
       itemBuilder: (context, index) {
         Jugador jugador = jugadores[index];
 
-        pageController.addListener(() async {
-          Fun.logColor(color: Colores.yellow, body: "actualPage: $actualPage");
-
-          if (actualPage == 1.0 && pageController.page == 0.0) {
-            Fun.logColor(color: Colores.green, body: "ENTREEE");
-            await Future.delayed(const Duration(milliseconds: 100));
-            rebuildWidget();
-          }
-
-          Fun.logColor(color: Colores.red, body: "pageController.page: ${pageController.page}");
-          pageEditarProvider.setActualPage(pageController.page);
-        });
-
         return _JugadorItem(
           jugador: jugador,
           index: index,
           canDelete: partidaProvider.partidaEnTurno!.jugadores!.length > 2,
-          onEdit: () async {
-            jugadorProvider.jugadorEditar = jugador;
-            nextPage();
-            await Future.delayed(const Duration(milliseconds: 200));
-            jugadorProvider.formJugador.patchValue(jugadorProvider.jugadorEditar!.toMap());
-          },
+          onEdit: () => onEditJugador(jugador),
           onDelete: () {
             jugadorProvider.deleteJugador(context, jugador: jugador, callBack: (value) async {
               if (value["tipo"] == "aceptar") {
@@ -116,10 +94,6 @@ class ListJugadores extends StatelessWidget {
         );
       },
     );
-  }
-
-  nextPage() {
-    pageController.nextPage(duration: const Duration(milliseconds: 500), curve: Curves.easeInOutQuart);
   }
 }
 

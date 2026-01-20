@@ -195,11 +195,11 @@ class _Body extends StatelessWidget {
       if (!response.hasError!) {
         final newPartida = response.data;
 
-        googleAdsProvider.showInterstitialAd(onCloseFunction: () {
-          partidaProvider.changePartidaEnTurno(newPartida);
-          Navigator.pushReplacementNamed(context, 'partida');
-          formPartidaProvider.resetForm();
-        });
+        // IMPORTANTE: Navegar PRIMERO, mostrar anuncio DESPUÉS (evita bloquear resultado)
+        partidaProvider.changePartidaEnTurno(newPartida);
+        formPartidaProvider.resetForm();
+        googleAdsProvider.markAdForAfterNavigation();
+        Navigator.pushReplacementNamed(context, 'partida');
       } else {
         Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.errorRegisteringGame);
       }

@@ -20,6 +20,10 @@ flutter pub get
 HOMEBREW_NO_AUTO_UPDATE=1 # disable homebrew's automatic updates.
 brew install cocoapods
 
+# Set UTF-8 encoding for CocoaPods compatibility
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
 # Install CocoaPods dependencies.
 cd ios && pod install
 

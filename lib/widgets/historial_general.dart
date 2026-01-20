@@ -10,6 +10,7 @@ import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:game_score/widgets/layout.dart';
+import 'package:game_score/widgets/slide_up_header.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:provider/provider.dart';
 
@@ -24,6 +25,7 @@ class HistorialGeneral extends StatefulWidget {
 class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScrollMixin {
   final TextEditingController puntuacionController = TextEditingController();
   final ScrollController historialController = ScrollController();
+  final GoogleBannerAd anuncio = const GoogleBannerAd(location: AdLocation.puntuacion);
   Jugador? jugadorSeleccionado;
 
   @override
@@ -137,6 +139,9 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
             ),
           ],
         ),
+        const SizedBox(height: 20),
+        // Anuncio (separado de los botones de acción)
+        anuncio,
       ],
     );
   }
@@ -239,93 +244,60 @@ class _HistorialHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
 
-    return GestureDetector(
-      onVerticalDragUpdate: (details) {
-        // Si arrastra hacia abajo, cerrar el panel
-        if (details.delta.dy > 8 && panelController.isAttached) {
-          panelController.close();
-        }
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDark
-                ? [Colors.white.withValues(alpha: 0.08), Colors.white.withValues(alpha: 0.03)]
-                : [AppThemes.colorPrimero.withValues(alpha: 0.08), AppThemes.colorPrimero.withValues(alpha: 0.03)],
-          ),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isDark ? Colors.white.withValues(alpha: 0.1) : AppThemes.colorPrimero.withValues(alpha: 0.15),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.white.withValues(alpha: isDark ? 0.05 : 0.8),
-              blurRadius: 4,
-              offset: const Offset(-2, -2),
-            ),
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
-              blurRadius: 4,
-              offset: const Offset(2, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
+    return SlideUpHeader(
+      panelController: panelController,
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: AppThemes.colorPrimero.withValues(alpha: 0.3),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
                 ),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppThemes.colorPrimero.withValues(alpha: 0.3),
-                    blurRadius: 6,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: const Center(
-                child: FaIcon(FontAwesomeIcons.clockRotateLeft, color: Colors.white, size: 18),
-              ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppLocalizations.of(context)!.generalHistory,
-                    style: TextStyle(
-                      fontFamily: "Poppins",
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : AppThemes.colorQuinto,
-                    ),
-                  ),
-                  const SizedBox(height: 1),
-                  Text(
-                    AppLocalizations.of(context)!.records(cantRegistros),
-                    style: TextStyle(
-                      fontFamily: "Poppins",
-                      fontSize: 11,
-                      color: isDark ? Colors.grey[400] : Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
+            child: const Center(
+              child: FaIcon(FontAwesomeIcons.clockRotateLeft, color: Colors.white, size: 18),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.generalHistory,
+                  style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : AppThemes.colorQuinto,
+                  ),
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  AppLocalizations.of(context)!.records(cantRegistros),
+                  style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 11,
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -561,20 +533,11 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
         backgroundColor: Colors.transparent,
         trailingActions: [
           SwipeAction(
-            content: Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              decoration: BoxDecoration(
-                color: Colors.red[400],
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(8),
-                  bottomRight: Radius.circular(8),
-                ),
-              ),
-              child: const FaIcon(FontAwesomeIcons.trash, color: Colors.white, size: 18),
-            ),
+            icon: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 20),
+            title: AppLocalizations.of(context)!.delete,
+            style: const TextStyle(fontFamily: 'Poppins', fontSize: 11),
             onTap: (handler) => _deleteHistorial(context, handler),
-            color: Colors.transparent,
+            color: Colors.red[400]!,
           ),
         ],
         child: Material(
@@ -811,15 +774,16 @@ class _KeyboardSection extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'Poppins',
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
               color: isDark ? Colors.white : AppThemes.colorQuinto,
             ),
             decoration: InputDecoration(
               labelText: AppLocalizations.of(context)!.scoreLabel,
               fillColor: AppThemes.inputDisabledColor,
               filled: true,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               labelStyle: TextStyle(
                 color: AppThemes.labelInputDisabledColor,
                 fontFamily: 'Poppins',

@@ -8,31 +8,28 @@ import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
+import 'package:game_score/widgets/slide_up_header.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
 class AddJugadorPartida extends StatelessWidget {
-  const AddJugadorPartida({Key? key}) : super(key: key);
+  const AddJugadorPartida({Key? key, required this.panelController}) : super(key: key);
+
+  final PanelController panelController;
 
   @override
   Widget build(BuildContext context) {
-    final PageController pageController = PageController();
     GoogleBannerAd anuncio = GoogleBannerAd(location: AdLocation.agregarJugador);
-    return PageView.builder(
-        controller: pageController,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: 2,
-        itemBuilder: (context, index) {
-          return index == 0 ? AddJugador(pageController: pageController, anuncio: anuncio) : EditarEntidad(pageController: pageController);
-        });
+    return AddJugador(anuncio: anuncio, panelController: panelController);
   }
 }
 
 class AddJugador extends StatefulWidget {
-  const AddJugador({Key? key, required this.pageController, required this.anuncio}) : super(key: key);
+  const AddJugador({Key? key, required this.anuncio, required this.panelController}) : super(key: key);
 
-  final PageController pageController;
   final GoogleBannerAd anuncio;
+  final PanelController panelController;
 
   @override
   State<AddJugador> createState() => _AddJugadorState();
@@ -62,16 +59,26 @@ class _AddJugadorState extends State<AddJugador> {
         child: Column(
           children: [
             // Header
-            _AddJugadorHeader(cantJugadores: cantJugadores),
+            _AddJugadorHeader(cantJugadores: cantJugadores, panelController: widget.panelController),
             const SizedBox(height: 16),
 
-            // Input Nombre
+            // Input Nombre + Botón agregar
             ReactiveForm(
               formGroup: form,
-              child: Column(children: <Widget>[
-                CustomReactiveInput(
-                    formControlName: 'nombre', labelText: AppLocalizations.of(context)!.playerName, textCapitalization: TextCapitalization.words)
-              ]),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: CustomReactiveInput(
+                      formControlName: 'nombre',
+                      labelText: AppLocalizations.of(context)!.playerName,
+                      textCapitalization: TextCapitalization.words,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  _AddIconButton(onTap: () => _agregarJugador(context, form)),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
 
@@ -96,27 +103,59 @@ class _AddJugadorState extends State<AddJugador> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: JugadoresActuales(
-                    pageController: widget.pageController,
                     jugadoresController: jugadoresController,
                     rebuildWidget: rebuildWidget,
+                    onEditJugador: (jugador) => _showEditarJugadorModal(context, jugador),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
-            // Botón Agregar
-            _AddButton(
-              onTap: () => _agregarJugador(context, form),
-            ),
-            const SizedBox(height: 12),
-
-            // Anuncios
+            // Anuncios (separado de la lista de jugadores)
             widget.anuncio
           ],
         ),
       ),
     );
+  }
+
+  void _showEditarJugadorModal(BuildContext context, Jugador jugador) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final jugadorProvider = context.read<JugadorProvider>();
+    final slideUpProvider = context.read<SlideUpProvider>();
+
+    jugadorProvider.jugadorEditar = jugador;
+    jugadorProvider.formJugador.patchValue(jugador.toMap());
+
+    // Cerrar el slideUp cuando se abre el modal (sin limpiar jugadorEditar)
+    slideUpProvider.closeSlideUp(controller: widget.panelController, skipClean: true);
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) => Dialog(
+        backgroundColor: AppThemes.themeColor_2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        child: Container(
+          width: double.infinity,
+          height: screenHeight * 0.5,
+          padding: const EdgeInsets.all(16),
+          child: EditarEntidad(
+            onClose: () => Navigator.pop(dialogContext),
+          ),
+        ),
+      ),
+    ).then((_) {
+      // Esperar al siguiente frame para asegurar que los datos estén sincronizados
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        slideUpProvider.openSlideUp(
+          controller: widget.panelController,
+          bodyContent: AddJugadorPartida(panelController: widget.panelController),
+        );
+      });
+    });
   }
 
   void _agregarJugador(BuildContext context, FormGroup form) async {
@@ -155,41 +194,17 @@ class _AddJugadorState extends State<AddJugador> {
 // ============================================
 
 class _AddJugadorHeader extends StatelessWidget {
-  const _AddJugadorHeader({required this.cantJugadores});
+  const _AddJugadorHeader({required this.cantJugadores, required this.panelController});
 
   final int cantJugadores;
+  final PanelController panelController;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [Colors.white.withValues(alpha: 0.08), Colors.white.withValues(alpha: 0.03)]
-              : [AppThemes.colorPrimero.withValues(alpha: 0.08), AppThemes.colorPrimero.withValues(alpha: 0.03)],
-        ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: isDark ? Colors.white.withValues(alpha: 0.1) : AppThemes.colorPrimero.withValues(alpha: 0.15),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.white.withValues(alpha: isDark ? 0.05 : 0.8),
-            blurRadius: 4,
-            offset: const Offset(-2, -2),
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
-            blurRadius: 4,
-            offset: const Offset(2, 2),
-          ),
-        ],
-      ),
+    return SlideUpHeader(
+      panelController: panelController,
       child: Row(
         children: [
           // Icono
@@ -308,8 +323,8 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
-class _AddButton extends StatelessWidget {
-  const _AddButton({required this.onTap});
+class _AddIconButton extends StatelessWidget {
+  const _AddIconButton({required this.onTap});
 
   final VoidCallback onTap;
 
@@ -321,12 +336,12 @@ class _AddButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          width: 52,
+          height: 52,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
               colors: [Color(0xFF4CAF50), Color(0xFF43A047)],
             ),
             borderRadius: BorderRadius.circular(12),
@@ -338,25 +353,12 @@ class _AddButton extends StatelessWidget {
               ),
             ],
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const FaIcon(
-                FontAwesomeIcons.plus,
-                color: Colors.white,
-                size: 16,
-              ),
-              const SizedBox(width: 10),
-              Text(
-                AppLocalizations.of(context)!.addPlayer,
-                style: const TextStyle(
-                  fontFamily: "Poppins",
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ],
+          child: const Center(
+            child: FaIcon(
+              FontAwesomeIcons.plus,
+              color: Colors.white,
+              size: 20,
+            ),
           ),
         ),
       ),

@@ -15,7 +15,7 @@ class Layout extends StatefulWidget {
     this.appBarLeading,
     this.appBarTrailing,
     this.hasFooter = false,
-    this.maxPanelHeightFraction = 0.85,
+    this.maxPanelHeightFraction = 0.95,
   }) : super(key: key);
 
   final Widget bodyContent;
@@ -71,14 +71,15 @@ class _LayoutState extends State<Layout> {
 
     final fraction = slideUpProvider.maxHeightFraction ?? widget.maxPanelHeightFraction;
     final visibleHeight = screenHeight - keyboardHeight;
-    final minTopMargin = topPadding + 80;
+    final minTopMargin = topPadding + 40;
 
     final maxHeight = max(
-        100.0,
-        min(
-          screenHeight * fraction,
-          min(visibleHeight * widget.maxPanelHeightFraction, visibleHeight - minTopMargin),
-        ));
+      100.0,
+      min(
+        screenHeight * fraction,
+        min(visibleHeight * widget.maxPanelHeightFraction, visibleHeight - minTopMargin),
+      ),
+    );
 
     final isDark = Preferences.isDarkMode;
 
@@ -93,6 +94,7 @@ class _LayoutState extends State<Layout> {
         parallaxEnabled: true,
         backdropOpacity: 0.7,
         backdropTapClosesPanel: slideUpProvider.closeOnOutsideClick,
+        isDraggable: slideUpProvider.isDraggable,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
@@ -150,9 +152,12 @@ class _LayoutState extends State<Layout> {
     if (slideUpProvider.body != null) slideUpProvider.body = null;
     FocusManager.instance.primaryFocus?.unfocus();
 
-    // Limpiar entidades en edición al cerrar el panel
-    context.read<JugadorProvider>().jugadorEditar = null;
-    context.read<PartidaProvider>().partidaEditar = null;
+    // Limpiar entidades en edición al cerrar el panel (solo si no se está abriendo un modal)
+    if (!slideUpProvider.skipCleanOnClose) {
+      context.read<JugadorProvider>().jugadorEditar = null;
+      context.read<PartidaProvider>().partidaEditar = null;
+    }
+    slideUpProvider.resetSkipClean();
 
     slideUpProvider.closeSlideUp(controller: widget.panelController, isListener: isListener);
   }

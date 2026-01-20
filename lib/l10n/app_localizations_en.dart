@@ -483,4 +483,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String minValue(String min) {
     return 'Minimum value is: $min';
   }
+
+  @override
+  String get aboutTitle => 'About';
+
+  @override
+  String get aboutAppTitle => 'What is Coro Games?';
+
+  @override
+  String get aboutAppDescription =>
+      'Coro Games is your perfect companion for keeping score in your favorite board games. Whether it\'s dominoes, cards, dice or any other game, our app lets you record scores, manage players and view game history quickly and easily.';
+
+  @override
+  String get privacyPolicyTitle => 'Privacy & Transparency';
+
+  @override
+  String get privacyPolicyDescription =>
+      'At Coro Games we respect your privacy. We do not request personal data such as names or email addresses.\n\n• Game Data: Stored locally on your device and never leaves it.\n\n• Third-Party Services: We use Google Firebase for performance analytics and Google AdMob to display ads. These services may collect device advertising identifiers for proper operation.\n\nYou can read our full Privacy Policy at the following link:';
+
+  @override
+  String get viewFullPrivacyPolicy => 'View Full Privacy Policy';
 }

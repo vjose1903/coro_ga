@@ -14,14 +14,14 @@ class LocaleProvider extends ChangeNotifier {
   /// Carga el idioma guardado en preferencias o detecta del dispositivo
   void _loadSavedLocale() {
     final savedCode = Preferences.languageCode;
-    if (savedCode == null || savedCode.isEmpty) {
-      // Primera vez: detectar idioma del dispositivo
+    if (savedCode == 'es' || savedCode == 'en') {
+      _locale = Locale(savedCode);
+    } else {
+      // Detectar idioma del dispositivo
       final systemLocale = PlatformDispatcher.instance.locale;
-      final code = (systemLocale.languageCode == 'es') ? 'es' : 'en';
+      final code = (systemLocale.languageCode == 'en') ? 'en' : 'es';
       _locale = Locale(code);
       Preferences.languageCode = code;
-    } else {
-      _locale = Locale(savedCode);
     }
   }
 
@@ -33,6 +33,9 @@ class LocaleProvider extends ChangeNotifier {
   }
 
   /// Obtiene el código actual ('es', 'en')
-  String get currentCode => Preferences.languageCode ?? 'es';
+  String get currentCode {
+    final code = _locale.languageCode;
+    return (code == 'es' || code == 'en') ? code : 'es';
+  }
 }
 

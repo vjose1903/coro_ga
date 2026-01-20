@@ -52,7 +52,24 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ForceUpdateModal.showIfNeeded(context);
       _fabAnimController.forward();
+      _showPendingAdIfNeeded();
     });
+  }
+
+  /// Muestra el anuncio intersticial si estaba pendiente (después de navegación)
+  void _showPendingAdIfNeeded() {
+    final googleAdsProvider = context.read<GoogleAdsProvider>();
+    if (googleAdsProvider.showAdAfterNavigation) {
+      googleAdsProvider.clearAdAfterNavigation();
+      // Esperar a que la pantalla esté completamente cargada
+      Future.delayed(const Duration(milliseconds: 800), () {
+        if (mounted) {
+          googleAdsProvider.showInterstitialAd(onCloseFunction: () {
+            googleAdsProvider.loadInterstitialAd();
+          });
+        }
+      });
+    }
   }
 
   @override
@@ -63,7 +80,7 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
 
   void openMenuSlideUp() {
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
-    slideUpProvider.openSlideUp(controller: panelController, bodyContent: _Menu(panelController: panelController));
+    slideUpProvider.openSlideUp(controller: panelController, bodyContent: _Menu(panelController: panelController), isDraggable: true);
   }
 
   void navigateToForm() {
@@ -88,46 +105,49 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
             bodyContent: _Body(panelController: panelController),
             panelController: panelController,
           ),
-          floatingActionButton: Visibility(
-            visible: !panelController.isAttached || panelController.isPanelClosed,
-            child: ScaleTransition(
-              scale: CurvedAnimation(parent: _fabAnimController, curve: Curves.elasticOut),
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppThemes.colorTercero.withValues(alpha: 0.4),
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
+          floatingActionButton: Padding(
+            padding: const EdgeInsets.only(bottom: 40),
+            child: Visibility(
+              visible: !panelController.isAttached || panelController.isPanelClosed,
+              child: ScaleTransition(
+                scale: CurvedAnimation(parent: _fabAnimController, curve: Curves.elasticOut),
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
                     ),
-                  ],
-                ),
-                child: FloatingActionButton(
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  shape: const CircleBorder(),
-                  onPressed: () {
-                    final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-                    final PremiumProvider premiumProvider = context.read<PremiumProvider>();
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppThemes.colorTercero.withValues(alpha: 0.4),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: FloatingActionButton(
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    shape: const CircleBorder(),
+                    onPressed: () {
+                      final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+                      final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
-                    if (premiumProvider.canCreateGame(partidaProvider.partidas.length)) {
-                      navigateToForm();
-                    } else {
-                      Toast.show(
-                          type: ToastType.info,
-                          context: context,
-                          message: l10n.freeVersionLimitGames(PremiumProvider.freeMaxGames),
-                          actionLabel: l10n.getPro,
-                          onAction: () => Navigator.pushNamed(context, 'premium'));
-                    }
-                  },
-                  child: const Icon(Icons.add_rounded, size: 32, color: Colors.white),
+                      if (premiumProvider.canCreateGame(partidaProvider.partidas.length)) {
+                        navigateToForm();
+                      } else {
+                        Toast.show(
+                            type: ToastType.info,
+                            context: context,
+                            message: l10n.freeVersionLimitGames(PremiumProvider.freeMaxGames),
+                            actionLabel: l10n.getPro,
+                            onAction: () => Navigator.pushNamed(context, 'premium'));
+                      }
+                    },
+                    child: const Icon(Icons.add_rounded, size: 32, color: Colors.white),
+                  ),
                 ),
               ),
             ),
@@ -162,8 +182,9 @@ class _Body extends StatelessWidget {
     return Column(
       children: [
         Expanded(child: ListPartidas(panelController: panelController)),
+        // Banner de anuncios
         Padding(
-          padding: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.only(bottom: 16),
           child: GoogleBannerAd(location: AdLocation.home),
         ),
       ],
@@ -473,6 +494,10 @@ class _MenuState extends State<_Menu> {
                 );
               },
             ),
+            const SizedBox(height: 16),
+
+            // Sección Acerca de
+            _AboutButton(panelController: widget.panelController),
           ],
         ),
       ),
@@ -988,6 +1013,72 @@ class _LanguageSwitcher extends StatelessWidget {
           onChanged: (code) {
             if (code != null) localeProvider.setLocale(code);
           },
+        ),
+      ),
+    );
+  }
+}
+
+class _AboutButton extends StatelessWidget {
+  final PanelController panelController;
+
+  const _AboutButton({required this.panelController});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return GestureDetector(
+      onTap: () {
+        final navigator = Navigator.of(context);
+        final slideUpProvider = context.read<SlideUpProvider>();
+        slideUpProvider.closeSlideUp(controller: panelController);
+        Future.delayed(const Duration(milliseconds: 300), () {
+          navigator.pushNamed('about');
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.05) : Colors.grey.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.grey.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.info_outline_rounded,
+                size: 20,
+                color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[600],
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                l10n.aboutTitle,
+                style: TextStyle(
+                  color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.9) : Colors.grey[700],
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 16,
+              color: Colors.grey[500],
+            ),
+          ],
         ),
       ),
     );

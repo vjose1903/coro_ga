@@ -155,10 +155,15 @@ class FormPartidaPredefinida extends StatelessWidget {
       }
 
       if (!response.hasError!) {
-        googleAdsProvider.showInterstitialAd(onCloseFunction: () {
-          DialogNavigator.of(context).pop();
-          formPartidaPredefinidaProvider.resetForm();
-          googleAdsProvider.loadInterstitialAd();
+        // IMPORTANTE: Cerrar diálogo PRIMERO, mostrar anuncio DESPUÉS (pausa natural)
+        DialogNavigator.of(context).pop();
+        formPartidaPredefinidaProvider.resetForm();
+        
+        // Mostrar anuncio después de un delay para dar pausa natural
+        Future.delayed(const Duration(milliseconds: 600), () {
+          googleAdsProvider.showInterstitialAd(onCloseFunction: () {
+            googleAdsProvider.loadInterstitialAd();
+          });
         });
       } else {
         Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.errorRegisteringGame);

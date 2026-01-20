@@ -961,6 +961,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Minimum value is: {min}'**
   String minValue(String min);
+
+  /// No description provided for @aboutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get aboutTitle;
+
+  /// No description provided for @aboutAppTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What is Coro Games?'**
+  String get aboutAppTitle;
+
+  /// No description provided for @aboutAppDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Coro Games is your perfect companion for keeping score in your favorite board games. Whether it\'s dominoes, cards, dice or any other game, our app lets you record scores, manage players and view game history quickly and easily.'**
+  String get aboutAppDescription;
+
+  /// No description provided for @privacyPolicyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy & Transparency'**
+  String get privacyPolicyTitle;
+
+  /// No description provided for @privacyPolicyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'At Coro Games we respect your privacy. We do not request personal data such as names or email addresses.\n\n• Game Data: Stored locally on your device and never leaves it.\n\n• Third-Party Services: We use Google Firebase for performance analytics and Google AdMob to display ads. These services may collect device advertising identifiers for proper operation.\n\nYou can read our full Privacy Policy at the following link:'**
+  String get privacyPolicyDescription;
+
+  /// No description provided for @viewFullPrivacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'View Full Privacy Policy'**
+  String get viewFullPrivacyPolicy;
 }
 
 class _AppLocalizationsDelegate

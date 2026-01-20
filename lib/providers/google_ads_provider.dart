@@ -6,6 +6,18 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 class GoogleAdsProvider extends ChangeNotifier {
   InterstitialAd? interstitialAd;
   Function? onCloseFunction_;
+  
+  // Flag para mostrar anuncio después de navegación
+  bool _showAdAfterNavigation = false;
+  bool get showAdAfterNavigation => _showAdAfterNavigation;
+  
+  void markAdForAfterNavigation() {
+    _showAdAfterNavigation = true;
+  }
+  
+  void clearAdAfterNavigation() {
+    _showAdAfterNavigation = false;
+  }
 
   RewardedAd? rewardedAd;
   Function? onRewardedCloseFunction_;

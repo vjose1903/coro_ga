@@ -8,6 +8,9 @@ class SlideUpProvider extends ChangeNotifier {
   bool _closeOnOutsideClick = true;
   bool _isPanelFullyOpen = false;
   double _panelPosition = 0.0;
+  bool _isResizing = false;
+  bool _skipCleanOnClose = false;
+  bool _isDraggable = false;
 
   // Callbacks para scroll automático pendiente
   final List<VoidCallback> _pendingScrollCallbacks = [];
@@ -17,6 +20,16 @@ class SlideUpProvider extends ChangeNotifier {
   bool get closeOnOutsideClick => _closeOnOutsideClick;
   bool get isPanelFullyOpen => _isPanelFullyOpen;
   double get panelPosition => _panelPosition;
+  bool get isResizing => _isResizing;
+  bool get skipCleanOnClose => _skipCleanOnClose;
+  bool get isDraggable => _isDraggable;
+
+  set isResizing(bool value) {
+    if (_isResizing != value) {
+      _isResizing = value;
+      notifyListeners();
+    }
+  }
 
   void openSlideUp({
     required PanelController controller,
@@ -24,11 +37,13 @@ class SlideUpProvider extends ChangeNotifier {
     double? topMargin,
     double? maxHeightFraction, // Altura máxima como fracción de la pantalla (0.5 = 50%)
     bool closeOnOutsideClick = true,
+    bool isDraggable = false,
   }) {
     if (bodyContent != null) body = bodyContent;
     _topMargin = topMargin;
     _maxHeightFraction = maxHeightFraction;
     _closeOnOutsideClick = closeOnOutsideClick;
+    _isDraggable = isDraggable;
 
     // Si el panel ya está abierto, solo notificar para actualizar el contenido
     if (controller.isAttached && controller.isPanelOpen) {
@@ -43,15 +58,22 @@ class SlideUpProvider extends ChangeNotifier {
     });
   }
 
-  void closeSlideUp({required PanelController controller, bool isListener = false}) {
+  void closeSlideUp({required PanelController controller, bool isListener = false, bool skipClean = false}) {
+    _skipCleanOnClose = skipClean;
     if (!isListener && controller.isAttached) controller.close();
     _topMargin = null;
     _maxHeightFraction = null;
     _closeOnOutsideClick = true;
     _isPanelFullyOpen = false;
     _panelPosition = 0.0;
+    _isDraggable = false;
     _pendingScrollCallbacks.clear();
-    notifyListeners();
+    // Solo notificar si no es llamado desde un listener (evita rebuilds innecesarios)
+    if (!isListener) notifyListeners();
+  }
+  
+  void resetSkipClean() {
+    _skipCleanOnClose = false;
   }
 
   /// Llamado cuando el panel está completamente abierto

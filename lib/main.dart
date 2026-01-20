@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:game_score/firebase_options.dart';
 import 'package:game_score/l10n/app_localizations.dart';
@@ -9,6 +8,7 @@ import 'package:game_score/providers/providers.dart';
 import 'package:game_score/routes/app_routes.dart';
 import 'package:game_score/screens/screens.dart';
 import 'package:game_score/services/app_integrity_service.dart';
+import 'package:game_score/services/consent_service.dart';
 import 'package:game_score/services/purchase_service.dart';
 import 'package:game_score/widgets/piracy_blocker.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -36,11 +36,8 @@ void main() async {
     return;
   }
 
-  final isPlatformDark =
-      WidgetsBinding.instance.platformDispatcher.platformBrightness ==
-          Brightness.dark;
-  bool initInDarkMode =
-      Preferences.isSystemMode ? isPlatformDark : Preferences.isDarkMode;
+  final isPlatformDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
+  bool initInDarkMode = Preferences.isSystemMode ? isPlatformDark : Preferences.isDarkMode;
 
   final premiumProvider = PremiumProvider();
   final localeProvider = LocaleProvider();
@@ -57,8 +54,7 @@ void main() async {
     ChangeNotifierProvider(create: (_) => ReorderableProvider()),
     ChangeNotifierProvider(create: (_) => PageEditarProvider()),
     ChangeNotifierProvider(create: (_) => PartidaPredefinidaProvider()),
-    ChangeNotifierProvider(
-        create: (_) => ThemeProvider(isDarkMode_: initInDarkMode)),
+    ChangeNotifierProvider(create: (_) => ThemeProvider(isDarkMode_: initInDarkMode)),
     ChangeNotifierProvider.value(value: premiumProvider),
     ChangeNotifierProvider.value(value: localeProvider),
   ], child: const MyApp()));
@@ -68,7 +64,7 @@ void main() async {
 void _initializeServicesDeferred(PremiumProvider premiumProvider) {
   // Ejecutar en paralelo después de que la UI se muestre
   Future.wait([
-    MobileAds.instance.initialize(),
+    _initializeMobileAds(),
     Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     ),
@@ -78,6 +74,24 @@ void _initializeServicesDeferred(PremiumProvider premiumProvider) {
       },
     ),
   ]);
+}
+
+/// Inicializa MobileAds con configuración COPPA y contenido apropiado
+Future<void> _initializeMobileAds() async {
+  await MobileAds.instance.initialize();
+
+  // IMPORTANTE: Inicializar consentimiento GDPR/UMP ANTES de configurar/cargar anuncios
+  await ConsentService.instance.initialize();
+
+  // Configurar restricciones de contenido para todos los anuncios
+  await MobileAds.instance.updateRequestConfiguration(
+    RequestConfiguration(
+      // El dominó es un juego familiar atractivo para niños -> marcar como sí
+      tagForChildDirectedTreatment: TagForChildDirectedTreatment.yes,
+      // Clasificación máxima de contenido: G = General (apto para todos)
+      maxAdContentRating: MaxAdContentRating.g,
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -113,11 +127,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       ThemeProvider themeProvider = context.read<ThemeProvider>();
       _lastLifecycleState = state;
 
-      if (Preferences.isSystemMode &&
-          _lastLifecycleState == AppLifecycleState.resumed) {
-        bool isActualSystemDark =
-            WidgetsBinding.instance.platformDispatcher.platformBrightness ==
-                Brightness.dark;
+      if (Preferences.isSystemMode && _lastLifecycleState == AppLifecycleState.resumed) {
+        bool isActualSystemDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
 
         if (isActualSystemDark != Preferences.isDarkMode) {
           Preferences.isDarkMode = isActualSystemDark;

@@ -492,4 +492,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String minValue(String min) {
     return 'Valor mínimo es: $min';
   }
+
+  @override
+  String get aboutTitle => 'Acerca de';
+
+  @override
+  String get aboutAppTitle => '¿Qué es Coro Games?';
+
+  @override
+  String get aboutAppDescription =>
+      'Coro Games es tu compañero perfecto para llevar el puntaje de tus juegos de mesa favoritos. Ya sea dominó, cartas, dados o cualquier otro juego, nuestra app te permite registrar puntuaciones, gestionar jugadores y ver el historial de partidas de forma fácil y rápida.';
+
+  @override
+  String get privacyPolicyTitle => 'Privacidad y Transparencia';
+
+  @override
+  String get privacyPolicyDescription =>
+      'En Coro Games respetamos tu privacidad. No solicitamos datos personales como nombres o correos electrónicos.\n\n• Datos de Partida: Se guardan localmente en tu dispositivo y no salen de él.\n\n• Servicios de Terceros: Utilizamos Google Firebase para estadísticas de rendimiento y Google AdMob para mostrar anuncios. Estos servicios pueden recopilar identificadores de publicidad del dispositivo para su correcto funcionamiento.\n\nPuedes consultar nuestra Política de Privacidad completa en el siguiente enlace:';
+
+  @override
+  String get viewFullPrivacyPolicy => 'Ver Política de Privacidad Completa';
 }

@@ -74,14 +74,14 @@ class _GanadorScreenState extends State<GanadorScreen> {
                   iconColor: ganadorColor,
                   icon: Icons.close,
                   onTap: () {
-                    googleAdsProvider.showInterstitialAd(onCloseFunction: () {
-                      Navigator.pushReplacement(
-                          context,
-                          PageRouteBuilder(
-                              pageBuilder: (context, animation, secondaryAnimation) => const HomeScreen(),
-                              transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
-                              transitionDuration: const Duration(milliseconds: 500)));
-                    });
+                    // IMPORTANTE: Navegar PRIMERO, mostrar anuncio DESPUÉS (pausa natural)
+                    googleAdsProvider.markAdForAfterNavigation();
+                    Navigator.pushReplacement(
+                        context,
+                        PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) => const HomeScreen(),
+                            transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
+                            transitionDuration: const Duration(milliseconds: 500)));
                   })),
           Container(
               margin: const EdgeInsets.only(top: 150),
