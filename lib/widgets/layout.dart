@@ -399,24 +399,35 @@ mixin SlideUpAutoScrollMixin<T extends StatefulWidget> on State<T> {
   }
 
   /// Programa un scroll al final de la lista
-  /// Se ejecuta solo cuando:
-  /// 1. El panel está completamente abierto
-  /// 2. El contenido del ListView está listo (hasContentDimensions && maxScrollExtent > 0)
+  /// Se ejecuta cuando el panel está completamente abierto y el contenido está listo
   void scheduleScrollToBottom(BuildContext context, ScrollController controller) {
+    // Cancelar cualquier scroll pendiente anterior
+    cancelPendingScroll();
+
     _autoScrollController = controller;
     _scrollPending = true;
     _retryCount = 0;
 
-    final slideUpProvider = context.read<SlideUpProvider>();
-
-    // Esperar a que el panel esté completamente abierto
-    slideUpProvider.executeWhenPanelOpen(() {
+    // Usar post frame callback para asegurar que el widget está construido
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !_scrollPending) return;
-      // Delay adicional después de que el panel está abierto
-      Future.delayed(const Duration(milliseconds: 150), () {
-        if (!mounted || !_scrollPending) return;
-        _executeScrollWhenReady();
-      });
+
+      final slideUpProvider = context.read<SlideUpProvider>();
+
+      // Si el panel ya está abierto, ejecutar directamente con un pequeño delay
+      if (slideUpProvider.isPanelFullyOpen) {
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (mounted && _scrollPending) _executeScrollWhenReady();
+        });
+      } else {
+        // Esperar a que el panel esté completamente abierto
+        slideUpProvider.executeWhenPanelOpen(() {
+          if (!mounted || !_scrollPending) return;
+          Future.delayed(const Duration(milliseconds: 100), () {
+            if (mounted && _scrollPending) _executeScrollWhenReady();
+          });
+        });
+      }
     });
   }
 
@@ -456,13 +467,11 @@ mixin SlideUpAutoScrollMixin<T extends StatefulWidget> on State<T> {
 
     _retryCount++;
     if (_retryCount >= _maxRetries) {
-      // Límite de reintentos alcanzado, desistir
       _scrollPending = false;
       _retryCount = 0;
       return;
     }
 
-    // Reintentar después de un pequeño delay
     Future.delayed(const Duration(milliseconds: 20), () {
       if (mounted && _scrollPending) _executeScrollWhenReady();
     });

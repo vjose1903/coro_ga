@@ -246,12 +246,31 @@ class _ListHistorial extends StatefulWidget {
 
 class _ListHistorialState extends State<_ListHistorial> with SlideUpAutoScrollMixin {
   int? _lastJugadorId;
-  bool _initialScrollScheduled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Programar scroll inicial después del primer frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _checkAndScheduleScroll();
+    });
+  }
 
   @override
   void dispose() {
     cancelPendingScroll();
     super.dispose();
+  }
+
+  void _checkAndScheduleScroll() {
+    final jugadorProvider = context.read<JugadorProvider?>();
+    final jugador = jugadorProvider?.jugadorEnTurno;
+    if (jugador?.historialJugadas != null && jugador!.historialJugadas!.isNotEmpty) {
+      _lastJugadorId = jugador.id;
+      final effectiveController = getEffectiveController(context, widget.historialController);
+      scheduleScrollToBottom(context, effectiveController);
+    }
   }
 
   @override
@@ -265,10 +284,8 @@ class _ListHistorialState extends State<_ListHistorial> with SlideUpAutoScrollMi
     final l10n = AppLocalizations.of(context)!;
     final msgNoRgistros = partidaProvider!.partidaEnTurno!.tipo == "Puntuación" ? l10n.noScoresRegistered : l10n.noRoundsRegistered;
 
-    // Scroll inicial al abrir el panel o cuando cambia el jugador
-    final shouldScroll = !_initialScrollScheduled || _lastJugadorId != jugador?.id;
-    if (shouldScroll && jugador?.historialJugadas != null && jugador!.historialJugadas!.isNotEmpty) {
-      _initialScrollScheduled = true;
+    // Scroll cuando cambia el jugador (después de init)
+    if (_lastJugadorId != null && _lastJugadorId != jugador?.id && jugador?.historialJugadas != null && jugador!.historialJugadas!.isNotEmpty) {
       _lastJugadorId = jugador.id;
       scheduleScrollToBottom(context, effectiveController);
     }

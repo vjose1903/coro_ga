@@ -428,7 +428,18 @@ class _ListHistorialGeneral extends StatefulWidget {
 }
 
 class _ListHistorialGeneralState extends State<_ListHistorialGeneral> with SlideUpAutoScrollMixin {
-  bool _initialScrollScheduled = false;
+  @override
+  void initState() {
+    super.initState();
+    // Programar scroll inicial después del primer frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (widget.historiales.isNotEmpty) {
+        final effectiveController = getEffectiveController(context, widget.historialController);
+        scheduleScrollToBottom(context, effectiveController);
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -439,12 +450,6 @@ class _ListHistorialGeneralState extends State<_ListHistorialGeneral> with Slide
   @override
   Widget build(BuildContext context) {
     final effectiveController = getEffectiveController(context, widget.historialController);
-
-    // Scroll inicial al abrir el panel
-    if (!_initialScrollScheduled && widget.historiales.isNotEmpty) {
-      _initialScrollScheduled = true;
-      scheduleScrollToBottom(context, effectiveController);
-    }
 
     if (widget.historiales.isEmpty) {
       return Center(
