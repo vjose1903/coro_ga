@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:game_score/helpers/helpers.dart';
-import 'package:game_score/l10n/app_localizations.dart';
-import 'package:game_score/models/models.dart';
-import 'package:game_score/providers/providers.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/utils/alert_dialog.dart';
-import 'package:game_score/utils/utils.dart';
-import 'package:game_score/widgets/widgets.dart';
-import 'package:game_score/widgets/slide_up_header.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
+
+import '../helpers/helpers.dart';
+import '../l10n/app_localizations.dart';
+import '../models/models.dart';
+import '../providers/providers.dart';
+import '../shared_preferences/preferences.dart';
+import '../themes/app_themes.dart';
+import '../utils/utils.dart';
+import 'slide_up_header.dart';
+import 'widgets.dart';
 
 class EditarEntidad extends StatelessWidget {
   const EditarEntidad({Key? key, this.pageController, this.panelController, this.onClose}) : super(key: key);
@@ -72,7 +72,10 @@ class EditarEntidad extends StatelessWidget {
           const SizedBox(height: 16),
 
           // Formulario
-          if (isPartida) EditPartida(form: form) else EditJugador(form: form),
+          if (isPartida)
+            EditPartida(key: const ValueKey('edit_partida'), form: form)
+          else
+            EditJugador(key: const ValueKey('edit_jugador'), form: form),
           const SizedBox(height: 16),
 
           // Botones de acción
@@ -142,27 +145,94 @@ class EditarEntidad extends StatelessWidget {
   }
 }
 
-class EditJugador extends StatelessWidget {
+class EditJugador extends StatefulWidget {
   const EditJugador({Key? key, required this.form}) : super(key: key);
 
   final FormGroup form;
 
   @override
+  State<EditJugador> createState() => _EditJugadorState();
+}
+
+class _EditJugadorState extends State<EditJugador> {
+  late final FocusNode _focusNode;
+  bool _focusRequested = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+    _requestFocusOnce();
+  }
+
+  void _requestFocusOnce() {
+    if (_focusRequested) return;
+    _focusRequested = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 350), () {
+        if (mounted && !_focusNode.hasFocus) _focusNode.requestFocus();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Expanded(
         child: ReactiveForm(
-      formGroup: form,
+      formGroup: widget.form,
       child: Column(children: <Widget>[
-        CustomReactiveInput(formControlName: 'nombre', labelText: AppLocalizations.of(context)!.name, textCapitalization: TextCapitalization.words)
+        CustomReactiveInput(
+            key: const ValueKey('edit_jugador_nombre'),
+            formControlName: 'nombre',
+            labelText: AppLocalizations.of(context)!.name,
+            textCapitalization: TextCapitalization.words,
+            focusNode: _focusNode)
       ]),
     ));
   }
 }
 
-class EditPartida extends StatelessWidget {
+class EditPartida extends StatefulWidget {
   const EditPartida({Key? key, required this.form}) : super(key: key);
 
   final FormGroup form;
+
+  @override
+  State<EditPartida> createState() => _EditPartidaState();
+}
+
+class _EditPartidaState extends State<EditPartida> {
+  late final FocusNode _focusNode;
+  bool _focusRequested = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+    _requestFocusOnce();
+  }
+
+  void _requestFocusOnce() {
+    if (_focusRequested) return;
+    _focusRequested = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 350), () {
+        if (mounted && !_focusNode.hasFocus) _focusNode.requestFocus();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -173,10 +243,14 @@ class EditPartida extends StatelessWidget {
 
         return Expanded(
             child: ReactiveForm(
-          formGroup: form,
+          formGroup: widget.form,
           child: Column(children: <Widget>[
             CustomReactiveInput(
-                formControlName: 'nombre', labelText: AppLocalizations.of(context)!.name, textCapitalization: TextCapitalization.words),
+                key: const ValueKey('edit_partida_nombre'),
+                formControlName: 'nombre',
+                labelText: AppLocalizations.of(context)!.name,
+                textCapitalization: TextCapitalization.words,
+                focusNode: _focusNode),
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

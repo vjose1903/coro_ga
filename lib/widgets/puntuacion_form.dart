@@ -10,8 +10,8 @@ import '../screens/ganador.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 import '../utils/utils.dart';
-import 'widgets.dart';
 import 'slide_up_header.dart';
+import 'widgets.dart';
 
 class PuntuacionForm extends StatelessWidget {
   const PuntuacionForm({Key? key, required this.panelController}) : super(key: key);

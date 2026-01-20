@@ -15,6 +15,7 @@ class CustomReactiveInput extends StatelessWidget {
   final bool enabled;
   final bool? autoFocus;
   final TextCapitalization? textCapitalization;
+  final FocusNode? focusNode;
 
   final int? maxLength;
 
@@ -32,6 +33,7 @@ class CustomReactiveInput extends StatelessWidget {
     this.autoFocus = false,
     this.maxLength,
     this.textCapitalization = TextCapitalization.none,
+    this.focusNode,
   }) : super(key: key);
 
   @override
@@ -39,6 +41,7 @@ class CustomReactiveInput extends StatelessWidget {
     return ReactiveTextField(
         key: key,
         formControlName: formControlName,
+        focusNode: focusNode,
         autofocus: autoFocus!,
         keyboardType: inputType,
         obscureText: obscureText,
@@ -70,8 +73,8 @@ class CustomReactiveInput extends StatelessWidget {
         ),
         showErrors: (control) => control.invalid && (control.touched || control.dirty),
         validationMessages: {
-              'required': (error) => L10n.fieldRequired,
-              'min': (error) => L10n.minValue((error as Map)["min"].toString()),
-            });
+          'required': (error) => L10n.fieldRequired,
+          'min': (error) => L10n.minValue((error as Map)["min"].toString()),
+        });
   }
 }
