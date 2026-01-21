@@ -31,6 +31,13 @@ class SlideUpProvider extends ChangeNotifier {
     }
   }
 
+  void setDraggable(bool value) {
+    if (_isDraggable != value) {
+      _isDraggable = value;
+      notifyListeners();
+    }
+  }
+
   void openSlideUp({
     required PanelController controller,
     Widget? bodyContent,

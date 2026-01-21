@@ -87,15 +87,15 @@ class _Body extends StatelessWidget {
 
       return Container(
           height: ((ResponsiveApp.size.height - (ResponsiveApp.size.height * 0.125)) - 80),
-          margin: const EdgeInsets.only(top: 15, bottom: 40),
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          margin: ResponsiveApp.only(top: 15, bottom: 40),
+          padding: ResponsiveApp.symmetric(horizontal: 20),
           child: ReactiveForm(
             formGroup: form,
             child: IntrinsicHeight(
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                   // Botón plantillas
                   Align(
                     alignment: Alignment.centerRight,
@@ -223,7 +223,7 @@ class _PlantillasButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(10),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: ResponsiveApp.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -314,8 +314,8 @@ class _JugadoresSection extends StatelessWidget {
               ),
             ),
             Container(
-              margin: const EdgeInsets.only(left: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            margin: ResponsiveApp.only(left: 10),
+            padding: ResponsiveApp.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: AppThemes.colorTercero.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(12),
@@ -348,8 +348,8 @@ class _JugadoresSection extends StatelessWidget {
       Toast.show(
           type: ToastType.info,
           context: context,
-          message: AppLocalizations.of(context)!.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
-          actionLabel: AppLocalizations.of(context)!.getPro,
+          message: l10n.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
+          actionLabel: l10n.getPro,
           onAction: () => Navigator.pushNamed(context, 'premium'));
       return;
     }
@@ -365,7 +365,8 @@ class _JugadoresSection extends StatelessWidget {
     });
 
     if (formPartidaProvider.jugadores.length == 20) {
-      Toast.show(type: ToastType.info, context: context, message: AppLocalizations.of(context)!.maxPlayersReached);
+      final l10n = AppLocalizations.of(context)!;
+      Toast.show(type: ToastType.info, context: context, message: l10n.maxPlayersReached);
     }
   }
 }
@@ -425,7 +426,7 @@ class _CreateButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          padding: ResponsiveApp.symmetric(vertical: 14),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               colors: [Color(0xFF66BB6A), Color(0xFF43A047)],

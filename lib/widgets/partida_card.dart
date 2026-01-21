@@ -1,6 +1,7 @@
 import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
@@ -45,7 +46,7 @@ class _PartidaCardState extends State<PartidaCard> {
     return Container(
       decoration: BoxDecoration(
         color: AppThemes.themeColor_2,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: ResponsiveApp.borderRadius(16),
         border: Border.all(
           color: Preferences.isDarkMode
               ? Colors.white.withValues(alpha: 0.08)
@@ -62,7 +63,7 @@ class _PartidaCardState extends State<PartidaCard> {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: ResponsiveApp.borderRadius(16),
         child: SwipeActionCell(
           backgroundColor: Colors.transparent,
           key: ValueKey(widget.partida.id),
@@ -73,7 +74,7 @@ class _PartidaCardState extends State<PartidaCard> {
                 icon: const Icon(Icons.delete_outline_rounded,
                     color: Colors.white, size: 22),
                 title: l10n.delete,
-                style: const TextStyle(fontFamily: 'Poppins', fontSize: 12),
+                style: TextStyle(fontFamily: 'Poppins', fontSize: ResponsiveApp.scaleText(12)),
                 onTap: (CompletionHandler handler) async =>
                     widget.functionBorrar(handler),
                 color: Colors.red[400]!),
@@ -82,7 +83,7 @@ class _PartidaCardState extends State<PartidaCard> {
                   icon: const Icon(Icons.restart_alt_rounded,
                       color: Colors.white, size: 22),
                   title: l10n.restart,
-                  style: const TextStyle(fontFamily: 'Poppins', fontSize: 12),
+                  style: TextStyle(fontFamily: 'Poppins', fontSize: ResponsiveApp.scaleText(12)),
                   onTap: (CompletionHandler handler) async {
                     CustomAlertDialog.show(
                       context,
@@ -113,7 +114,7 @@ class _PartidaCardState extends State<PartidaCard> {
                 icon: const Icon(Icons.edit_outlined,
                     color: Colors.white, size: 22),
                 title: l10n.edit,
-                style: const TextStyle(fontFamily: 'Poppins', fontSize: 12),
+                style: TextStyle(fontFamily: 'Poppins', fontSize: ResponsiveApp.scaleText(12)),
                 onTap: (CompletionHandler handler) async {
                   widget.functionEditar();
                   await handler(false);
@@ -126,9 +127,9 @@ class _PartidaCardState extends State<PartidaCard> {
               onTap: () => widget.onTap(),
               onLongPress: () => _swipeController.openCellAt(
                   index: widget.index, trailing: true),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: ResponsiveApp.borderRadius(16),
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: ResponsiveApp.all(16),
                 child: Row(
                   children: [
                     Expanded(
@@ -145,7 +146,7 @@ class _PartidaCardState extends State<PartidaCard> {
                                   style: TextStyle(
                                     fontFamily: 'Poppins',
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 16,
+                                    fontSize: ResponsiveApp.scaleText(16),
                                     color: Preferences.isDarkMode
                                         ? Colors.white
                                         : AppThemes.colorCuarto,
@@ -153,12 +154,12 @@ class _PartidaCardState extends State<PartidaCard> {
                                 ),
                               ),
                               Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 4),
+                                padding:
+                                    ResponsiveApp.symmetric(horizontal: 10, vertical: 4),
                                 decoration: BoxDecoration(
                                   color: AppThemes.colorPrimero
                                       .withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius: ResponsiveApp.borderRadius(20),
                                 ),
                                 child: Text(
                                   widget.partida.tipo == "Rondas" 
@@ -167,7 +168,7 @@ class _PartidaCardState extends State<PartidaCard> {
                                   style: TextStyle(
                                     fontFamily: 'Poppins',
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 10,
+                                    fontSize: ResponsiveApp.scaleText(10),
                                     letterSpacing: 0.5,
                                     color: AppThemes.colorPrimero,
                                   ),
@@ -175,14 +176,14 @@ class _PartidaCardState extends State<PartidaCard> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 12),
+                          SizedBox(height: ResponsiveApp.scaleHeight(12)),
                           Row(
                             children: [
                               _InfoChip(
                                 icon: FontAwesomeIcons.users,
                                 label: widget.partida.cantJugadores.toString(),
                               ),
-                              const SizedBox(width: 12),
+                              SizedBox(width: ResponsiveApp.scaleWidth(12)),
                               Expanded(
                                   child:
                                       EstadoPartida(partida: widget.partida)),
@@ -191,10 +192,10 @@ class _PartidaCardState extends State<PartidaCard> {
                         ],
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: ResponsiveApp.scaleWidth(8)),
                     // Flecha
                     Container(
-                      padding: const EdgeInsets.all(8),
+                    padding: ResponsiveApp.all(8),
                       decoration: BoxDecoration(
                         color: Preferences.isDarkMode
                             ? Colors.white.withValues(alpha: 0.05)
@@ -227,23 +228,23 @@ class _InfoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: Preferences.isDarkMode
-            ? Colors.white.withValues(alpha: 0.08)
-            : Colors.grey.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
-      ),
+      padding: ResponsiveApp.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: Preferences.isDarkMode
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.grey.withValues(alpha: 0.1),
+          borderRadius: ResponsiveApp.borderRadius(20),
+        ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          FaIcon(icon, size: 12, color: Colors.grey[500]),
-          const SizedBox(width: 6),
+          FaIcon(icon, size: ResponsiveApp.scaleWidth(12), color: Colors.grey[500]),
+          SizedBox(width: ResponsiveApp.scaleWidth(6)),
           Text(
             label,
             style: TextStyle(
               color: Colors.grey[600],
-              fontSize: 13,
+              fontSize: ResponsiveApp.scaleText(13),
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w500,
             ),
@@ -292,21 +293,21 @@ class _EstadoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(20),
-      ),
+      padding: ResponsiveApp.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          borderRadius: ResponsiveApp.borderRadius(20),
+        ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: color),
-          const SizedBox(width: 5),
+          Icon(icon, size: ResponsiveApp.scaleWidth(14), color: color),
+          SizedBox(width: ResponsiveApp.scaleWidth(5)),
           Text(
             label,
             style: TextStyle(
               color: color,
-              fontSize: 12,
+              fontSize: ResponsiveApp.scaleText(12),
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w600,
             ),
@@ -341,7 +342,7 @@ class _GanadorPerdedor extends StatelessWidget {
             color: Colors.green,
           ),
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: ResponsiveApp.scaleWidth(8)),
         Flexible(
           child: _PlayerStatus(
             icon: Icons.trending_down_rounded,
@@ -370,16 +371,16 @@ class _PlayerStatus extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      padding: ResponsiveApp.symmetric(horizontal: 8, vertical: 5),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: ResponsiveApp.borderRadius(16),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: color),
-          const SizedBox(width: 4),
+          Icon(icon, size: ResponsiveApp.scaleWidth(12), color: color),
+          SizedBox(width: ResponsiveApp.scaleWidth(4)),
           Flexible(
             child: Text(
               name,
@@ -387,18 +388,18 @@ class _PlayerStatus extends StatelessWidget {
               maxLines: 1,
               style: TextStyle(
                 color: color,
-                fontSize: 11,
+                fontSize: ResponsiveApp.scaleText(11),
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
-          const SizedBox(width: 5),
+          SizedBox(width: ResponsiveApp.scaleWidth(5)),
           Text(
             puntuacion.toString(),
             style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 11,
+                fontSize: ResponsiveApp.scaleText(11),
                 fontWeight: FontWeight.w900,
                 color: color),
           )

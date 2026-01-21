@@ -50,7 +50,7 @@ class EditarEntidad extends StatelessWidget {
 
     return Container(
       height: double.infinity,
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: ResponsiveApp.only(bottom: 10),
       child: Column(
         children: [
           // Header con avatar e información
@@ -69,14 +69,14 @@ class EditarEntidad extends StatelessWidget {
                   }
                 : null,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: ResponsiveApp.scaleHeight(16)),
 
           // Formulario
           if (isPartida)
             EditPartida(key: const ValueKey('edit_partida'), form: form)
           else
             EditJugador(key: const ValueKey('edit_jugador'), form: form),
-          const SizedBox(height: 16),
+          SizedBox(height: ResponsiveApp.scaleHeight(16)),
 
           // Botones de acción
           Row(
@@ -103,7 +103,7 @@ class EditarEntidad extends StatelessWidget {
                   },
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: ResponsiveApp.scaleWidth(12)),
               // ACEPTAR
               Expanded(
                 child: _ActionButton(
@@ -126,7 +126,7 @@ class EditarEntidad extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 25),
+          SizedBox(height: ResponsiveApp.scaleHeight(25)),
           // Anuncio separado de los botones de acción
           GoogleBannerAd(location: AdLocation.editarEntidad)
         ],
@@ -251,7 +251,7 @@ class _EditPartidaState extends State<EditPartida> {
                 labelText: AppLocalizations.of(context)!.name,
                 textCapitalization: TextCapitalization.words,
                 focusNode: _focusNode),
-            const SizedBox(height: 10),
+            SizedBox(height: ResponsiveApp.scaleHeight(10)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -366,8 +366,8 @@ class _EditHeader extends StatelessWidget {
       children: [
         // Avatar con icono
         Container(
-          width: 42,
-          height: 42,
+          width: ResponsiveApp.scaleWidth(42),
+          height: ResponsiveApp.scaleHeight(42),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -377,12 +377,12 @@ class _EditHeader extends StatelessWidget {
                 AppThemes.colorPrimero.withValues(alpha: 0.7),
               ],
             ),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: ResponsiveApp.borderRadius(12),
             boxShadow: [
               BoxShadow(
                 color: AppThemes.colorPrimero.withValues(alpha: 0.3),
                 blurRadius: 6,
-                offset: const Offset(0, 3),
+                offset: Offset(0, ResponsiveApp.scaleHeight(3)),
               ),
             ],
           ),
@@ -390,11 +390,11 @@ class _EditHeader extends StatelessWidget {
             child: FaIcon(
               icon,
               color: Colors.white,
-              size: 18,
+              size: ResponsiveApp.scaleWidth(18),
             ),
           ),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: ResponsiveApp.scaleWidth(12)),
 
         // Información
         Expanded(
@@ -404,18 +404,18 @@ class _EditHeader extends StatelessWidget {
               Text(
                 "${l10n.edit} $tipo",
                 style: TextStyle(
-                  fontFamily: "Poppins",
-                  fontSize: 11,
+              fontFamily: "Poppins",
+              fontSize: ResponsiveApp.scaleText(11),
                   color: isDark ? Colors.grey[400] : Colors.grey[600],
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 1),
+          SizedBox(height: ResponsiveApp.scaleHeight(1)),
               Text(
                 nombre.isNotEmpty ? nombre : l10n.noName,
                 style: TextStyle(
                   fontFamily: "Poppins",
-                  fontSize: 16,
+              fontSize: ResponsiveApp.scaleText(16),
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.white : AppThemes.colorQuinto,
                 ),
@@ -452,16 +452,16 @@ class _EditHeader extends StatelessWidget {
                   ],
                 );
               },
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: ResponsiveApp.borderRadius(10),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: ResponsiveApp.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [Color(0xFFFFB300), Color(0xFFFF8F00)],
                   ),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: ResponsiveApp.borderRadius(10),
                   boxShadow: [
                     BoxShadow(
                       color: const Color(0xFFFFA000).withValues(alpha: 0.3),
@@ -473,13 +473,14 @@ class _EditHeader extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.restart_alt_rounded, color: Colors.white, size: 16),
-                    const SizedBox(width: 4),
+                    Icon(Icons.restart_alt_rounded,
+                        color: Colors.white, size: ResponsiveApp.scaleWidth(16)),
+                    SizedBox(width: ResponsiveApp.scaleWidth(4)),
                     Text(
                       l10n.restart,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: "Poppins",
-                        fontSize: 12,
+                        fontSize: ResponsiveApp.scaleText(12),
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
                       ),
@@ -508,7 +509,7 @@ class _HeaderContainer extends StatelessWidget {
     final isDark = Preferences.isDarkMode;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: ResponsiveApp.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -517,7 +518,7 @@ class _HeaderContainer extends StatelessWidget {
               ? [Colors.white.withValues(alpha: 0.08), Colors.white.withValues(alpha: 0.03)]
               : [AppThemes.colorPrimero.withValues(alpha: 0.08), AppThemes.colorPrimero.withValues(alpha: 0.03)],
         ),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: ResponsiveApp.borderRadius(14),
         border: Border.all(
           color: isDark ? Colors.white.withValues(alpha: 0.1) : AppThemes.colorPrimero.withValues(alpha: 0.15),
         ),
@@ -582,16 +583,16 @@ class _ActionButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: ResponsiveApp.borderRadius(12),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          padding: ResponsiveApp.symmetric(vertical: 14),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: gradientColors,
             ),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: ResponsiveApp.borderRadius(12),
             boxShadow: [
               BoxShadow(
                 color: (isPrimary
@@ -611,14 +612,14 @@ class _ActionButton extends StatelessWidget {
               FaIcon(
                 icon,
                 color: textColor,
-                size: 16,
+                size: ResponsiveApp.scaleWidth(16),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: ResponsiveApp.scaleWidth(8)),
               Text(
                 label,
                 style: TextStyle(
                   fontFamily: "Poppins",
-                  fontSize: 14,
+                  fontSize: ResponsiveApp.scaleText(14),
                   fontWeight: FontWeight.w600,
                   color: textColor,
                 ),

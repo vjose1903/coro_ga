@@ -1,6 +1,8 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
+import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/providers/providers.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
@@ -217,12 +219,12 @@ class _AppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: ResponsiveApp.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
             if (leading != null)
               Container(
-                margin: const EdgeInsets.only(right: 12),
+                margin: ResponsiveApp.only(right: 12),
                 child: leading!,
               ),
             if (title != null)
@@ -231,11 +233,11 @@ class _AppBar extends StatelessWidget {
                   title!,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.bold,
-                    fontSize: 20,
+                    fontSize: ResponsiveApp.scaleText(20),
                     letterSpacing: 1.5,
                     shadows: [
                       Shadow(
@@ -268,9 +270,9 @@ class _Body extends StatelessWidget {
       children: [
         SizedBox(height: appBarHeight),
         Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(topLeft: Radius.circular(50)),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(ResponsiveApp.scaleWidth(50))),
               color: AppThemes.themeColor_1,
               boxShadow: [
                 BoxShadow(
@@ -280,8 +282,8 @@ class _Body extends StatelessWidget {
                 ),
               ],
             ),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(topLeft: Radius.circular(50)),
+              child: ClipRRect(
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(ResponsiveApp.scaleWidth(50))),
               child: child,
             ),
           ),
@@ -309,9 +311,9 @@ class _SlideUpContent extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(ResponsiveApp.scaleWidth(24)),
+          topRight: Radius.circular(ResponsiveApp.scaleWidth(24)),
         ),
         color: AppThemes.themeColor_2,
       ),
@@ -322,7 +324,7 @@ class _SlideUpContent extends StatelessWidget {
           // Contenido
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(right: 12, left: 12, bottom: 16),
+              padding: ResponsiveApp.only(right: 12, left: 12, bottom: 16),
               child: KeyedSubtree(
                 key: ValueKey('body_${themeProvider.isDarkMode}'),
                 child: SlideUpScrollController(
@@ -345,13 +347,13 @@ class _PanelHandle extends StatelessWidget {
     final isDark = Preferences.isDarkMode;
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: ResponsiveApp.symmetric(vertical: 12),
       child: Container(
-        width: 40,
-        height: 5,
+        width: ResponsiveApp.scaleWidth(40),
+        height: ResponsiveApp.scaleHeight(5),
         decoration: BoxDecoration(
           color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.3),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(ResponsiveApp.scaleWidth(10)),
           boxShadow: [
             if (!isDark)
               BoxShadow(

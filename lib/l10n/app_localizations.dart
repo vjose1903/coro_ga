@@ -997,6 +997,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View Full Privacy Policy'**
   String get viewFullPrivacyPolicy;
+
+  /// No description provided for @reviewCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you like the app?'**
+  String get reviewCardTitle;
+
+  /// No description provided for @reviewCardDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Your rating keeps Coro Games improving. Leave it on the store so other players can discover it.'**
+  String get reviewCardDescription;
+
+  /// No description provided for @reviewCardButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate now'**
+  String get reviewCardButton;
+
+  /// No description provided for @reviewFallbackMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open the review prompt. Search for Coro Games in the store to leave your feedback.'**
+  String get reviewFallbackMessage;
 }
 
 class _AppLocalizationsDelegate

@@ -503,4 +503,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get viewFullPrivacyPolicy => 'View Full Privacy Policy';
+
+  @override
+  String get reviewCardTitle => 'Do you like the app?';
+
+  @override
+  String get reviewCardDescription =>
+      'Your rating keeps Coro Games improving. Leave it on the store so other players can discover it.';
+
+  @override
+  String get reviewCardButton => 'Rate now';
+
+  @override
+  String get reviewFallbackMessage =>
+      'Unable to open the review prompt. Search for Coro Games in the store to leave your feedback.';
 }

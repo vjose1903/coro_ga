@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
@@ -37,8 +38,7 @@ class MainHome extends StatefulWidget {
   State<MainHome> createState() => _MainHomeState();
 }
 
-class _MainHomeState extends State<MainHome>
-    with SingleTickerProviderStateMixin {
+class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin {
   late final PanelController panelController;
   late final AnimationController _fabAnimController;
 
@@ -82,15 +82,11 @@ class _MainHomeState extends State<MainHome>
 
   void openMenuSlideUp() {
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
-    slideUpProvider.openSlideUp(
-        controller: panelController,
-        bodyContent: _Menu(panelController: panelController),
-        isDraggable: true);
+    slideUpProvider.openSlideUp(controller: panelController, bodyContent: _Menu(panelController: panelController), isDraggable: true);
   }
 
   void navigateToForm() {
-    FormPartidaProvider formPartidaProvider =
-        context.read<FormPartidaProvider>();
+    FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
     formPartidaProvider.resetForm();
     Navigator.pushNamed(context, 'formulario');
   }
@@ -112,13 +108,11 @@ class _MainHomeState extends State<MainHome>
             panelController: panelController,
           ),
           floatingActionButton: Padding(
-            padding: const EdgeInsets.only(bottom: 40),
+            padding: ResponsiveApp.only(bottom: 40),
             child: Visibility(
-              visible:
-                  !panelController.isAttached || panelController.isPanelClosed,
+              visible: !panelController.isAttached || panelController.isPanelClosed,
               child: ScaleTransition(
-                scale: CurvedAnimation(
-                    parent: _fabAnimController, curve: Curves.elasticOut),
+                scale: CurvedAnimation(parent: _fabAnimController, curve: Curves.elasticOut),
                 child: Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
@@ -140,27 +134,21 @@ class _MainHomeState extends State<MainHome>
                     elevation: 0,
                     shape: const CircleBorder(),
                     onPressed: () {
-                      final PartidaProvider partidaProvider =
-                          context.read<PartidaProvider>();
-                      final PremiumProvider premiumProvider =
-                          context.read<PremiumProvider>();
+                      final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+                      final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
-                      if (premiumProvider
-                          .canCreateGame(partidaProvider.partidas.length)) {
+                      if (premiumProvider.canCreateGame(partidaProvider.partidas.length)) {
                         navigateToForm();
                       } else {
                         Toast.show(
                             type: ToastType.info,
                             context: context,
-                            message: l10n.freeVersionLimitGames(
-                                PremiumProvider.freeMaxGames),
+                            message: l10n.freeVersionLimitGames(PremiumProvider.freeMaxGames),
                             actionLabel: l10n.getPro,
-                            onAction: () =>
-                                Navigator.pushNamed(context, 'premium'));
+                            onAction: () => Navigator.pushNamed(context, 'premium'));
                       }
                     },
-                    child: const Icon(Icons.add_rounded,
-                        size: 32, color: Colors.white),
+                    child: const Icon(Icons.add_rounded, size: 32, color: Colors.white),
                   ),
                 ),
               ),
@@ -198,7 +186,7 @@ class _Body extends StatelessWidget {
         Expanded(child: ListPartidas(panelController: panelController)),
         // Banner de anuncios
         Padding(
-          padding: const EdgeInsets.only(bottom: 16),
+          padding: ResponsiveApp.only(bottom: 16),
           child: GoogleBannerAd(location: AdLocation.home),
         ),
       ],
@@ -207,8 +195,7 @@ class _Body extends StatelessWidget {
 }
 
 class ListPartidas extends StatelessWidget {
-  const ListPartidas({Key? key, required this.panelController})
-      : super(key: key);
+  const ListPartidas({Key? key, required this.panelController}) : super(key: key);
   final PanelController panelController;
 
   @override
@@ -223,18 +210,16 @@ class ListPartidas extends StatelessWidget {
 
     return ListView.builder(
       itemCount: partidas.length,
-      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+      padding: ResponsiveApp.symmetric(vertical: 30, horizontal: 20),
       physics: const BouncingScrollPhysics(),
       addAutomaticKeepAlives: true,
       cacheExtent: 300,
       itemBuilder: (_, index) {
         final partida = partidas[index];
         return Padding(
-          padding:
-              EdgeInsets.only(bottom: index < partidas.length - 1 ? 16 : 0),
+          padding: EdgeInsets.only(bottom: index < partidas.length - 1 ? 16 : 0),
           child: FadeInUp(
-            duration:
-                Duration(milliseconds: 300 + (index < 5 ? index * 50 : 250)),
+            duration: Duration(milliseconds: 300 + (index < 5 ? index * 50 : 250)),
             child: PartidaCard(
               partida: partida,
               onTap: () {
@@ -255,27 +240,17 @@ class ListPartidas extends StatelessWidget {
                           handler(false);
                         }
                       }),
-                      CustomActionsButtons.aceptarButton({
-                        "label": l10n.accept,
-                        "onTap": () =>
-                            removePartida(context, handler, partidas, index)
-                      })
+                      CustomActionsButtons.aceptarButton({"label": l10n.accept, "onTap": () => removePartida(context, handler, partidas, index)})
                     ]);
               },
               functionEditar: () {
-                FormPartidaProvider formPartidaProvider =
-                    context.read<FormPartidaProvider>();
+                FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
                 SlideUpProvider slideUp = context.read<SlideUpProvider>();
-                context
-                    .read<BannerPrefetchService>()
-                    .ensurePrefetched(AdLocation.editarEntidad);
+                context.read<BannerPrefetchService>().ensurePrefetched(AdLocation.editarEntidad);
                 formPartidaProvider.form.patchValue(partida.toMap());
                 partidaProvider.partidaEditar = partida;
                 slideUp.openSlideUp(
-                    controller: panelController,
-                    maxHeightFraction: 0.5,
-                    bodyContent:
-                        EditarEntidad(panelController: panelController));
+                    controller: panelController, maxHeightFraction: 0.5, bodyContent: EditarEntidad(panelController: panelController));
               },
               functionReiniciar: () async {
                 await partida.restartPartida();
@@ -289,12 +264,10 @@ class ListPartidas extends StatelessWidget {
     );
   }
 
-  Future removePartida(BuildContext context, CompletionHandler handler,
-      List<Partida> partidas, int index) async {
+  Future removePartida(BuildContext context, CompletionHandler handler, List<Partida> partidas, int index) async {
     Navigator.pop(context);
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-    return partidaProvider.deletePartida(context,
-        partida: partidas[index], handler: handler);
+    return partidaProvider.deletePartida(context, partida: partidas[index], handler: handler);
   }
 }
 
@@ -307,7 +280,7 @@ class _EmptyState extends StatelessWidget {
       child: FadeIn(
         duration: const Duration(milliseconds: 600),
         child: Padding(
-          padding: const EdgeInsets.all(40),
+          padding: ResponsiveApp.all(40),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -345,9 +318,7 @@ class _EmptyState extends StatelessWidget {
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w600,
                         fontSize: 20,
-                        color: Preferences.isDarkMode
-                            ? Colors.white.withValues(alpha: 0.9)
-                            : AppThemes.colorCuarto,
+                        color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.9) : AppThemes.colorCuarto,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -363,8 +334,7 @@ class _EmptyState extends StatelessWidget {
                     ),
                     const SizedBox(height: 32),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
+                      padding: ResponsiveApp.symmetric(horizontal: 20, vertical: 10),
                       decoration: BoxDecoration(
                         color: AppThemes.colorPrimero.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(30),
@@ -376,8 +346,7 @@ class _EmptyState extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.swipe_left_rounded,
-                              size: 18, color: AppThemes.colorPrimero),
+                          Icon(Icons.swipe_left_rounded, size: 18, color: AppThemes.colorPrimero),
                           const SizedBox(width: 8),
                           Text(
                             l10n.swipeToEditOrDelete,
@@ -442,6 +411,33 @@ class _Menu extends StatefulWidget {
 }
 
 class _MenuState extends State<_Menu> {
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_handleScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<SlideUpProvider>().setDraggable(true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_handleScroll)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _handleScroll() {
+    if (!mounted || !_scrollController.hasClients) return;
+    final slideUpProvider = context.read<SlideUpProvider>();
+    slideUpProvider.setDraggable(_scrollController.offset <= 0);
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeProvider themeProvider = context.watch<ThemeProvider>();
@@ -449,18 +445,18 @@ class _MenuState extends State<_Menu> {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      padding: const EdgeInsets.only(top: 5, bottom: 20),
+      padding: ResponsiveApp.only(top: 5, bottom: 20),
       child: SingleChildScrollView(
+        controller: _scrollController,
         physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header con logo
             Padding(
-              padding: const EdgeInsets.only(left: 4),
+              padding: ResponsiveApp.only(left: 4),
               child: Consumer<PremiumProvider>(
-                builder: (context, premiumProvider, child) =>
-                    _MenuHeader(isPremium: premiumProvider.isPremium),
+                builder: (context, premiumProvider, child) => _MenuHeader(isPremium: premiumProvider.isPremium),
               ),
             ),
             const SizedBox(height: 24),
@@ -477,21 +473,17 @@ class _MenuState extends State<_Menu> {
                     value: Preferences.isSystemMode,
                     onChanged: (value) {
                       Preferences.isSystemMode = value;
-                      Preferences.isDarkMode =
-                          PlatformDispatcher.instance.platformBrightness ==
-                              Brightness.dark;
+                      Preferences.isDarkMode = PlatformDispatcher.instance.platformBrightness == Brightness.dark;
                       themeProvider.changeCurrentTheme();
                       setState(() {});
                     },
                   ),
                   AnimatedCrossFade(
                     duration: const Duration(milliseconds: 300),
-                    crossFadeState: Preferences.isSystemMode
-                        ? CrossFadeState.showFirst
-                        : CrossFadeState.showSecond,
+                    crossFadeState: Preferences.isSystemMode ? CrossFadeState.showFirst : CrossFadeState.showSecond,
                     firstChild: const SizedBox(height: 0),
                     secondChild: Padding(
-                      padding: const EdgeInsets.only(top: 12),
+                      padding: ResponsiveApp.only(top: 12),
                       child: _ThemeSwitcher(
                         isDark: Preferences.isDarkMode,
                         onTap: () {
@@ -524,17 +516,17 @@ class _MenuState extends State<_Menu> {
                   onTap: () {
                     final navigator = Navigator.of(context);
                     final slideUpProvider = context.read<SlideUpProvider>();
-                    slideUpProvider.closeSlideUp(
-                        controller: widget.panelController);
+                    slideUpProvider.closeSlideUp(controller: widget.panelController);
                     Future.delayed(const Duration(milliseconds: 300), () {
                       navigator.pushNamed('premium');
                     });
                   },
-                  onSimulateChanged: (value) =>
-                      premiumProvider.setSimulatePremium(value),
+                  onSimulateChanged: (value) => premiumProvider.setSimulatePremium(value),
                 );
               },
             ),
+            const SizedBox(height: 16),
+            const _ReviewSection(),
             const SizedBox(height: 16),
 
             // Sección Acerca de
@@ -560,14 +552,12 @@ class _MenuHeader extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
-                color: Colors.black
-                    .withValues(alpha: Preferences.isDarkMode ? 0.3 : 0.12),
+                color: Colors.black.withValues(alpha: Preferences.isDarkMode ? 0.3 : 0.12),
                 blurRadius: 8,
                 offset: const Offset(3, 3),
               ),
               BoxShadow(
-                color: Colors.white
-                    .withValues(alpha: Preferences.isDarkMode ? 0.08 : 0.75),
+                color: Colors.white.withValues(alpha: Preferences.isDarkMode ? 0.08 : 0.75),
                 blurRadius: 8,
                 offset: const Offset(-3, -3),
               ),
@@ -592,9 +582,7 @@ class _MenuHeader extends StatelessWidget {
                 Text(
                   AppLocalizations.of(context)!.appTitle,
                   style: TextStyle(
-                    color: Preferences.isDarkMode
-                        ? Colors.white
-                        : AppThemes.colorCuarto,
+                    color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.bold,
                     fontSize: 22,
@@ -604,8 +592,7 @@ class _MenuHeader extends StatelessWidget {
                 if (isPremium) ...[
                   const SizedBox(width: 8),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: ResponsiveApp.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
@@ -645,22 +632,17 @@ class _MenuSection extends StatelessWidget {
   final String title;
   final Widget child;
 
-  const _MenuSection(
-      {required this.icon, required this.title, required this.child});
+  const _MenuSection({required this.icon, required this.title, required this.child});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: ResponsiveApp.all(16),
       decoration: BoxDecoration(
-        color: Preferences.isDarkMode
-            ? Colors.white.withValues(alpha: 0.05)
-            : Colors.grey.withValues(alpha: 0.08),
+        color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.05) : Colors.grey.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Preferences.isDarkMode
-              ? Colors.white.withValues(alpha: 0.08)
-              : Colors.grey.withValues(alpha: 0.15),
+          color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
           width: 1,
         ),
       ),
@@ -670,7 +652,7 @@ class _MenuSection extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: ResponsiveApp.all(8),
                 decoration: BoxDecoration(
                   color: AppThemes.colorPrimero.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
@@ -681,9 +663,7 @@ class _MenuSection extends StatelessWidget {
               Text(
                 title,
                 style: TextStyle(
-                  color: Preferences.isDarkMode
-                      ? Colors.white
-                      : AppThemes.colorCuarto,
+                  color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
@@ -723,9 +703,7 @@ class _ThemeToggleRow extends StatelessWidget {
               Text(
                 title,
                 style: TextStyle(
-                  color: Preferences.isDarkMode
-                      ? Colors.white.withValues(alpha: 0.9)
-                      : Colors.grey[800],
+                  color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.9) : Colors.grey[800],
                   fontFamily: 'Poppins',
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -764,7 +742,7 @@ class _ThemeSwitcher extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(4),
+        padding: ResponsiveApp.all(4),
         decoration: BoxDecoration(
           color: Preferences.isDarkMode ? Colors.grey[800] : Colors.grey[200],
           borderRadius: BorderRadius.circular(30),
@@ -794,25 +772,17 @@ class _ThemeOption extends StatelessWidget {
   final String label;
   final bool isSelected;
 
-  const _ThemeOption(
-      {required this.icon, required this.label, required this.isSelected});
+  const _ThemeOption({required this.icon, required this.label, required this.isSelected});
 
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: ResponsiveApp.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: isSelected ? AppThemes.colorPrimero : Colors.transparent,
         borderRadius: BorderRadius.circular(25),
-        boxShadow: isSelected
-            ? [
-                BoxShadow(
-                    color: AppThemes.colorPrimero.withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2))
-              ]
-            : null,
+        boxShadow: isSelected ? [BoxShadow(color: AppThemes.colorPrimero.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 2))] : null,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -856,7 +826,7 @@ class _PremiumCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: ResponsiveApp.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -877,35 +847,23 @@ class _PremiumCard extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: ResponsiveApp.all(12),
                   decoration: BoxDecoration(
-                    gradient: isPremium
-                        ? const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
-                          )
-                        : LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              AppThemes.colorPrimero,
-                              AppThemes.colorTercero
-                            ],
-                          ),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
+                    ),
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: isPremium
-                            ? const Color(0xFFFFD700).withValues(alpha: 0.4)
-                            : AppThemes.colorTercero.withValues(alpha: 0.3),
+                        color: AppThemes.colorTercero.withValues(alpha: 0.3),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
                     ],
                   ),
-                  child: Image.asset('assets/img/corona-pro.png',
-                      width: 28, height: 28),
+                  child: Image.asset('assets/img/corona-pro.png', width: 28, height: 28),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -915,13 +873,9 @@ class _PremiumCard extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            isPremium
-                                ? AppLocalizations.of(context)!.youArePro
-                                : AppLocalizations.of(context)!.getPro,
+                            isPremium ? AppLocalizations.of(context)!.youArePro : AppLocalizations.of(context)!.getPro,
                             style: TextStyle(
-                              color: Preferences.isDarkMode
-                                  ? Colors.white
-                                  : AppThemes.colorCuarto,
+                              color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.bold,
                               fontSize: 17,
@@ -930,8 +884,7 @@ class _PremiumCard extends StatelessWidget {
                           if (isPremium) ...[
                             const SizedBox(width: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 3),
+                              padding: ResponsiveApp.symmetric(horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
                                 color: Colors.green.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(20),
@@ -939,8 +892,7 @@ class _PremiumCard extends StatelessWidget {
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(Icons.check_circle,
-                                      size: 12, color: Colors.green),
+                                  const Icon(Icons.check_circle, size: 12, color: Colors.green),
                                   const SizedBox(width: 4),
                                   Text(
                                     AppLocalizations.of(context)!.active,
@@ -959,9 +911,7 @@ class _PremiumCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        isPremium
-                            ? AppLocalizations.of(context)!.allFeaturesUnlocked
-                            : AppLocalizations.of(context)!.noAdsUnlimitedGames,
+                        isPremium ? AppLocalizations.of(context)!.allFeaturesUnlocked : AppLocalizations.of(context)!.noAdsUnlimitedGames,
                         style: TextStyle(
                           color: Colors.grey[500],
                           fontFamily: 'Poppins',
@@ -973,30 +923,27 @@ class _PremiumCard extends StatelessWidget {
                 ),
                 if (!isPremium)
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: ResponsiveApp.all(8),
                     decoration: BoxDecoration(
                       color: AppThemes.colorPrimero.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.arrow_forward_ios_rounded,
-                        size: 16, color: AppThemes.colorPrimero),
+                    child: Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppThemes.colorPrimero),
                   ),
               ],
             ),
             if (kDebugMode) ...[
               const SizedBox(height: 12),
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: ResponsiveApp.all(10),
                 decoration: BoxDecoration(
                   color: Colors.orange.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
-                  border:
-                      Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                  border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.bug_report_rounded,
-                        size: 18, color: Colors.orange[700]),
+                    Icon(Icons.bug_report_rounded, size: 18, color: Colors.orange[700]),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -1032,22 +979,12 @@ class _LanguageSwitcher extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     final languages = [
-      {
-        'code': 'es',
-        'flag': '🇪🇸',
-        'short': 'ES',
-        'name': l10n.languageSpanish
-      },
-      {
-        'code': 'en',
-        'flag': '🇺🇸',
-        'short': 'EN',
-        'name': l10n.languageEnglish
-      },
+      {'code': 'es', 'flag': '🇪🇸', 'short': 'ES', 'name': l10n.languageSpanish},
+      {'code': 'en', 'flag': '🇺🇸', 'short': 'EN', 'name': l10n.languageEnglish},
     ];
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: ResponsiveApp.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
         color: Preferences.isDarkMode ? Colors.grey[800] : Colors.grey[200],
         borderRadius: BorderRadius.circular(12),
@@ -1056,8 +993,7 @@ class _LanguageSwitcher extends StatelessWidget {
         child: DropdownButton<String>(
           value: localeProvider.currentCode,
           isExpanded: true,
-          dropdownColor:
-              Preferences.isDarkMode ? Colors.grey[850] : Colors.white,
+          dropdownColor: Preferences.isDarkMode ? Colors.grey[850] : Colors.white,
           borderRadius: BorderRadius.circular(12),
           icon: Icon(
             Icons.keyboard_arrow_down_rounded,
@@ -1075,9 +1011,7 @@ class _LanguageSwitcher extends StatelessWidget {
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
-                      color: Preferences.isDarkMode
-                          ? Colors.white
-                          : Colors.grey[800],
+                      color: Preferences.isDarkMode ? Colors.white : Colors.grey[800],
                     ),
                   ),
                 ],
@@ -1096,9 +1030,7 @@ class _LanguageSwitcher extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 14,
-                      color: Preferences.isDarkMode
-                          ? Colors.white
-                          : Colors.grey[800],
+                      color: Preferences.isDarkMode ? Colors.white : Colors.grey[800],
                     ),
                   ),
                 ],
@@ -1114,75 +1046,110 @@ class _LanguageSwitcher extends StatelessWidget {
   }
 }
 
+class _MenuActionButton extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+  const _MenuActionButton({required this.icon, required this.title, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Preferences.isDarkMode;
+    final borderColor = isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15);
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Container(
+          padding: ResponsiveApp.all(16),
+          decoration: BoxDecoration(
+            color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: borderColor, width: 1),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: ResponsiveApp.all(8),
+                decoration: BoxDecoration(
+                  color: AppThemes.colorPrimero.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: FaIcon(icon, size: 18, color: AppThemes.colorPrimero),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : AppThemes.colorCuarto,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 16,
+                color: isDark ? Colors.white70 : Colors.grey[500],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ReviewSection extends StatelessWidget {
+  const _ReviewSection();
+
+  Future<void> _promptReview(BuildContext context, AppLocalizations l10n) async {
+    final inAppReview = InAppReview.instance;
+    try {
+      if (await inAppReview.isAvailable()) {
+        await inAppReview.requestReview();
+        return;
+      }
+    } catch (error) {
+      if (kDebugMode) debugPrint('Review request failed: $error');
+    }
+    Toast.info(context, message: l10n.reviewFallbackMessage);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return _MenuActionButton(
+      icon: FontAwesomeIcons.solidStar,
+      title: l10n.reviewCardTitle,
+      onTap: () => _promptReview(context, l10n),
+    );
+  }
+}
+
 class _AboutButton extends StatelessWidget {
   final PanelController panelController;
 
   const _AboutButton({required this.panelController});
 
+  void _openAbout(BuildContext context) {
+    final navigator = Navigator.of(context);
+    final slideUpProvider = context.read<SlideUpProvider>();
+    slideUpProvider.closeSlideUp(controller: panelController);
+    Future.delayed(const Duration(milliseconds: 300), () => navigator.pushNamed('about'));
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-
-    return GestureDetector(
-      onTap: () {
-        final navigator = Navigator.of(context);
-        final slideUpProvider = context.read<SlideUpProvider>();
-        slideUpProvider.closeSlideUp(controller: panelController);
-        Future.delayed(const Duration(milliseconds: 300), () {
-          navigator.pushNamed('about');
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Preferences.isDarkMode
-              ? Colors.white.withValues(alpha: 0.05)
-              : Colors.grey.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Preferences.isDarkMode
-                ? Colors.white.withValues(alpha: 0.08)
-                : Colors.grey.withValues(alpha: 0.15),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.grey.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.info_outline_rounded,
-                size: 20,
-                color:
-                    Preferences.isDarkMode ? Colors.white70 : Colors.grey[600],
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Text(
-                l10n.aboutTitle,
-                style: TextStyle(
-                  color: Preferences.isDarkMode
-                      ? Colors.white.withValues(alpha: 0.9)
-                      : Colors.grey[700],
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 15,
-                ),
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios_rounded,
-              size: 16,
-              color: Colors.grey[500],
-            ),
-          ],
-        ),
-      ),
+    return _MenuActionButton(
+      icon: FontAwesomeIcons.infoCircle,
+      title: l10n.aboutTitle,
+      onTap: () => _openAbout(context),
     );
   }
 }

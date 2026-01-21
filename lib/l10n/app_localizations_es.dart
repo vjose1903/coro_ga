@@ -512,4 +512,18 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get viewFullPrivacyPolicy => 'Ver Política de Privacidad Completa';
+
+  @override
+  String get reviewCardTitle => '¿Te gusta la app?';
+
+  @override
+  String get reviewCardDescription =>
+      'Tu calificación nos ayuda a seguir mejorando Coro Games. Déjala directamente en la tienda para que más jugadores nos encuentren.';
+
+  @override
+  String get reviewCardButton => 'Calificar ahora';
+
+  @override
+  String get reviewFallbackMessage =>
+      'No pudimos abrir el cuadro de reseñas. Busca Coro Games en la tienda para dejar tu opinión.';
 }

@@ -129,6 +129,14 @@ class _Body extends StatelessWidget {
         context.read<FormPartidaProvider>();
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
     Partida partida = partidaProvider.partidaEnTurno!;
+    final bool compactHeight = ResponsiveApp.isSmallHeight;
+    final double topMargin = compactHeight ? 24 : 40;
+    final double bottomMargin = compactHeight ? 60 : 90;
+    final double horizontalPadding = ResponsiveApp.scaleWidth(20);
+    final double contentSpacing = ResponsiveApp.scaleHeight(20);
+    final double betweenCardGap = compactHeight ? ResponsiveApp.scaleHeight(22) : ResponsiveApp.scaleHeight(25);
+    final double adSpacing = ResponsiveApp.scaleHeight(15);
+
     return Layout(
         panelController: panelController,
         hasFooter: true,
@@ -157,16 +165,16 @@ class _Body extends StatelessWidget {
           },
         ),
         bodyContent: Container(
-            margin: const EdgeInsets.only(top: 40, bottom: 90),
-            padding: const EdgeInsets.symmetric(horizontal: 25),
+            margin: EdgeInsets.only(top: topMargin, bottom: bottomMargin),
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             child: Column(children: [
               const CustomEstadoPartida(),
-              const SizedBox(height: 20),
+              SizedBox(height: contentSpacing),
               JugadoresCard(panelController: panelController),
-              const SizedBox(height: 25),
+              SizedBox(height: betweenCardGap),
               // Anuncio separado de la lista de jugadores
               anuncio,
-              const SizedBox(height: 15),
+              SizedBox(height: adSpacing),
             ])));
   }
 }
@@ -412,10 +420,18 @@ class _JugadorCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isWinner = estado == Estado.ganador;
     final bool isLoser = estado == Estado.perdedor;
+    final bool compactWidth = ResponsiveApp.isSmallWidth;
+    final double cardHeight = ResponsiveApp.scaleHeight(130);
+    final double cardWidth = ResponsiveApp.size.width * (compactWidth ? 0.48 : 0.4);
+    final double contentPadding = ResponsiveApp.scaleWidth(12);
+    final double nameFontSize = ResponsiveApp.scaleText(14);
+    final double scoreFontSize = ResponsiveApp.scaleText(42);
+    final double iconSize = ResponsiveApp.scaleWidth(14);
+    final double iconPadding = ResponsiveApp.scaleWidth(4);
 
     return Container(
-      height: 140,
-      width: ResponsiveApp.size.width * 0.4,
+      height: cardHeight,
+      width: cardWidth,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -452,8 +468,8 @@ class _JugadorCard extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
+              child: Padding(
+                padding: EdgeInsets.all(contentPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -464,7 +480,7 @@ class _JugadorCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 14,
+                    fontSize: nameFontSize,
                     fontWeight: FontWeight.w600,
                     color: Preferences.isDarkMode
                         ? AppThemes.colorPrimero
@@ -487,9 +503,9 @@ class _JugadorCard extends StatelessWidget {
                       ).createShader(bounds),
                       child: Text(
                         jugador.puntuacion.toString(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Poppins',
-                          fontSize: 42,
+                          fontSize: scoreFontSize,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -501,14 +517,14 @@ class _JugadorCard extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerRight,
                   child: Container(
-                    padding: const EdgeInsets.all(4),
+                    padding: EdgeInsets.all(iconPadding),
                     decoration: BoxDecoration(
                       color: config['bgColor'],
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
                       config['icon'],
-                      size: 14,
+                      size: iconSize,
                       color: config['color'],
                     ),
                   ),

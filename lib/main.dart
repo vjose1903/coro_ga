@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:game_score/helpers/helpers.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
@@ -166,7 +167,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           locale: localeProvider.locale,
           home: const HomeScreen(),
           builder: EasyLoading.init(
-            builder: (context, child) => child ?? const SizedBox.shrink(),
+            builder: (context, child) {
+              ResponsiveApp.setMq(context);
+              return child ?? const SizedBox.shrink();
+            },
           ),
           routes: AppRoutes.getAppRoutes(),
           theme: themeProvider.getCurrentTheme),
