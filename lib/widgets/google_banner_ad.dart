@@ -1,23 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/providers/premium_provider.dart';
+import 'package:game_score/services/banner_prefetch_service.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
-enum AdLocation {
-  home,
-  partida,
-  puntuacion,
-  agregarJugador,
-  editarEntidad,
-}
-
 class GoogleBannerAd extends StatefulWidget {
-  const GoogleBannerAd({Key? key, required this.location, this.onCloseAd})
-      : super(key: key);
+  const GoogleBannerAd({Key? key, required this.location, this.onCloseAd}) : super(key: key);
 
   final AdLocation location;
   final Function? onCloseAd;
@@ -29,83 +21,97 @@ class GoogleBannerAd extends StatefulWidget {
 class _GoogleBannerAdState extends State<GoogleBannerAd> {
   BannerAd? _bannerAd;
   bool _isHideSkeleton = false;
-  bool _isLoading = false;
+  bool _timerStarted = false;
+  bool _isRequesting = false;
+  late final BannerPrefetchService _bannerService;
 
   @override
   void initState() {
     super.initState();
-    _loadBannerAd();
+    _bannerService = context.read<BannerPrefetchService>();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _bannerService.ensurePrefetched(widget.location);
+      _requestBanner();
+      _startSkeletonTimer();
+    });
   }
 
   @override
-  void dispose() {
-    _disposeBannerAd();
-    super.dispose();
-  }
-
-  void _disposeBannerAd() {
-    _bannerAd?.dispose();
-    _bannerAd = null;
-  }
-
-  void _loadBannerAd() {
-    // Evitar cargar múltiples veces
-    if (_isLoading || _bannerAd != null) return;
-    _isLoading = true;
-
-    BannerAd(
-      adUnitId: AdHelper.getBannerAdUnitId(widget.location),
-      request: const AdRequest(),
-      size: AdSize.banner,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          if (mounted) {
-            setState(() {
-              _bannerAd = ad as BannerAd;
-              _isLoading = false;
-            });
-          }
-        },
-        onAdFailedToLoad: (ad, err) {
-          ad.dispose();
-          if (mounted) {
-            setState(() => _isLoading = false);
-          }
-        },
-      ),
-    ).load();
-
-    // Timeout: si no carga en 30s, ocultar skeleton
-    Future.delayed(const Duration(seconds: 30)).then((_) {
-      if (mounted && _bannerAd == null) {
-        setState(() => _isHideSkeleton = true);
+  void didUpdateWidget(covariant GoogleBannerAd oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.location != widget.location) {
+      if (_bannerAd != null) {
+        _bannerService.releaseBanner(oldWidget.location, _bannerAd!);
+        _bannerAd = null;
       }
+      _bannerService.ensurePrefetched(widget.location);
+      _requestBanner();
+    }
+  }
+
+  void _startSkeletonTimer() {
+    if (_timerStarted || _bannerAd != null) return;
+    _timerStarted = true;
+    Future.delayed(const Duration(seconds: 30)).then((_) {
+      if (!mounted) return;
+      if (_bannerAd == null) setState(() => _isHideSkeleton = true);
     });
+  }
+
+  void _requestBanner() {
+    if (_isRequesting || _bannerAd != null) return;
+    _isRequesting = true;
+    final readyAd = _bannerService.leaseReadyBanner(widget.location);
+    if (readyAd != null) {
+      setState(() {
+        _bannerAd = readyAd;
+        _isHideSkeleton = false;
+      });
+      _isRequesting = false;
+      return;
+    }
+
+    _bannerService.acquireBannerAd(widget.location).then((ad) {
+      if (!mounted) {
+        ad.dispose();
+        return;
+      }
+      setState(() {
+        _bannerAd = ad;
+        _isHideSkeleton = false;
+      });
+    }).catchError((_) {
+      // Ignorar errores silenciosamente.
+    }).whenComplete(() => _isRequesting = false);
   }
 
   @override
   Widget build(BuildContext context) {
     final premiumProvider = context.watch<PremiumProvider>();
+    final double width = _bannerAd?.size.width.toDouble() ?? 300;
+    final double height = _bannerAd?.size.height.toDouble() ?? 50;
 
     // No mostrar anuncios si es premium
-    if (premiumProvider.isPremium || _isHideSkeleton) {
+    if (premiumProvider.isPremium || (_isHideSkeleton && _bannerAd == null)) {
       return const SizedBox.shrink();
     }
 
+    if (_bannerAd != null && _isHideSkeleton) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _isHideSkeleton) setState(() => _isHideSkeleton = false);
+      });
+    }
+
     return Container(
-      width: 300,
+      width: width,
       alignment: Alignment.topCenter,
       child: _bannerAd == null
           ? Shimmer.fromColors(
-              baseColor: Preferences.isDarkMode
-                  ? Colors.grey[800]!
-                  : Colors.grey[300]!,
-              highlightColor: Preferences.isDarkMode
-                  ? Colors.grey[700]!
-                  : Colors.grey[100]!,
+              baseColor: Preferences.isDarkMode ? Colors.grey[800]! : Colors.grey[300]!,
+              highlightColor: Preferences.isDarkMode ? Colors.grey[700]! : Colors.grey[100]!,
               child: Container(
-                width: 300,
-                height: 50,
+                width: width,
+                height: height,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
@@ -113,10 +119,19 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
               ),
             )
           : SizedBox(
-              width: _bannerAd!.size.width.toDouble(),
-              height: _bannerAd!.size.height.toDouble(),
+              width: width,
+              height: height,
               child: AdWidget(ad: _bannerAd!),
             ),
     );
+  }
+
+  @override
+  void dispose() {
+    if (_bannerAd != null) {
+      _bannerService.releaseBanner(widget.location, _bannerAd!);
+      _bannerAd = null;
+    }
+    super.dispose();
   }
 }

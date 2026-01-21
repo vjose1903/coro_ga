@@ -6,10 +6,12 @@ import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import '../l10n/app_localizations.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
+import 'package:game_score/services/banner_prefetch_service.dart';
 import '../screens/ganador.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 import '../utils/utils.dart';
+import '../helpers/ad_locations.dart';
 import 'slide_up_header.dart';
 import 'widgets.dart';
 
@@ -31,7 +33,7 @@ class PuntuacionPage extends StatefulWidget {
   State<PuntuacionPage> createState() => _PuntuacionPageState();
 }
 
-class _PuntuacionPageState extends State<PuntuacionPage> with SlideUpAutoScrollMixin {
+class _PuntuacionPageState extends State<PuntuacionPage> {
   // El widget GoogleBannerAd maneja su propio dispose internamente
   final GoogleBannerAd anuncio = const GoogleBannerAd(location: AdLocation.puntuacion);
   final ScrollController historialController = ScrollController();
@@ -39,7 +41,6 @@ class _PuntuacionPageState extends State<PuntuacionPage> with SlideUpAutoScrollM
 
   @override
   void dispose() {
-    cancelPendingScroll();
     historialController.dispose();
     puntuacionController.dispose();
     super.dispose();
@@ -112,14 +113,14 @@ class _PuntuacionPageState extends State<PuntuacionPage> with SlideUpAutoScrollM
                   label: AppLocalizations.of(context)!.decrease,
                   color: Colors.red[400]!,
                   onTap: () {
-                    final scrollController = getEffectiveController(context, historialController);
+                    final slideUpProvider = context.read<SlideUpProvider>();
                     String puntuacion = hasTeclado ? puntuacionController.text : "1";
 
                     changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: "reducir", context: context)
                         .then((newPuntuacion) {
                       if (newPuntuacion != 0) {
                         puntuacionController.text = "";
-                        scheduleScrollToBottom(context, scrollController);
+                        slideUpProvider.closeSlideUp(controller: widget.panelController);
                       }
                     });
                   },
@@ -133,7 +134,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> with SlideUpAutoScrollM
                   label: AppLocalizations.of(context)!.increase,
                   color: Colors.green,
                   onTap: () {
-                    final scrollController = getEffectiveController(context, historialController);
+                    final slideUpProvider = context.read<SlideUpProvider>();
                     String puntuacion = hasTeclado ? puntuacionController.text : "1";
                     changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: "aumentar", context: context)
                         .then((newPuntuacion) {
@@ -151,8 +152,9 @@ class _PuntuacionPageState extends State<PuntuacionPage> with SlideUpAutoScrollM
                                   transitionsBuilder: (context, animation, secondaryAnimation, child) =>
                                       FadeTransition(opacity: animation, child: child),
                                   transitionDuration: const Duration(milliseconds: 400)));
+                        } else {
+                          slideUpProvider.closeSlideUp(controller: widget.panelController);
                         }
-                        scheduleScrollToBottom(context, scrollController);
                       }
                     });
                   },
@@ -194,6 +196,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> with SlideUpAutoScrollM
     ).then((_) {
       // Esperar al siguiente frame para asegurar que los datos estén sincronizados
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<BannerPrefetchService>().ensurePrefetched(AdLocation.editarEntidad);
         slideUpProvider.openSlideUp(
           controller: widget.panelController,
           bodyContent: PuntuacionForm(panelController: widget.panelController),

@@ -12,20 +12,24 @@ import 'package:game_score/widgets/widgets.dart';
 import 'package:game_score/widgets/layout.dart';
 import 'package:game_score/widgets/slide_up_header.dart';
 import 'package:game_score/utils/utils.dart';
+import 'package:game_score/helpers/ad_locations.dart';
 import 'package:provider/provider.dart';
 
 class HistorialGeneral extends StatefulWidget {
-  const HistorialGeneral({Key? key, required this.panelController}) : super(key: key);
+  const HistorialGeneral({Key? key, required this.panelController})
+      : super(key: key);
   final PanelController panelController;
 
   @override
   State<HistorialGeneral> createState() => _HistorialGeneralState();
 }
 
-class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScrollMixin {
+class _HistorialGeneralState extends State<HistorialGeneral>
+    with SlideUpAutoScrollMixin {
   final TextEditingController puntuacionController = TextEditingController();
   final ScrollController historialController = ScrollController();
-  final GoogleBannerAd anuncio = const GoogleBannerAd(location: AdLocation.puntuacion);
+  final GoogleBannerAd anuncio =
+      const GoogleBannerAd(location: AdLocation.puntuacion);
   Jugador? jugadorSeleccionado;
 
   @override
@@ -51,7 +55,8 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
     for (var jugador in jugadores) {
       if (jugador.historialJugadas != null) {
         for (var historial in jugador.historialJugadas!) {
-          todosHistoriales.add(_HistorialConJugador(jugador: jugador, historial: historial));
+          todosHistoriales.add(
+              _HistorialConJugador(jugador: jugador, historial: historial));
         }
       }
     }
@@ -86,7 +91,9 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
                 color: AppThemes.themeColor_1,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : Colors.grey.withValues(alpha: 0.15),
                 ),
               ),
               child: ClipRRect(
@@ -152,18 +159,30 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
     required PartidaProvider partidaProvider,
     required String tipo,
   }) async {
-    final scrollController = getEffectiveController(context, historialController);
+    final scrollController =
+        getEffectiveController(context, historialController);
     final l10n = AppLocalizations.of(context)!;
     if (jugadorSeleccionado == null) {
-      Toast.show(type: ToastType.warning, context: context, message: l10n.selectPlayer);
+      Toast.show(
+          type: ToastType.warning,
+          context: context,
+          message: l10n.selectPlayer);
       return;
     }
 
-    String puntuacion = partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? puntuacionController.text : "1";
+    String puntuacion = partidaProvider.partidaEnTurno!.tipo == "Puntuación"
+        ? puntuacionController.text
+        : "1";
 
     if (puntuacion.isEmpty || puntuacion == "0") {
-      String msg = puntuacion == "0" ? l10n.scoreMustBeGreaterThanZero : l10n.enterScoreToContinue;
-      Toast.show(type: ToastType.warning, context: context, title: l10n.warning, message: msg);
+      String msg = puntuacion == "0"
+          ? l10n.scoreMustBeGreaterThanZero
+          : l10n.enterScoreToContinue;
+      Toast.show(
+          type: ToastType.warning,
+          context: context,
+          title: l10n.warning,
+          message: msg);
       return;
     }
 
@@ -171,8 +190,14 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
     int puntuacionActual = jugadorSeleccionado!.puntuacion!;
 
     if (tipo == "reducir" && puntuacionActual - puntuacionInt < 0) {
-      String msgError = partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? l10n.minScoreWarning : l10n.minRoundWarning;
-      Toast.show(type: ToastType.warning, context: context, title: l10n.warning, message: msgError);
+      String msgError = partidaProvider.partidaEnTurno!.tipo == "Puntuación"
+          ? l10n.minScoreWarning
+          : l10n.minRoundWarning;
+      Toast.show(
+          type: ToastType.warning,
+          context: context,
+          title: l10n.warning,
+          message: msgError);
       return;
     }
 
@@ -191,7 +216,8 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
     partidaProvider.refresh();
 
     // Restaurar jugador anterior si existía
-    if (jugadorAnterior != null && jugadorAnterior.id != jugadorSeleccionado!.id) {
+    if (jugadorAnterior != null &&
+        jugadorAnterior.id != jugadorSeleccionado!.id) {
       jugadorProvider.changeJugadorEnTurno(jugadorAnterior);
     }
 
@@ -202,7 +228,8 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
       setState(() {}); // Refrescar la lista
 
       int newPuntuacion = response.data.puntuacion;
-      if (newPuntuacion >= partidaProvider.partidaEnTurno!.maxPuntuacion!.toInt()) {
+      if (newPuntuacion >=
+          partidaProvider.partidaEnTurno!.maxPuntuacion!.toInt()) {
         Navigator.pushReplacement(
           context,
           PageRouteBuilder(
@@ -210,8 +237,11 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
               "partida": partidaProvider.partidaEnTurno!.nombre,
               "jugador": jugadorSeleccionado!.nombre,
             }),
-            pageBuilder: (context, animation, secondaryAnimation) => const GanadorScreen(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                const GanadorScreen(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) =>
+                    FadeTransition(opacity: animation, child: child),
             transitionDuration: const Duration(milliseconds: 400),
           ),
         );
@@ -235,7 +265,8 @@ class _HistorialConJugador {
 // ============================================
 
 class _HistorialHeader extends StatelessWidget {
-  const _HistorialHeader({required this.cantRegistros, required this.panelController});
+  const _HistorialHeader(
+      {required this.cantRegistros, required this.panelController});
 
   final int cantRegistros;
   final PanelController panelController;
@@ -267,7 +298,8 @@ class _HistorialHeader extends StatelessWidget {
               ],
             ),
             child: const Center(
-              child: FaIcon(FontAwesomeIcons.clockRotateLeft, color: Colors.white, size: 18),
+              child: FaIcon(FontAwesomeIcons.clockRotateLeft,
+                  color: Colors.white, size: 18),
             ),
           ),
           const SizedBox(width: 12),
@@ -357,13 +389,18 @@ class _JugadorSelector extends StatelessWidget {
                       height: 28,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
+                          colors: [
+                            AppThemes.colorPrimero,
+                            AppThemes.colorTercero
+                          ],
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Center(
                         child: Text(
-                          jugador.nombre != null && jugador.nombre!.isNotEmpty ? jugador.nombre![0].toUpperCase() : '?',
+                          jugador.nombre != null && jugador.nombre!.isNotEmpty
+                              ? jugador.nombre![0].toUpperCase()
+                              : '?',
                           style: const TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 12,
@@ -389,9 +426,12 @@ class _JugadorSelector extends StatelessWidget {
                     const SizedBox(width: 8),
                     // Puntuación con badge
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: isDark ? AppThemes.colorPrimero.withValues(alpha: 0.3) : AppThemes.colorPrimero.withValues(alpha: 0.12),
+                        color: isDark
+                            ? AppThemes.colorPrimero.withValues(alpha: 0.3)
+                            : AppThemes.colorPrimero.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -418,7 +458,9 @@ class _JugadorSelector extends StatelessWidget {
 }
 
 class _ListHistorialGeneral extends StatefulWidget {
-  const _ListHistorialGeneral({Key? key, required this.historiales, required this.historialController}) : super(key: key);
+  const _ListHistorialGeneral(
+      {Key? key, required this.historiales, required this.historialController})
+      : super(key: key);
 
   final List<_HistorialConJugador> historiales;
   final ScrollController historialController;
@@ -427,7 +469,8 @@ class _ListHistorialGeneral extends StatefulWidget {
   State<_ListHistorialGeneral> createState() => _ListHistorialGeneralState();
 }
 
-class _ListHistorialGeneralState extends State<_ListHistorialGeneral> with SlideUpAutoScrollMixin {
+class _ListHistorialGeneralState extends State<_ListHistorialGeneral>
+    with SlideUpAutoScrollMixin {
   @override
   void initState() {
     super.initState();
@@ -435,7 +478,8 @@ class _ListHistorialGeneralState extends State<_ListHistorialGeneral> with Slide
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (widget.historiales.isNotEmpty) {
-        final effectiveController = getEffectiveController(context, widget.historialController);
+        final effectiveController =
+            getEffectiveController(context, widget.historialController);
         scheduleScrollToBottom(context, effectiveController);
       }
     });
@@ -449,7 +493,8 @@ class _ListHistorialGeneralState extends State<_ListHistorialGeneral> with Slide
 
   @override
   Widget build(BuildContext context) {
-    final effectiveController = getEffectiveController(context, widget.historialController);
+    final effectiveController =
+        getEffectiveController(context, widget.historialController);
 
     if (widget.historiales.isEmpty) {
       return Center(
@@ -471,7 +516,8 @@ class _ListHistorialGeneralState extends State<_ListHistorialGeneral> with Slide
             const SizedBox(height: 10),
             Text(
               AppLocalizations.of(context)!.noRecords,
-              style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.grey[500]),
+              style: TextStyle(
+                  fontFamily: 'Poppins', fontSize: 12, color: Colors.grey[500]),
             ),
           ],
         ),
@@ -483,7 +529,9 @@ class _ListHistorialGeneralState extends State<_ListHistorialGeneral> with Slide
       physics: const ClampingScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       separatorBuilder: (_, __) => Divider(
-        color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.2),
+        color: Preferences.isDarkMode
+            ? Colors.white.withValues(alpha: 0.08)
+            : Colors.grey.withValues(alpha: 0.2),
         height: 1,
       ),
       itemCount: widget.historiales.length,
@@ -538,7 +586,8 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
         backgroundColor: Colors.transparent,
         trailingActions: [
           SwipeAction(
-            icon: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 20),
+            icon: const Icon(Icons.delete_outline_rounded,
+                color: Colors.white, size: 20),
             title: AppLocalizations.of(context)!.delete,
             style: const TextStyle(fontFamily: 'Poppins', fontSize: 11),
             onTap: (handler) => _deleteHistorial(context, handler),
@@ -548,7 +597,8 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onLongPress: () => _controller.openCellAt(index: widget.index, trailing: true),
+            onLongPress: () =>
+                _controller.openCellAt(index: widget.index, trailing: true),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: Row(
@@ -559,13 +609,19 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
                     height: 32,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
+                        colors: [
+                          AppThemes.colorPrimero,
+                          AppThemes.colorTercero
+                        ],
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Center(
                       child: Text(
-                        widget.jugador.nombre != null && widget.jugador.nombre!.isNotEmpty ? widget.jugador.nombre![0].toUpperCase() : '?',
+                        widget.jugador.nombre != null &&
+                                widget.jugador.nombre!.isNotEmpty
+                            ? widget.jugador.nombre![0].toUpperCase()
+                            : '?',
                         style: const TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 12,
@@ -584,7 +640,9 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
                         fontFamily: 'Poppins',
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: isDark ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorQuinto,
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.8)
+                            : AppThemes.colorQuinto,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -592,7 +650,8 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
                   ),
                   // Puntuación
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: color.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
@@ -601,7 +660,9 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          isAumentar ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
+                          isAumentar
+                              ? Icons.arrow_upward_rounded
+                              : Icons.arrow_downward_rounded,
                           size: 14,
                           color: color,
                         ),
@@ -632,7 +693,8 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
     CustomAlertDialog.show(
       context,
       title: l10n.confirm,
-      menssage: l10n.confirmDeleteScore(widget.historial.puntuacion!.toInt(), widget.jugador.nombre!),
+      menssage: l10n.confirmDeleteScore(
+          widget.historial.puntuacion!.toInt(), widget.jugador.nombre!),
       dialogType: DialogType.error,
       buttonsList: [
         CustomActionsButtons.cancelButton({
@@ -727,7 +789,8 @@ class _ActionScoreButton extends StatelessWidget {
 }
 
 class _KeyboardSection extends StatelessWidget {
-  const _KeyboardSection({Key? key, required this.puntuacionController}) : super(key: key);
+  const _KeyboardSection({Key? key, required this.puntuacionController})
+      : super(key: key);
 
   final TextEditingController puntuacionController;
 
@@ -758,7 +821,9 @@ class _KeyboardSection extends StatelessWidget {
         color: isDark ? const Color(0xFF3A3A3A) : const Color(0xFFF5F5F5),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.grey.withValues(alpha: 0.15),
           width: 1,
         ),
         boxShadow: [
@@ -788,7 +853,8 @@ class _KeyboardSection extends StatelessWidget {
               fillColor: AppThemes.inputDisabledColor,
               filled: true,
               isDense: true,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               labelStyle: TextStyle(
                 color: AppThemes.labelInputDisabledColor,
                 fontFamily: 'Poppins',
@@ -815,7 +881,9 @@ class _KeyboardSection extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           // Teclado
-          CustomKeyboard(onChanged: (value) => changePuntuacionValue(value), tipo: KeyboardType.number),
+          CustomKeyboard(
+              onChanged: (value) => changePuntuacionValue(value),
+              tipo: KeyboardType.number),
         ],
       ),
     );

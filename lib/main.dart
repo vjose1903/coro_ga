@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,6 +11,7 @@ import 'providers/providers.dart';
 import 'routes/app_routes.dart';
 import 'screens/screens.dart';
 import 'services/app_integrity_service.dart';
+import 'services/banner_prefetch_service.dart';
 import 'services/consent_service.dart';
 import 'services/purchase_service.dart';
 import 'shared_preferences/preferences.dart';
@@ -38,11 +36,11 @@ void main() async {
     return;
   }
 
-  // 🍎 iOS: Solicitar ATT ANTES de mostrar la app (mientras splash está visible)
-  if (Platform.isIOS) await _requestATTPermission();
-
-  final isPlatformDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
-  bool initInDarkMode = Preferences.isSystemMode ? isPlatformDark : Preferences.isDarkMode;
+  final isPlatformDark =
+      WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+          Brightness.dark;
+  bool initInDarkMode =
+      Preferences.isSystemMode ? isPlatformDark : Preferences.isDarkMode;
 
   final premiumProvider = PremiumProvider();
   final localeProvider = LocaleProvider();
@@ -56,10 +54,12 @@ void main() async {
     ChangeNotifierProvider(create: (_) => SlideUpProvider()),
     ChangeNotifierProvider(create: (_) => JugadorProvider()),
     ChangeNotifierProvider(create: (_) => GoogleAdsProvider()),
+    Provider(create: (_) => BannerPrefetchService()),
     ChangeNotifierProvider(create: (_) => ReorderableProvider()),
     ChangeNotifierProvider(create: (_) => PageEditarProvider()),
     ChangeNotifierProvider(create: (_) => PartidaPredefinidaProvider()),
-    ChangeNotifierProvider(create: (_) => ThemeProvider(isDarkMode_: initInDarkMode)),
+    ChangeNotifierProvider(
+        create: (_) => ThemeProvider(isDarkMode_: initInDarkMode)),
     ChangeNotifierProvider.value(value: premiumProvider),
     ChangeNotifierProvider.value(value: localeProvider),
   ], child: const MyApp()));
@@ -79,18 +79,6 @@ void _initializeServicesDeferred(PremiumProvider premiumProvider) {
       },
     ),
   ]);
-}
-
-/// 🍎 Solicita permiso de App Tracking Transparency en iOS (ANTES de runApp)
-Future<void> _requestATTPermission() async {
-  try {
-    final status = await AppTrackingTransparency.trackingAuthorizationStatus;
-    if (status == TrackingStatus.notDetermined) {
-      await AppTrackingTransparency.requestTrackingAuthorization();
-    }
-  } catch (e) {
-    debugPrint('ATT: Error requesting permission: $e');
-  }
 }
 
 /// Inicializa MobileAds con configuración COPPA y contenido apropiado
@@ -144,8 +132,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       ThemeProvider themeProvider = context.read<ThemeProvider>();
       _lastLifecycleState = state;
 
-      if (Preferences.isSystemMode && _lastLifecycleState == AppLifecycleState.resumed) {
-        bool isActualSystemDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
+      if (Preferences.isSystemMode &&
+          _lastLifecycleState == AppLifecycleState.resumed) {
+        bool isActualSystemDark =
+            WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+                Brightness.dark;
 
         if (isActualSystemDark != Preferences.isDarkMode) {
           Preferences.isDarkMode = isActualSystemDark;

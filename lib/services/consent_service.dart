@@ -1,8 +1,9 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 /// Servicio para manejar el consentimiento de usuario (GDPR/UMP)
-/// Nota: ATT (App Tracking Transparency) para iOS se solicita en main.dart ANTES de runApp()
+/// Solo funciona en Android - iOS no requiere UMP
 class ConsentService {
   ConsentService._();
   static final ConsentService instance = ConsentService._();
@@ -12,11 +13,17 @@ class ConsentService {
 
   bool get canRequestAds => _canRequestAds;
 
-  /// Inicializa el sistema de consentimiento UMP (GDPR)
+  /// Inicializa el sistema de consentimiento UMP (GDPR) - Solo Android
   /// Debe llamarse antes de cargar cualquier anuncio
-  /// Nota: ATT ya fue solicitado en main.dart antes de runApp()
   Future<void> initialize() async {
     if (_isInitialized) return;
+
+    // Solo ejecutar en Android
+    if (!Platform.isAndroid) {
+      _canRequestAds = true;
+      _isInitialized = true;
+      return;
+    }
 
     try {
       // Configurar parámetros de consentimiento
