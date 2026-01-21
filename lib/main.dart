@@ -11,37 +11,19 @@ import 'l10n/app_localizations.dart';
 import 'providers/providers.dart';
 import 'routes/app_routes.dart';
 import 'screens/screens.dart';
-import 'services/app_integrity_service.dart';
 import 'services/banner_prefetch_service.dart';
 import 'services/consent_service.dart';
 import 'services/purchase_service.dart';
 import 'shared_preferences/preferences.dart';
-import 'widgets/piracy_blocker.dart';
 
 void main() async {
   // Preservar el splash nativo mientras inicializamos
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  // ⚡ OPTIMIZACIÓN: Ejecutar operaciones críticas en paralelo
-  final results = await Future.wait<bool>([
-    Preferences.init().then((_) => true),
-    AppIntegrityService.instance.verifyIntegrity(),
-  ]);
-
-  final isLegit = results[1];
-
-  if (!isLegit) {
-    FlutterNativeSplash.remove();
-    runApp(const PiracyBlocker());
-    return;
-  }
-
-  final isPlatformDark =
-      WidgetsBinding.instance.platformDispatcher.platformBrightness ==
-          Brightness.dark;
-  bool initInDarkMode =
-      Preferences.isSystemMode ? isPlatformDark : Preferences.isDarkMode;
+  await Preferences.init();
+  final isPlatformDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
+  bool initInDarkMode = Preferences.isSystemMode ? isPlatformDark : Preferences.isDarkMode;
 
   final premiumProvider = PremiumProvider();
   final localeProvider = LocaleProvider();
@@ -59,8 +41,7 @@ void main() async {
     ChangeNotifierProvider(create: (_) => ReorderableProvider()),
     ChangeNotifierProvider(create: (_) => PageEditarProvider()),
     ChangeNotifierProvider(create: (_) => PartidaPredefinidaProvider()),
-    ChangeNotifierProvider(
-        create: (_) => ThemeProvider(isDarkMode_: initInDarkMode)),
+    ChangeNotifierProvider(create: (_) => ThemeProvider(isDarkMode_: initInDarkMode)),
     ChangeNotifierProvider.value(value: premiumProvider),
     ChangeNotifierProvider.value(value: localeProvider),
   ], child: const MyApp()));
@@ -133,11 +114,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       ThemeProvider themeProvider = context.read<ThemeProvider>();
       _lastLifecycleState = state;
 
-      if (Preferences.isSystemMode &&
-          _lastLifecycleState == AppLifecycleState.resumed) {
-        bool isActualSystemDark =
-            WidgetsBinding.instance.platformDispatcher.platformBrightness ==
-                Brightness.dark;
+      if (Preferences.isSystemMode && _lastLifecycleState == AppLifecycleState.resumed) {
+        bool isActualSystemDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
 
         if (isActualSystemDark != Preferences.isDarkMode) {
           Preferences.isDarkMode = isActualSystemDark;
