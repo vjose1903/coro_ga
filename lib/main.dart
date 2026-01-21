@@ -1,21 +1,23 @@
+import 'dart:io';
+
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:game_score/firebase_options.dart';
-import 'package:game_score/l10n/app_localizations.dart';
-import 'package:game_score/providers/providers.dart';
-import 'package:game_score/routes/app_routes.dart';
-import 'package:game_score/screens/screens.dart';
-import 'package:game_score/services/app_integrity_service.dart';
-import 'package:game_score/services/consent_service.dart';
-import 'package:game_score/services/purchase_service.dart';
-import 'package:game_score/widgets/piracy_blocker.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/services.dart';
-
+import 'firebase_options.dart';
+import 'l10n/app_localizations.dart';
+import 'providers/providers.dart';
+import 'routes/app_routes.dart';
+import 'screens/screens.dart';
+import 'services/app_integrity_service.dart';
+import 'services/consent_service.dart';
+import 'services/purchase_service.dart';
 import 'shared_preferences/preferences.dart';
+import 'widgets/piracy_blocker.dart';
 
 void main() async {
   // Preservar el splash nativo mientras inicializamos
@@ -35,6 +37,9 @@ void main() async {
     runApp(const PiracyBlocker());
     return;
   }
+
+  // 🍎 iOS: Solicitar ATT ANTES de mostrar la app (mientras splash está visible)
+  if (Platform.isIOS) await _requestATTPermission();
 
   final isPlatformDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
   bool initInDarkMode = Preferences.isSystemMode ? isPlatformDark : Preferences.isDarkMode;
@@ -74,6 +79,18 @@ void _initializeServicesDeferred(PremiumProvider premiumProvider) {
       },
     ),
   ]);
+}
+
+/// 🍎 Solicita permiso de App Tracking Transparency en iOS (ANTES de runApp)
+Future<void> _requestATTPermission() async {
+  try {
+    final status = await AppTrackingTransparency.trackingAuthorizationStatus;
+    if (status == TrackingStatus.notDetermined) {
+      await AppTrackingTransparency.requestTrackingAuthorization();
+    }
+  } catch (e) {
+    debugPrint('ATT: Error requesting permission: $e');
+  }
 }
 
 /// Inicializa MobileAds con configuración COPPA y contenido apropiado
