@@ -39,21 +39,24 @@ class _FormularioScreenState extends State<FormularioScreen> {
     googleAdsProvider.loadInterstitialAd();
 
     final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: Layout(
-        panelController: PanelController(),
-        appBarTitle: l10n.createNewGame,
-        appBarLeading: CustomIconButtom(
-          iconSize: 25,
-          iconColor: Colors.white,
-          icon: Icons.arrow_back_ios_new,
-          onTap: () {
-            FocusManager.instance.primaryFocus?.unfocus();
-            Navigator.pop(context, 'home');
-          },
+    return ScreenTracker(
+      screenName: 'FormularioScreen',
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: Layout(
+          panelController: PanelController(),
+          appBarTitle: l10n.createNewGame,
+          appBarLeading: CustomIconButtom(
+            iconSize: ResponsiveApp.isSmallHeight ? 20 : 25,
+            iconColor: Colors.white,
+            icon: Icons.arrow_back_ios_new,
+            onTap: () {
+              FocusManager.instance.primaryFocus?.unfocus();
+              Navigator.pop(context, 'home');
+            },
+          ),
+          bodyContent: SingleChildScrollView(physics: const BouncingScrollPhysics(), child: _Body()),
         ),
-        bodyContent: SingleChildScrollView(physics: const BouncingScrollPhysics(), child: _Body()),
       ),
     );
   }
@@ -92,10 +95,10 @@ class _Body extends StatelessWidget {
           child: ReactiveForm(
             formGroup: form,
             child: IntrinsicHeight(
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   // Botón plantillas
                   Align(
                     alignment: Alignment.centerRight,
@@ -223,7 +226,7 @@ class _PlantillasButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(10),
         child: Container(
-              padding: ResponsiveApp.symmetric(horizontal: 12, vertical: 8),
+          padding: ResponsiveApp.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -255,7 +258,7 @@ class _PlantillasButton extends StatelessWidget {
                 AppLocalizations.of(context)!.predefined,
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 12,
+                  fontSize: ResponsiveApp.scaleText(12),
                   fontWeight: FontWeight.w500,
                   color: Colors.white,
                 ),
@@ -308,23 +311,23 @@ class _JugadoresSection extends StatelessWidget {
               AppLocalizations.of(context)!.players,
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 16,
+                fontSize: ResponsiveApp.scaleText(16),
                 fontWeight: FontWeight.w600,
                 color: isDark ? Colors.white : AppThemes.colorCuarto,
               ),
             ),
             Container(
-            margin: ResponsiveApp.only(left: 10),
-            padding: ResponsiveApp.symmetric(horizontal: 10, vertical: 4),
+              margin: ResponsiveApp.only(left: 10),
+              padding: ResponsiveApp.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: AppThemes.colorTercero.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
                 formPartidaProvider.jugadores.length.toString(),
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 13,
+                  fontSize: ResponsiveApp.scaleText(13),
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
@@ -451,7 +454,7 @@ class _CreateButton extends StatelessWidget {
                 AppLocalizations.of(context)!.createGame,
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 16,
+                  fontSize: ResponsiveApp.scaleText(16),
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
@@ -586,7 +589,7 @@ class _JugadorInputState extends State<_JugadorInput> with AutomaticKeepAliveCli
               '${widget.index + 1}',
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 12,
+                fontSize: ResponsiveApp.scaleText(12),
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
               ),
@@ -603,7 +606,7 @@ class _JugadorInputState extends State<_JugadorInput> with AutomaticKeepAliveCli
             textCapitalization: TextCapitalization.words,
             style: TextStyle(
               fontFamily: 'Poppins',
-              fontSize: 14,
+              fontSize: ResponsiveApp.scaleText(14),
               color: isDark ? Colors.white : AppThemes.colorCuarto,
             ),
             decoration: InputDecoration(
@@ -616,7 +619,7 @@ class _JugadorInputState extends State<_JugadorInput> with AutomaticKeepAliveCli
               ),
               floatingLabelStyle: TextStyle(
                 color: AppThemes.colorQuinto,
-                fontSize: 15,
+                fontSize: ResponsiveApp.scaleText(15),
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Poppins',
               ),

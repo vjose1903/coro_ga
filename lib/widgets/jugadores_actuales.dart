@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_score/helpers/helpers.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
@@ -55,7 +56,7 @@ class ListJugadores extends StatelessWidget {
               AppLocalizations.of(context)!.noPlayers,
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 12,
+                fontSize: ResponsiveApp.scaleText(12),
                 color: Colors.grey[500],
               ),
             ),
@@ -165,9 +166,9 @@ class _JugadorItem extends StatelessWidget {
                   child: Center(
                     child: Text(
                       jugador.nombre != null && jugador.nombre!.isNotEmpty ? jugador.nombre![0].toUpperCase() : '?',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Poppins',
-                        fontSize: 14,
+                        fontSize: ResponsiveApp.scaleText(14),
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -182,7 +183,7 @@ class _JugadorItem extends StatelessWidget {
                     jugador.nombre ?? '',
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: 13,
+                      fontSize: ResponsiveApp.scaleText(13),
                       fontWeight: FontWeight.w500,
                       color: isDark ? Colors.white.withValues(alpha: 0.9) : AppThemes.colorQuinto,
                     ),
@@ -202,7 +203,7 @@ class _JugadorItem extends StatelessWidget {
                     jugador.puntuacion.toString(),
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: 12,
+                      fontSize: ResponsiveApp.scaleText(12),
                       fontWeight: FontWeight.bold,
                       color: AppThemes.colorPrimero,
                     ),

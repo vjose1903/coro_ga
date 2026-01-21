@@ -219,12 +219,12 @@ class _AppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: ResponsiveApp.symmetric(horizontal: 16, vertical: 12),
+        padding: ResponsiveApp.symmetric(horizontal: 12, vertical: 10),
         child: Row(
           children: [
             if (leading != null)
               Container(
-                margin: ResponsiveApp.only(right: 12),
+                margin: ResponsiveApp.only(right: 3),
                 child: leading!,
               ),
             if (title != null)
@@ -237,8 +237,8 @@ class _AppBar extends StatelessWidget {
                     color: Colors.white,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.bold,
-                    fontSize: ResponsiveApp.scaleText(20),
-                    letterSpacing: 1.5,
+                    fontSize: ResponsiveApp.scaleText(18),
+                    letterSpacing: 1.2,
                     shadows: [
                       Shadow(
                         color: Colors.black26,
@@ -270,9 +270,9 @@ class _Body extends StatelessWidget {
       children: [
         SizedBox(height: appBarHeight),
         Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(ResponsiveApp.scaleWidth(50))),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(ResponsiveApp.scaleWidth(50))),
               color: AppThemes.themeColor_1,
               boxShadow: [
                 BoxShadow(
@@ -282,8 +282,8 @@ class _Body extends StatelessWidget {
                 ),
               ],
             ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(ResponsiveApp.scaleWidth(50))),
+            child: ClipRRect(
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(ResponsiveApp.scaleWidth(50))),
               child: child,
             ),
           ),

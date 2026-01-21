@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/l10n_helper.dart';
 import 'package:reactive_forms/reactive_forms.dart';
+import '../helpers/helpers.dart';
 
 class CustomReactiveInput extends StatelessWidget {
   final String formControlName;
@@ -68,7 +69,12 @@ class CustomReactiveInput extends StatelessWidget {
                 : enabled
                     ? AppThemes.colorQuinto
                     : AppThemes.colorQuinto.withValues(alpha: 0.6);
-            return TextStyle(color: color, fontSize: 15, fontWeight: FontWeight.bold, fontFamily: 'Poppins');
+            return TextStyle(
+              color: color,
+              fontSize: ResponsiveApp.scaleText(15),
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Poppins',
+            );
           }),
         ),
         showErrors: (control) => control.invalid && (control.touched || control.dirty),

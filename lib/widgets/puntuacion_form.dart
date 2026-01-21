@@ -12,6 +12,7 @@ import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 import '../utils/utils.dart';
 import '../helpers/ad_locations.dart';
+import '../helpers/helpers.dart';
 import 'slide_up_header.dart';
 import 'widgets.dart';
 
@@ -309,7 +310,14 @@ class _ListHistorialState extends State<_ListHistorial> with SlideUpAutoScrollMi
               child: Icon(Icons.history_rounded, size: 32, color: AppThemes.colorPrimero.withValues(alpha: 0.5)),
             ),
             const SizedBox(height: 12),
-            Text(msgNoRgistros, style: TextStyle(fontFamily: 'Poppins', fontSize: 13, color: Colors.grey[500]))
+            Text(
+              msgNoRgistros,
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: ResponsiveApp.scaleText(13),
+                color: Colors.grey[500],
+              ),
+            )
           ],
         ),
       );
@@ -369,6 +377,8 @@ class _HistorialItemState extends State<_HistorialItem> {
   @override
   Widget build(BuildContext context) {
     final bool isAumentar = widget.historial.tipo == "aumentar";
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallScreen = screenHeight < 700;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -381,7 +391,10 @@ class _HistorialItemState extends State<_HistorialItem> {
           SwipeAction(
             icon: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 20),
             title: AppLocalizations.of(context)!.delete,
-            style: const TextStyle(fontFamily: 'Poppins', fontSize: 11),
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: ResponsiveApp.scaleText(11),
+            ),
             onTap: (CompletionHandler handler) async {
               final l10n = AppLocalizations.of(context)!;
               CustomAlertDialog.show(
@@ -420,14 +433,14 @@ class _HistorialItemState extends State<_HistorialItem> {
             onLongPress: () => _swipeController.openCellAt(index: widget.index, trailing: true),
             borderRadius: BorderRadius.circular(8),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+              padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 6 : 10, horizontal: 4),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(6),
+                        padding: EdgeInsets.all(isSmallScreen ? 4 : 6),
                         decoration: BoxDecoration(
                           color: (isAumentar ? Colors.green : Colors.red).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(8),
@@ -435,15 +448,15 @@ class _HistorialItemState extends State<_HistorialItem> {
                         child: Icon(
                           isAumentar ? Icons.trending_up_rounded : Icons.trending_down_rounded,
                           color: isAumentar ? Colors.green : Colors.red[400],
-                          size: 16,
+                          size: isSmallScreen ? 14 : 16,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: isSmallScreen ? 8 : 12),
                       Text(
                         "${isAumentar ? '+' : '-'}${widget.historial.puntuacion}",
                         style: TextStyle(
                           fontFamily: 'Poppins',
-                          fontSize: 15,
+                          fontSize: ResponsiveApp.scaleText(15),
                           fontWeight: FontWeight.w600,
                           color: isAumentar ? Colors.green : Colors.red[400],
                         ),
@@ -454,7 +467,7 @@ class _HistorialItemState extends State<_HistorialItem> {
                     L10n.getActionType(context, widget.historial.tipo),
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: 11,
+                      fontSize: ResponsiveApp.scaleText(11),
                       color: Colors.grey[500],
                     ),
                   ),
@@ -493,9 +506,13 @@ class _KeyboardSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallScreen = screenHeight < 700;
+    final padding = isSmallScreen ? 8.0 : 12.0;
+    final spacing = isSmallScreen ? 6.0 : 12.0;
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF3A3A3A) : const Color(0xFFF5F5F5),
         borderRadius: BorderRadius.circular(16),
@@ -512,6 +529,7 @@ class _KeyboardSection extends StatelessWidget {
         ],
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           // Input de puntuación
           TextField(
@@ -521,7 +539,7 @@ class _KeyboardSection extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'Poppins',
-              fontSize: 14,
+              fontSize: ResponsiveApp.scaleText(14),
               fontWeight: FontWeight.w600,
               color: isDark ? Colors.white : AppThemes.colorQuinto,
             ),
@@ -530,14 +548,14 @@ class _KeyboardSection extends StatelessWidget {
               fillColor: AppThemes.inputDisabledColor,
               filled: true,
               isDense: true,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: isSmallScreen ? 2 : 4),
               labelStyle: TextStyle(
                 color: AppThemes.labelInputDisabledColor,
                 fontFamily: 'Poppins',
               ),
               floatingLabelStyle: TextStyle(
                 color: isDark ? Colors.grey[400] : AppThemes.colorQuinto,
-                fontSize: 15,
+                fontSize: ResponsiveApp.scaleText(15),
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Poppins',
               ),
@@ -555,7 +573,7 @@ class _KeyboardSection extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: spacing),
           // Teclado
           CustomKeyboard(onChanged: (value) => changePuntuacionValue(value), tipo: KeyboardType.number),
         ],
@@ -615,16 +633,16 @@ class _JugadorHeader extends StatelessWidget {
             child: Center(
               child: Text(
                 nombre.isNotEmpty ? nombre[0].toUpperCase() : '?',
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 18,
+                  fontSize: ResponsiveApp.scaleText(18),
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
 
           // Información
           Expanded(
@@ -635,7 +653,7 @@ class _JugadorHeader extends StatelessWidget {
                   nombre,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 16,
+                    fontSize: ResponsiveApp.scaleText(14),
                     fontWeight: FontWeight.bold,
                     color: isDark ? Colors.white : AppThemes.colorQuinto,
                   ),
@@ -647,7 +665,7 @@ class _JugadorHeader extends StatelessWidget {
                   AppLocalizations.of(context)!.playerScore(puntuacion),
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 12,
+                    fontSize: ResponsiveApp.scaleText(11),
                     color: isDark ? Colors.grey[400] : Colors.grey[600],
                     fontWeight: FontWeight.w500,
                   ),
@@ -733,7 +751,7 @@ class _ActionScoreButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(14),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          padding: const EdgeInsets.symmetric(vertical: 7),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -756,9 +774,9 @@ class _ActionScoreButton extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 15,
+                  fontSize: ResponsiveApp.scaleText(15),
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),

@@ -178,7 +178,7 @@ class _PredefinidaHeader extends StatelessWidget {
                   AppLocalizations.of(context)!.predefinedGames,
                   style: TextStyle(
                     fontFamily: "Poppins",
-                    fontSize: 16,
+                    fontSize: ResponsiveApp.scaleText(16),
                     fontWeight: FontWeight.bold,
                     color: isDark ? Colors.white : AppThemes.colorQuinto,
                   ),
@@ -187,7 +187,7 @@ class _PredefinidaHeader extends StatelessWidget {
                   isReordering ? AppLocalizations.of(context)!.dragToReorder : AppLocalizations.of(context)!.tapToSelect,
                   style: TextStyle(
                     fontFamily: "Poppins",
-                    fontSize: 11,
+                    fontSize: ResponsiveApp.scaleText(11),
                     color: isDark ? Colors.grey[400] : Colors.grey[600],
                     fontWeight: FontWeight.w500,
                   ),
@@ -268,9 +268,9 @@ class _DoneButton extends StatelessWidget {
           ),
           child: Text(
             AppLocalizations.of(context)!.done,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Poppins',
-              fontSize: 13,
+              fontSize: ResponsiveApp.scaleText(13),
               fontWeight: FontWeight.w600,
               color: Colors.white,
             ),
@@ -316,9 +316,9 @@ class _CloseButton extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   AppLocalizations.of(context)!.close,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 14,
+                    fontSize: ResponsiveApp.scaleText(14),
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
@@ -376,7 +376,7 @@ class PartidasScrollView extends StatelessWidget {
                   AppLocalizations.of(context)!.noPredefinedGames,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 14,
+                    fontSize: ResponsiveApp.scaleText(14),
                     fontWeight: FontWeight.w500,
                     color: Colors.grey[500],
                   ),
@@ -386,7 +386,7 @@ class PartidasScrollView extends StatelessWidget {
                   AppLocalizations.of(context)!.tapPlusToCreate,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 12,
+                    fontSize: ResponsiveApp.scaleText(12),
                     color: Colors.grey[400],
                   ),
                 ),
@@ -499,12 +499,12 @@ class ReordenableItem extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             maxLines: 2,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontFamily: "Poppins",
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 13,
-                            ),
+                          style: TextStyle(
+                            fontFamily: "Poppins",
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: ResponsiveApp.scaleText(13),
+                          ),
                           ),
                         ),
                       ),
@@ -523,12 +523,12 @@ class ReordenableItem extends StatelessWidget {
                             const SizedBox(width: 3),
                             Text(
                               '${partidaPredefinida.cantidadJugadores ?? 0}',
-                              style: TextStyle(
-                                fontFamily: "Poppins",
-                                fontSize: 9,
-                                color: Colors.white.withValues(alpha: 0.6),
-                                fontWeight: FontWeight.w500,
-                              ),
+                            style: TextStyle(
+                              fontFamily: "Poppins",
+                              fontSize: ResponsiveApp.scaleText(9),
+                              color: Colors.white.withValues(alpha: 0.6),
+                              fontWeight: FontWeight.w500,
+                            ),
                             ),
                           ],
                         ),
@@ -541,7 +541,7 @@ class ReordenableItem extends StatelessWidget {
                           L10n.getGameType(context, partidaPredefinida.tipo),
                           style: TextStyle(
                             fontFamily: "Poppins",
-                            fontSize: 8,
+                            fontSize: ResponsiveApp.scaleText(8),
                             color: Colors.white.withValues(alpha: 0.6),
                             fontWeight: FontWeight.w500,
                           ),

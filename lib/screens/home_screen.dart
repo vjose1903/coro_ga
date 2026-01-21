@@ -27,7 +27,10 @@ class HomeScreen extends StatelessWidget {
 
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     if (partidaProvider.isFirstSearch) partidaProvider.getPartidas();
-    return const MainHome();
+    return const ScreenTracker(
+      screenName: 'HomeScreen',
+      child: MainHome(),
+    );
   }
 }
 
@@ -317,7 +320,7 @@ class _EmptyState extends StatelessWidget {
                       style: TextStyle(
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w600,
-                        fontSize: 20,
+                        fontSize: ResponsiveApp.scaleText(20),
                         color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.9) : AppThemes.colorCuarto,
                       ),
                     ),
@@ -327,7 +330,7 @@ class _EmptyState extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: 'Poppins',
-                        fontSize: 14,
+                        fontSize: ResponsiveApp.scaleText(14),
                         height: 1.5,
                         color: Colors.grey[500],
                       ),
@@ -352,7 +355,7 @@ class _EmptyState extends StatelessWidget {
                             l10n.swipeToEditOrDelete,
                             style: TextStyle(
                               fontFamily: 'Poppins',
-                              fontSize: 12,
+                              fontSize: ResponsiveApp.scaleText(12),
                               color: AppThemes.colorPrimero,
                             ),
                           ),
@@ -391,7 +394,7 @@ class _LoadingState extends StatelessWidget {
             l10n.loadingGames,
             style: TextStyle(
               fontFamily: 'Poppins',
-              fontSize: 14,
+              fontSize: ResponsiveApp.scaleText(14),
               color: Colors.grey[500],
             ),
           ),
@@ -411,31 +414,46 @@ class _Menu extends StatefulWidget {
 }
 
 class _MenuState extends State<_Menu> {
-  late final ScrollController _scrollController;
+  ScrollController? _contentScrollController;
+  bool _ownsController = false;
 
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
-    _scrollController.addListener(_handleScroll);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      context.read<SlideUpProvider>().setDraggable(true);
-    });
+    _setController(ScrollController(), owns: true);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final inheritedController = SlideUpScrollController.of(context);
+    if (inheritedController != null && inheritedController != _contentScrollController) {
+      _setController(inheritedController, owns: false);
+    }
   }
 
   @override
   void dispose() {
-    _scrollController
-      ..removeListener(_handleScroll)
-      ..dispose();
+    _contentScrollController?.removeListener(_handleScroll);
+    if (_ownsController) _contentScrollController?.dispose();
     super.dispose();
   }
 
   void _handleScroll() {
-    if (!mounted || !_scrollController.hasClients) return;
-    final slideUpProvider = context.read<SlideUpProvider>();
-    slideUpProvider.setDraggable(_scrollController.offset <= 0);
+    final controller = _contentScrollController;
+    if (!mounted || controller == null || !controller.hasClients) return;
+    context.read<SlideUpProvider>().setDraggable(controller.offset <= 0);
+  }
+
+  void _setController(ScrollController controller, {required bool owns}) {
+    if (_contentScrollController == controller) return;
+    _contentScrollController?.removeListener(_handleScroll);
+    if (_ownsController && _contentScrollController != null && _contentScrollController != controller) {
+      _contentScrollController!.dispose();
+    }
+    _contentScrollController = controller;
+    _ownsController = owns;
+    _contentScrollController?.addListener(_handleScroll);
   }
 
   @override
@@ -447,7 +465,7 @@ class _MenuState extends State<_Menu> {
       height: double.infinity,
       padding: ResponsiveApp.only(top: 5, bottom: 20),
       child: SingleChildScrollView(
-        controller: _scrollController,
+        controller: _contentScrollController,
         physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -585,7 +603,7 @@ class _MenuHeader extends StatelessWidget {
                     color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.bold,
-                    fontSize: 22,
+                    fontSize: ResponsiveApp.scaleText(22),
                     letterSpacing: 1,
                   ),
                 ),
@@ -599,12 +617,12 @@ class _MenuHeader extends StatelessWidget {
                       ),
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Text(
+                    child: Text(
                       'PRO',
                       style: TextStyle(
                         color: Colors.white,
                         fontFamily: 'Poppins',
-                        fontSize: 10,
+                        fontSize: ResponsiveApp.scaleText(10),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -617,7 +635,7 @@ class _MenuHeader extends StatelessWidget {
               style: TextStyle(
                 color: Colors.grey[500],
                 fontFamily: 'Poppins',
-                fontSize: 12,
+                fontSize: ResponsiveApp.scaleText(12),
               ),
             ),
           ],
@@ -666,7 +684,7 @@ class _MenuSection extends StatelessWidget {
                   color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w600,
-                  fontSize: 16,
+                  fontSize: ResponsiveApp.scaleText(16),
                 ),
               ),
             ],
@@ -705,7 +723,7 @@ class _ThemeToggleRow extends StatelessWidget {
                 style: TextStyle(
                   color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.9) : Colors.grey[800],
                   fontFamily: 'Poppins',
-                  fontSize: 14,
+                  fontSize: ResponsiveApp.scaleText(14),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -714,7 +732,7 @@ class _ThemeToggleRow extends StatelessWidget {
                 style: TextStyle(
                   color: Colors.grey[500],
                   fontFamily: 'Poppins',
-                  fontSize: 11,
+                  fontSize: ResponsiveApp.scaleText(11),
                 ),
               ),
             ],
@@ -798,7 +816,7 @@ class _ThemeOption extends StatelessWidget {
             style: TextStyle(
               color: isSelected ? Colors.white : Colors.grey[500],
               fontFamily: 'Poppins',
-              fontSize: 13,
+              fontSize: ResponsiveApp.scaleText(13),
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
@@ -878,7 +896,7 @@ class _PremiumCard extends StatelessWidget {
                               color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.bold,
-                              fontSize: 17,
+                              fontSize: ResponsiveApp.scaleText(17),
                             ),
                           ),
                           if (isPremium) ...[
@@ -896,10 +914,10 @@ class _PremiumCard extends StatelessWidget {
                                   const SizedBox(width: 4),
                                   Text(
                                     AppLocalizations.of(context)!.active,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: Colors.green,
                                       fontFamily: 'Poppins',
-                                      fontSize: 10,
+                                      fontSize: ResponsiveApp.scaleText(10),
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -915,7 +933,7 @@ class _PremiumCard extends StatelessWidget {
                         style: TextStyle(
                           color: Colors.grey[500],
                           fontFamily: 'Poppins',
-                          fontSize: 12,
+                          fontSize: ResponsiveApp.scaleText(12),
                         ),
                       ),
                     ],
@@ -951,7 +969,7 @@ class _PremiumCard extends StatelessWidget {
                         style: TextStyle(
                           color: Colors.orange[700],
                           fontFamily: 'Poppins',
-                          fontSize: 12,
+                          fontSize: ResponsiveApp.scaleText(12),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -1003,14 +1021,14 @@ class _LanguageSwitcher extends StatelessWidget {
             return languages.map((lang) {
               return Row(
                 children: [
-                  Text(lang['flag']!, style: const TextStyle(fontSize: 18)),
+                  Text(lang['flag']!, style: TextStyle(fontSize: ResponsiveApp.scaleText(18))),
                   const SizedBox(width: 10),
                   Text(
                     lang['short']!,
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w600,
-                      fontSize: 14,
+                      fontSize: ResponsiveApp.scaleText(14),
                       color: Preferences.isDarkMode ? Colors.white : Colors.grey[800],
                     ),
                   ),
@@ -1023,13 +1041,13 @@ class _LanguageSwitcher extends StatelessWidget {
               value: lang['code'],
               child: Row(
                 children: [
-                  Text(lang['flag']!, style: const TextStyle(fontSize: 18)),
+                  Text(lang['flag']!, style: TextStyle(fontSize: ResponsiveApp.scaleText(18))),
                   const SizedBox(width: 10),
                   Text(
                     lang['name']!,
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: 14,
+                      fontSize: ResponsiveApp.scaleText(14),
                       color: Preferences.isDarkMode ? Colors.white : Colors.grey[800],
                     ),
                   ),
@@ -1050,7 +1068,14 @@ class _MenuActionButton extends StatelessWidget {
   final IconData icon;
   final String title;
   final VoidCallback onTap;
-  const _MenuActionButton({required this.icon, required this.title, required this.onTap});
+  final Widget? trailing;
+
+  const _MenuActionButton({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+    this.trailing,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1087,15 +1112,16 @@ class _MenuActionButton extends StatelessWidget {
                     color: isDark ? Colors.white : AppThemes.colorCuarto,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w600,
-                    fontSize: 16,
+                    fontSize: ResponsiveApp.scaleText(16),
                   ),
                 ),
               ),
-              Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 16,
-                color: isDark ? Colors.white70 : Colors.grey[500],
-              ),
+              trailing ??
+                  Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 16,
+                    color: isDark ? Colors.white70 : Colors.grey[500],
+                  ),
             ],
           ),
         ),
@@ -1104,20 +1130,34 @@ class _MenuActionButton extends StatelessWidget {
   }
 }
 
-class _ReviewSection extends StatelessWidget {
+class _ReviewSection extends StatefulWidget {
   const _ReviewSection();
 
-  Future<void> _promptReview(BuildContext context, AppLocalizations l10n) async {
+  @override
+  State<_ReviewSection> createState() => _ReviewSectionState();
+}
+
+class _ReviewSectionState extends State<_ReviewSection> {
+  bool _isLoading = false;
+
+  Future<void> _handleReviewTap() async {
+    if (_isLoading) return;
+    setState(() => _isLoading = true);
+    final l10n = AppLocalizations.of(context)!;
     final inAppReview = InAppReview.instance;
     try {
-      if (await inAppReview.isAvailable()) {
+      final available = await inAppReview.isAvailable();
+      if (available) {
         await inAppReview.requestReview();
-        return;
+      } else {
+        Toast.info(context, message: l10n.reviewFallbackMessage);
       }
     } catch (error) {
       if (kDebugMode) debugPrint('Review request failed: $error');
+      Toast.info(context, message: l10n.reviewFallbackMessage);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
-    Toast.info(context, message: l10n.reviewFallbackMessage);
   }
 
   @override
@@ -1126,7 +1166,28 @@ class _ReviewSection extends StatelessWidget {
     return _MenuActionButton(
       icon: FontAwesomeIcons.solidStar,
       title: l10n.reviewCardTitle,
-      onTap: () => _promptReview(context, l10n),
+      onTap: _handleReviewTap,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (_isLoading) ...[
+            SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation(AppThemes.colorPrimero),
+              ),
+            ),
+            const SizedBox(width: 6),
+          ],
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[500],
+          ),
+        ],
+      ),
     );
   }
 }

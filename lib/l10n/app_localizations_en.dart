@@ -502,7 +502,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'At Coro Games we respect your privacy. We do not request personal data such as names or email addresses.\n\n• Game Data: Stored locally on your device and never leaves it.\n\n• Third-Party Services: We use Google Firebase for performance analytics and Google AdMob to display ads. These services may collect device advertising identifiers for proper operation.\n\nYou can read our full Privacy Policy at the following link:';
 
   @override
-  String get viewFullPrivacyPolicy => 'View Full Privacy Policy';
+  String get viewFullPrivacyPolicy => 'Privacy Policy';
 
   @override
   String get reviewCardTitle => 'Do you like the app?';

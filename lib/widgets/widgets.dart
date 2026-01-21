@@ -18,3 +18,4 @@ export 'package:game_score/widgets/custom_input_field.dart';
 export 'package:game_score/widgets/partida_card.dart';
 export 'package:game_score/widgets/custom_icon_buttom.dart';
 export 'package:game_score/widgets/layout.dart';
+export 'package:game_score/widgets/screen_tracker.dart';

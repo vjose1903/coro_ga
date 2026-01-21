@@ -1,37 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
+import '../helpers/helpers.dart';
 
 enum KeyboardType { number }
 
 class CustomKeyboard extends StatelessWidget {
-  const CustomKeyboard({Key? key, required this.onChanged, required this.tipo}) : super(key: key);
+  const CustomKeyboard({Key? key, required this.onChanged, required this.tipo, this.buttonHeight}) : super(key: key);
   final Function onChanged;
   final KeyboardType tipo;
+  final double? buttonHeight;
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    // Altura responsive: en pantallas pequeñas (<700px) reduce proporcionalmente
+    final defaultHeight = screenHeight < 700 ? (screenHeight * 0.045).clamp(28.0, 38.0) : 38.0;
+    final height = buttonHeight ?? defaultHeight;
+
     return Table(
       children: [
         TableRow(children: [
-          _Tecla(label: "1", onChanged: (value) => onChanged(value)),
-          _Tecla(label: "2", onChanged: (value) => onChanged(value)),
-          _Tecla(label: "3", onChanged: (value) => onChanged(value))
+          _Tecla(label: "1", onChanged: (value) => onChanged(value), height: height),
+          _Tecla(label: "2", onChanged: (value) => onChanged(value), height: height),
+          _Tecla(label: "3", onChanged: (value) => onChanged(value), height: height)
         ]),
         TableRow(children: [
-          _Tecla(label: "4", onChanged: (value) => onChanged(value)),
-          _Tecla(label: "5", onChanged: (value) => onChanged(value)),
-          _Tecla(label: "6", onChanged: (value) => onChanged(value))
+          _Tecla(label: "4", onChanged: (value) => onChanged(value), height: height),
+          _Tecla(label: "5", onChanged: (value) => onChanged(value), height: height),
+          _Tecla(label: "6", onChanged: (value) => onChanged(value), height: height)
         ]),
         TableRow(children: [
-          _Tecla(label: "7", onChanged: (value) => onChanged(value)),
-          _Tecla(label: "8", onChanged: (value) => onChanged(value)),
-          _Tecla(label: "9", onChanged: (value) => onChanged(value))
+          _Tecla(label: "7", onChanged: (value) => onChanged(value), height: height),
+          _Tecla(label: "8", onChanged: (value) => onChanged(value), height: height),
+          _Tecla(label: "9", onChanged: (value) => onChanged(value), height: height)
         ]),
         TableRow(children: [
           Container(),
-          _Tecla(label: "0", onChanged: (value) => onChanged(value)),
-          _Tecla(label: "DEL", icon: Icons.backspace_rounded, onChanged: (value) => onChanged(value), backgroundColor: Colors.transparent)
+          _Tecla(label: "0", onChanged: (value) => onChanged(value), height: height),
+          _Tecla(label: "DEL", icon: Icons.backspace_rounded, onChanged: (value) => onChanged(value), backgroundColor: Colors.transparent, height: height)
         ]),
       ],
     );
@@ -39,21 +46,23 @@ class CustomKeyboard extends StatelessWidget {
 }
 
 class _Tecla extends StatelessWidget {
-  const _Tecla({Key? key, required this.label, required this.onChanged, this.icon, this.backgroundColor, this.labelColor}) : super(key: key);
+  const _Tecla({Key? key, required this.label, required this.onChanged, this.icon, this.backgroundColor, this.labelColor, this.height = 38}) : super(key: key);
 
   final String? label;
   final Function onChanged;
   final IconData? icon;
   final Color? backgroundColor;
   final Color? labelColor;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
     final bool isTransparent = backgroundColor == Colors.transparent;
     Color backColor = backgroundColor ?? (Preferences.isDarkMode ? const Color(0xff505050) : const Color(0xffFFFFFF));
+    final margin = height < 34 ? 3.0 : 5.0;
     
     return Container(
-      margin: const EdgeInsets.all(5),
+      margin: EdgeInsets.all(margin),
       decoration: isTransparent ? null : BoxDecoration(
         color: backColor,
         borderRadius: BorderRadius.circular(10),
@@ -73,13 +82,13 @@ class _Tecla extends StatelessWidget {
         ],
       ),
       child: SizedBox(
-        height: 38,
+        height: height,
         child: Material(
           color: Colors.transparent,
           child: InkWell(
             onTap: () => onChanged(label),
             borderRadius: BorderRadius.circular(10),
-            child: Center(child: _Simbolo(label: label, icon: icon, labelColor: labelColor)),
+            child: Center(child: _Simbolo(label: label, icon: icon, labelColor: labelColor, height: height)),
           ),
         ),
       ),
@@ -88,18 +97,23 @@ class _Tecla extends StatelessWidget {
 }
 
 class _Simbolo extends StatelessWidget {
-  const _Simbolo({Key? key, this.label, this.icon, this.labelColor}) : super(key: key);
+  const _Simbolo({Key? key, this.label, this.icon, this.labelColor, this.height = 38}) : super(key: key);
 
   final String? label;
   final IconData? icon;
   final Color? labelColor;
+  final double height;
+
   @override
   Widget build(BuildContext context) {
     Color color = labelColor ?? (Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorQuinto.withValues(alpha: 0.9));
-    if (icon != null) {
-      return Icon(icon, size: 20, color: color);
-    } else {
-      return Text(label!, style: TextStyle(fontFamily: 'Poppins', fontSize: 17, color: color));
-    }
+    // Escalar tamaño basado en altura de tecla
+    final iconSize = (height * 0.52).clamp(16.0, 20.0);
+    final fontSize = (height * 0.45).clamp(14.0, 17.0);
+    if (icon != null) return Icon(icon, size: iconSize, color: color);
+    return Text(
+      label!,
+      style: TextStyle(fontFamily: 'Poppins', fontSize: fontSize, color: color),
+    );
   }
 }

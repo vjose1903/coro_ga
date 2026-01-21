@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_score/helpers/helpers.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:toastification/toastification.dart';
 
@@ -87,7 +88,7 @@ class Toast {
               style: TextStyle(
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w600,
-                fontSize: 14,
+                fontSize: ResponsiveApp.scaleText(14),
                 color: isDark ? Colors.white : Colors.black87,
               ),
             )
@@ -101,7 +102,7 @@ class Toast {
                   message,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 13,
+                    fontSize: ResponsiveApp.scaleText(13),
                     color: isDark ? Colors.white70 : Colors.black54,
                   ),
                 ),
@@ -135,11 +136,11 @@ class Toast {
                           ),
                           child: Text(
                             actionLabel,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Poppins',
                               color: Colors.white,
                               fontWeight: FontWeight.w500,
-                              fontSize: 12,
+                              fontSize: ResponsiveApp.scaleText(12),
                             ),
                           ),
                         ),

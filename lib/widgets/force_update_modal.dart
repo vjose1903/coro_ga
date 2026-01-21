@@ -6,6 +6,7 @@ import 'package:game_score/services/version_service.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../helpers/helpers.dart';
 
 class ForceUpdateModal extends StatelessWidget {
   const ForceUpdateModal({Key? key}) : super(key: key);
@@ -89,8 +90,8 @@ class ForceUpdateModal extends StatelessWidget {
                       return Text(
                         l10n.newVersionTitle,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 22,
+                        style: TextStyle(
+                          fontSize: ResponsiveApp.scaleText(22),
                           fontWeight: FontWeight.bold,
                           fontFamily: 'Poppins',
                           color: Colors.white,
@@ -112,7 +113,7 @@ class ForceUpdateModal extends StatelessWidget {
                         l10n.newVersionAvailable,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: ResponsiveApp.scaleText(14),
                           fontFamily: 'Poppins',
                           color: Colors.white.withValues(alpha: 0.85),
                           height: 1.5,
@@ -154,7 +155,7 @@ class ForceUpdateModal extends StatelessWidget {
                               return Text(
                                 l10n.updateNow,
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: ResponsiveApp.scaleText(16),
                                   fontFamily: 'Poppins',
                                   fontWeight: FontWeight.w600,
                                   color: AppThemes.colorCuarto,

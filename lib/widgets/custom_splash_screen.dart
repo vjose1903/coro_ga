@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import '../helpers/helpers.dart';
 
 class CustomSplashScreen extends StatefulWidget {
   final Widget navigateRoute;
@@ -70,7 +71,8 @@ class _CustomSplashScreenState extends State<CustomSplashScreen> {
                 delay: const Duration(milliseconds: 500),
                 child: _AnimatedText(
                   text: widget.text,
-                  style: widget.textStyle ?? const TextStyle(fontSize: 30.0, fontFamily: "Poppins"),
+                  style: widget.textStyle ??
+                      TextStyle(fontSize: ResponsiveApp.scaleText(30), fontFamily: "Poppins"),
                 ),
               ),
           ],

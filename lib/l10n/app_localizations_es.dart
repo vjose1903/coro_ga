@@ -511,7 +511,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'En Coro Games respetamos tu privacidad. No solicitamos datos personales como nombres o correos electrónicos.\n\n• Datos de Partida: Se guardan localmente en tu dispositivo y no salen de él.\n\n• Servicios de Terceros: Utilizamos Google Firebase para estadísticas de rendimiento y Google AdMob para mostrar anuncios. Estos servicios pueden recopilar identificadores de publicidad del dispositivo para su correcto funcionamiento.\n\nPuedes consultar nuestra Política de Privacidad completa en el siguiente enlace:';
 
   @override
-  String get viewFullPrivacyPolicy => 'Ver Política de Privacidad Completa';
+  String get viewFullPrivacyPolicy => 'Política de Privacidad';
 
   @override
   String get reviewCardTitle => '¿Te gusta la app?';

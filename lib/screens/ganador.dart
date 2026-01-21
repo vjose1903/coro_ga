@@ -1,4 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
+import 'package:game_score/helpers/helpers.dart';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
@@ -61,8 +62,10 @@ class _GanadorScreenState extends State<GanadorScreen> {
       ),
     );
 
-    return Scaffold(
-      body: Stack(
+    return ScreenTracker(
+      screenName: 'GanadorScreen',
+      child: Scaffold(
+        body: Stack(
         children: [
           Container(decoration: boxDecoration),
           Container(
@@ -91,11 +94,11 @@ class _GanadorScreenState extends State<GanadorScreen> {
                   TextAnimator(AppLocalizations.of(context)!.winner,
                       initialDelay: const Duration(seconds: 1),
                       incomingEffect: WidgetTransitionEffects.incomingOffsetThenScaleAndStep(duration: const Duration(milliseconds: 800)),
-                      style: TextStyle(color: ganadorColor, fontFamily: 'Poppins', fontSize: 30, fontWeight: FontWeight.bold, letterSpacing: 3)),
+                      style: TextStyle(color: ganadorColor, fontFamily: 'Poppins', fontSize: ResponsiveApp.scaleText(30), fontWeight: FontWeight.bold, letterSpacing: 3)),
                   TextAnimator(partida,
                       initialDelay: const Duration(seconds: 1, milliseconds: 800),
                       incomingEffect: WidgetTransitionEffects.incomingScaleDown(duration: const Duration(seconds: 1)),
-                      style: TextStyle(color: partidaColor, fontFamily: 'Poppins', fontSize: 20)),
+                      style: TextStyle(color: partidaColor, fontFamily: 'Poppins', fontSize: ResponsiveApp.scaleText(20))),
                   //
                   const SizedBox(height: 20),
 
@@ -115,7 +118,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
                       incomingEffect: WidgetTransitionEffects.incomingScaleUp(),
                       atRestEffect: WidgetRestingEffects.pulse(effectStrength: 0.8),
                       initialDelay: const Duration(seconds: 2),
-                      style: TextStyle(color: ganadorColor, fontFamily: 'Poppins', fontSize: 30, fontWeight: FontWeight.bold, letterSpacing: 3)),
+                      style: TextStyle(color: ganadorColor, fontFamily: 'Poppins', fontSize: ResponsiveApp.scaleText(30), fontWeight: FontWeight.bold, letterSpacing: 3)),
 
                   const SizedBox(height: 40),
 
@@ -131,10 +134,10 @@ class _GanadorScreenState extends State<GanadorScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(AppLocalizations.of(context)!.rematch,
-                                style: const TextStyle(fontSize: 15, fontFamily: 'Poppins', fontWeight: FontWeight.bold, letterSpacing: 2)),
+                                style: TextStyle(fontSize: ResponsiveApp.scaleText(15), fontFamily: 'Poppins', fontWeight: FontWeight.bold, letterSpacing: 2)),
                             if (!premiumProvider.isPremium)
                               Text(AppLocalizations.of(context)!.watchAd,
-                                  style: const TextStyle(fontSize: 10, fontFamily: 'Poppins', fontWeight: FontWeight.normal)),
+                                  style: TextStyle(fontSize: ResponsiveApp.scaleText(10), fontFamily: 'Poppins', fontWeight: FontWeight.normal)),
                           ],
                         ),
                       ),
@@ -144,7 +147,8 @@ class _GanadorScreenState extends State<GanadorScreen> {
               )),
         ],
       ),
-    );
+    ),
+  );
   }
 
   revanchaFunction() async {

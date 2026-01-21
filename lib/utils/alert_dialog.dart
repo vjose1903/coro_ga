@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:game_score/helpers/helpers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -288,7 +289,7 @@ class _DialogHeader extends StatelessWidget {
               title,
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 15,
+                fontSize: ResponsiveApp.scaleText(15),
                 fontWeight: FontWeight.w600,
                 color: isDark ? Colors.white : AppThemes.colorCuarto,
               ),
@@ -409,7 +410,7 @@ class _ActionButton extends StatelessWidget {
               label,
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 14,
+                fontSize: ResponsiveApp.scaleText(14),
                 fontWeight: FontWeight.w500,
                 color: textColor,
               ),
@@ -451,7 +452,7 @@ class DialogBody extends StatelessWidget {
           menssage,
           style: TextStyle(
             fontFamily: 'Poppins',
-            fontSize: 14,
+            fontSize: ResponsiveApp.scaleText(14),
             height: 1.5,
             color: isDark ? Colors.white70 : Colors.black87,
           ),

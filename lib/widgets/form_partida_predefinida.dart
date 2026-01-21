@@ -10,6 +10,7 @@ import 'package:game_score/utils/utils.dart';
 import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
+import '../helpers/helpers.dart';
 
 class FormPartidaPredefinida extends StatelessWidget {
   const FormPartidaPredefinida({Key? key}) : super(key: key);
@@ -250,7 +251,7 @@ class _FormHeader extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w600,
-                    fontSize: 16,
+                    fontSize: ResponsiveApp.scaleText(16),
                     color: isDark ? Colors.white : AppThemes.colorCuarto,
                   ),
                 ),
@@ -258,7 +259,7 @@ class _FormHeader extends StatelessWidget {
                   isEditing ? AppLocalizations.of(context)!.modifyGameData : AppLocalizations.of(context)!.configureYourPredefined,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 11,
+                    fontSize: ResponsiveApp.scaleText(11),
                     color: isDark ? Colors.white54 : Colors.black54,
                   ),
                 ),
@@ -326,7 +327,7 @@ class _JugadoresCounter extends StatelessWidget {
                 AppLocalizations.of(context)!.playerCount,
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 13,
+                  fontSize: ResponsiveApp.scaleText(13),
                   fontWeight: FontWeight.w500,
                   color: isDark ? Colors.white70 : Colors.black87,
                 ),
@@ -365,7 +366,7 @@ class _JugadoresCounter extends StatelessWidget {
                       cantidad.toString(),
                       style: TextStyle(
                         fontFamily: 'Poppins',
-                        fontSize: 22,
+                        fontSize: ResponsiveApp.scaleText(22),
                         fontWeight: FontWeight.bold,
                         color: isDark ? Colors.white : AppThemes.colorCuarto,
                       ),
@@ -487,10 +488,10 @@ class _ActionButton extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w600,
-                  fontSize: 14,
+                  fontSize: ResponsiveApp.scaleText(14),
                   color: Colors.white,
                 ),
               ),

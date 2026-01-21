@@ -22,6 +22,10 @@ void main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   await Preferences.init();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   final isPlatformDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
   bool initInDarkMode = Preferences.isSystemMode ? isPlatformDark : Preferences.isDarkMode;
 
@@ -52,9 +56,6 @@ void _initializeServicesDeferred(PremiumProvider premiumProvider) {
   // Ejecutar en paralelo después de que la UI se muestre
   Future.wait([
     _initializeMobileAds(),
-    Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    ),
     PurchaseService.instance.initialize(
       onPurchaseComplete: (success) {
         if (success) premiumProvider.setPremium(true);

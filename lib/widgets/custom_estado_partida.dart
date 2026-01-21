@@ -83,7 +83,7 @@ class _EstadoChip extends StatelessWidget {
             label,
             style: TextStyle(
               fontFamily: 'Poppins',
-              fontSize: 14,
+              fontSize: ResponsiveApp.scaleText(14),
               fontWeight: FontWeight.w600,
               color: Preferences.isDarkMode ? color : color.withValues(alpha: 0.9),
             ),
@@ -182,7 +182,7 @@ class _PlayerStatusChip extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 14,
+                fontSize: ResponsiveApp.scaleText(14),
                 fontWeight: FontWeight.w600,
                 color: Preferences.isDarkMode ? color : color.withValues(alpha: 0.9),
               ),

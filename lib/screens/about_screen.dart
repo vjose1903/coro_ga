@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_score/helpers/helpers.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -31,77 +32,80 @@ class AboutScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final topPadding = MediaQuery.of(context).padding.top;
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Fondo con gradiente
-          Container(decoration: _backgroundDecoration),
-          // Decoración de círculos sutiles
-          const _BackgroundCircles(),
-          // AppBar custom
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                children: [
-                  CustomIconButtom(
-                    iconSize: 25,
-                    iconColor: Colors.white,
-                    icon: Icons.arrow_back_ios_new,
-                    onTap: () => Navigator.pop(context),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      l10n.aboutTitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        letterSpacing: 1.5,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black26,
-                            blurRadius: 4,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
+    return ScreenTracker(
+      screenName: 'AboutScreen',
+      child: Scaffold(
+        body: Stack(
+          children: [
+            // Fondo con gradiente
+            Container(decoration: _backgroundDecoration),
+            // Decoración de círculos sutiles
+            const _BackgroundCircles(),
+            // AppBar custom
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    CustomIconButtom(
+                      iconSize: ResponsiveApp.isSmallHeight ? 18 : 22,
+                      iconColor: Colors.white,
+                      icon: Icons.arrow_back_ios_new,
+                      onTap: () => Navigator.pop(context),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        l10n.aboutTitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
+                          fontSize: ResponsiveApp.scaleText(20),
+                          letterSpacing: 1.5,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black26,
+                              blurRadius: 4,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          // Body con el contenido
-          Column(
-            children: [
-              SizedBox(height: topPadding + 65),
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.only(topLeft: Radius.circular(50)),
-                    color: AppThemes.themeColor_1,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        blurRadius: 20,
-                        offset: const Offset(0, -5),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(topLeft: Radius.circular(50)),
-                    child: _AboutContent(l10n: l10n),
-                  ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ],
+            ),
+            // Body con el contenido
+            Column(
+              children: [
+                SizedBox(height: topPadding + 65),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.only(topLeft: Radius.circular(50)),
+                      color: AppThemes.themeColor_1,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 20,
+                          offset: const Offset(0, -5),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(topLeft: Radius.circular(50)),
+                      child: _AboutContent(l10n: l10n),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -180,7 +184,7 @@ class _AboutContent extends StatelessWidget {
             'Coro Games',
             style: TextStyle(
               fontFamily: 'Poppins',
-              fontSize: 28,
+              fontSize: ResponsiveApp.scaleText(28),
               fontWeight: FontWeight.bold,
               color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
             ),
@@ -194,7 +198,7 @@ class _AboutContent extends StatelessWidget {
                 version,
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 14,
+                  fontSize: ResponsiveApp.scaleText(14),
                   color: Colors.grey[500],
                 ),
               );
@@ -209,7 +213,7 @@ class _AboutContent extends StatelessWidget {
               l10n.aboutAppDescription,
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 14,
+                fontSize: ResponsiveApp.scaleText(14),
                 height: 1.6,
                 color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[700],
               ),
@@ -227,7 +231,7 @@ class _AboutContent extends StatelessWidget {
                   l10n.privacyPolicyDescription,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 14,
+                    fontSize: ResponsiveApp.scaleText(14),
                     height: 1.6,
                     color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[700],
                   ),
@@ -241,10 +245,10 @@ class _AboutContent extends StatelessWidget {
           const SizedBox(height: 32),
           // Footer
           Text(
-            '© 2024 Coro Games',
+            '© 2024-${DateTime.now().year} Coro Games',
             style: TextStyle(
               fontFamily: 'Poppins',
-              fontSize: 12,
+              fontSize: ResponsiveApp.scaleText(12),
               color: Colors.grey[500],
             ),
           ),
@@ -297,9 +301,9 @@ class _PrivacyPolicyButton extends StatelessWidget {
               const SizedBox(width: 10),
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 14,
+                  fontSize: ResponsiveApp.scaleText(14),
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
@@ -364,7 +368,7 @@ class _SectionCard extends StatelessWidget {
             title,
             style: TextStyle(
               fontFamily: 'Poppins',
-              fontSize: 18,
+              fontSize: ResponsiveApp.scaleText(18),
               fontWeight: FontWeight.w600,
               color: isDark ? Colors.white : AppThemes.colorCuarto,
             ),

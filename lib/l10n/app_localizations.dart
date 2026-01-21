@@ -995,7 +995,7 @@ abstract class AppLocalizations {
   /// No description provided for @viewFullPrivacyPolicy.
   ///
   /// In en, this message translates to:
-  /// **'View Full Privacy Policy'**
+  /// **'Privacy Policy'**
   String get viewFullPrivacyPolicy;
 
   /// No description provided for @reviewCardTitle.

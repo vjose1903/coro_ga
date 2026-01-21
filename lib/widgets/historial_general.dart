@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:game_score/helpers/helpers.dart';
 import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/models/models.dart';
 import 'package:game_score/providers/providers.dart';
@@ -16,20 +17,17 @@ import 'package:game_score/helpers/ad_locations.dart';
 import 'package:provider/provider.dart';
 
 class HistorialGeneral extends StatefulWidget {
-  const HistorialGeneral({Key? key, required this.panelController})
-      : super(key: key);
+  const HistorialGeneral({Key? key, required this.panelController}) : super(key: key);
   final PanelController panelController;
 
   @override
   State<HistorialGeneral> createState() => _HistorialGeneralState();
 }
 
-class _HistorialGeneralState extends State<HistorialGeneral>
-    with SlideUpAutoScrollMixin {
+class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScrollMixin {
   final TextEditingController puntuacionController = TextEditingController();
   final ScrollController historialController = ScrollController();
-  final GoogleBannerAd anuncio =
-      const GoogleBannerAd(location: AdLocation.puntuacion);
+  final GoogleBannerAd anuncio = const GoogleBannerAd(location: AdLocation.puntuacion);
   Jugador? jugadorSeleccionado;
 
   @override
@@ -55,12 +53,16 @@ class _HistorialGeneralState extends State<HistorialGeneral>
     for (var jugador in jugadores) {
       if (jugador.historialJugadas != null) {
         for (var historial in jugador.historialJugadas!) {
-          todosHistoriales.add(
-              _HistorialConJugador(jugador: jugador, historial: historial));
+          todosHistoriales.add(_HistorialConJugador(jugador: jugador, historial: historial));
         }
       }
     }
     todosHistoriales.sort((a, b) => a.historial.id!.compareTo(b.historial.id!));
+
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallScreen = screenHeight < 700;
+    final spacingLg = isSmallScreen ? 8.0 : 16.0;
+    final spacingMd = isSmallScreen ? 6.0 : 12.0;
 
     return Column(
       children: [
@@ -69,7 +71,7 @@ class _HistorialGeneralState extends State<HistorialGeneral>
           cantRegistros: todosHistoriales.length,
           panelController: widget.panelController,
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: spacingLg),
 
         // Selector de jugador
         _JugadorSelector(
@@ -77,23 +79,21 @@ class _HistorialGeneralState extends State<HistorialGeneral>
           jugadorSeleccionado: jugadorSeleccionado,
           onChanged: (jugador) => setState(() => jugadorSeleccionado = jugador),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: spacingMd),
 
         // Lista de historial
         Flexible(
           flex: 2,
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height * 0.18,
+              minHeight: screenHeight * (isSmallScreen ? 0.12 : 0.18),
             ),
             child: Container(
               decoration: BoxDecoration(
                 color: AppThemes.themeColor_1,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.08)
-                      : Colors.grey.withValues(alpha: 0.15),
+                  color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
                 ),
               ),
               child: ClipRRect(
@@ -106,12 +106,12 @@ class _HistorialGeneralState extends State<HistorialGeneral>
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: spacingMd),
 
         // Teclado y campo de puntuación
         if (partida.tipo == "Puntuación") ...[
           _KeyboardSection(puntuacionController: puntuacionController),
-          const SizedBox(height: 12),
+          SizedBox(height: spacingMd),
         ],
 
         // Botones de acción
@@ -159,30 +159,18 @@ class _HistorialGeneralState extends State<HistorialGeneral>
     required PartidaProvider partidaProvider,
     required String tipo,
   }) async {
-    final scrollController =
-        getEffectiveController(context, historialController);
+    final scrollController = getEffectiveController(context, historialController);
     final l10n = AppLocalizations.of(context)!;
     if (jugadorSeleccionado == null) {
-      Toast.show(
-          type: ToastType.warning,
-          context: context,
-          message: l10n.selectPlayer);
+      Toast.show(type: ToastType.warning, context: context, message: l10n.selectPlayer);
       return;
     }
 
-    String puntuacion = partidaProvider.partidaEnTurno!.tipo == "Puntuación"
-        ? puntuacionController.text
-        : "1";
+    String puntuacion = partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? puntuacionController.text : "1";
 
     if (puntuacion.isEmpty || puntuacion == "0") {
-      String msg = puntuacion == "0"
-          ? l10n.scoreMustBeGreaterThanZero
-          : l10n.enterScoreToContinue;
-      Toast.show(
-          type: ToastType.warning,
-          context: context,
-          title: l10n.warning,
-          message: msg);
+      String msg = puntuacion == "0" ? l10n.scoreMustBeGreaterThanZero : l10n.enterScoreToContinue;
+      Toast.show(type: ToastType.warning, context: context, title: l10n.warning, message: msg);
       return;
     }
 
@@ -190,14 +178,8 @@ class _HistorialGeneralState extends State<HistorialGeneral>
     int puntuacionActual = jugadorSeleccionado!.puntuacion!;
 
     if (tipo == "reducir" && puntuacionActual - puntuacionInt < 0) {
-      String msgError = partidaProvider.partidaEnTurno!.tipo == "Puntuación"
-          ? l10n.minScoreWarning
-          : l10n.minRoundWarning;
-      Toast.show(
-          type: ToastType.warning,
-          context: context,
-          title: l10n.warning,
-          message: msgError);
+      String msgError = partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? l10n.minScoreWarning : l10n.minRoundWarning;
+      Toast.show(type: ToastType.warning, context: context, title: l10n.warning, message: msgError);
       return;
     }
 
@@ -216,8 +198,7 @@ class _HistorialGeneralState extends State<HistorialGeneral>
     partidaProvider.refresh();
 
     // Restaurar jugador anterior si existía
-    if (jugadorAnterior != null &&
-        jugadorAnterior.id != jugadorSeleccionado!.id) {
+    if (jugadorAnterior != null && jugadorAnterior.id != jugadorSeleccionado!.id) {
       jugadorProvider.changeJugadorEnTurno(jugadorAnterior);
     }
 
@@ -228,8 +209,7 @@ class _HistorialGeneralState extends State<HistorialGeneral>
       setState(() {}); // Refrescar la lista
 
       int newPuntuacion = response.data.puntuacion;
-      if (newPuntuacion >=
-          partidaProvider.partidaEnTurno!.maxPuntuacion!.toInt()) {
+      if (newPuntuacion >= partidaProvider.partidaEnTurno!.maxPuntuacion!.toInt()) {
         Navigator.pushReplacement(
           context,
           PageRouteBuilder(
@@ -237,11 +217,8 @@ class _HistorialGeneralState extends State<HistorialGeneral>
               "partida": partidaProvider.partidaEnTurno!.nombre,
               "jugador": jugadorSeleccionado!.nombre,
             }),
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                const GanadorScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) =>
-                    FadeTransition(opacity: animation, child: child),
+            pageBuilder: (context, animation, secondaryAnimation) => const GanadorScreen(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
             transitionDuration: const Duration(milliseconds: 400),
           ),
         );
@@ -265,8 +242,7 @@ class _HistorialConJugador {
 // ============================================
 
 class _HistorialHeader extends StatelessWidget {
-  const _HistorialHeader(
-      {required this.cantRegistros, required this.panelController});
+  const _HistorialHeader({required this.cantRegistros, required this.panelController});
 
   final int cantRegistros;
   final PanelController panelController;
@@ -298,8 +274,7 @@ class _HistorialHeader extends StatelessWidget {
               ],
             ),
             child: const Center(
-              child: FaIcon(FontAwesomeIcons.clockRotateLeft,
-                  color: Colors.white, size: 18),
+              child: FaIcon(FontAwesomeIcons.clockRotateLeft, color: Colors.white, size: 18),
             ),
           ),
           const SizedBox(width: 12),
@@ -311,7 +286,7 @@ class _HistorialHeader extends StatelessWidget {
                   AppLocalizations.of(context)!.generalHistory,
                   style: TextStyle(
                     fontFamily: "Poppins",
-                    fontSize: 16,
+                    fontSize: ResponsiveApp.scaleText(14),
                     fontWeight: FontWeight.bold,
                     color: isDark ? Colors.white : AppThemes.colorQuinto,
                   ),
@@ -321,7 +296,7 @@ class _HistorialHeader extends StatelessWidget {
                   AppLocalizations.of(context)!.records(cantRegistros),
                   style: TextStyle(
                     fontFamily: "Poppins",
-                    fontSize: 11,
+                    fontSize: ResponsiveApp.scaleText(11),
                     color: isDark ? Colors.grey[400] : Colors.grey[600],
                     fontWeight: FontWeight.w500,
                   ),
@@ -349,118 +324,98 @@ class _JugadorSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallScreen = screenHeight < 700;
+    final avatarSize = isSmallScreen ? 24.0 : 28.0;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppLocalizations.of(context)!.selectedPlayer,
-          style: TextStyle(
-            fontFamily: "Poppins",
-            fontSize: 12,
-            color: isDark ? Colors.grey[400] : Colors.grey[600],
-            fontWeight: FontWeight.w500,
-          ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppThemes.inputColor,
+        borderRadius: BorderRadius.circular(isSmallScreen ? 6 : 15),
+      ),
+      child: DropdownButton<Jugador>(
+        value: jugadorSeleccionado,
+        isExpanded: true,
+        isDense: isSmallScreen,
+        underline: const SizedBox(),
+        dropdownColor: isDark ? AppThemes.themeColor_1 : Colors.white,
+        icon: Icon(
+          Icons.arrow_drop_down,
+          color: isDark ? Colors.grey[400] : Colors.grey[600],
+          size: isSmallScreen ? 20 : 24,
         ),
-        const SizedBox(height: 6),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(
-            color: AppThemes.inputColor,
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: DropdownButton<Jugador>(
-            value: jugadorSeleccionado,
-            isExpanded: true,
-            underline: const SizedBox(),
-            dropdownColor: isDark ? AppThemes.themeColor_1 : Colors.white,
-            icon: Icon(
-              Icons.arrow_drop_down,
-              color: isDark ? Colors.grey[400] : Colors.grey[600],
-            ),
-            items: jugadores.map((jugador) {
-              return DropdownMenuItem<Jugador>(
-                value: jugador,
-                child: Row(
-                  children: [
-                    // Avatar
-                    Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            AppThemes.colorPrimero,
-                            AppThemes.colorTercero
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Center(
-                        child: Text(
-                          jugador.nombre != null && jugador.nombre!.isNotEmpty
-                              ? jugador.nombre![0].toUpperCase()
-                              : '?',
-                          style: const TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
+        items: jugadores.map((jugador) {
+          return DropdownMenuItem<Jugador>(
+            value: jugador,
+            child: Row(
+              children: [
+                // Avatar
+                Container(
+                  width: avatarSize,
+                  height: avatarSize,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
+                    ),
+                    borderRadius: BorderRadius.circular(isSmallScreen ? 6 : 8),
+                  ),
+                  child: Center(
+                    child: Text(
+                      jugador.nombre != null && jugador.nombre!.isNotEmpty ? jugador.nombre![0].toUpperCase() : '?',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: ResponsiveApp.scaleText(12),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    // Nombre
-                    Expanded(
-                      child: Text(
-                        jugador.nombre!,
-                        style: TextStyle(
-                          fontFamily: "Poppins",
-                          fontSize: 14,
-                          color: isDark ? Colors.white : AppThemes.colorQuinto,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    // Puntuación con badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? AppThemes.colorPrimero.withValues(alpha: 0.3)
-                            : AppThemes.colorPrimero.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        "${jugador.puntuacion}",
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : AppThemes.colorPrimero,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                  ],
+                  ),
                 ),
-              );
-            }).toList(),
-            onChanged: onChanged,
-          ),
-        ),
-      ],
+                SizedBox(width: isSmallScreen ? 8 : 10),
+                // Nombre
+                Expanded(
+                  child: Text(
+                    jugador.nombre!,
+                    style: TextStyle(
+                      fontFamily: "Poppins",
+                      fontSize: ResponsiveApp.scaleText(14),
+                      color: isDark ? Colors.white : AppThemes.colorQuinto,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Puntuación con badge
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 6 : 8, vertical: isSmallScreen ? 1 : 2),
+                  decoration: BoxDecoration(
+                    color: isDark ? AppThemes.colorPrimero.withValues(alpha: 0.3) : AppThemes.colorPrimero.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    "${jugador.puntuacion}",
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: ResponsiveApp.scaleText(11),
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : AppThemes.colorPrimero,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+            ),
+          );
+        }).toList(),
+        onChanged: onChanged,
+      ),
     );
   }
 }
 
 class _ListHistorialGeneral extends StatefulWidget {
-  const _ListHistorialGeneral(
-      {Key? key, required this.historiales, required this.historialController})
-      : super(key: key);
+  const _ListHistorialGeneral({Key? key, required this.historiales, required this.historialController}) : super(key: key);
 
   final List<_HistorialConJugador> historiales;
   final ScrollController historialController;
@@ -469,8 +424,7 @@ class _ListHistorialGeneral extends StatefulWidget {
   State<_ListHistorialGeneral> createState() => _ListHistorialGeneralState();
 }
 
-class _ListHistorialGeneralState extends State<_ListHistorialGeneral>
-    with SlideUpAutoScrollMixin {
+class _ListHistorialGeneralState extends State<_ListHistorialGeneral> with SlideUpAutoScrollMixin {
   @override
   void initState() {
     super.initState();
@@ -478,8 +432,7 @@ class _ListHistorialGeneralState extends State<_ListHistorialGeneral>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (widget.historiales.isNotEmpty) {
-        final effectiveController =
-            getEffectiveController(context, widget.historialController);
+        final effectiveController = getEffectiveController(context, widget.historialController);
         scheduleScrollToBottom(context, effectiveController);
       }
     });
@@ -493,8 +446,7 @@ class _ListHistorialGeneralState extends State<_ListHistorialGeneral>
 
   @override
   Widget build(BuildContext context) {
-    final effectiveController =
-        getEffectiveController(context, widget.historialController);
+    final effectiveController = getEffectiveController(context, widget.historialController);
 
     if (widget.historiales.isEmpty) {
       return Center(
@@ -517,7 +469,10 @@ class _ListHistorialGeneralState extends State<_ListHistorialGeneral>
             Text(
               AppLocalizations.of(context)!.noRecords,
               style: TextStyle(
-                  fontFamily: 'Poppins', fontSize: 12, color: Colors.grey[500]),
+                fontFamily: 'Poppins',
+                fontSize: ResponsiveApp.scaleText(12),
+                color: Colors.grey[500],
+              ),
             ),
           ],
         ),
@@ -529,9 +484,7 @@ class _ListHistorialGeneralState extends State<_ListHistorialGeneral>
       physics: const ClampingScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       separatorBuilder: (_, __) => Divider(
-        color: Preferences.isDarkMode
-            ? Colors.white.withValues(alpha: 0.08)
-            : Colors.grey.withValues(alpha: 0.2),
+        color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.2),
         height: 1,
       ),
       itemCount: widget.historiales.length,
@@ -576,6 +529,9 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
     final isDark = Preferences.isDarkMode;
     final isAumentar = widget.historial.tipo == "aumentar";
     final color = isAumentar ? const Color(0xFF4CAF50) : Colors.red[400]!;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallScreen = screenHeight < 700;
+    final avatarSize = isSmallScreen ? 26.0 : 32.0;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
@@ -586,10 +542,12 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
         backgroundColor: Colors.transparent,
         trailingActions: [
           SwipeAction(
-            icon: const Icon(Icons.delete_outline_rounded,
-                color: Colors.white, size: 20),
+            icon: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 20),
             title: AppLocalizations.of(context)!.delete,
-            style: const TextStyle(fontFamily: 'Poppins', fontSize: 11),
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: ResponsiveApp.scaleText(11),
+            ),
             onTap: (handler) => _deleteHistorial(context, handler),
             color: Colors.red[400]!,
           ),
@@ -597,52 +555,43 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onLongPress: () =>
-                _controller.openCellAt(index: widget.index, trailing: true),
+            onLongPress: () => _controller.openCellAt(index: widget.index, trailing: true),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
+              padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 6 : 10),
               child: Row(
                 children: [
                   // Avatar del jugador
                   Container(
-                    width: 32,
-                    height: 32,
+                    width: avatarSize,
+                    height: avatarSize,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [
-                          AppThemes.colorPrimero,
-                          AppThemes.colorTercero
-                        ],
+                        colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Center(
                       child: Text(
-                        widget.jugador.nombre != null &&
-                                widget.jugador.nombre!.isNotEmpty
-                            ? widget.jugador.nombre![0].toUpperCase()
-                            : '?',
-                        style: const TextStyle(
+                        widget.jugador.nombre != null && widget.jugador.nombre!.isNotEmpty ? widget.jugador.nombre![0].toUpperCase() : '?',
+                        style: TextStyle(
                           fontFamily: 'Poppins',
-                          fontSize: 12,
+                          fontSize: ResponsiveApp.scaleText(12),
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: isSmallScreen ? 8 : 10),
                   // Nombre
                   Expanded(
                     child: Text(
                       widget.jugador.nombre!,
                       style: TextStyle(
                         fontFamily: 'Poppins',
-                        fontSize: 13,
+                        fontSize: ResponsiveApp.scaleText(13),
                         fontWeight: FontWeight.w500,
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.8)
-                            : AppThemes.colorQuinto,
+                        color: isDark ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorQuinto,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -650,8 +599,7 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
                   ),
                   // Puntuación
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: color.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
@@ -660,9 +608,7 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          isAumentar
-                              ? Icons.arrow_upward_rounded
-                              : Icons.arrow_downward_rounded,
+                          isAumentar ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
                           size: 14,
                           color: color,
                         ),
@@ -671,7 +617,7 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
                           "${isAumentar ? '+' : '-'}${widget.historial.puntuacion}",
                           style: TextStyle(
                             fontFamily: 'Poppins',
-                            fontSize: 13,
+                            fontSize: ResponsiveApp.scaleText(13),
                             fontWeight: FontWeight.bold,
                             color: color,
                           ),
@@ -693,8 +639,7 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
     CustomAlertDialog.show(
       context,
       title: l10n.confirm,
-      menssage: l10n.confirmDeleteScore(
-          widget.historial.puntuacion!.toInt(), widget.jugador.nombre!),
+      menssage: l10n.confirmDeleteScore(widget.historial.puntuacion!.toInt(), widget.jugador.nombre!),
       dialogType: DialogType.error,
       buttonsList: [
         CustomActionsButtons.cancelButton({
@@ -750,7 +695,7 @@ class _ActionScoreButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          padding: const EdgeInsets.symmetric(vertical: 7),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
@@ -773,9 +718,9 @@ class _ActionScoreButton extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: "Poppins",
-                  fontSize: 14,
+                  fontSize: ResponsiveApp.scaleText(14),
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
@@ -789,8 +734,7 @@ class _ActionScoreButton extends StatelessWidget {
 }
 
 class _KeyboardSection extends StatelessWidget {
-  const _KeyboardSection({Key? key, required this.puntuacionController})
-      : super(key: key);
+  const _KeyboardSection({Key? key, required this.puntuacionController}) : super(key: key);
 
   final TextEditingController puntuacionController;
 
@@ -814,16 +758,18 @@ class _KeyboardSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallScreen = screenHeight < 700;
+    final padding = isSmallScreen ? 8.0 : 12.0;
+    final spacing = isSmallScreen ? 6.0 : 12.0;
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF3A3A3A) : const Color(0xFFF5F5F5),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.08)
-              : Colors.grey.withValues(alpha: 0.15),
+          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
           width: 1,
         ),
         boxShadow: [
@@ -835,6 +781,7 @@ class _KeyboardSection extends StatelessWidget {
         ],
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           // Input de puntuación
           TextField(
@@ -844,7 +791,7 @@ class _KeyboardSection extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'Poppins',
-              fontSize: 14,
+              fontSize: ResponsiveApp.scaleText(14),
               fontWeight: FontWeight.w600,
               color: isDark ? Colors.white : AppThemes.colorQuinto,
             ),
@@ -853,15 +800,14 @@ class _KeyboardSection extends StatelessWidget {
               fillColor: AppThemes.inputDisabledColor,
               filled: true,
               isDense: true,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: isSmallScreen ? 2 : 4),
               labelStyle: TextStyle(
                 color: AppThemes.labelInputDisabledColor,
                 fontFamily: 'Poppins',
               ),
               floatingLabelStyle: TextStyle(
                 color: isDark ? Colors.grey[400] : AppThemes.colorQuinto,
-                fontSize: 15,
+                fontSize: ResponsiveApp.scaleText(15),
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Poppins',
               ),
@@ -879,11 +825,9 @@ class _KeyboardSection extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: spacing),
           // Teclado
-          CustomKeyboard(
-              onChanged: (value) => changePuntuacionValue(value),
-              tipo: KeyboardType.number),
+          CustomKeyboard(onChanged: (value) => changePuntuacionValue(value), tipo: KeyboardType.number),
         ],
       ),
     );

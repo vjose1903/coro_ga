@@ -78,7 +78,7 @@ class SlideUpProvider extends ChangeNotifier {
     // Solo notificar si no es llamado desde un listener (evita rebuilds innecesarios)
     if (!isListener) notifyListeners();
   }
-  
+
   void resetSkipClean() {
     _skipCleanOnClose = false;
   }

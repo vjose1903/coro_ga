@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_score/helpers/helpers.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
@@ -20,7 +21,7 @@ class MyLoading {
       ..textColor = isDark ? Colors.white : AppThemes.colorCuarto
       ..textStyle = TextStyle(
         fontFamily: 'Poppins',
-        fontSize: 14,
+        fontSize: ResponsiveApp.scaleText(14),
         fontWeight: FontWeight.w500,
         color: isDark ? Colors.white70 : AppThemes.colorCuarto.withValues(alpha: 0.8),
       )

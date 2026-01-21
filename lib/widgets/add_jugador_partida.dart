@@ -15,23 +15,19 @@ import 'package:reactive_forms/reactive_forms.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
 class AddJugadorPartida extends StatelessWidget {
-  const AddJugadorPartida({Key? key, required this.panelController})
-      : super(key: key);
+  const AddJugadorPartida({Key? key, required this.panelController}) : super(key: key);
 
   final PanelController panelController;
 
   @override
   Widget build(BuildContext context) {
-    GoogleBannerAd anuncio =
-        GoogleBannerAd(location: AdLocation.agregarJugador);
+    GoogleBannerAd anuncio = GoogleBannerAd(location: AdLocation.agregarJugador);
     return AddJugador(anuncio: anuncio, panelController: panelController);
   }
 }
 
 class AddJugador extends StatefulWidget {
-  const AddJugador(
-      {Key? key, required this.anuncio, required this.panelController})
-      : super(key: key);
+  const AddJugador({Key? key, required this.anuncio, required this.panelController}) : super(key: key);
 
   final GoogleBannerAd anuncio;
   final PanelController panelController;
@@ -55,20 +51,16 @@ class _AddJugadorState extends State<AddJugador> {
     final isDark = Preferences.isDarkMode;
     FormGroup form = jugadorProvider.formJugador;
 
-    final int cantJugadores =
-        partidaProvider.partidaEnTurno?.jugadores?.length ?? 0;
+    final int cantJugadores = partidaProvider.partidaEnTurno?.jugadores?.length ?? 0;
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: SizedBox(
-        height:
-            (ResponsiveApp.size.height - (ResponsiveApp.size.height * 0.22)),
+        height: (ResponsiveApp.size.height - (ResponsiveApp.size.height * 0.22)),
         child: Column(
           children: [
             // Header
-            _AddJugadorHeader(
-                cantJugadores: cantJugadores,
-                panelController: widget.panelController),
+            _AddJugadorHeader(cantJugadores: cantJugadores, panelController: widget.panelController),
             const SizedBox(height: 16),
 
             // Input Nombre + Botón agregar
@@ -106,9 +98,7 @@ class _AddJugadorState extends State<AddJugador> {
                   color: AppThemes.themeColor_1,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.08)
-                        : Colors.grey.withValues(alpha: 0.15),
+                    color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
                   ),
                 ),
                 child: ClipRRect(
@@ -116,8 +106,7 @@ class _AddJugadorState extends State<AddJugador> {
                   child: JugadoresActuales(
                     jugadoresController: jugadoresController,
                     rebuildWidget: rebuildWidget,
-                    onEditJugador: (jugador) =>
-                        _showEditarJugadorModal(context, jugador),
+                    onEditJugador: (jugador) => _showEditarJugadorModal(context, jugador),
                   ),
                 ),
               ),
@@ -141,8 +130,7 @@ class _AddJugadorState extends State<AddJugador> {
     jugadorProvider.formJugador.patchValue(jugador.toMap());
 
     // Cerrar el slideUp cuando se abre el modal (sin limpiar jugadorEditar)
-    slideUpProvider.closeSlideUp(
-        controller: widget.panelController, skipClean: true);
+    slideUpProvider.closeSlideUp(controller: widget.panelController, skipClean: true);
 
     showDialog(
       context: context,
@@ -163,13 +151,10 @@ class _AddJugadorState extends State<AddJugador> {
     ).then((_) {
       // Esperar al siguiente frame para asegurar que los datos estén sincronizados
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context
-            .read<BannerPrefetchService>()
-            .ensurePrefetched(AdLocation.editarEntidad);
+        context.read<BannerPrefetchService>().ensurePrefetched(AdLocation.editarEntidad);
         slideUpProvider.openSlideUp(
           controller: widget.panelController,
-          bodyContent:
-              AddJugadorPartida(panelController: widget.panelController),
+          bodyContent: AddJugadorPartida(panelController: widget.panelController),
         );
       });
     });
@@ -179,13 +164,11 @@ class _AddJugadorState extends State<AddJugador> {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
-    if (!premiumProvider
-        .canAddPlayer(partidaProvider.partidaEnTurno!.jugadores!.length)) {
+    if (!premiumProvider.canAddPlayer(partidaProvider.partidaEnTurno!.jugadores!.length)) {
       Toast.show(
           type: ToastType.info,
           context: context,
-          message: AppLocalizations.of(context)!
-              .freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
+          message: AppLocalizations.of(context)!.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
           actionLabel: AppLocalizations.of(context)!.getPro,
           onAction: () => Navigator.pushNamed(context, 'premium'));
       return;
@@ -194,25 +177,16 @@ class _AddJugadorState extends State<AddJugador> {
     if (form.valid) {
       Jugador nuevoJugador = Jugador.fromMap(form.value);
 
-      partidaProvider
-          .addJugadorToPartida(context,
-              jugador: nuevoJugador, partida: partidaProvider.partidaEnTurno!)
-          .then((value) async {
+      partidaProvider.addJugadorToPartida(context, jugador: nuevoJugador, partida: partidaProvider.partidaEnTurno!).then((value) async {
         form.reset();
         rebuildWidget();
 
         await Future.delayed(const Duration(milliseconds: 50));
 
-        jugadoresController.animateTo(
-            jugadoresController.position.maxScrollExtent,
-            duration: const Duration(seconds: 1),
-            curve: Curves.easeOutCubic);
+        jugadoresController.animateTo(jugadoresController.position.maxScrollExtent, duration: const Duration(seconds: 1), curve: Curves.easeOutCubic);
       });
     } else {
-      Toast.show(
-          type: ToastType.error,
-          context: context,
-          message: AppLocalizations.of(context)!.enterNewPlayerName);
+      Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.enterNewPlayerName);
     }
   }
 }
@@ -222,8 +196,7 @@ class _AddJugadorState extends State<AddJugador> {
 // ============================================
 
 class _AddJugadorHeader extends StatelessWidget {
-  const _AddJugadorHeader(
-      {required this.cantJugadores, required this.panelController});
+  const _AddJugadorHeader({required this.cantJugadores, required this.panelController});
 
   final int cantJugadores;
   final PanelController panelController;
@@ -274,7 +247,7 @@ class _AddJugadorHeader extends StatelessWidget {
                   AppLocalizations.of(context)!.players,
                   style: TextStyle(
                     fontFamily: "Poppins",
-                    fontSize: 16,
+                    fontSize: ResponsiveApp.scaleText(14),
                     fontWeight: FontWeight.bold,
                     color: isDark ? Colors.white : AppThemes.colorQuinto,
                   ),
@@ -284,7 +257,7 @@ class _AddJugadorHeader extends StatelessWidget {
                   AppLocalizations.of(context)!.playersInGame(cantJugadores),
                   style: TextStyle(
                     fontFamily: "Poppins",
-                    fontSize: 11,
+                    fontSize: ResponsiveApp.scaleText(11),
                     color: isDark ? Colors.grey[400] : Colors.grey[600],
                     fontWeight: FontWeight.w500,
                   ),
@@ -325,7 +298,7 @@ class _SectionTitle extends StatelessWidget {
           title,
           style: TextStyle(
             fontFamily: "Poppins",
-            fontSize: 12,
+            fontSize: ResponsiveApp.scaleText(12),
             fontWeight: FontWeight.w600,
             color: isDark ? Colors.grey[400] : Colors.grey[700],
           ),
@@ -341,7 +314,7 @@ class _SectionTitle extends StatelessWidget {
             "$count",
             style: TextStyle(
               fontFamily: "Poppins",
-              fontSize: 10,
+              fontSize: ResponsiveApp.scaleText(10),
               fontWeight: FontWeight.bold,
               color: AppThemes.colorPrimero,
             ),

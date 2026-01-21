@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_score/themes/app_themes.dart';
+import '../helpers/helpers.dart';
 
 class CustomInputField<T> extends StatelessWidget {
   final String? hintText;
@@ -60,9 +61,19 @@ class CustomInputField<T> extends StatelessWidget {
         // Labels -----------
         labelStyle: TextStyle(color: enabled ? AppThemes.labelInputColor : AppThemes.labelInputDisabledColor, fontFamily: 'Poppins'),
         floatingLabelStyle: WidgetStateTextStyle.resolveWith((Set<WidgetState> states) {
-          final Color? color = states.contains(WidgetState.error) ? enabled ? Colors.red[900] : Colors.red[900]!.withValues(alpha: 0.6) : enabled ? AppThemes.colorQuinto : AppThemes.colorQuinto.withValues(alpha: 0.6);
-          return TextStyle(color: color, fontSize: 15, fontWeight: FontWeight.bold, fontFamily: 'Poppins');
-          
+          final Color? color = states.contains(WidgetState.error)
+              ? enabled
+                  ? Colors.red[900]
+                  : Colors.red[900]!.withValues(alpha: 0.6)
+              : enabled
+                  ? AppThemes.colorQuinto
+                  : AppThemes.colorQuinto.withValues(alpha: 0.6);
+          return TextStyle(
+            color: color,
+            fontSize: ResponsiveApp.scaleText(15),
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Poppins',
+          );
         }),
       ),
     );

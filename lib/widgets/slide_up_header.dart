@@ -38,23 +38,23 @@ class _SlideUpHeaderState extends State<SlideUpHeader> {
       },
       onVerticalDragUpdate: (details) {
         if (!widget.panelController.isAttached || _panelMaxHeight == null) return;
-        
+
         // Acumular el delta del drag
         _dragAccumulated += details.delta.dy;
-        
+
         // Calcular la nueva posición (invertir porque drag down = posición menor)
         final dragFraction = _dragAccumulated / _panelMaxHeight!;
         final newPosition = (_dragStartPosition - dragFraction).clamp(0.0, 1.0);
-        
+
         // Mover el panel a la nueva posición
         widget.panelController.panelPosition = newPosition;
       },
       onVerticalDragEnd: (details) {
         if (!widget.panelController.isAttached) return;
-        
+
         final velocity = details.primaryVelocity ?? 0;
         final currentPosition = widget.panelController.panelPosition;
-        
+
         // Si la velocidad es alta hacia abajo o la posición es menor al 50%, cerrar
         if (velocity > 300 || currentPosition < 0.5) {
           widget.panelController.close();
@@ -64,7 +64,7 @@ class _SlideUpHeaderState extends State<SlideUpHeader> {
         }
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,

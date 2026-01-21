@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_score/helpers/helpers.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game_score/l10n/app_localizations.dart';
 import 'package:game_score/providers/premium_provider.dart';
@@ -6,6 +7,7 @@ import 'package:game_score/services/purchase_service.dart';
 import 'package:game_score/shared_preferences/preferences.dart';
 import 'package:game_score/themes/app_themes.dart';
 import 'package:game_score/utils/utils.dart';
+import 'package:game_score/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
 
@@ -15,144 +17,146 @@ class PremiumScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
-
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: isDark
-                ? [
-                    AppThemes.themeColor_1,
-                    AppThemes.themeColor_1.withValues(alpha: 0.95),
-                  ]
-                : [
-                    Colors.white,
-                    const Color(0xFFF5F5F5),
-                  ],
+    return ScreenTracker(
+      screenName: 'PremiumScreen',
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: isDark
+                  ? [
+                      AppThemes.themeColor_1,
+                      AppThemes.themeColor_1.withValues(alpha: 0.95),
+                    ]
+                  : [
+                      Colors.white,
+                      const Color(0xFFF5F5F5),
+                    ],
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  // Header con botón de volver
-                  _BackButton(),
-                  const SizedBox(height: 20),
+          child: SafeArea(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    // Header con botón de volver
+                    _BackButton(),
+                    const SizedBox(height: 20),
 
-                  // Logo Premium con efecto shine
-                  _PremiumLogo(),
-                  const SizedBox(height: 24),
+                    // Logo Premium con efecto shine
+                    _PremiumLogo(),
+                    const SizedBox(height: 24),
 
-                  // Título
-                  FadeInUp(
-                    delay: const Duration(milliseconds: 200),
-                    child: ShaderMask(
-                      shaderCallback: (bounds) => const LinearGradient(
-                        colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ).createShader(bounds),
-                      child: Text(
-                        AppLocalizations.of(context)!.coroGamesPro,
-                        style: const TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  FadeInUp(
-                    delay: const Duration(milliseconds: 300),
-                    child: Text(
-                      AppLocalizations.of(context)!.unlockFullPotential,
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 15,
-                        color: isDark ? Colors.white54 : Colors.grey[600],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-
-                  // Features
-                  _FeatureItem(
-                    icon: FontAwesomeIcons.userGroup,
-                    title: AppLocalizations.of(context)!.unlimitedPlayers,
-                    description: AppLocalizations.of(context)!.unlimitedPlayersDesc,
-                    delay: 400,
-                  ),
-                  _FeatureItem(
-                    icon: FontAwesomeIcons.gamepad,
-                    title: AppLocalizations.of(context)!.unlimitedGames,
-                    description: AppLocalizations.of(context)!.unlimitedGamesDesc,
-                    delay: 500,
-                  ),
-                  _FeatureItem(
-                    icon: FontAwesomeIcons.gamepad,
-                    title: AppLocalizations.of(context)!.predefinedGamesFeature,
-                    description: AppLocalizations.of(context)!.predefinedGamesDesc,
-                    delay: 600,
-                  ),
-                  _FeatureItem(
-                    icon: FontAwesomeIcons.clockRotateLeft,
-                    title: AppLocalizations.of(context)!.fullHistory,
-                    description: AppLocalizations.of(context)!.fullHistoryDesc,
-                    delay: 700,
-                  ),
-                  _FeatureItem(
-                    icon: FontAwesomeIcons.ban,
-                    title: AppLocalizations.of(context)!.noAds,
-                    description: AppLocalizations.of(context)!.noAdsDesc,
-                    delay: 800,
-                  ),
-
-                  const SizedBox(height: 32),
-
-                  // Botón de compra
-                  Consumer<PremiumProvider>(
-                    builder: (context, premiumProvider, child) {
-                      if (premiumProvider.isPremium) {
-                        return _AlreadyPremiumCard();
-                      }
-                      return _BuyButton(onTap: () => _buyPremium(context));
-                    },
-                  ),
-
-                  const SizedBox(height: 14),
-
-                  FadeInUp(
-                    delay: const Duration(milliseconds: 1000),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        FaIcon(
-                          FontAwesomeIcons.lock,
-                          size: 12,
-                          color: isDark ? Colors.white38 : Colors.grey[400],
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          AppLocalizations.of(context)!.oneTimePayment,
+                    // Título
+                    FadeInUp(
+                      delay: const Duration(milliseconds: 200),
+                      child: ShaderMask(
+                        shaderCallback: (bounds) => const LinearGradient(
+                          colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ).createShader(bounds),
+                        child: Text(
+                          AppLocalizations.of(context)!.coroGamesPro,
                           style: TextStyle(
                             fontFamily: 'Poppins',
-                            fontSize: 12,
-                            color: isDark ? Colors.white38 : Colors.grey[500],
+                            fontSize: ResponsiveApp.scaleText(28),
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 30),
-                ],
+                    const SizedBox(height: 8),
+
+                    FadeInUp(
+                      delay: const Duration(milliseconds: 300),
+                      child: Text(
+                        AppLocalizations.of(context)!.unlockFullPotential,
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: ResponsiveApp.scaleText(15),
+                          color: isDark ? Colors.white54 : Colors.grey[600],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Features
+                    _FeatureItem(
+                      icon: FontAwesomeIcons.userGroup,
+                      title: AppLocalizations.of(context)!.unlimitedPlayers,
+                      description: AppLocalizations.of(context)!.unlimitedPlayersDesc,
+                      delay: 400,
+                    ),
+                    _FeatureItem(
+                      icon: FontAwesomeIcons.gamepad,
+                      title: AppLocalizations.of(context)!.unlimitedGames,
+                      description: AppLocalizations.of(context)!.unlimitedGamesDesc,
+                      delay: 500,
+                    ),
+                    _FeatureItem(
+                      icon: FontAwesomeIcons.gamepad,
+                      title: AppLocalizations.of(context)!.predefinedGamesFeature,
+                      description: AppLocalizations.of(context)!.predefinedGamesDesc,
+                      delay: 600,
+                    ),
+                    _FeatureItem(
+                      icon: FontAwesomeIcons.clockRotateLeft,
+                      title: AppLocalizations.of(context)!.fullHistory,
+                      description: AppLocalizations.of(context)!.fullHistoryDesc,
+                      delay: 700,
+                    ),
+                    _FeatureItem(
+                      icon: FontAwesomeIcons.ban,
+                      title: AppLocalizations.of(context)!.noAds,
+                      description: AppLocalizations.of(context)!.noAdsDesc,
+                      delay: 800,
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Botón de compra
+                    Consumer<PremiumProvider>(
+                      builder: (context, premiumProvider, child) {
+                        if (premiumProvider.isPremium) {
+                          return _AlreadyPremiumCard();
+                        }
+                        return _BuyButton(onTap: () => _buyPremium(context));
+                      },
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    FadeInUp(
+                      delay: const Duration(milliseconds: 1000),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          FaIcon(
+                            FontAwesomeIcons.lock,
+                            size: 12,
+                            color: isDark ? Colors.white38 : Colors.grey[400],
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            AppLocalizations.of(context)!.oneTimePayment,
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: ResponsiveApp.scaleText(12),
+                              color: isDark ? Colors.white38 : Colors.grey[500],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                  ],
+                ),
               ),
             ),
           ),
@@ -366,7 +370,7 @@ class _FeatureItem extends StatelessWidget {
                     title,
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: 15,
+                      fontSize: ResponsiveApp.scaleText(15),
                       fontWeight: FontWeight.w600,
                       color: isDark ? Colors.white : AppThemes.colorCuarto,
                     ),
@@ -376,7 +380,7 @@ class _FeatureItem extends StatelessWidget {
                     description,
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: 12,
+                      fontSize: ResponsiveApp.scaleText(12),
                       color: isDark ? Colors.white54 : Colors.grey[600],
                     ),
                   ),
@@ -460,7 +464,7 @@ class _AlreadyPremiumCard extends StatelessWidget {
               AppLocalizations.of(context)!.alreadyPremium,
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 18,
+                fontSize: ResponsiveApp.scaleText(18),
                 fontWeight: FontWeight.bold,
                 color: isDark ? const Color(0xFF81C784) : const Color(0xFF43A047),
               ),
@@ -514,9 +518,9 @@ class _BuyButton extends StatelessWidget {
                     const SizedBox(width: 10),
                     Text(
                       AppLocalizations.of(context)!.getPro,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Poppins',
-                        fontSize: 20,
+                        fontSize: ResponsiveApp.scaleText(20),
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -528,7 +532,7 @@ class _BuyButton extends StatelessWidget {
                   PurchaseService.instance.premiumPrice,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 14,
+                    fontSize: ResponsiveApp.scaleText(14),
                     color: Colors.white.withValues(alpha: 0.85),
                   ),
                 ),
