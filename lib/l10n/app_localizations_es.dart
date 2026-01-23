@@ -256,11 +256,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get oneTimePayment => 'Pago único • Sin suscripción';
 
   @override
+  String get restorePurchases => 'Restaurar compras';
+
+  @override
   String get purchaseRestored => '¡Compra restaurada! Ya eres Premium.';
 
   @override
   String get purchaseFailed =>
       'No se pudo completar la compra. Intenta de nuevo.';
+
+  @override
+  String get restoreFailed =>
+      'No se pudo restaurar la compra. Intenta de nuevo.';
 
   @override
   String get gameType_rounds => 'Rondas';

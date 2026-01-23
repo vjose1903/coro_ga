@@ -15,7 +15,7 @@ import 'slide_up_header.dart';
 import 'widgets.dart';
 
 class EditarEntidad extends StatelessWidget {
-  const EditarEntidad({Key? key, this.pageController, this.panelController, this.onClose}) : super(key: key);
+  const EditarEntidad({super.key, this.pageController, this.panelController, this.onClose});
 
   final PageController? pageController;
   final PanelController? panelController;
@@ -27,8 +27,8 @@ class EditarEntidad extends StatelessWidget {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
 
-    Jugador? jugador = jugadorProvider.jugadorEditar;
-    Partida? partida = partidaProvider.partidaEditar;
+    final Jugador? jugador = jugadorProvider.jugadorEditar;
+    final Partida? partida = partidaProvider.partidaEditar;
 
     final bool isPartida = partida != null;
     late String tipo;
@@ -46,7 +46,7 @@ class EditarEntidad extends StatelessWidget {
       icon = FontAwesomeIcons.user;
     }
 
-    FormGroup form = isPartida ? formPartidaProvider.form : jugadorProvider.formJugador;
+    final FormGroup form = isPartida ? formPartidaProvider.form : jugadorProvider.formJugador;
 
     return Container(
       height: double.infinity,
@@ -56,7 +56,7 @@ class EditarEntidad extends StatelessWidget {
           // Header con avatar e información
           _EditHeader(
             tipo: tipo,
-            nombre: entidad?.nombre ?? "",
+            nombre: entidad?.nombre ?? '',
             icon: icon,
             noNameLabel: AppLocalizations.of(context)!.noName,
             panelController: panelController,
@@ -128,7 +128,7 @@ class EditarEntidad extends StatelessWidget {
           ),
           SizedBox(height: ResponsiveApp.scaleHeight(25)),
           // Anuncio separado de los botones de acción
-          GoogleBannerAd(location: AdLocation.editarEntidad)
+          const GoogleBannerAd(location: AdLocation.editarEntidad)
         ],
       ),
     );
@@ -146,7 +146,7 @@ class EditarEntidad extends StatelessWidget {
 }
 
 class EditJugador extends StatefulWidget {
-  const EditJugador({Key? key, required this.form}) : super(key: key);
+  const EditJugador({super.key, required this.form});
 
   final FormGroup form;
 
@@ -199,7 +199,7 @@ class _EditJugadorState extends State<EditJugador> {
 }
 
 class EditPartida extends StatefulWidget {
-  const EditPartida({Key? key, required this.form}) : super(key: key);
+  const EditPartida({super.key, required this.form});
 
   final FormGroup form;
 
@@ -265,8 +265,8 @@ class _EditPartidaState extends State<EditPartida> {
                     formControlName: 'tipo',
                     labelText: AppLocalizations.of(context)!.type,
                     items: [
-                      DropdownMenuItem(value: "Rondas", child: Text(AppLocalizations.of(context)!.rounds)),
-                      DropdownMenuItem(value: "Puntuación", child: Text(AppLocalizations.of(context)!.score))
+                      DropdownMenuItem(value: 'Rondas', child: Text(AppLocalizations.of(context)!.rounds)),
+                      DropdownMenuItem(value: 'Puntuación', child: Text(AppLocalizations.of(context)!.score))
                     ],
                     onChanged: (value) => formPartidaProvider.changeTipo(value),
                   ),
@@ -277,7 +277,7 @@ class _EditPartidaState extends State<EditPartida> {
                     width: tipoPartida == '' ? 0.01 : ResponsiveApp.size.width * 0.46,
                     child: CustomReactiveInput(
                         formControlName: 'maxPuntuacion',
-                        labelText: tipoPartida == "Rondas" ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScoreFull,
+                        labelText: tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScoreFull,
                         inputType: TextInputType.number)),
               ],
             ),
@@ -302,8 +302,8 @@ aceptarFunction(BuildContext context, dynamic entidad,
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
     if (form.valid) {
       FocusManager.instance.primaryFocus?.unfocus();
-      partidaProvider.editPartida(context, partida: entidad, newNombrePartida: form.value["nombre"].toString()).then((value) async {
-        entidad.nombre = form.value["nombre"].toString();
+      partidaProvider.editPartida(context, partida: entidad, newNombrePartida: form.value['nombre'].toString()).then((value) async {
+        entidad.nombre = form.value['nombre'].toString();
         partidaProvider.refresh();
         form.reset();
         resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
@@ -316,8 +316,8 @@ aceptarFunction(BuildContext context, dynamic entidad,
   } else {
     if (form.valid) {
       FocusManager.instance.primaryFocus?.unfocus();
-      jugadorProvider.editJugador(context, jugador: entidad, newNombreJugador: form.value["nombre"].toString()).then((value) {
-        entidad.nombre = form.value["nombre"].toString();
+      jugadorProvider.editJugador(context, jugador: entidad, newNombreJugador: form.value['nombre'].toString()).then((value) {
+        entidad.nombre = form.value['nombre'].toString();
         partidaProvider.refresh();
 
         form.reset();
@@ -402,9 +402,9 @@ class _EditHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "${l10n.edit} $tipo",
+                '${l10n.edit} $tipo',
                 style: TextStyle(
-              fontFamily: "Poppins",
+              fontFamily: 'Poppins',
               fontSize: ResponsiveApp.scaleText(11),
                   color: isDark ? Colors.grey[400] : Colors.grey[600],
                   fontWeight: FontWeight.w500,
@@ -414,7 +414,7 @@ class _EditHeader extends StatelessWidget {
               Text(
                 nombre.isNotEmpty ? nombre : l10n.noName,
                 style: TextStyle(
-                  fontFamily: "Poppins",
+                  fontFamily: 'Poppins',
               fontSize: ResponsiveApp.scaleText(16),
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.white : AppThemes.colorQuinto,
@@ -439,12 +439,12 @@ class _EditHeader extends StatelessWidget {
                   dialogType: DialogType.warning,
                   buttonsList: [
                     CustomActionsButtons.cancelButton({
-                      "label": l10n.cancel,
-                      "onTap": () => Navigator.pop(context),
+                      'label': l10n.cancel,
+                      'onTap': () => Navigator.pop(context),
                     }),
                     CustomActionsButtons.aceptarButton({
-                      "label": l10n.accept,
-                      "onTap": () async {
+                      'label': l10n.accept,
+                      'onTap': () async {
                         Navigator.pop(context);
                         await onRestart!();
                       },
@@ -479,7 +479,7 @@ class _EditHeader extends StatelessWidget {
                     Text(
                       l10n.restart,
                       style: TextStyle(
-                        fontFamily: "Poppins",
+                        fontFamily: 'Poppins',
                         fontSize: ResponsiveApp.scaleText(12),
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -618,7 +618,7 @@ class _ActionButton extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                  fontFamily: "Poppins",
+                  fontFamily: 'Poppins',
                   fontSize: ResponsiveApp.scaleText(14),
                   fontWeight: FontWeight.w600,
                   color: textColor,

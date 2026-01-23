@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:game_score/helpers/helpers.dart';
+import 'helpers/helpers.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
@@ -18,7 +18,7 @@ import 'shared_preferences/preferences.dart';
 
 void main() async {
   // Preservar el splash nativo mientras inicializamos
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  final WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   await Preferences.init();
@@ -27,7 +27,7 @@ void main() async {
   );
 
   final isPlatformDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
-  bool initInDarkMode = Preferences.isSystemMode ? isPlatformDark : Preferences.isDarkMode;
+  final bool initInDarkMode = Preferences.isSystemMode ? isPlatformDark : Preferences.isDarkMode;
 
   final premiumProvider = PremiumProvider();
   final localeProvider = LocaleProvider();
@@ -82,8 +82,19 @@ Future<void> _initializeMobileAds() async {
   );
 }
 
+/// Consistent, glow-free physics so scrolls feel snappier across the app.
+class SmoothScrollBehavior extends MaterialScrollBehavior {
+  const SmoothScrollBehavior();
+
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) => const ClampingScrollPhysics();
+
+  @override
+  Widget buildOverscrollIndicator(BuildContext context, Widget child, ScrollableDetails details) => child;
+}
+
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -112,11 +123,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     setState(() {
-      ThemeProvider themeProvider = context.read<ThemeProvider>();
+      final ThemeProvider themeProvider = context.read<ThemeProvider>();
       _lastLifecycleState = state;
 
       if (Preferences.isSystemMode && _lastLifecycleState == AppLifecycleState.resumed) {
-        bool isActualSystemDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
+        final bool isActualSystemDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
 
         if (isActualSystemDark != Preferences.isDarkMode) {
           Preferences.isDarkMode = isActualSystemDark;
@@ -128,7 +139,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    ThemeProvider themeProvider = context.watch<ThemeProvider>();
+    final ThemeProvider themeProvider = context.watch<ThemeProvider>();
     final localeProvider = context.watch<LocaleProvider>();
 
     SystemChrome.setPreferredOrientations([
@@ -145,6 +156,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           supportedLocales: AppLocalizations.supportedLocales,
           locale: localeProvider.locale,
           home: const HomeScreen(),
+          scrollBehavior: const SmoothScrollBehavior(),
           builder: EasyLoading.init(
             builder: (context, child) {
               ResponsiveApp.setMq(context);

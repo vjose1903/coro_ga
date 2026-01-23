@@ -14,7 +14,7 @@ import '../themes/app_themes.dart';
 import '../widgets/widgets.dart';
 
 class PartidaScreen extends StatefulWidget {
-  const PartidaScreen({Key? key}) : super(key: key);
+  const PartidaScreen({super.key});
 
   @override
   State<PartidaScreen> createState() => _PartidaScreenState();
@@ -29,7 +29,7 @@ class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProvider
   void initState() {
     super.initState();
     panelController = PanelController();
-    anuncio = GoogleBannerAd(location: AdLocation.partida);
+    anuncio = const GoogleBannerAd(location: AdLocation.partida);
     _fabAnimController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -77,7 +77,7 @@ class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProvider
               visible: !panelController.isAttached || panelController.isPanelClosed,
               child: ScaleTransition(
                 scale: CurvedAnimation(parent: _fabAnimController, curve: Curves.elasticOut),
-                child: Container(
+                child: DecoratedBox(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
@@ -113,7 +113,7 @@ class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProvider
 }
 
 class _Body extends StatelessWidget {
-  const _Body({Key? key, required this.panelController, required this.anuncio}) : super(key: key);
+  const _Body({super.key, required this.panelController, required this.anuncio});
 
   final PanelController panelController;
   final GoogleBannerAd anuncio;
@@ -122,7 +122,7 @@ class _Body extends StatelessWidget {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
-    Partida partida = partidaProvider.partidaEnTurno!;
+    final Partida partida = partidaProvider.partidaEnTurno!;
     final bool compactHeight = ResponsiveApp.isSmallHeight;
     final double topMargin = compactHeight ? 24 : 40;
     final double bottomMargin = compactHeight ? 60 : 90;
@@ -172,7 +172,7 @@ class _Body extends StatelessWidget {
 }
 
 class JugadoresCard extends StatelessWidget {
-  const JugadoresCard({Key? key, required this.panelController}) : super(key: key);
+  const JugadoresCard({super.key, required this.panelController});
   final PanelController panelController;
 
   @override
@@ -186,13 +186,12 @@ class JugadoresCard extends StatelessWidget {
     }
 
     return Expanded(
-      child: Container(
+      child: DecoratedBox(
         decoration: BoxDecoration(
           color: AppThemes.themeColor_2,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
-            width: 1,
           ),
           boxShadow: [
             BoxShadow(
@@ -237,15 +236,15 @@ class JugadoresCard extends StatelessWidget {
 }
 
 class _ActionButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  final bool isPrimary;
 
   const _ActionButton({
     required this.icon,
     required this.onTap,
     this.isPrimary = false,
   });
+  final IconData icon;
+  final VoidCallback onTap;
+  final bool isPrimary;
 
   @override
   Widget build(BuildContext context) {
@@ -277,7 +276,7 @@ class _ActionButton extends StatelessWidget {
 }
 
 class JugadoresList extends StatelessWidget {
-  const JugadoresList({Key? key, required this.panelController}) : super(key: key);
+  const JugadoresList({super.key, required this.panelController});
   final PanelController panelController;
 
   @override
@@ -298,9 +297,8 @@ class JugadoresList extends StatelessWidget {
         return SizedBox(
           width: double.infinity,
           child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
+            physics: const ClampingScrollPhysics(),
             child: Wrap(
-              alignment: WrapAlignment.start,
               runSpacing: 10,
               spacing: horizontalSpacing,
               children: jugadores.asMap().entries.map((entry) {
@@ -331,7 +329,7 @@ class JugadoresList extends StatelessWidget {
 }
 
 class JugadorInfo extends StatelessWidget {
-  const JugadorInfo({Key? key, required this.jugador, required this.panelController, this.forcedWidth}) : super(key: key);
+  const JugadorInfo({super.key, required this.jugador, required this.panelController, this.forcedWidth});
   final Jugador jugador;
   final PanelController panelController;
   final double? forcedWidth;
@@ -384,11 +382,6 @@ class JugadorInfo extends StatelessWidget {
 }
 
 class _JugadorCard extends StatelessWidget {
-  final Jugador jugador;
-  final String estado;
-  final Map<String, dynamic> config;
-  final double? width;
-  final VoidCallback onTap;
 
   const _JugadorCard({
     required this.jugador,
@@ -397,6 +390,11 @@ class _JugadorCard extends StatelessWidget {
     this.width,
     required this.onTap,
   });
+  final Jugador jugador;
+  final String estado;
+  final Map<String, dynamic> config;
+  final double? width;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -513,7 +511,7 @@ class _JugadorCard extends StatelessWidget {
 }
 
 class NavigationBar extends StatefulWidget {
-  const NavigationBar({Key? key}) : super(key: key);
+  const NavigationBar({super.key});
 
   @override
   State<NavigationBar> createState() => _NavigationBarState();
@@ -562,15 +560,15 @@ class _NavigationBarState extends State<NavigationBar> {
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
-    List<Partida> partidas = partidaProvider.partidas;
+    final List<Partida> partidas = partidaProvider.partidas;
 
     if (partidas.isNotEmpty) {
-      return ScrollablePositionedList.separated(
+        return ScrollablePositionedList.separated(
           separatorBuilder: (_, __) => const SizedBox(width: 10),
           itemScrollController: itemScrollController,
           itemPositionsListener: itemPositionsListener,
           scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
+          physics: const ClampingScrollPhysics(),
           itemCount: partidas.length,
           padding: const EdgeInsets.only(left: 20, right: 150),
           itemBuilder: (context, index) => _Chip(partida: partidas[index], scrollToGame: scrollToGame));
@@ -581,7 +579,7 @@ class _NavigationBarState extends State<NavigationBar> {
 }
 
 class _Chip extends StatelessWidget {
-  const _Chip({Key? key, required this.partida, required this.scrollToGame}) : super(key: key);
+  const _Chip({super.key, required this.partida, required this.scrollToGame});
   final Partida? partida;
   final Function scrollToGame;
 

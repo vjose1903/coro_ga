@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:game_score/helpers/helpers.dart';
+import '../helpers/helpers.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -10,7 +10,7 @@ import '../themes/app_themes.dart';
 import '../widgets/widgets.dart';
 
 class AboutScreen extends StatelessWidget {
-  const AboutScreen({Key? key}) : super(key: key);
+  const AboutScreen({super.key});
 
   // Mismo gradiente del Layout principal
   static const _backgroundDecoration = BoxDecoration(
@@ -65,7 +65,7 @@ class AboutScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           fontSize: ResponsiveApp.scaleText(20),
                           letterSpacing: 1.5,
-                          shadows: [
+                          shadows: const [
                             Shadow(
                               color: Colors.black26,
                               blurRadius: 4,
@@ -84,7 +84,7 @@ class AboutScreen extends StatelessWidget {
               children: [
                 SizedBox(height: topPadding + 65),
                 Expanded(
-                  child: Container(
+                  child: DecoratedBox(
                     decoration: BoxDecoration(
                       borderRadius: const BorderRadius.only(topLeft: Radius.circular(50)),
                       color: AppThemes.themeColor_1,
@@ -145,19 +145,18 @@ class _CirclesPainter extends CustomPainter {
 }
 
 class _AboutContent extends StatelessWidget {
-  final AppLocalizations l10n;
   const _AboutContent({required this.l10n});
+  final AppLocalizations l10n;
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
           const SizedBox(height: 20),
           // Logo con sombra
-          Container(
+          DecoratedBox(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
@@ -260,8 +259,8 @@ class _AboutContent extends StatelessWidget {
 }
 
 class _PrivacyPolicyButton extends StatelessWidget {
-  final String label;
   const _PrivacyPolicyButton({required this.label});
+  final String label;
 
   void _launchPrivacyPolicy() async {
     final uri = Uri.parse('https://coro-games.netlify.app/');
@@ -317,15 +316,15 @@ class _PrivacyPolicyButton extends StatelessWidget {
 }
 
 class _SectionCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final Widget child;
 
   const _SectionCard({
     required this.icon,
     required this.title,
     required this.child,
   });
+  final IconData icon;
+  final String title;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
@@ -339,7 +338,6 @@ class _SectionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
-          width: 1,
         ),
         boxShadow: [
           BoxShadow(

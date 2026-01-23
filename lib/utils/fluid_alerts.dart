@@ -1,7 +1,7 @@
 import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:game_score/themes/app_themes.dart';
+import '../themes/app_themes.dart';
 
 class FluidAlerts {
   FluidAlerts();
@@ -10,21 +10,30 @@ class FluidAlerts {
     showModal(
       context: context,
       builder: (context) => FluidDialog(
-        alignmentCurve: Curves.bounceOut,
+        alignmentCurve: Curves.easeOutCubic,
         // Setting custom durations for all animations.
 
-        sizeDuration: const Duration(milliseconds: 600),
-        alignmentDuration: const Duration(milliseconds: 500),
-        transitionDuration: const Duration(seconds: 1, milliseconds: 100),
-        reverseTransitionDuration: const Duration(milliseconds: 400),
+        sizeDuration: const Duration(milliseconds: 400),
+        transitionDuration: const Duration(milliseconds: 280),
+        reverseTransitionDuration: const Duration(milliseconds: 240),
         // Here we use another animation from the animations package instead of the default one.
-        transitionBuilder: (child, animation) => SharedAxisTransition(
-          transitionType: SharedAxisTransitionType.scaled,
-          animation: animation,
-          secondaryAnimation: ReverseAnimation(animation),
-          fillColor: Colors.transparent,
-          child: child,
-        ),
+        transitionBuilder: (child, animation) {
+          final landingAnimation = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+          );
+          final retreatAnimation = CurvedAnimation(
+            parent: ReverseAnimation(animation),
+            curve: Curves.easeIn,
+          );
+          return SharedAxisTransition(
+            transitionType: SharedAxisTransitionType.scaled,
+            animation: landingAnimation,
+            secondaryAnimation: retreatAnimation,
+            fillColor: Colors.transparent,
+            child: child,
+          );
+        },
         // Configuring how the dialog looks.
         defaultDecoration: BoxDecoration(
           color: AppThemes.themeColor_2,

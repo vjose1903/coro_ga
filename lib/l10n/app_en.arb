@@ -125,8 +125,10 @@
   "noAdsDesc": "Enjoy without interruptions",
   "alreadyPremium": "You are Premium!",
   "oneTimePayment": "One-time payment • No subscription",
+  "restorePurchases": "Restore purchases",
   "purchaseRestored": "Purchase restored! You are Premium.",
   "purchaseFailed": "Could not complete purchase. Try again.",
+  "restoreFailed": "Could not restore purchase. Try again.",
   
   "gameType_rounds": "Rounds",
   "gameType_score": "Score",

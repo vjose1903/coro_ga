@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:game_score/l10n/app_localizations.dart';
-import 'package:game_score/models/partida_predefinida.dart';
+import '../l10n/app_localizations.dart';
+import '../models/partida_predefinida.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 class FormPartidaProvider extends ChangeNotifier {
   FormGroup form = fb.group({
     'nombre': ['', Validators.required],
-    'activo': ["true"],
+    'activo': ['true'],
     'tipo': ['', Validators.required],
     'maxPuntuacion': [1, Validators.min(1)],
     'jugadores': fb.array([])
@@ -17,9 +17,9 @@ class FormPartidaProvider extends ChangeNotifier {
     form.patchValue(partidaPredefinida.toMap());
 
     for (var index = 0; index < partidaPredefinida.cantidadJugadores!; index++) {
-      String playerName = context != null 
+      final String playerName = context != null 
           ? AppLocalizations.of(context)!.playerNumber(index + 1)
-          : "Player ${index + 1}";
+          : 'Player ${index + 1}';
       addJugadorToList(name: playerName);
     }
 
@@ -48,7 +48,7 @@ class FormPartidaProvider extends ChangeNotifier {
       }
     }
 
-    form.control("activo").value = "true";
+    form.control('activo').value = 'true';
     notifyListeners();
     // return Future.delayed(const Duration(milliseconds: 10));
   }
@@ -75,7 +75,7 @@ class FormPartidaProvider extends ChangeNotifier {
   }
 
   static List<FormGroup> createItem({required int cant, String? name}) {
-    List<FormGroup> jugadoresForm = List<FormGroup>.from([]);
+    final List<FormGroup> jugadoresForm = List<FormGroup>.from([]);
 
     for (var i = 0; i < cant; i++) {
       jugadoresForm.add(fb.group({

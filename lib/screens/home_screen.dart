@@ -85,7 +85,7 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
 
   void openMenuSlideUp() {
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
-    slideUpProvider.openSlideUp(controller: panelController, bodyContent: _Menu(panelController: panelController), isDraggable: true);
+    slideUpProvider.openSlideUp(controller: panelController, bodyContent: _Menu(panelController: panelController), isDraggable: false);
   }
 
   void navigateToForm() {
@@ -214,8 +214,7 @@ class ListPartidas extends StatelessWidget {
     return ListView.builder(
       itemCount: partidas.length,
       padding: ResponsiveApp.symmetric(vertical: 30, horizontal: 20),
-      physics: const BouncingScrollPhysics(),
-      addAutomaticKeepAlives: true,
+      physics: const ClampingScrollPhysics(),
       cacheExtent: 300,
       itemBuilder: (_, index) {
         final partida = partidas[index];
@@ -237,18 +236,18 @@ class ListPartidas extends StatelessWidget {
                     dialogType: DialogType.error,
                     buttonsList: [
                       CustomActionsButtons.cancelButton({
-                        "label": l10n.cancel,
-                        "onTap": () {
+                        'label': l10n.cancel,
+                        'onTap': () {
                           Navigator.pop(context);
                           handler(false);
                         }
                       }),
-                      CustomActionsButtons.aceptarButton({"label": l10n.accept, "onTap": () => removePartida(context, handler, partidas, index)})
+                      CustomActionsButtons.aceptarButton({'label': l10n.accept, 'onTap': () => removePartida(context, handler, partidas, index)})
                     ]);
               },
               functionEditar: () {
-                FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
-                SlideUpProvider slideUp = context.read<SlideUpProvider>();
+                final FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
+                final SlideUpProvider slideUp = context.read<SlideUpProvider>();
                 context.read<BannerPrefetchService>().ensurePrefetched(AdLocation.editarEntidad);
                 formPartidaProvider.form.patchValue(partida.toMap());
                 partidaProvider.partidaEditar = partida;
@@ -414,144 +413,128 @@ class _Menu extends StatefulWidget {
 }
 
 class _MenuState extends State<_Menu> {
-  ScrollController? _contentScrollController;
-  bool _ownsController = false;
+  final ScrollController _fallbackController = ScrollController();
+  ScrollController? _currentController;
 
-  @override
-  void initState() {
-    super.initState();
-    _setController(ScrollController(), owns: true);
-  }
+  ScrollController get _controller => _currentController ?? _fallbackController;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final inheritedController = SlideUpScrollController.of(context);
-    if (inheritedController != null && inheritedController != _contentScrollController) {
-      _setController(inheritedController, owns: false);
+    if (inheritedController != null && inheritedController != _currentController) {
+      _currentController = inheritedController;
     }
   }
 
   @override
   void dispose() {
-    _contentScrollController?.removeListener(_handleScroll);
-    if (_ownsController) _contentScrollController?.dispose();
+    _fallbackController.dispose();
     super.dispose();
   }
 
-  void _handleScroll() {
-    final controller = _contentScrollController;
-    if (!mounted || controller == null || !controller.hasClients) return;
-    context.read<SlideUpProvider>().setDraggable(controller.offset <= 0);
-  }
-
-  void _setController(ScrollController controller, {required bool owns}) {
-    if (_contentScrollController == controller) return;
-    _contentScrollController?.removeListener(_handleScroll);
-    if (_ownsController && _contentScrollController != null && _contentScrollController != controller) {
-      _contentScrollController!.dispose();
-    }
-    _contentScrollController = controller;
-    _ownsController = owns;
-    _contentScrollController?.addListener(_handleScroll);
+  void _closePanel() {
+    final slideUpProvider = context.read<SlideUpProvider>();
+    if (widget.panelController.isAttached) widget.panelController.close();
+    slideUpProvider.closeSlideUp(controller: widget.panelController, isListener: true);
   }
 
   @override
   Widget build(BuildContext context) {
     ThemeProvider themeProvider = context.watch<ThemeProvider>();
-
+    final controller = _controller;
     return Container(
-      width: double.infinity,
-      height: double.infinity,
-      padding: ResponsiveApp.only(top: 5, bottom: 20),
-      child: SingleChildScrollView(
-        controller: _contentScrollController,
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header con logo
-            Padding(
-              padding: ResponsiveApp.only(left: 4),
-              child: Consumer<PremiumProvider>(
-                builder: (context, premiumProvider, child) => _MenuHeader(isPremium: premiumProvider.isPremium),
+        width: double.infinity,
+        height: double.infinity,
+        padding: ResponsiveApp.only(top: 5, bottom: 20),
+        child: SingleChildScrollView(
+          controller: controller,
+          physics: const ClampingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header con logo
+              Padding(
+                padding: ResponsiveApp.only(left: 4),
+                child: Consumer<PremiumProvider>(
+                  builder: (context, premiumProvider, child) => _MenuHeader(isPremium: premiumProvider.isPremium),
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            // Sección de Tema
-            _MenuSection(
-              icon: Icons.palette_outlined,
-              title: AppLocalizations.of(context)!.appearance,
-              child: Column(
-                children: [
-                  _ThemeToggleRow(
-                    title: AppLocalizations.of(context)!.systemTheme,
-                    subtitle: AppLocalizations.of(context)!.syncWithDevice,
-                    value: Preferences.isSystemMode,
-                    onChanged: (value) {
-                      Preferences.isSystemMode = value;
-                      Preferences.isDarkMode = PlatformDispatcher.instance.platformBrightness == Brightness.dark;
-                      themeProvider.changeCurrentTheme();
-                      setState(() {});
-                    },
-                  ),
-                  AnimatedCrossFade(
-                    duration: const Duration(milliseconds: 300),
-                    crossFadeState: Preferences.isSystemMode ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-                    firstChild: const SizedBox(height: 0),
-                    secondChild: Padding(
-                      padding: ResponsiveApp.only(top: 12),
-                      child: _ThemeSwitcher(
-                        isDark: Preferences.isDarkMode,
-                        onTap: () {
-                          Preferences.isDarkMode = !Preferences.isDarkMode;
-                          themeProvider.changeCurrentTheme();
-                          setState(() {});
-                        },
+              // Sección de Tema
+              _MenuSection(
+                icon: Icons.palette_outlined,
+                title: AppLocalizations.of(context)!.appearance,
+                child: Column(
+                  children: [
+                    _ThemeToggleRow(
+                      title: AppLocalizations.of(context)!.systemTheme,
+                      subtitle: AppLocalizations.of(context)!.syncWithDevice,
+                      value: Preferences.isSystemMode,
+                      onChanged: (value) {
+                        Preferences.isSystemMode = value;
+                        Preferences.isDarkMode = PlatformDispatcher.instance.platformBrightness == Brightness.dark;
+                        themeProvider.changeCurrentTheme();
+                        setState(() {});
+                      },
+                    ),
+                    AnimatedCrossFade(
+                      duration: const Duration(milliseconds: 300),
+                      crossFadeState: Preferences.isSystemMode ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+                      firstChild: const SizedBox(height: 0),
+                      secondChild: Padding(
+                        padding: ResponsiveApp.only(top: 12),
+                        child: _ThemeSwitcher(
+                          isDark: Preferences.isDarkMode,
+                          onTap: () {
+                            Preferences.isDarkMode = !Preferences.isDarkMode;
+                            themeProvider.changeCurrentTheme();
+                            setState(() {});
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            // Sección de Idioma
-            _MenuSection(
-              icon: Icons.language_rounded,
-              title: AppLocalizations.of(context)!.language,
-              child: _LanguageSwitcher(),
-            ),
-            const SizedBox(height: 16),
+              // Sección de Idioma
+              _MenuSection(
+                icon: Icons.language_rounded,
+                title: AppLocalizations.of(context)!.language,
+                child: _LanguageSwitcher(),
+              ),
+              const SizedBox(height: 16),
 
-            // Sección Premium
-            Consumer<PremiumProvider>(
-              builder: (context, premiumProvider, child) {
-                return _PremiumCard(
-                  isPremium: premiumProvider.isPremium,
-                  simulatePremium: premiumProvider.simulatePremium,
-                  onTap: () {
-                    final navigator = Navigator.of(context);
-                    final slideUpProvider = context.read<SlideUpProvider>();
-                    slideUpProvider.closeSlideUp(controller: widget.panelController);
-                    Future.delayed(const Duration(milliseconds: 300), () {
-                      navigator.pushNamed('premium');
-                    });
-                  },
-                  onSimulateChanged: (value) => premiumProvider.setSimulatePremium(value),
-                );
-              },
-            ),
-            const SizedBox(height: 16),
-            const _ReviewSection(),
-            const SizedBox(height: 16),
+              // Sección Premium
+              Consumer<PremiumProvider>(
+                builder: (context, premiumProvider, child) {
+                  return _PremiumCard(
+                    isPremium: premiumProvider.isPremium,
+                    simulatePremium: premiumProvider.simulatePremium,
+                    onTap: () {
+                      final navigator = Navigator.of(context);
+                      final slideUpProvider = context.read<SlideUpProvider>();
+                      slideUpProvider.closeSlideUp(controller: widget.panelController);
+                      Future.delayed(const Duration(milliseconds: 300), () {
+                        navigator.pushNamed('premium');
+                      });
+                    },
+                    onSimulateChanged: (value) => premiumProvider.setSimulatePremium(value),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              const _ReviewSection(),
+              const SizedBox(height: 16),
 
-            // Sección Acerca de
-            _AboutButton(panelController: widget.panelController),
-          ],
+              // Sección Acerca de
+              _AboutButton(panelController: widget.panelController),
+            ],
+          ),
         ),
-      ),
     );
   }
 }

@@ -119,8 +119,12 @@ class VersionService {
     final currentParts = currentVersion.split('.').map((e) => int.tryParse(e) ?? 0).toList();
 
     // Asegurar que ambas listas tengan la misma longitud
-    while (storeParts.length < 3) storeParts.add(0);
-    while (currentParts.length < 3) currentParts.add(0);
+    while (storeParts.length < 3) {
+      storeParts.add(0);
+    }
+    while (currentParts.length < 3) {
+      currentParts.add(0);
+    }
 
     for (int i = 0; i < 3; i++) {
       if (storeParts[i] > currentParts[i]) return true;

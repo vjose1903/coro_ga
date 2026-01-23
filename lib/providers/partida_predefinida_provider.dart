@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:game_score/l10n/app_localizations.dart';
-import 'package:game_score/models/models.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/utils/utils.dart';
+import '../l10n/app_localizations.dart';
+import '../models/models.dart';
+import '../shared_preferences/preferences.dart';
+import '../utils/utils.dart';
 
 import 'package:reactive_forms/reactive_forms.dart';
 
@@ -30,13 +30,13 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
 
   void changeCantidadJugadores({required String tipo, required BuildContext context}) {
     print("formPartidaPredefinida.control(cantidadJugadores).value: ${form.control("cantidadJugadores").value} ");
-    int actualCantidad = form.control("cantidadJugadores").value;
+    final int actualCantidad = form.control('cantidadJugadores').value;
 
-    if (tipo == "+") {
-      form.control("cantidadJugadores").value += 1;
+    if (tipo == '+') {
+      form.control('cantidadJugadores').value += 1;
     } else {
       if (actualCantidad > 2) {
-        form.control("cantidadJugadores").value -= 1;
+        form.control('cantidadJugadores').value -= 1;
       } else {
         final l10n = AppLocalizations.of(context)!;
         Toast.show(type: ToastType.warning, context: context, message: l10n.minPlayersWarning);
@@ -53,8 +53,8 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
 
   resetForm() async {
     form.reset();
-    form.control("maxPuntuacion").value = 1;
-    form.control("cantidadJugadores").value = 2;
+    form.control('maxPuntuacion').value = 1;
+    form.control('cantidadJugadores').value = 2;
     partidaPredefinidaEditar = null;
     notifyListeners();
 
@@ -62,10 +62,10 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
   }
 
   seed() async {
-    List<PartidaPredefinida> listado = [PartidaPredefinida(nombre: "Domino", orden: 1, tipo: "Puntuación", maxPuntuacion: 200, cantidadJugadores: 2)];
+    final List<PartidaPredefinida> listado = [PartidaPredefinida(nombre: 'Domino', orden: 1, tipo: 'Puntuación', maxPuntuacion: 200, cantidadJugadores: 2)];
 
     for (var index = 0; index < listado.length; index++) {
-      PartidaPredefinida partida = listado[index];
+      final PartidaPredefinida partida = listado[index];
       partida.orden = index += 1;
       await newPartida(partida: partida);
     }
@@ -77,7 +77,7 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
     partida.orden = partidasPredefinidas.length + 1;
 
     final response = await PartidaPredefinida.createPartidaPredefinida(partida: partida);
-    PartidaPredefinida newPartida = response.data;
+    final PartidaPredefinida newPartida = response.data;
 
     partidasPredefinidas.add(newPartida);
     partidaPredefinidaEditar = null;

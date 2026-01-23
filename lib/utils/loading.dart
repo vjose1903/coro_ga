@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:game_score/helpers/helpers.dart';
+import '../helpers/helpers.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/themes/app_themes.dart';
+import '../shared_preferences/preferences.dart';
+import '../themes/app_themes.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class MyLoading {
-  MyLoading({Key? key});
+  MyLoading();
 
   static show({String? message}) async {
     final isDark = Preferences.isDarkMode;

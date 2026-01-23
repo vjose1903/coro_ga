@@ -3,24 +3,24 @@ import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_shake_animated/flutter_shake_animated.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:game_score/helpers/helpers.dart';
-import 'package:game_score/l10n/app_localizations.dart';
-import 'package:game_score/models/models.dart';
-import 'package:game_score/providers/providers.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/utils/utils.dart';
-import 'package:game_score/widgets/widgets.dart';
+import '../helpers/helpers.dart';
+import '../l10n/app_localizations.dart';
+import '../models/models.dart';
+import '../providers/providers.dart';
+import '../shared_preferences/preferences.dart';
+import '../themes/app_themes.dart';
+import '../utils/utils.dart';
+import 'widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:reorderables/reorderables.dart';
 
 class PartidasDefaultAlert extends StatelessWidget {
-  const PartidasDefaultAlert({Key? key}) : super(key: key);
+  const PartidasDefaultAlert({super.key});
 
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
-    PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
+    final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
     formPartidaPredefinidaProvider.getPartidasPredefinidas();
 
     return Consumer<ReorderableProvider>(
@@ -80,8 +80,8 @@ class PartidasDefaultAlert extends StatelessWidget {
   }
 
   void _addPartidaPredefinida(BuildContext context) {
-    PartidaPredefinidaProvider partidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
-    PremiumProvider premiumProvider = context.read<PremiumProvider>();
+    final PartidaPredefinidaProvider partidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
+    final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
     if (!premiumProvider.canCreatePredefinedGame(partidaPredefinidaProvider.partidasPredefinidas.length)) {
       final l10n = AppLocalizations.of(context)!;
@@ -177,7 +177,7 @@ class _PredefinidaHeader extends StatelessWidget {
                 Text(
                   AppLocalizations.of(context)!.predefinedGames,
                   style: TextStyle(
-                    fontFamily: "Poppins",
+                    fontFamily: 'Poppins',
                     fontSize: ResponsiveApp.scaleText(16),
                     fontWeight: FontWeight.bold,
                     color: isDark ? Colors.white : AppThemes.colorQuinto,
@@ -186,7 +186,7 @@ class _PredefinidaHeader extends StatelessWidget {
                 Text(
                   isReordering ? AppLocalizations.of(context)!.dragToReorder : AppLocalizations.of(context)!.tapToSelect,
                   style: TextStyle(
-                    fontFamily: "Poppins",
+                    fontFamily: 'Poppins',
                     fontSize: ResponsiveApp.scaleText(11),
                     color: isDark ? Colors.grey[400] : Colors.grey[600],
                     fontWeight: FontWeight.w500,
@@ -333,18 +333,18 @@ class _CloseButton extends StatelessWidget {
 }
 
 class PartidasScrollView extends StatelessWidget {
-  const PartidasScrollView({Key? key}) : super(key: key);
+  const PartidasScrollView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.watch<PartidaPredefinidaProvider>();
+    final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.watch<PartidaPredefinidaProvider>();
 
     return FutureBuilder<List<Widget>>(
       future: getPartidas(context, formPartidaPredefinidaProvider),
       builder: (BuildContext context, AsyncSnapshot<List<Widget>> snapshot) {
         reordenarDataBase() async {
           for (var index = 0; index < snapshot.data!.length; index++) {
-            PartidaPredefinida partidaPredefinida = (snapshot.data![index] as ReordenableItem).partidaPredefinida;
+            final PartidaPredefinida partidaPredefinida = (snapshot.data![index] as ReordenableItem).partidaPredefinida;
             partidaPredefinida.orden = index + 1;
             final partidaEdit = partidaPredefinida.toMap();
             await PartidaPredefinida.edit(id: partidaPredefinida.id!, partidaEdit: partidaEdit);
@@ -395,7 +395,7 @@ class PartidasScrollView extends StatelessWidget {
           );
         } else {
           return Consumer(builder: (BuildContext context, value, Widget? child) {
-            ReorderableProvider reorderableProvider = context.watch<ReorderableProvider>();
+            final ReorderableProvider reorderableProvider = context.watch<ReorderableProvider>();
 
             return LayoutBuilder(
               builder: (context, constraints) {
@@ -403,16 +403,16 @@ class PartidasScrollView extends StatelessWidget {
                 const double padding = 10;
                 final double itemWidth = (constraints.maxWidth - (padding * 2) - (spacing * 2)) / 3;
 
-                return SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.all(padding),
-                  child: ReorderableWrap(
-                      enableReorder: reorderableProvider.isReording,
-                      needsLongPressDraggable: false,
-                      runSpacing: 15,
+              return SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                padding: const EdgeInsets.all(padding),
+                child: ReorderableWrap(
+                    enableReorder: reorderableProvider.isReording,
+                    needsLongPressDraggable: false,
+                    runSpacing: 15,
                       spacing: spacing,
                       maxMainAxisCount: 3,
-                      scrollPhysics: const BouncingScrollPhysics(),
+                      scrollPhysics: const ClampingScrollPhysics(),
                       onReorder: (oldIndex, newIndex) {
                         reorderableProvider.onReorder(oldIndex: oldIndex, newIndex: newIndex, reordenableList: snapshot.data);
                         reordenarDataBase();
@@ -446,14 +446,14 @@ Future<List<Widget>> getPartidas(BuildContext context, PartidaPredefinidaProvide
 }
 
 class ReordenableItem extends StatelessWidget {
-  const ReordenableItem({Key? key, required this.partidaPredefinida, this.itemWidth}) : super(key: key);
+  const ReordenableItem({super.key, required this.partidaPredefinida, this.itemWidth});
   final PartidaPredefinida partidaPredefinida;
   final double? itemWidth;
 
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (BuildContext context, value, Widget? child) {
-      ReorderableProvider reorderableProvider = context.watch<ReorderableProvider>();
+      final ReorderableProvider reorderableProvider = context.watch<ReorderableProvider>();
 
       return ShakeWidget(
         shakeConstant: ShakeRotateConstant1(),
@@ -500,7 +500,7 @@ class ReordenableItem extends StatelessWidget {
                             maxLines: 2,
                             textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontFamily: "Poppins",
+                            fontFamily: 'Poppins',
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                             fontSize: ResponsiveApp.scaleText(13),
@@ -524,7 +524,7 @@ class ReordenableItem extends StatelessWidget {
                             Text(
                               '${partidaPredefinida.cantidadJugadores ?? 0}',
                             style: TextStyle(
-                              fontFamily: "Poppins",
+                              fontFamily: 'Poppins',
                               fontSize: ResponsiveApp.scaleText(9),
                               color: Colors.white.withValues(alpha: 0.6),
                               fontWeight: FontWeight.w500,
@@ -540,7 +540,7 @@ class ReordenableItem extends StatelessWidget {
                         child: Text(
                           L10n.getGameType(context, partidaPredefinida.tipo),
                           style: TextStyle(
-                            fontFamily: "Poppins",
+                            fontFamily: 'Poppins',
                             fontSize: ResponsiveApp.scaleText(8),
                             color: Colors.white.withValues(alpha: 0.6),
                             fontWeight: FontWeight.w500,
@@ -592,7 +592,7 @@ class ReordenableItem extends StatelessWidget {
   }
 
   deletePartidaPredefinida(BuildContext context, PartidaPredefinida partida) {
-    PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
+    final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
     final l10n = AppLocalizations.of(context)!;
 
     CustomAlertDialog.show(context,
@@ -600,10 +600,10 @@ class ReordenableItem extends StatelessWidget {
         title: l10n.confirm,
         dialogType: DialogType.error,
         buttonsList: [
-          CustomActionsButtons.cancelButton({"label": l10n.cancel, "onTap": () => Navigator.pop(context)}),
+          CustomActionsButtons.cancelButton({'label': l10n.cancel, 'onTap': () => Navigator.pop(context)}),
           CustomActionsButtons.aceptarButton({
-            "label": l10n.accept,
-            "onTap": () {
+            'label': l10n.accept,
+            'onTap': () {
               Navigator.pop(context);
               formPartidaPredefinidaProvider.deletePartidaPredefinida(context, partida: partida);
             }
@@ -612,13 +612,13 @@ class ReordenableItem extends StatelessWidget {
   }
 
   selectPartidaPredefinida({required BuildContext context}) {
-    FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
+    final FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
     formPartidaProvider.rellenarFormulario(partidaPredefinida, context: context);
     Navigator.pop(context);
   }
 
   patchFormPartida({required BuildContext context, required PartidaPredefinida partida}) {
-    PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
+    final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
     formPartidaPredefinidaProvider.rellenarFormulario(partida);
 
     DialogNavigator.of(context).push(FluidDialogPage(

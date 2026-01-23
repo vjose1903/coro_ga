@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:game_score/helpers/helpers.dart';
+import '../helpers/helpers.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:game_score/l10n/app_localizations.dart';
-import 'package:game_score/models/models.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/providers/providers.dart';
-import 'package:game_score/widgets/layout.dart';
+import '../l10n/app_localizations.dart';
+import '../models/models.dart';
+import '../shared_preferences/preferences.dart';
+import '../themes/app_themes.dart';
+import '../providers/providers.dart';
+import 'layout.dart';
 import 'package:provider/provider.dart';
 
 class JugadoresActuales extends StatelessWidget {
-  const JugadoresActuales({Key? key, required this.jugadoresController, required this.rebuildWidget, required this.onEditJugador}) : super(key: key);
+  const JugadoresActuales({super.key, required this.jugadoresController, required this.rebuildWidget, required this.onEditJugador});
   final Function rebuildWidget;
   final ScrollController jugadoresController;
   final Function(Jugador) onEditJugador;
@@ -22,7 +22,7 @@ class JugadoresActuales extends StatelessWidget {
 }
 
 class ListJugadores extends StatelessWidget {
-  const ListJugadores({Key? key, required this.jugadoresController, required this.rebuildWidget, required this.onEditJugador}) : super(key: key);
+  const ListJugadores({super.key, required this.jugadoresController, required this.rebuildWidget, required this.onEditJugador});
   final ScrollController jugadoresController;
   final Function rebuildWidget;
   final Function(Jugador) onEditJugador;
@@ -32,7 +32,7 @@ class ListJugadores extends StatelessWidget {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
 
-    List<Jugador> jugadores = partidaProvider.partidaEnTurno!.jugadoresSort;
+    final List<Jugador> jugadores = partidaProvider.partidaEnTurno!.jugadoresSort;
 
     if (jugadores.isEmpty) {
       return Center(
@@ -75,7 +75,7 @@ class ListJugadores extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       itemCount: jugadores.length,
       itemBuilder: (context, index) {
-        Jugador jugador = jugadores[index];
+        final Jugador jugador = jugadores[index];
 
         return _JugadorItem(
           jugador: jugador,
@@ -84,8 +84,8 @@ class ListJugadores extends StatelessWidget {
           onEdit: () => onEditJugador(jugador),
           onDelete: () {
             jugadorProvider.deleteJugador(context, jugador: jugador, callBack: (value) async {
-              if (value["tipo"] == "aceptar") {
-                double actualPosition = jugadoresController.position.pixels;
+              if (value['tipo'] == 'aceptar') {
+                final double actualPosition = jugadoresController.position.pixels;
                 rebuildWidget();
                 await Future.delayed(const Duration(milliseconds: 50));
                 jugadoresController.jumpTo(actualPosition);

@@ -1,24 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/utils/l10n_helper.dart';
+import '../themes/app_themes.dart';
+import '../utils/l10n_helper.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import '../helpers/helpers.dart';
 
 class CustomReactiveDropDown extends StatelessWidget {
-  final String formControlName;
-  final String? labelText;
-  final String? hintText;
-  final String? helperText;
-  final IconData? innerLeft;
-  final IconData? innerRight;
-  final TextInputType? inputType;
-  final bool obscureText;
-  final bool enabled;
-  final bool? autoFocus;
-  final TextCapitalization? textCapitalization;
-  final List<DropdownMenuItem> items;
-  final Function? onChanged;
-  final int? maxLength;
 
   const CustomReactiveDropDown({
     Key? key,
@@ -37,12 +23,26 @@ class CustomReactiveDropDown extends StatelessWidget {
     this.textCapitalization = TextCapitalization.none,
     this.onChanged,
   }) : super(key: key);
+  final String formControlName;
+  final String? labelText;
+  final String? hintText;
+  final String? helperText;
+  final IconData? innerLeft;
+  final IconData? innerRight;
+  final TextInputType? inputType;
+  final bool obscureText;
+  final bool enabled;
+  final bool? autoFocus;
+  final TextCapitalization? textCapitalization;
+  final List<DropdownMenuItem> items;
+  final Function? onChanged;
+  final int? maxLength;
 
   @override
   Widget build(BuildContext context) {
     return ReactiveDropdownField<dynamic>(
         key: key,
-        formControlName: "tipo",
+        formControlName: 'tipo',
         items: items,
         autofocus: autoFocus!,
         onChanged: (value) => onChanged != null ? onChanged!(value) : null,

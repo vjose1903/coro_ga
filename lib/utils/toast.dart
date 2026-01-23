@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:game_score/helpers/helpers.dart';
+import '../helpers/helpers.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:toastification/toastification.dart';
 

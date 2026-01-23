@@ -1,7 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
-import 'package:game_score/models/models.dart';
-import 'package:game_score/utils/utils.dart';
+import '../models/models.dart';
+import '../utils/utils.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 
 class PartidaProvider extends ChangeNotifier {
@@ -37,11 +37,11 @@ class PartidaProvider extends ChangeNotifier {
   }
 
   void removeJugador(Jugador jugador) {
-    int index = partidaEnTurno!.jugadores!.indexWhere((item) => item.id == jugador.id);
+    final int index = partidaEnTurno!.jugadores!.indexWhere((item) => item.id == jugador.id);
     partidaEnTurno!.jugadores!.removeAt(index);
 
     if (partidaEnTurno != null) {
-      int indexPartida = partidas.indexWhere((item) => item.id == partidaEnTurno!.id);
+      final int indexPartida = partidas.indexWhere((item) => item.id == partidaEnTurno!.id);
       partidas[indexPartida] = partidaEnTurno!;
     }
     notifyListeners();
@@ -49,7 +49,7 @@ class PartidaProvider extends ChangeNotifier {
 
   Future<SqlResponse> newPartida(Partida partida, BuildContext context) async {
     final response = await Partida.createPartida(context, partida: partida);
-    Partida newPartida = response.data;
+    final Partida newPartida = response.data;
 
     partidas.add(newPartida);
     notifyListeners();
@@ -60,7 +60,7 @@ class PartidaProvider extends ChangeNotifier {
   Future<Partida> addJugadorToPartida(BuildContext context, {required Partida partida, required Jugador jugador}) async {
     final response = await Partida.addNewJugador(partida: partida, jugador: jugador);
 
-    int index = partidas.indexWhere((item) => item.id == partida.id);
+    final int index = partidas.indexWhere((item) => item.id == partida.id);
     partidas[index] = response.data;
 
     // notifyListeners();

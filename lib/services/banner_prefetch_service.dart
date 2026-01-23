@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-import 'package:game_score/helpers/helpers.dart';
+import '../helpers/helpers.dart';
 
 /// Servicio que precarga y mantiene en memoria los banners por ubicación.
 class BannerPrefetchService {

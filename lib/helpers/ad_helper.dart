@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:game_score/helpers/ad_locations.dart';
+import 'ad_locations.dart';
 
 enum RewardedAdLocation {
   revancha,
@@ -76,16 +76,21 @@ class AdHelper {
   }
 
   static String _getProductionBannerId(AdLocation location) {
-    if (location == AdLocation.home)
+    if (location == AdLocation.home) {
       return Platform.isIOS ? _iosBannerHome : _bannerHome;
-    if (location == AdLocation.partida)
+    }
+    if (location == AdLocation.partida) {
       return Platform.isIOS ? _iosBannerPartida : _bannerPartida;
-    if (location == AdLocation.puntuacion)
+    }
+    if (location == AdLocation.puntuacion) {
       return Platform.isIOS ? _iosBannerPuntuacion : _bannerPuntuacion;
-    if (location == AdLocation.agregarJugador)
+    }
+    if (location == AdLocation.agregarJugador) {
       return Platform.isIOS ? _iosBannerAgregarJugador : _bannerAgregarJugador;
-    if (location == AdLocation.editarEntidad)
+    }
+    if (location == AdLocation.editarEntidad) {
       return Platform.isIOS ? _iosBannerEditarEntidad : _bannerEditarEntidad;
+    }
     throw UnimplementedError('AdLocation $location is not mapped');
   }
 }

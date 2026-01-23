@@ -1,24 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/utils/l10n_helper.dart';
+import '../themes/app_themes.dart';
+import '../utils/l10n_helper.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import '../helpers/helpers.dart';
 
 class CustomReactiveInput extends StatelessWidget {
-  final String formControlName;
-  final String? labelText;
-  final String? hintText;
-  final String? helperText;
-  final IconData? innerLeft;
-  final IconData? innerRight;
-  final TextInputType? inputType;
-  final bool obscureText;
-  final bool enabled;
-  final bool? autoFocus;
-  final TextCapitalization? textCapitalization;
-  final FocusNode? focusNode;
-
-  final int? maxLength;
 
   const CustomReactiveInput({
     Key? key,
@@ -36,6 +22,20 @@ class CustomReactiveInput extends StatelessWidget {
     this.textCapitalization = TextCapitalization.none,
     this.focusNode,
   }) : super(key: key);
+  final String formControlName;
+  final String? labelText;
+  final String? hintText;
+  final String? helperText;
+  final IconData? innerLeft;
+  final IconData? innerRight;
+  final TextInputType? inputType;
+  final bool obscureText;
+  final bool enabled;
+  final bool? autoFocus;
+  final TextCapitalization? textCapitalization;
+  final FocusNode? focusNode;
+
+  final int? maxLength;
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +80,7 @@ class CustomReactiveInput extends StatelessWidget {
         showErrors: (control) => control.invalid && (control.touched || control.dirty),
         validationMessages: {
           'required': (error) => L10n.fieldRequired,
-          'min': (error) => L10n.minValue((error as Map)["min"].toString()),
+          'min': (error) => L10n.minValue((error as Map)['min'].toString()),
         });
   }
 }

@@ -25,24 +25,24 @@ class Fun {
   }
 
   static String getPrettyJSONString(jsonObject) {
-    const encoder = JsonEncoder.withIndent("  ");
+    const encoder = JsonEncoder.withIndent('  ');
     return encoder.convert(jsonObject);
   }
 
   static bool toBoolean(dynamic arg) {
     if (arg.runtimeType != String || arg.runtimeType == bool || arg == null) return arg;
 
-    return arg == "true" ? true : false;
+    return arg == 'true' ? true : false;
   }
 
   static removeKeys(Map<dynamic, dynamic> obj, List<String> keys) {
-    for (var key in keys) {
+    for (final key in keys) {
       if (obj.containsKey(key)) obj.remove(key);
     }
   }
 
   static bool arraySortedOrNot(List<dynamic> arr, dynamic property) {
-    int n = arr.length;
+    final int n = arr.length;
     return sortFun(arr, property, n);
   }
 

@@ -560,6 +560,12 @@ abstract class AppLocalizations {
   /// **'One-time payment • No subscription'**
   String get oneTimePayment;
 
+  /// No description provided for @restorePurchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore purchases'**
+  String get restorePurchases;
+
   /// No description provided for @purchaseRestored.
   ///
   /// In en, this message translates to:
@@ -571,6 +577,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not complete purchase. Try again.'**
   String get purchaseFailed;
+
+  /// No description provided for @restoreFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not restore purchase. Try again.'**
+  String get restoreFailed;
 
   /// No description provided for @gameType_rounds.
   ///

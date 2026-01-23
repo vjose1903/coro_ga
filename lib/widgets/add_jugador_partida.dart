@@ -1,33 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:game_score/helpers/helpers.dart';
-import 'package:game_score/l10n/app_localizations.dart';
-import 'package:game_score/models/models.dart';
-import 'package:game_score/providers/providers.dart';
-import 'package:game_score/services/banner_prefetch_service.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/utils/utils.dart';
-import 'package:game_score/widgets/widgets.dart';
-import 'package:game_score/widgets/slide_up_header.dart';
+import '../helpers/helpers.dart';
+import '../l10n/app_localizations.dart';
+import '../models/models.dart';
+import '../providers/providers.dart';
+import '../services/banner_prefetch_service.dart';
+import '../shared_preferences/preferences.dart';
+import '../themes/app_themes.dart';
+import '../utils/utils.dart';
+import 'widgets.dart';
+import 'slide_up_header.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
 class AddJugadorPartida extends StatelessWidget {
-  const AddJugadorPartida({Key? key, required this.panelController}) : super(key: key);
+  const AddJugadorPartida({super.key, required this.panelController});
 
   final PanelController panelController;
 
   @override
   Widget build(BuildContext context) {
-    GoogleBannerAd anuncio = GoogleBannerAd(location: AdLocation.agregarJugador);
+    final GoogleBannerAd anuncio = const GoogleBannerAd(location: AdLocation.agregarJugador);
     return AddJugador(anuncio: anuncio, panelController: panelController);
   }
 }
 
 class AddJugador extends StatefulWidget {
-  const AddJugador({Key? key, required this.anuncio, required this.panelController}) : super(key: key);
+  const AddJugador({super.key, required this.anuncio, required this.panelController});
 
   final GoogleBannerAd anuncio;
   final PanelController panelController;
@@ -40,7 +40,7 @@ class _AddJugadorState extends State<AddJugador> {
   final ScrollController jugadoresController = ScrollController();
 
   rebuildWidget() {
-    Fun.logColor(color: Colores.magenta, body: "mounted: $mounted");
+    Fun.logColor(color: Colores.magenta, body: 'mounted: $mounted');
     if (mounted) setState(() {});
   }
 
@@ -49,12 +49,12 @@ class _AddJugadorState extends State<AddJugador> {
     final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     final isDark = Preferences.isDarkMode;
-    FormGroup form = jugadorProvider.formJugador;
+    final FormGroup form = jugadorProvider.formJugador;
 
     final int cantJugadores = partidaProvider.partidaEnTurno?.jugadores?.length ?? 0;
 
     return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
+      physics: const ClampingScrollPhysics(),
       child: SizedBox(
         height: (ResponsiveApp.size.height - (ResponsiveApp.size.height * 0.22)),
         child: Column(
@@ -93,7 +93,7 @@ class _AddJugadorState extends State<AddJugador> {
 
             // Lista de jugadores
             Expanded(
-              child: Container(
+              child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: AppThemes.themeColor_1,
                   borderRadius: BorderRadius.circular(12),
@@ -134,7 +134,6 @@ class _AddJugadorState extends State<AddJugador> {
 
     showDialog(
       context: context,
-      barrierDismissible: true,
       builder: (dialogContext) => Dialog(
         backgroundColor: AppThemes.themeColor_2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -175,7 +174,7 @@ class _AddJugadorState extends State<AddJugador> {
     }
 
     if (form.valid) {
-      Jugador nuevoJugador = Jugador.fromMap(form.value);
+      final Jugador nuevoJugador = Jugador.fromMap(form.value);
 
       partidaProvider.addJugadorToPartida(context, jugador: nuevoJugador, partida: partidaProvider.partidaEnTurno!).then((value) async {
         form.reset();
@@ -246,7 +245,7 @@ class _AddJugadorHeader extends StatelessWidget {
                 Text(
                   AppLocalizations.of(context)!.players,
                   style: TextStyle(
-                    fontFamily: "Poppins",
+                    fontFamily: 'Poppins',
                     fontSize: ResponsiveApp.scaleText(14),
                     fontWeight: FontWeight.bold,
                     color: isDark ? Colors.white : AppThemes.colorQuinto,
@@ -256,7 +255,7 @@ class _AddJugadorHeader extends StatelessWidget {
                 Text(
                   AppLocalizations.of(context)!.playersInGame(cantJugadores),
                   style: TextStyle(
-                    fontFamily: "Poppins",
+                    fontFamily: 'Poppins',
                     fontSize: ResponsiveApp.scaleText(11),
                     color: isDark ? Colors.grey[400] : Colors.grey[600],
                     fontWeight: FontWeight.w500,
@@ -297,7 +296,7 @@ class _SectionTitle extends StatelessWidget {
         Text(
           title,
           style: TextStyle(
-            fontFamily: "Poppins",
+            fontFamily: 'Poppins',
             fontSize: ResponsiveApp.scaleText(12),
             fontWeight: FontWeight.w600,
             color: isDark ? Colors.grey[400] : Colors.grey[700],
@@ -311,9 +310,9 @@ class _SectionTitle extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
           child: Text(
-            "$count",
+            '$count',
             style: TextStyle(
-              fontFamily: "Poppins",
+              fontFamily: 'Poppins',
               fontSize: ResponsiveApp.scaleText(10),
               fontWeight: FontWeight.bold,
               color: AppThemes.colorPrimero,

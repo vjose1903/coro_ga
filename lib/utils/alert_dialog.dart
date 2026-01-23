@@ -1,31 +1,14 @@
 import 'dart:io';
-import 'package:game_score/helpers/helpers.dart';
+import '../helpers/helpers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/themes/app_themes.dart';
+import '../shared_preferences/preferences.dart';
+import '../themes/app_themes.dart';
 
 enum DialogType { error, success, warning, info, custom }
 
 class CustomActionsButtons {
-  CustomActionsButtons({
-    this.textColor,
-    required this.label,
-    this.onTap,
-    this.isPrimary = false,
-    this.isDestructive = false,
-  });
-
-  final String label;
-  final Function? onTap;
-  final Color? textColor;
-  final bool isPrimary;
-  final bool isDestructive;
-
-  static Color? defaultTextColor = Preferences.isDarkMode
-      ? Colors.white.withValues(alpha: 0.7)
-      : Colors.blueGrey[600]!.withValues(alpha: 0.7);
 
   factory CustomActionsButtons.cancelButton(Map<String, dynamic> json) =>
       CustomActionsButtons(
@@ -42,6 +25,22 @@ class CustomActionsButtons {
         textColor: json["textColor"],
         isPrimary: true,
       );
+  CustomActionsButtons({
+    required this.label, this.textColor,
+    this.onTap,
+    this.isPrimary = false,
+    this.isDestructive = false,
+  });
+
+  final String label;
+  final Function? onTap;
+  final Color? textColor;
+  final bool isPrimary;
+  final bool isDestructive;
+
+  static Color? defaultTextColor = Preferences.isDarkMode
+      ? Colors.white.withValues(alpha: 0.7)
+      : Colors.blueGrey[600]!.withValues(alpha: 0.7);
 }
 
 class CustomAlertDialog {
@@ -167,7 +166,6 @@ class CustomAlertDialog {
               dialogType: dialogType,
               menssage: menssage,
               body: body,
-              showIcon: false,
             ),
           ),
         );
@@ -247,10 +245,10 @@ class CustomAlertDialog {
 
 // Header del diálogo
 class _DialogHeader extends StatelessWidget {
-  final String title;
-  final DialogType? dialogType;
 
   const _DialogHeader({required this.title, this.dialogType});
+  final String title;
+  final DialogType? dialogType;
 
   @override
   Widget build(BuildContext context) {
@@ -318,9 +316,9 @@ class _DialogHeader extends StatelessWidget {
 
 // Botones del diálogo
 class _DialogActions extends StatelessWidget {
-  final List<CustomActionsButtons> buttons;
 
   const _DialogActions({required this.buttons});
+  final List<CustomActionsButtons> buttons;
 
   @override
   Widget build(BuildContext context) {
@@ -350,10 +348,6 @@ class _DialogActions extends StatelessWidget {
 
 // Botón de acción individual
 class _ActionButton extends StatelessWidget {
-  final String label;
-  final bool isPrimary;
-  final bool isDestructive;
-  final VoidCallback onTap;
 
   const _ActionButton({
     required this.label,
@@ -361,6 +355,10 @@ class _ActionButton extends StatelessWidget {
     this.isDestructive = false,
     required this.onTap,
   });
+  final String label;
+  final bool isPrimary;
+  final bool isDestructive;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -424,12 +422,12 @@ class _ActionButton extends StatelessWidget {
 
 class DialogBody extends StatelessWidget {
   const DialogBody({
-    Key? key,
+    super.key,
     required this.dialogType,
     required this.menssage,
     this.body,
     this.showIcon = false,
-  }) : super(key: key);
+  });
 
   final DialogType? dialogType;
   final String menssage;

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:game_score/helpers/helpers.dart';
-import 'package:game_score/l10n/app_localizations.dart';
-import 'package:game_score/models/models.dart';
-import 'package:game_score/providers/providers.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
+import '../helpers/helpers.dart';
+import '../l10n/app_localizations.dart';
+import '../models/models.dart';
+import '../providers/providers.dart';
+import '../shared_preferences/preferences.dart';
 import 'package:provider/provider.dart';
 
 class CustomEstadoPartida extends StatelessWidget {
-  const CustomEstadoPartida({Key? key}) : super(key: key);
+  const CustomEstadoPartida({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -34,11 +34,11 @@ class CustomEstadoPartida extends StatelessWidget {
 }
 
 class _EstadoChip extends StatelessWidget {
+
+  const _EstadoChip({required this.icon, required this.label, required this.color});
   final IconData icon;
   final String label;
   final Color color;
-
-  const _EstadoChip({required this.icon, required this.label, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +95,7 @@ class _EstadoChip extends StatelessWidget {
 }
 
 class _GanadorPerdedor extends StatelessWidget {
-  const _GanadorPerdedor({Key? key, required this.partida}) : super(key: key);
+  const _GanadorPerdedor({super.key, required this.partida});
   final Partida partida;
 
   String _getTranslatedLabel(BuildContext context, String name) {
@@ -127,10 +127,6 @@ class _GanadorPerdedor extends StatelessWidget {
 }
 
 class _PlayerStatusChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final bool isWinner;
 
   const _PlayerStatusChip({
     required this.icon,
@@ -138,6 +134,10 @@ class _PlayerStatusChip extends StatelessWidget {
     required this.color,
     required this.isWinner,
   });
+  final IconData icon;
+  final String label;
+  final Color color;
+  final bool isWinner;
 
   @override
   Widget build(BuildContext context) {

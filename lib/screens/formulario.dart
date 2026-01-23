@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
-import 'package:game_score/helpers/helpers.dart';
-import 'package:game_score/l10n/app_localizations.dart';
-import 'package:game_score/providers/providers.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/utils/utils.dart';
-import 'package:game_score/widgets/widgets.dart';
-import 'package:game_score/models/models.dart';
+import '../helpers/helpers.dart';
+import '../l10n/app_localizations.dart';
+import '../providers/providers.dart';
+import '../shared_preferences/preferences.dart';
+import '../themes/app_themes.dart';
+import '../utils/utils.dart';
+import '../widgets/widgets.dart';
+import '../models/models.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 class FormularioScreen extends StatefulWidget {
-  const FormularioScreen({Key? key}) : super(key: key);
+  const FormularioScreen({super.key});
 
   @override
   State<FormularioScreen> createState() => _FormularioScreenState();
@@ -34,7 +34,7 @@ class _FormularioScreenState extends State<FormularioScreen> {
 
   @override
   Widget build(BuildContext context) {
-    GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
+    final GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
 
     googleAdsProvider.loadInterstitialAd();
 
@@ -55,7 +55,7 @@ class _FormularioScreenState extends State<FormularioScreen> {
               Navigator.pop(context, 'home');
             },
           ),
-          bodyContent: SingleChildScrollView(physics: const BouncingScrollPhysics(), child: _Body()),
+          bodyContent: SingleChildScrollView(physics: const ClampingScrollPhysics(), child: _Body()),
         ),
       ),
     );
@@ -75,7 +75,7 @@ openDefaultsPartidasDialog(BuildContext context) {
 }
 
 class _Body extends StatelessWidget {
-  _Body({Key? key}) : super(key: key);
+  _Body({super.key});
 
   final ScrollController jugadoresController = ScrollController();
 
@@ -96,7 +96,6 @@ class _Body extends StatelessWidget {
             formGroup: form,
             child: IntrinsicHeight(
               child: Column(
-                mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Botón plantillas
@@ -115,31 +114,33 @@ class _Body extends StatelessWidget {
 
                   // Tipo y puntuación
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeOut,
-                        width: tipoPartida == '' || tipoPartida == null ? ResponsiveApp.size.width - 42 : ResponsiveApp.size.width * 0.43,
+                      Expanded(
                         child: CustomReactiveDropDown(
                           formControlName: 'tipo',
                           labelText: AppLocalizations.of(context)!.type,
                           items: [
-                            DropdownMenuItem(value: "Rondas", child: Text(AppLocalizations.of(context)!.rounds)),
-                            DropdownMenuItem(value: "Puntuación", child: Text(AppLocalizations.of(context)!.score))
+                            DropdownMenuItem(value: 'Rondas', child: Text(AppLocalizations.of(context)!.rounds)),
+                            DropdownMenuItem(value: 'Puntuación', child: Text(AppLocalizations.of(context)!.score))
                           ],
                           onChanged: (value) => formPartidaProvider.changeTipo(value),
                         ),
                       ),
-                      AnimatedContainer(
-                          duration: const Duration(milliseconds: 500),
-                          curve: Curves.easeOut,
-                          width: tipoPartida == '' || tipoPartida == null ? 0.01 : ResponsiveApp.size.width * 0.43,
-                          child: CustomReactiveInput(
-                              formControlName: 'maxPuntuacion',
-                              labelText: tipoPartida == "Rondas" ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScore,
-                              inputType: TextInputType.number)),
+                      if (tipoPartida != null && tipoPartida != '') const SizedBox(width: 12),
+                      AnimatedSize(
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeOut,
+                        child: tipoPartida == '' || tipoPartida == null
+                            ? const SizedBox.shrink()
+                            : SizedBox(
+                                width: ResponsiveApp.size.width * 0.43,
+                                child: CustomReactiveInput(
+                                    formControlName: 'maxPuntuacion',
+                                    labelText: tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScore,
+                                    inputType: TextInputType.number),
+                              ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -150,7 +151,7 @@ class _Body extends StatelessWidget {
 
                   // Lista de jugadores
                   Expanded(
-                    child: Container(
+                    child: DecoratedBox(
                       decoration: BoxDecoration(
                         color: AppThemes.themeColor_2,
                         borderRadius: BorderRadius.circular(12),
@@ -214,9 +215,9 @@ class _Body extends StatelessWidget {
 
 // Botón de plantillas
 class _PlantillasButton extends StatelessWidget {
-  final VoidCallback onTap;
 
   const _PlantillasButton({required this.onTap});
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -248,7 +249,7 @@ class _PlantillasButton extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              FaIcon(
+              const FaIcon(
                 FontAwesomeIcons.layerGroup,
                 size: 14,
                 color: Colors.white,
@@ -273,9 +274,9 @@ class _PlantillasButton extends StatelessWidget {
 
 // Sección de jugadores con header
 class _JugadoresSection extends StatelessWidget {
-  final ScrollController jugadoresController;
 
   const _JugadoresSection({required this.jugadoresController});
+  final ScrollController jugadoresController;
 
   @override
   Widget build(BuildContext context) {
@@ -298,7 +299,7 @@ class _JugadoresSection extends StatelessWidget {
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Center(
+              child: const Center(
                 child: FaIcon(
                   FontAwesomeIcons.users,
                   size: 14,
@@ -376,9 +377,9 @@ class _JugadoresSection extends StatelessWidget {
 
 // Botón agregar jugador
 class _AddPlayerButton extends StatelessWidget {
-  final VoidCallback onTap;
 
   const _AddPlayerButton({required this.onTap});
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -405,7 +406,7 @@ class _AddPlayerButton extends StatelessWidget {
               ),
             ],
           ),
-          child: Center(
+          child: const Center(
             child: FaIcon(FontAwesomeIcons.plus, size: 14, color: Colors.white),
           ),
         ),
@@ -416,9 +417,9 @@ class _AddPlayerButton extends StatelessWidget {
 
 // Botón crear partida
 class _CreateButton extends StatelessWidget {
-  final VoidCallback onTap;
 
   const _CreateButton({required this.onTap});
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -448,7 +449,7 @@ class _CreateButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              FaIcon(FontAwesomeIcons.plus, size: 16, color: Colors.white),
+              const FaIcon(FontAwesomeIcons.plus, size: 16, color: Colors.white),
               const SizedBox(width: 10),
               Text(
                 AppLocalizations.of(context)!.createGame,
@@ -468,7 +469,7 @@ class _CreateButton extends StatelessWidget {
 }
 
 class _Inputs extends StatelessWidget {
-  const _Inputs({Key? key, required this.jugadoresController}) : super(key: key);
+  const _Inputs({super.key, required this.jugadoresController});
   final ScrollController jugadoresController;
 
   @override
@@ -478,9 +479,8 @@ class _Inputs extends StatelessWidget {
 
     return ListView.separated(
       controller: jugadoresController,
-      physics: const BouncingScrollPhysics(),
+      physics: const ClampingScrollPhysics(),
       padding: EdgeInsets.only(top: 12, left: 12, right: 12, bottom: 12 + keyboardHeight),
-      addAutomaticKeepAlives: true,
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemCount: jugadoresLength,
       itemBuilder: (_, index) => _JugadorInput(index: index, scrollController: jugadoresController),
@@ -652,7 +652,7 @@ class _JugadorInputState extends State<_JugadorInput> with AutomaticKeepAliveCli
                     ),
                   ],
                 ),
-                child: Center(
+                child: const Center(
                   child: FaIcon(FontAwesomeIcons.minus, size: 12, color: Colors.white),
                 ),
               ),

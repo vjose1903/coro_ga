@@ -3,13 +3,13 @@ import 'package:package_info_plus/package_info_plus.dart';
 enum Env { free, pro }
 
 class AppEnvironment {
-  static final AppEnvironment env = AppEnvironment._();
 
   factory AppEnvironment() {
     return env;
   }
 
   AppEnvironment._();
+  static final AppEnvironment env = AppEnvironment._();
 
   static PackageInfo? _packageInfo;
 
@@ -22,7 +22,7 @@ class AppEnvironment {
   }
 
   static bool get isPro {
-    return appName.contains("pro");
+    return appName.contains('pro');
   }
 
   static initialize() async {
@@ -30,7 +30,7 @@ class AppEnvironment {
   }
 
   static Future<PackageInfo> initializePackageInfo() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
     return packageInfo;
   }
 }

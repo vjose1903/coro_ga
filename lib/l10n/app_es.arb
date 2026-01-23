@@ -125,8 +125,10 @@
   "noAdsDesc": "Disfruta sin interrupciones",
   "alreadyPremium": "¡Ya eres Premium!",
   "oneTimePayment": "Pago único • Sin suscripción",
+  "restorePurchases": "Restaurar compras",
   "purchaseRestored": "¡Compra restaurada! Ya eres Premium.",
   "purchaseFailed": "No se pudo completar la compra. Intenta de nuevo.",
+  "restoreFailed": "No se pudo restaurar la compra. Intenta de nuevo.",
   
   "gameType_rounds": "Rondas",
   "gameType_score": "Puntuación",
@@ -252,4 +254,3 @@
   "reviewCardButton": "Calificar ahora",
   "reviewFallbackMessage": "No pudimos abrir el cuadro de reseñas. Busca Coro Games en la tienda para dejar tu opinión."
 }
-

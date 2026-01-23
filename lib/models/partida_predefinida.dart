@@ -1,13 +1,24 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:game_score/models/models.dart';
-import 'package:game_score/helpers/helpers.dart';
-import 'package:game_score/utils/utils.dart';
+import 'models.dart';
+import '../helpers/helpers.dart';
+import '../utils/utils.dart';
 
 class PartidaPredefinida extends DynamicClass {
+
+  factory PartidaPredefinida.fromJson(String str) => PartidaPredefinida.fromMap(json.decode(str));
+
+  factory PartidaPredefinida.fromMap(Map<String, dynamic> json) => PartidaPredefinida(
+        id: json["id"],
+        nombre: json["nombre"],
+        tipo: json["tipo"],
+        maxPuntuacion: json["maxPuntuacion"],
+        cantidadJugadores: json["cantidadJugadores"],
+        orden: json["orden"],
+      );
   PartidaPredefinida({this.id, this.nombre, this.tipo, this.maxPuntuacion, this.cantidadJugadores, this.orden});
 
-  static String tableName = "PartidaPredefinida";
+  static String tableName = 'PartidaPredefinida';
 
   int? id;
   String? nombre;
@@ -15,8 +26,6 @@ class PartidaPredefinida extends DynamicClass {
   int? maxPuntuacion;
   int? cantidadJugadores;
   int? orden;
-
-  factory PartidaPredefinida.fromJson(String str) => PartidaPredefinida.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
@@ -30,23 +39,14 @@ class PartidaPredefinida extends DynamicClass {
     return model.toMap();
   }
 
-  factory PartidaPredefinida.fromMap(Map<String, dynamic> json) => PartidaPredefinida(
-        id: json["id"],
-        nombre: json["nombre"],
-        tipo: json["tipo"],
-        maxPuntuacion: json["maxPuntuacion"],
-        cantidadJugadores: json["cantidadJugadores"],
-        orden: json["orden"],
-      );
-
   @override
   Map<String, dynamic> toMap() => {
-        "id": id,
-        "nombre": nombre,
-        "tipo": tipo,
-        "maxPuntuacion": maxPuntuacion,
-        "cantidadJugadores": cantidadJugadores,
-        "orden": orden,
+        'id': id,
+        'nombre': nombre,
+        'tipo': tipo,
+        'maxPuntuacion': maxPuntuacion,
+        'cantidadJugadores': cantidadJugadores,
+        'orden': orden,
       };
 
   @override
@@ -61,7 +61,7 @@ class PartidaPredefinida extends DynamicClass {
   static createPartidaPredefinida({required PartidaPredefinida partida}) async {
     final SqlResponse response = SqlResponse();
 
-    Map<String, dynamic> tempPartidaMap = partida.toMap();
+    final Map<String, dynamic> tempPartidaMap = partida.toMap();
 
     Fun.removeKeys(tempPartidaMap, ['id']);
 

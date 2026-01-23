@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
-import 'package:game_score/l10n/app_localizations.dart';
-import 'package:game_score/models/models.dart';
-import 'package:game_score/utils/utils.dart';
-import 'package:game_score/providers/providers.dart';
+import '../l10n/app_localizations.dart';
+import '../models/models.dart';
+import '../utils/utils.dart';
+import 'providers.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
@@ -16,7 +16,7 @@ class JugadorProvider extends ChangeNotifier {
   });
 
   String get nombreJugador {
-    if (jugadorEnTurno == null) return "";
+    if (jugadorEnTurno == null) return '';
 
     return jugadorEnTurno!.nombre!;
   }
@@ -50,16 +50,16 @@ class JugadorProvider extends ChangeNotifier {
   }
 
   Future<SqlResponse> changePuntuacion({required Jugador jugador, required int newPuntuacion, required String tipo}) async {
-    Map body = jugador.toMap();
+    final Map body = jugador.toMap();
 
-    if (tipo == "aumentar") body["puntuacion"] = body["puntuacion"] + newPuntuacion;
-    if (tipo == "reducir") body["puntuacion"] = body["puntuacion"] - newPuntuacion;
+    if (tipo == 'aumentar') body['puntuacion'] = body['puntuacion'] + newPuntuacion;
+    if (tipo == 'reducir') body['puntuacion'] = body['puntuacion'] - newPuntuacion;
 
-    SqlResponse response = await Jugador.changePuntuacion(jugador: jugador, newPuntuacion: newPuntuacion, tipo: tipo, newData: body);
+    final SqlResponse response = await Jugador.changePuntuacion(jugador: jugador, newPuntuacion: newPuntuacion, tipo: tipo, newData: body);
 
     if (!response.hasError!) {
-      jugadorEnTurno!.addHistorial(response.data["historial"]);
-      jugadorEnTurno!.puntuacion = response.data["newPuntuacion"];
+      jugadorEnTurno!.addHistorial(response.data['historial']);
+      jugadorEnTurno!.puntuacion = response.data['newPuntuacion'];
       response.data = jugadorEnTurno;
       notifyListeners();
     }
@@ -68,10 +68,10 @@ class JugadorProvider extends ChangeNotifier {
   }
 
   Future<SqlResponse> deleteHistorial({required HistorialJugada historial}) async {
-    SqlResponse response = await Jugador.deleteHistorial(jugador: jugadorEnTurno!, historial: historial);
+    final SqlResponse response = await Jugador.deleteHistorial(jugador: jugadorEnTurno!, historial: historial);
 
     if (!response.hasError!) {
-      jugadorEnTurno!.puntuacion = response.data["newPuntuacion"];
+      jugadorEnTurno!.puntuacion = response.data['newPuntuacion'];
       notifyListeners();
     }
 
@@ -79,7 +79,7 @@ class JugadorProvider extends ChangeNotifier {
   }
 
   Future<dynamic> deleteJugador(BuildContext context,
-      {required Jugador jugador, PanelController? panelController, required Function callBack}) async {
+      {required Jugador jugador, required Function callBack, PanelController? panelController}) async {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
     final l10n = AppLocalizations.of(context)!;
@@ -90,15 +90,15 @@ class JugadorProvider extends ChangeNotifier {
         dialogType: DialogType.error,
         buttonsList: [
           CustomActionsButtons.cancelButton({
-            "label": l10n.cancel,
-            "onTap": () {
+            'label': l10n.cancel,
+            'onTap': () {
               Navigator.pop(context);
-              callBack({"tipo": "cancelar"});
+              callBack({'tipo': 'cancelar'});
             }
           }),
           CustomActionsButtons.aceptarButton({
-            "label": l10n.accept,
-            "onTap": () async {
+            'label': l10n.accept,
+            'onTap': () async {
               Navigator.pop(context);
 
               final response = await jugador.delete();
@@ -113,7 +113,7 @@ class JugadorProvider extends ChangeNotifier {
               } else {
                 Toast.show(type: ToastType.error, context: context, message: response.messages!.first);
               }
-              callBack({"tipo": "aceptar"});
+              callBack({'tipo': 'aceptar'});
             }
           })
         ]);

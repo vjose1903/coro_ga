@@ -2,22 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:game_score/helpers/helpers.dart';
-import 'package:game_score/l10n/app_localizations.dart';
-import 'package:game_score/models/models.dart';
-import 'package:game_score/providers/providers.dart';
-import 'package:game_score/screens/ganador.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/widgets/widgets.dart';
-import 'package:game_score/widgets/layout.dart';
-import 'package:game_score/widgets/slide_up_header.dart';
-import 'package:game_score/utils/utils.dart';
-import 'package:game_score/helpers/ad_locations.dart';
+import '../helpers/helpers.dart';
+import '../l10n/app_localizations.dart';
+import '../models/models.dart';
+import '../providers/providers.dart';
+import '../screens/ganador.dart';
+import '../shared_preferences/preferences.dart';
+import '../themes/app_themes.dart';
+import 'widgets.dart';
+import 'layout.dart';
+import 'slide_up_header.dart';
+import '../utils/utils.dart';
+import '../helpers/ad_locations.dart';
 import 'package:provider/provider.dart';
 
 class HistorialGeneral extends StatefulWidget {
-  const HistorialGeneral({Key? key, required this.panelController}) : super(key: key);
+  const HistorialGeneral({super.key, required this.panelController});
   final PanelController panelController;
 
   @override
@@ -49,10 +49,10 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
     jugadorSeleccionado ??= jugadores.isNotEmpty ? jugadores.first : null;
 
     // Combinar todos los historiales
-    List<_HistorialConJugador> todosHistoriales = [];
-    for (var jugador in jugadores) {
+    final List<_HistorialConJugador> todosHistoriales = [];
+    for (final jugador in jugadores) {
       if (jugador.historialJugadas != null) {
-        for (var historial in jugador.historialJugadas!) {
+        for (final historial in jugador.historialJugadas!) {
           todosHistoriales.add(_HistorialConJugador(jugador: jugador, historial: historial));
         }
       }
@@ -88,7 +88,7 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
             constraints: BoxConstraints(
               minHeight: screenHeight * (isSmallScreen ? 0.12 : 0.18),
             ),
-            child: Container(
+            child: DecoratedBox(
               decoration: BoxDecoration(
                 color: AppThemes.themeColor_1,
                 borderRadius: BorderRadius.circular(12),
@@ -109,7 +109,7 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
         SizedBox(height: spacingMd),
 
         // Teclado y campo de puntuación
-        if (partida.tipo == "Puntuación") ...[
+        if (partida.tipo == 'Puntuación') ...[
           _KeyboardSection(puntuacionController: puntuacionController),
           SizedBox(height: spacingMd),
         ],
@@ -126,7 +126,7 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
                   context: context,
                   jugadorProvider: jugadorProvider,
                   partidaProvider: partidaProvider,
-                  tipo: "reducir",
+                  tipo: 'reducir',
                 ),
               ),
             ),
@@ -140,7 +140,7 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
                   context: context,
                   jugadorProvider: jugadorProvider,
                   partidaProvider: partidaProvider,
-                  tipo: "aumentar",
+                  tipo: 'aumentar',
                 ),
               ),
             ),
@@ -166,19 +166,19 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
       return;
     }
 
-    String puntuacion = partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? puntuacionController.text : "1";
+    final String puntuacion = partidaProvider.partidaEnTurno!.tipo == 'Puntuación' ? puntuacionController.text : '1';
 
-    if (puntuacion.isEmpty || puntuacion == "0") {
-      String msg = puntuacion == "0" ? l10n.scoreMustBeGreaterThanZero : l10n.enterScoreToContinue;
+    if (puntuacion.isEmpty || puntuacion == '0') {
+      final String msg = puntuacion == '0' ? l10n.scoreMustBeGreaterThanZero : l10n.enterScoreToContinue;
       Toast.show(type: ToastType.warning, context: context, title: l10n.warning, message: msg);
       return;
     }
 
-    int puntuacionInt = int.parse(puntuacion);
-    int puntuacionActual = jugadorSeleccionado!.puntuacion!;
+    final int puntuacionInt = int.parse(puntuacion);
+    final int puntuacionActual = jugadorSeleccionado!.puntuacion!;
 
-    if (tipo == "reducir" && puntuacionActual - puntuacionInt < 0) {
-      String msgError = partidaProvider.partidaEnTurno!.tipo == "Puntuación" ? l10n.minScoreWarning : l10n.minRoundWarning;
+    if (tipo == 'reducir' && puntuacionActual - puntuacionInt < 0) {
+      final String msgError = partidaProvider.partidaEnTurno!.tipo == 'Puntuación' ? l10n.minScoreWarning : l10n.minRoundWarning;
       Toast.show(type: ToastType.warning, context: context, title: l10n.warning, message: msgError);
       return;
     }
@@ -186,10 +186,10 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
     MyLoading.show();
 
     // Cambiar temporalmente el jugador en turno para usar el método existente
-    Jugador? jugadorAnterior = jugadorProvider.jugadorEnTurno;
+    final Jugador? jugadorAnterior = jugadorProvider.jugadorEnTurno;
     jugadorProvider.changeJugadorEnTurno(jugadorSeleccionado!);
 
-    SqlResponse response = await jugadorProvider.changePuntuacion(
+    final SqlResponse response = await jugadorProvider.changePuntuacion(
       jugador: jugadorSeleccionado!,
       newPuntuacion: puntuacionInt,
       tipo: tipo,
@@ -205,17 +205,17 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
     MyLoading.close();
 
     if (!response.hasError!) {
-      puntuacionController.text = "";
+      puntuacionController.text = '';
       setState(() {}); // Refrescar la lista
 
-      int newPuntuacion = response.data.puntuacion;
+      final int newPuntuacion = response.data.puntuacion;
       if (newPuntuacion >= partidaProvider.partidaEnTurno!.maxPuntuacion!.toInt()) {
         Navigator.pushReplacement(
           context,
           PageRouteBuilder(
             settings: RouteSettings(arguments: {
-              "partida": partidaProvider.partidaEnTurno!.nombre,
-              "jugador": jugadorSeleccionado!.nombre,
+              'partida': partidaProvider.partidaEnTurno!.nombre,
+              'jugador': jugadorSeleccionado!.nombre,
             }),
             pageBuilder: (context, animation, secondaryAnimation) => const GanadorScreen(),
             transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
@@ -231,10 +231,10 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
 }
 
 class _HistorialConJugador {
-  final Jugador jugador;
-  final HistorialJugada historial;
 
   _HistorialConJugador({required this.jugador, required this.historial});
+  final Jugador jugador;
+  final HistorialJugada historial;
 }
 
 // ============================================
@@ -285,7 +285,7 @@ class _HistorialHeader extends StatelessWidget {
                 Text(
                   AppLocalizations.of(context)!.generalHistory,
                   style: TextStyle(
-                    fontFamily: "Poppins",
+                    fontFamily: 'Poppins',
                     fontSize: ResponsiveApp.scaleText(14),
                     fontWeight: FontWeight.bold,
                     color: isDark ? Colors.white : AppThemes.colorQuinto,
@@ -295,7 +295,7 @@ class _HistorialHeader extends StatelessWidget {
                 Text(
                   AppLocalizations.of(context)!.records(cantRegistros),
                   style: TextStyle(
-                    fontFamily: "Poppins",
+                    fontFamily: 'Poppins',
                     fontSize: ResponsiveApp.scaleText(11),
                     color: isDark ? Colors.grey[400] : Colors.grey[600],
                     fontWeight: FontWeight.w500,
@@ -378,7 +378,7 @@ class _JugadorSelector extends StatelessWidget {
                   child: Text(
                     jugador.nombre!,
                     style: TextStyle(
-                      fontFamily: "Poppins",
+                      fontFamily: 'Poppins',
                       fontSize: ResponsiveApp.scaleText(14),
                       color: isDark ? Colors.white : AppThemes.colorQuinto,
                     ),
@@ -394,7 +394,7 @@ class _JugadorSelector extends StatelessWidget {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    "${jugador.puntuacion}",
+                    '${jugador.puntuacion}',
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: ResponsiveApp.scaleText(11),
@@ -415,7 +415,7 @@ class _JugadorSelector extends StatelessWidget {
 }
 
 class _ListHistorialGeneral extends StatefulWidget {
-  const _ListHistorialGeneral({Key? key, required this.historiales, required this.historialController}) : super(key: key);
+  const _ListHistorialGeneral({super.key, required this.historiales, required this.historialController});
 
   final List<_HistorialConJugador> historiales;
   final ScrollController historialController;
@@ -527,7 +527,7 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
-    final isAumentar = widget.historial.tipo == "aumentar";
+    final isAumentar = widget.historial.tipo == 'aumentar';
     final color = isAumentar ? const Color(0xFF4CAF50) : Colors.red[400]!;
     final screenHeight = MediaQuery.of(context).size.height;
     final isSmallScreen = screenHeight < 700;
@@ -643,20 +643,20 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
       dialogType: DialogType.error,
       buttonsList: [
         CustomActionsButtons.cancelButton({
-          "label": l10n.cancel,
-          "onTap": () {
+          'label': l10n.cancel,
+          'onTap': () {
             Navigator.pop(context);
             handler(false);
           }
         }),
         CustomActionsButtons.aceptarButton({
-          "label": l10n.accept,
-          "onTap": () async {
+          'label': l10n.accept,
+          'onTap': () async {
             Navigator.pop(context);
             final jugadorProvider = context.read<JugadorProvider>();
             final partidaProvider = context.read<PartidaProvider>();
 
-            Jugador? jugadorAnterior = jugadorProvider.jugadorEnTurno;
+            final Jugador? jugadorAnterior = jugadorProvider.jugadorEnTurno;
             jugadorProvider.changeJugadorEnTurno(widget.jugador);
 
             await jugadorProvider.deleteHistorial(historial: widget.historial);
@@ -719,7 +719,7 @@ class _ActionScoreButton extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                  fontFamily: "Poppins",
+                  fontFamily: 'Poppins',
                   fontSize: ResponsiveApp.scaleText(14),
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -734,14 +734,14 @@ class _ActionScoreButton extends StatelessWidget {
 }
 
 class _KeyboardSection extends StatelessWidget {
-  const _KeyboardSection({Key? key, required this.puntuacionController}) : super(key: key);
+  const _KeyboardSection({super.key, required this.puntuacionController});
 
   final TextEditingController puntuacionController;
 
   void changePuntuacionValue(String value) {
-    if (value != "DEL") {
-      if (puntuacionController.text == "0" && value == "0") return;
-      if (puntuacionController.text == "0" && value != "0") {
+    if (value != 'DEL') {
+      if (puntuacionController.text == '0' && value == '0') return;
+      if (puntuacionController.text == '0' && value != '0') {
         puntuacionController.text = value;
       } else {
         puntuacionController.text = puntuacionController.text += value;
@@ -770,7 +770,6 @@ class _KeyboardSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
-          width: 1,
         ),
         boxShadow: [
           BoxShadow(

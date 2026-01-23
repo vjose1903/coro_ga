@@ -3,13 +3,6 @@ import 'package:animate_do/animate_do.dart';
 import '../helpers/helpers.dart';
 
 class CustomSplashScreen extends StatefulWidget {
-  final Widget navigateRoute;
-  final int duration;
-  final double imageSize;
-  final String imageSrc;
-  final String text;
-  final TextStyle? textStyle;
-  final Color backgroundColor;
 
   const CustomSplashScreen({
     Key? key,
@@ -21,6 +14,13 @@ class CustomSplashScreen extends StatefulWidget {
     this.textStyle,
     required this.backgroundColor,
   }) : super(key: key);
+  final Widget navigateRoute;
+  final int duration;
+  final double imageSize;
+  final String imageSrc;
+  final String text;
+  final TextStyle? textStyle;
+  final Color backgroundColor;
 
   @override
   State<CustomSplashScreen> createState() => _CustomSplashScreenState();
@@ -58,7 +58,6 @@ class _CustomSplashScreenState extends State<CustomSplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             FadeInDown(
-              duration: const Duration(milliseconds: 800),
               child: Image.asset(
                 widget.imageSrc,
                 width: widget.imageSize,
@@ -72,7 +71,7 @@ class _CustomSplashScreenState extends State<CustomSplashScreen> {
                 child: _AnimatedText(
                   text: widget.text,
                   style: widget.textStyle ??
-                      TextStyle(fontSize: ResponsiveApp.scaleText(30), fontFamily: "Poppins"),
+                      TextStyle(fontSize: ResponsiveApp.scaleText(30), fontFamily: 'Poppins'),
                 ),
               ),
           ],
@@ -83,17 +82,17 @@ class _CustomSplashScreenState extends State<CustomSplashScreen> {
 }
 
 class _AnimatedText extends StatefulWidget {
-  final String text;
-  final TextStyle style;
 
   const _AnimatedText({required this.text, required this.style});
+  final String text;
+  final TextStyle style;
 
   @override
   State<_AnimatedText> createState() => _AnimatedTextState();
 }
 
 class _AnimatedTextState extends State<_AnimatedText> {
-  String _displayedText = "";
+  String _displayedText = '';
   int _charIndex = 0;
 
   @override

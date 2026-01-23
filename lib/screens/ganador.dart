@@ -1,24 +1,24 @@
 // ignore_for_file: use_build_context_synchronously
-import 'package:game_score/helpers/helpers.dart';
+import '../helpers/helpers.dart';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:game_score/l10n/app_localizations.dart';
-import 'package:game_score/models/models.dart';
-import 'package:game_score/providers/partida_provider.dart';
-import 'package:game_score/providers/providers.dart';
-import 'package:game_score/screens/screens.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/utils/utils.dart';
-import 'package:game_score/helpers/ad_helper.dart';
-import 'package:game_score/widgets/widgets.dart';
+import '../l10n/app_localizations.dart';
+import '../models/models.dart';
+import '../providers/partida_provider.dart';
+import '../providers/providers.dart';
+import 'screens.dart';
+import '../shared_preferences/preferences.dart';
+import '../themes/app_themes.dart';
+import '../utils/utils.dart';
+import '../helpers/ad_helper.dart';
+import '../widgets/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:widget_and_text_animator/widget_and_text_animator.dart';
 
 class GanadorScreen extends StatefulWidget {
-  const GanadorScreen({Key? key}) : super(key: key);
+  const GanadorScreen({super.key});
 
   @override
   State<GanadorScreen> createState() => _GanadorScreenState();
@@ -39,8 +39,8 @@ class _GanadorScreenState extends State<GanadorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
-    PremiumProvider premiumProvider = context.read<PremiumProvider>();
+    final GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
+    final PremiumProvider premiumProvider = context.read<PremiumProvider>();
     googleAdsProvider.loadInterstitialAd();
     if (!premiumProvider.isPremium) googleAdsProvider.loadRewardedAd(RewardedAdLocation.revancha);
 
@@ -113,7 +113,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
                   const SizedBox(height: 10),
 
                   TextAnimator(jugador,
-                      spaceDelay: const Duration(milliseconds: 0),
+                      spaceDelay: const Duration(),
                       characterDelay: const Duration(milliseconds: 180),
                       incomingEffect: WidgetTransitionEffects.incomingScaleUp(),
                       atRestEffect: WidgetRestingEffects.pulse(effectStrength: 0.8),
@@ -153,8 +153,8 @@ class _GanadorScreenState extends State<GanadorScreen> {
 
   revanchaFunction() async {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-    GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
-    PremiumProvider premiumProvider = context.read<PremiumProvider>();
+    final GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
+    final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
     void startNewGame(Partida newPartida) {
       partidaProvider.changePartidaEnTurno(newPartida);
@@ -162,7 +162,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
     }
 
     MyLoading.show();
-    for (Jugador jugador in partidaProvider.partidaEnTurno!.jugadores!) {
+    for (final Jugador jugador in partidaProvider.partidaEnTurno!.jugadores!) {
       jugador.puntuacion = 0;
     }
 

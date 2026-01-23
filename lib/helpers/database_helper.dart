@@ -1,21 +1,21 @@
 import 'dart:io';
-import 'package:game_score/models/models.dart';
-import 'package:game_score/utils/utils.dart';
+import '../models/models.dart';
+import '../utils/utils.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-  static const dbFileName = 'GameScore.db';
-  static const dbCurrentVersion = 2;
-
-  static final DatabaseHelper db = DatabaseHelper._();
 
   factory DatabaseHelper() {
     return db;
   }
 
   DatabaseHelper._();
+  static const dbFileName = 'GameScore.db';
+  static const dbCurrentVersion = 2;
+
+  static final DatabaseHelper db = DatabaseHelper._();
 
   static Database? _database;
 
@@ -26,13 +26,13 @@ class DatabaseHelper {
   }
 
   static Future<Database> initializeDatabase() async {
-    Directory applicationDocumentDirectory = await getApplicationDocumentsDirectory();
+    final Directory applicationDocumentDirectory = await getApplicationDocumentsDirectory();
 
-    String path = join(applicationDocumentDirectory.path, dbFileName);
+    final String path = join(applicationDocumentDirectory.path, dbFileName);
 
     Fun.logColor(color: Colores.green, body: 'path: $path');
 
-    var myDatabase = await openDatabase(
+    final myDatabase = await openDatabase(
       path,
       version: dbCurrentVersion,
       onOpen: _onOpen,
@@ -61,7 +61,7 @@ class DatabaseHelper {
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   static _databaseV1(Database db) async {
-    Fun.logColor(color: Colores.yellow, body: "=========== BASE DE DATOS V1 ===========");
+    Fun.logColor(color: Colores.yellow, body: '=========== BASE DE DATOS V1 ===========');
     await db.execute(''' 
         CREATE TABLE ${Partida.tableName}(
           id INTEGER PRIMARY KEY,
@@ -95,7 +95,7 @@ class DatabaseHelper {
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   static _databaseV2(Database db) async {
-    Fun.logColor(color: Colores.yellow, body: "=========== BASE DE DATOS V2 ===========");
+    Fun.logColor(color: Colores.yellow, body: '=========== BASE DE DATOS V2 ===========');
     await db.execute('''
       CREATE TABLE IF NOT EXISTS ${PartidaPredefinida.tableName}(
         id INTEGER PRIMARY KEY,

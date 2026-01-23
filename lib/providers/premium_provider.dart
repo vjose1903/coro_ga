@@ -1,64 +1,56 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:game_score/services/purchase_service.dart';
+import '../services/purchase_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PremiumProvider extends ChangeNotifier {
+
+  PremiumProvider() {
+    _loadPremiumStatus();
+  }
   bool _isPremium = false;
   bool _isLoading = true;
-  bool _simulatePremium = false; // Solo funciona en debug
+  bool _simulatePremium = false; // solo debug
 
   bool get isPremium => (kDebugMode && _simulatePremium) || _isPremium;
-  bool get simulatePremium => _simulatePremium;
-
-  void setSimulatePremium(bool value) {
-    if (!kDebugMode) return;
-    _simulatePremium = value;
-    notifyListeners();
-  }
+  bool get simulatePremium => kDebugMode ? _simulatePremium : false;
   bool get isLoading => _isLoading;
 
-  // Límites para versión FREE
+  // Límites versión FREE
   static const int freeMaxPlayers = 3;
   static const int freeMaxGames = 2;
   static const int freeMaxPredefinedGames = 2;
   static const int freeMaxHistory = 10;
 
-  PremiumProvider() {
-    _loadPremiumStatus();
-  }
-
+  /// Cargar estado premium
   Future<void> _loadPremiumStatus() async {
     _isLoading = true;
     notifyListeners();
 
-    // 1. Verificar cache local primero (rápido)
     final prefs = await SharedPreferences.getInstance();
     _isPremium = prefs.getBool('isPremium') ?? false;
-
-    // 2. Si no es premium en cache, verificar con la tienda
-    if (!_isPremium) {
-      _isPremium = await PurchaseService.instance.restorePurchases();
-      if (_isPremium) {
-        await prefs.setBool('isPremium', true);
-      }
-    }
 
     _isLoading = false;
     notifyListeners();
   }
 
-  Future<void> checkAndRestorePurchases() async {
+  /// Restaurar manual (botón explícito)
+  Future<void> restorePurchases() async {
     _isLoading = true;
     notifyListeners();
 
-    _isPremium = await PurchaseService.instance.restorePurchases();
-    
+    final restored = await PurchaseService.instance.restorePurchases();
+    _isPremium = restored;
+
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isPremium', _isPremium);
+    await prefs.setBool('isPremium', restored);
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  /// Alias de restauración para UI (mantiene la separación de flujo)
+  Future<void> checkAndRestorePurchases() async {
+    await restorePurchases();
   }
 
   void setPremium(bool value) async {
@@ -68,7 +60,14 @@ class PremiumProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Verificadores de límites
+  // DEBUG
+  void setSimulatePremium(bool value) {
+    if (!kDebugMode) return;
+    _simulatePremium = value;
+    notifyListeners();
+  }
+
+  // Validadores
   bool canAddPlayer(int currentPlayers) {
     if (isPremium) return true;
     return currentPlayers < freeMaxPlayers;
@@ -85,10 +84,9 @@ class PremiumProvider extends ChangeNotifier {
   }
 
   int getHistoryLimit() {
-    if (isPremium) return -1; // Sin límite
+    if (isPremium) return -1;
     return freeMaxHistory;
   }
 
   bool get showAds => !isPremium;
 }
-

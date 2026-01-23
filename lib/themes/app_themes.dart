@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
+import '../shared_preferences/preferences.dart';
 
 class AppThemes {
   static Color get colorPrimero => const Color(0xFF4D73EF);

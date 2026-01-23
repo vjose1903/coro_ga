@@ -6,9 +6,9 @@ import 'package:package_info_plus/package_info_plus.dart';
 /// Servicio para verificar la integridad de la app
 /// Detecta si la app fue modificada o instalada desde fuentes no autorizadas
 class AppIntegrityService {
+  AppIntegrityService._();
   static final AppIntegrityService _instance = AppIntegrityService._();
   static AppIntegrityService get instance => _instance;
-  AppIntegrityService._();
 
   bool _isVerified = false;
   bool _hasChecked = false;
@@ -126,7 +126,7 @@ class AppIntegrityService {
       return _allowedInstallers.contains(installer);
     } catch (e) {
       // Si el método nativo no está implementado, usar alternativa
-      return await _verifyInstallerFallback();
+      return _verifyInstallerFallback();
     }
   }
 

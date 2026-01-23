@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 class ExpandedButtom extends StatelessWidget {
   const ExpandedButtom({
-    Key? key,
+    super.key,
     required this.label,
     this.onTap,
     required this.backgroundColor,
     required this.textColor,
     this.fontSize = 15,
-  }) : super(key: key);
+  });
 
   final String label;
   final Function? onTap;
@@ -27,7 +27,7 @@ class ExpandedButtom extends StatelessWidget {
           onTap: () => onTap != null ? onTap!() : null,
           child: Padding(
             padding: const EdgeInsets.all(7),
-            child: Text(label, style: TextStyle(fontFamily: "Poppins", fontSize: fontSize, color: textColor), textAlign: TextAlign.center),
+            child: Text(label, style: TextStyle(fontFamily: 'Poppins', fontSize: fontSize, color: textColor), textAlign: TextAlign.center),
           ),
         ),
       ),

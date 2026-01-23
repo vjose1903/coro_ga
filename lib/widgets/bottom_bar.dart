@@ -2,13 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
-import 'package:game_score/providers/providers.dart';
+import '../providers/providers.dart';
 import 'package:provider/provider.dart';
 
 import '../shared_preferences/preferences.dart';
 
 class BottomBar extends StatelessWidget {
-  const BottomBar({Key? key, this.child, this.panelController}) : super(key: key);
+  const BottomBar({super.key, this.child, this.panelController});
   final Widget? child;
   final PanelController? panelController;
 
@@ -16,7 +16,7 @@ class BottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color backgroundColor = Preferences.isDarkMode ? const Color(0xEB333333) : const Color(0xFFC4D0E5);
+    final Color backgroundColor = Preferences.isDarkMode ? const Color(0xEB333333) : const Color(0xFFC4D0E5);
     final SlideUpProvider slideUpProvider = context.watch<SlideUpProvider>();
 
     // Usar la posición del panel para animar la altura suavemente

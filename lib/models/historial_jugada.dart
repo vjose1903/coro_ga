@@ -1,29 +1,29 @@
 import 'dart:convert';
-import 'package:game_score/helpers/helpers.dart';
-import 'package:game_score/models/models.dart';
-import 'package:game_score/utils/utils.dart';
-import 'package:flutter/material.dart';
+import '../helpers/helpers.dart';
+import '../utils/utils.dart';
+import 'models.dart';
 
 class HistorialJugada extends DynamicClass {
+
+  factory HistorialJugada.fromJson(String str) => HistorialJugada.fromMap(json.decode(str));
+
+  factory HistorialJugada.fromMap(Map<String, dynamic> json) => HistorialJugada(
+        id: json['id'],
+        jugadorId: json['jugador_id'],
+        tipo: json['tipo'],
+        puntuacion: json['puntuacion'],
+      );
   HistorialJugada({this.id, this.jugadorId, this.puntuacion, this.tipo});
-  static String tableName = "HistorialJugadas";
+  static String tableName = 'HistorialJugadas';
   int? id;
   int? jugadorId;
   int? puntuacion;
   String? tipo;
 
-  factory HistorialJugada.fromJson(String str) => HistorialJugada.fromMap(json.decode(str));
-
   String toJson() => json.encode(toMap());
 
-  factory HistorialJugada.fromMap(Map<String, dynamic> json) => HistorialJugada(
-        id: json["id"],
-        jugadorId: json["jugador_id"],
-        tipo: json["tipo"],
-        puntuacion: json["puntuacion"],
-      );
-
-  Map<String, dynamic> toMap() => {"id": id, "jugador_id": jugadorId, "puntuacion": puntuacion, "tipo": tipo};
+  @override
+  Map<String, dynamic> toMap() => {'id': id, 'jugador_id': jugadorId, 'puntuacion': puntuacion, 'tipo': tipo};
 
   @override
   String toString() {
@@ -34,7 +34,7 @@ class HistorialJugada extends DynamicClass {
     final SqlResponse response = SqlResponse();
 
     final HistorialJugada historialJugada = HistorialJugada(jugadorId: jugadorId, puntuacion: puntuacion, tipo: tipo);
-    Map body = historialJugada.toMap();
+    final Map body = historialJugada.toMap();
     Fun.removeKeys(body, ['id']);
 
     final res = await CrudHelper.insert(tableName: HistorialJugada.tableName, body: body);

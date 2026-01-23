@@ -1,13 +1,13 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
+import '../shared_preferences/preferences.dart';
 
 class LocaleProvider extends ChangeNotifier {
-  Locale _locale = const Locale('es');
 
   LocaleProvider() {
     _loadSavedLocale();
   }
+  Locale _locale = const Locale('es');
 
   Locale get locale => _locale;
 

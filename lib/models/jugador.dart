@@ -1,21 +1,30 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:game_score/helpers/helpers.dart';
-import 'package:game_score/models/models.dart';
-import 'package:game_score/utils/functions.dart';
-import 'package:game_score/utils/utils.dart';
+import '../helpers/helpers.dart';
+import 'models.dart';
+import '../utils/functions.dart';
+import '../utils/utils.dart';
 
 class Jugador extends DynamicClass {
+
+  factory Jugador.fromJson(String str) => Jugador.fromMap(json.decode(str));
+
+  factory Jugador.fromMap(Map<String, dynamic> json) => Jugador(
+        id: json["id"],
+        partidaId: json["partida_id"],
+        nombre: json["nombre"],
+        puntuacion: json["puntuacion"] ?? 0,
+        historialJugadas:
+            json["historial_jugadas"] != null ? List<HistorialJugada>.from(json["historial_jugadas"].map((x) => HistorialJugada.fromMap(x))) : [],
+      );
   Jugador({this.id, this.nombre, this.puntuacion = 0, this.partidaId, this.historialJugadas});
 
-  static String tableName = "Jugador";
+  static String tableName = 'Jugador';
   int? id;
   int? partidaId;
   String? nombre;
   int? puntuacion;
   List<HistorialJugada>? historialJugadas;
-
-  factory Jugador.fromJson(String str) => Jugador.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
@@ -29,18 +38,10 @@ class Jugador extends DynamicClass {
     return model.toMap();
   }
 
-  factory Jugador.fromMap(Map<String, dynamic> json) => Jugador(
-        id: json["id"],
-        partidaId: json["partida_id"],
-        nombre: json["nombre"],
-        puntuacion: json["puntuacion"] ?? 0,
-        historialJugadas:
-            json["historial_jugadas"] != null ? List<HistorialJugada>.from(json["historial_jugadas"].map((x) => HistorialJugada.fromMap(x))) : [],
-      );
+  @override
+  Map<String, dynamic> toMap() => {'id': id, 'nombre': nombre, 'puntuacion': puntuacion, 'partida_id': partidaId};
 
-  Map<String, dynamic> toMap() => {"id": id, "nombre": nombre, "puntuacion": puntuacion, "partida_id": partidaId};
-
-  Map<String, dynamic> toUpdateMap() => {"nombre": nombre};
+  Map<String, dynamic> toUpdateMap() => {'nombre': nombre};
 
   @override
   String toString() {
@@ -53,14 +54,14 @@ class Jugador extends DynamicClass {
   }
 
   addHistoriales(List<HistorialJugada?> historiales) {
-    for (var historial in historiales) {
+    for (final historial in historiales) {
       addHistorial(historial!);
     }
   }
 
   static Future<SqlResponse> edit({required Jugador jugador, required String newNombreJugador}) async {
-    Map<String, dynamic> tempJugadorMap = jugador.toUpdateMap();
-    tempJugadorMap["nombre"] = newNombreJugador;
+    final Map<String, dynamic> tempJugadorMap = jugador.toUpdateMap();
+    tempJugadorMap['nombre'] = newNombreJugador;
 
     final response = await CrudHelper.updateOne(tableName: Jugador.tableName, id: jugador.id, newData: tempJugadorMap);
 
@@ -79,7 +80,7 @@ class Jugador extends DynamicClass {
     if (!res.hasError!) {
       final resHistorial = await HistorialJugada.newHistorial(jugadorId: jugador.id!, puntuacion: newPuntuacion, tipo: tipo);
 
-      response.data = {"historial": resHistorial.data, "newPuntuacion": newData["puntuacion"]};
+      response.data = {'historial': resHistorial.data, 'newPuntuacion': newData['puntuacion']};
     } else {
       response.addMsgs(res.messages);
     }
@@ -94,13 +95,13 @@ class Jugador extends DynamicClass {
 
     if (!res.hasError!) {
       jugador.historialJugadas!.remove(historial);
-      int newPuntuacion = historial.tipo == "aumentar"
+      final int newPuntuacion = historial.tipo == 'aumentar'
           ? jugador.puntuacion! - historial.puntuacion!
           : jugador.puntuacion! + historial.puntuacion!;
 
-      await CrudHelper.updateOne(tableName: Jugador.tableName, id: jugador.id!, newData: {"puntuacion": newPuntuacion});
+      await CrudHelper.updateOne(tableName: Jugador.tableName, id: jugador.id!, newData: {'puntuacion': newPuntuacion});
 
-      response.data = {"newPuntuacion": newPuntuacion};
+      response.data = {'newPuntuacion': newPuntuacion};
     } else {
       response.hasError = true;
       response.addMsg(L10n.errorDeletingHistory);
@@ -112,7 +113,7 @@ class Jugador extends DynamicClass {
   static findHistorial({required Jugador jugador}) async {
     final response = await CrudHelper.getAll(
       tableName: HistorialJugada.tableName,
-      where_: "jugador_id = ?",
+      where_: 'jugador_id = ?',
       whereArgs_: [jugador.id],
     );
 
@@ -130,7 +131,7 @@ class Jugador extends DynamicClass {
     response = await CrudHelper.deleteOne(tableName: Jugador.tableName, id: id!);
     if (!response.hasError!) {
       if (historialJugadas != null && historialJugadas!.isNotEmpty) {
-        for (var historial in historialJugadas!) {
+        for (final historial in historialJugadas!) {
           final responseHistorial = await CrudHelper.deleteOne(tableName: HistorialJugada.tableName, id: historial.id!);
 
           if (responseHistorial.hasError! && response.messages == null) {

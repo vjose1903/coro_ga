@@ -1,22 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:game_score/themes/app_themes.dart';
+import '../themes/app_themes.dart';
 import '../helpers/helpers.dart';
 
 class CustomInputField<T> extends StatelessWidget {
-  final String? hintText;
-  final String? labelText;
-  final String? helperText;
-  final IconData? innerLeft;
-  final IconData? innerRight;
-  final TextInputType? inputType;
-  final bool obscureText;
-  final bool enabled;
-
-  final Function? validators;
-  final Function initialValueFn;
-  final Function onChanged;
-
-  final TextEditingController? controller;
 
   const CustomInputField({
     Key? key,
@@ -33,6 +19,20 @@ class CustomInputField<T> extends StatelessWidget {
     this.controller,
     this.enabled = true,
   }) : super(key: key);
+  final String? hintText;
+  final String? labelText;
+  final String? helperText;
+  final IconData? innerLeft;
+  final IconData? innerRight;
+  final TextInputType? inputType;
+  final bool obscureText;
+  final bool enabled;
+
+  final Function? validators;
+  final Function initialValueFn;
+  final Function onChanged;
+
+  final TextEditingController? controller;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,6 @@ class CustomInputField<T> extends StatelessWidget {
       key: key,
       enabled: enabled,
       controller: controller,
-      autofocus: false,
       initialValue: initialValueFn(),
       textCapitalization: TextCapitalization.words,
       keyboardType: inputType,

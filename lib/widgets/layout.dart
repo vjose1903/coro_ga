@@ -82,6 +82,7 @@ class _LayoutState extends State<Layout> {
         min(visibleHeight * widget.maxPanelHeightFraction, visibleHeight - minTopMargin),
       ),
     );
+    slideUpProvider.panelMaxHeight = maxHeight;
 
     final isDark = Preferences.isDarkMode;
 
@@ -320,7 +321,7 @@ class _SlideUpContent extends StatelessWidget {
       child: Column(
         children: [
           // Handle del panel
-          _PanelHandle(),
+          _PanelHandle(panelController: panelController),
           // Contenido
           Expanded(
             child: Padding(
@@ -341,27 +342,91 @@ class _SlideUpContent extends StatelessWidget {
 }
 
 // Handle del panel modernizado
-class _PanelHandle extends StatelessWidget {
+class _PanelHandle extends StatefulWidget {
+  const _PanelHandle({required this.panelController});
+
+  final PanelController panelController;
+
+  @override
+  State<_PanelHandle> createState() => _PanelHandleState();
+}
+
+class _PanelHandleState extends State<_PanelHandle> {
+  double _dragStartPosition = 1.0;
+  double _dragAccumulated = 0.0;
+  double? _panelMaxHeight;
+
+  void _initializeMaxHeight(BuildContext context) {
+    if (_panelMaxHeight != null && _panelMaxHeight! > 0) return;
+    final slideUpProvider = context.read<SlideUpProvider>();
+    final providerHeight = slideUpProvider.panelMaxHeight;
+    if (providerHeight > 0) {
+      _panelMaxHeight = providerHeight;
+      return;
+    }
+    _panelMaxHeight = MediaQuery.of(context).size.height * 0.95;
+  }
+
+  void _movePanel(double delta) {
+    if (!widget.panelController.isAttached) return;
+    final height = _panelMaxHeight;
+    if (height == null || height <= 0) return;
+    final currentPosition = widget.panelController.panelPosition;
+    _dragAccumulated += delta;
+    final fraction = _dragAccumulated / height;
+    final newPosition = (_dragStartPosition - fraction).clamp(0.0, 1.0);
+    widget.panelController.panelPosition = newPosition;
+    if (newPosition <= 0.05) {
+      widget.panelController.close();
+    }
+  }
+
+  void _handleDragEnd(DragEndDetails details) {
+    if (!widget.panelController.isAttached) return;
+    final velocity = details.primaryVelocity ?? 0;
+    final currentPosition = widget.panelController.panelPosition;
+    if (velocity > 300 || currentPosition < 0.5) {
+      widget.panelController.close();
+    } else {
+      widget.panelController.open();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
 
-    return Container(
-      padding: ResponsiveApp.symmetric(vertical: 12),
+    return GestureDetector(
+      onVerticalDragStart: (details) {
+        if (!widget.panelController.isAttached) return;
+        _dragStartPosition = widget.panelController.panelPosition;
+        _dragAccumulated = 0.0;
+        _initializeMaxHeight(context);
+      },
+      onVerticalDragUpdate: (details) {
+        if (details.delta.dy == 0 || _panelMaxHeight == null) return;
+        _movePanel(details.delta.dy);
+      },
+      onVerticalDragEnd: _handleDragEnd,
+      behavior: HitTestBehavior.translucent,
       child: Container(
-        width: ResponsiveApp.scaleWidth(40),
-        height: ResponsiveApp.scaleHeight(5),
-        decoration: BoxDecoration(
-          color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.3),
-          borderRadius: BorderRadius.circular(ResponsiveApp.scaleWidth(10)),
-          boxShadow: [
-            if (!isDark)
-              BoxShadow(
-                color: Colors.white.withValues(alpha: 0.5),
-                offset: const Offset(0, 1),
-                blurRadius: 1,
-              ),
-          ],
+        padding: ResponsiveApp.symmetric(vertical: 12),
+        alignment: Alignment.center,
+        child: Container(
+          width: ResponsiveApp.scaleWidth(40),
+          height: ResponsiveApp.scaleHeight(5),
+          decoration: BoxDecoration(
+            color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(ResponsiveApp.scaleWidth(10)),
+            boxShadow: [
+              if (!isDark)
+                BoxShadow(
+                  color: Colors.white.withValues(alpha: 0.5),
+                  offset: const Offset(0, 1),
+                  blurRadius: 1,
+                ),
+            ],
+          ),
         ),
       ),
     );

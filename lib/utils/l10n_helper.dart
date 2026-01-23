@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:game_score/l10n/app_localizations.dart';
-import 'package:game_score/models/models.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
+import '../l10n/app_localizations.dart';
+import '../models/models.dart';
+import '../shared_preferences/preferences.dart';
 
 /// Helper para acceder a las traducciones de forma segura
 class L10n {

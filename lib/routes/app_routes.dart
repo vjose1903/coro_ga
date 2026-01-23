@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:game_score/screens/screens.dart';
+import '../screens/screens.dart';
 import '../models/menu_option.dart';
 
 class AppRoutes {
@@ -13,7 +13,7 @@ class AppRoutes {
   ];
 
   static Map<String, Widget Function(BuildContext)> getAppRoutes() {
-    Map<String, Widget Function(BuildContext)> appRoutes = {};
+    final Map<String, Widget Function(BuildContext)> appRoutes = {};
 
     for (final option in menuOptions) {
       appRoutes.addAll({option.route: (BuildContext context) => option.screen});

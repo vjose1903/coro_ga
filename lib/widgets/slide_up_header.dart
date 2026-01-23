@@ -7,9 +7,7 @@ import '../themes/app_themes.dart';
 /// Incluye la decoración neumórfica y el gesto de drag para controlar el panel.
 class SlideUpHeader extends StatefulWidget {
   const SlideUpHeader({
-    super.key,
-    required this.panelController,
-    required this.child,
+    required this.panelController, required this.child, super.key,
   });
 
   final PanelController panelController;

@@ -14,13 +14,13 @@ class SqlResponse {
     if (args == null) return;
     messages ??= [];
 
-    for (String arg in args) {
+    for (final String arg in args) {
       messages!.add(arg);
     }
   }
 
   @override
   String toString() {
-    return "hasError: $hasError, messages: $messages, data: $data";
+    return 'hasError: $hasError, messages: $messages, data: $data';
   }
 }

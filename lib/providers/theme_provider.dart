@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/utils/utils.dart';
+import '../shared_preferences/preferences.dart';
+import '../themes/app_themes.dart';
+import '../utils/utils.dart';
 
 class ThemeProvider extends ChangeNotifier {
-  bool isDarkMode;
   ThemeProvider({required bool isDarkMode_}) : isDarkMode = isDarkMode_;
+  bool isDarkMode;
 
   ThemeData get getCurrentTheme {
     return isDarkMode ? AppThemes.darkTheme : AppThemes.lightTheme;

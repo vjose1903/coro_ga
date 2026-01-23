@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:game_score/helpers/helpers.dart';
-import 'package:game_score/providers/premium_provider.dart';
-import 'package:game_score/services/banner_prefetch_service.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
+import '../helpers/helpers.dart';
+import '../providers/premium_provider.dart';
+import '../services/banner_prefetch_service.dart';
+import '../shared_preferences/preferences.dart';
 
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 class GoogleBannerAd extends StatefulWidget {
-  const GoogleBannerAd({Key? key, required this.location, this.onCloseAd}) : super(key: key);
+  const GoogleBannerAd({super.key, required this.location, this.onCloseAd});
 
   final AdLocation location;
   final Function? onCloseAd;

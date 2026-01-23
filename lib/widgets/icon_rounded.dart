@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 
 class IconRounded extends StatelessWidget {
   const IconRounded(
-      {Key? key,
+      {super.key,
       required this.icon,
       this.iconColor = Colors.grey,
       this.iconSize = 15,
       this.backgroundColor,
       this.marginLeft = 0,
-      this.marginRight = 0})
-      : super(key: key);
+      this.marginRight = 0});
 
   final IconData icon;
   final Color iconColor;

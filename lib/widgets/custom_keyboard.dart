@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/themes/app_themes.dart';
+import '../shared_preferences/preferences.dart';
+import '../themes/app_themes.dart';
 import '../helpers/helpers.dart';
 
 enum KeyboardType { number }
 
 class CustomKeyboard extends StatelessWidget {
-  const CustomKeyboard({Key? key, required this.onChanged, required this.tipo, this.buttonHeight}) : super(key: key);
+  const CustomKeyboard({super.key, required this.onChanged, required this.tipo, this.buttonHeight});
   final Function onChanged;
   final KeyboardType tipo;
   final double? buttonHeight;
@@ -21,24 +21,24 @@ class CustomKeyboard extends StatelessWidget {
     return Table(
       children: [
         TableRow(children: [
-          _Tecla(label: "1", onChanged: (value) => onChanged(value), height: height),
-          _Tecla(label: "2", onChanged: (value) => onChanged(value), height: height),
-          _Tecla(label: "3", onChanged: (value) => onChanged(value), height: height)
+          _Tecla(label: '1', onChanged: (value) => onChanged(value), height: height),
+          _Tecla(label: '2', onChanged: (value) => onChanged(value), height: height),
+          _Tecla(label: '3', onChanged: (value) => onChanged(value), height: height)
         ]),
         TableRow(children: [
-          _Tecla(label: "4", onChanged: (value) => onChanged(value), height: height),
-          _Tecla(label: "5", onChanged: (value) => onChanged(value), height: height),
-          _Tecla(label: "6", onChanged: (value) => onChanged(value), height: height)
+          _Tecla(label: '4', onChanged: (value) => onChanged(value), height: height),
+          _Tecla(label: '5', onChanged: (value) => onChanged(value), height: height),
+          _Tecla(label: '6', onChanged: (value) => onChanged(value), height: height)
         ]),
         TableRow(children: [
-          _Tecla(label: "7", onChanged: (value) => onChanged(value), height: height),
-          _Tecla(label: "8", onChanged: (value) => onChanged(value), height: height),
-          _Tecla(label: "9", onChanged: (value) => onChanged(value), height: height)
+          _Tecla(label: '7', onChanged: (value) => onChanged(value), height: height),
+          _Tecla(label: '8', onChanged: (value) => onChanged(value), height: height),
+          _Tecla(label: '9', onChanged: (value) => onChanged(value), height: height)
         ]),
         TableRow(children: [
           Container(),
-          _Tecla(label: "0", onChanged: (value) => onChanged(value), height: height),
-          _Tecla(label: "DEL", icon: Icons.backspace_rounded, onChanged: (value) => onChanged(value), backgroundColor: Colors.transparent, height: height)
+          _Tecla(label: '0', onChanged: (value) => onChanged(value), height: height),
+          _Tecla(label: 'DEL', icon: Icons.backspace_rounded, onChanged: (value) => onChanged(value), backgroundColor: Colors.transparent, height: height)
         ]),
       ],
     );
@@ -46,7 +46,15 @@ class CustomKeyboard extends StatelessWidget {
 }
 
 class _Tecla extends StatelessWidget {
-  const _Tecla({Key? key, required this.label, required this.onChanged, this.icon, this.backgroundColor, this.labelColor, this.height = 38}) : super(key: key);
+  const _Tecla({
+    super.key,
+    required this.label,
+    required this.onChanged,
+    this.icon,
+    this.backgroundColor,
+    this.labelColor,
+    this.height = 38,
+  });
 
   final String? label;
   final Function onChanged;
@@ -58,7 +66,7 @@ class _Tecla extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isTransparent = backgroundColor == Colors.transparent;
-    Color backColor = backgroundColor ?? (Preferences.isDarkMode ? const Color(0xff505050) : const Color(0xffFFFFFF));
+    final Color backColor = backgroundColor ?? (Preferences.isDarkMode ? const Color(0xff505050) : const Color(0xffFFFFFF));
     final margin = height < 34 ? 3.0 : 5.0;
     
     return Container(
@@ -97,7 +105,7 @@ class _Tecla extends StatelessWidget {
 }
 
 class _Simbolo extends StatelessWidget {
-  const _Simbolo({Key? key, this.label, this.icon, this.labelColor, this.height = 38}) : super(key: key);
+  const _Simbolo({super.key, this.label, this.icon, this.labelColor, this.height = 38});
 
   final String? label;
   final IconData? icon;
@@ -106,7 +114,7 @@ class _Simbolo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color color = labelColor ?? (Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorQuinto.withValues(alpha: 0.9));
+    final Color color = labelColor ?? (Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorQuinto.withValues(alpha: 0.9));
     // Escalar tamaño basado en altura de tecla
     final iconSize = (height * 0.52).clamp(16.0, 20.0);
     final fontSize = (height * 0.45).clamp(14.0, 17.0);

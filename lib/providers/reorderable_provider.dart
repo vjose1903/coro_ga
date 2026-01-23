@@ -11,7 +11,7 @@ class ReorderableProvider extends ChangeNotifier {
   bool get isReording => _isReording;
 
   void onReorder({required int oldIndex, required int newIndex, required reordenableList}) {
-    Widget row = reordenableList.removeAt(oldIndex);
+    final Widget row = reordenableList.removeAt(oldIndex);
     reordenableList.insert(newIndex, row);
   }
 

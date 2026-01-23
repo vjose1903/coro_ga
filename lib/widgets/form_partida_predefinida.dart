@@ -1,19 +1,19 @@
 import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:game_score/l10n/app_localizations.dart';
-import 'package:game_score/models/models.dart';
-import 'package:game_score/providers/providers.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/utils/utils.dart';
-import 'package:game_score/widgets/widgets.dart';
+import '../l10n/app_localizations.dart';
+import '../models/models.dart';
+import '../providers/providers.dart';
+import '../shared_preferences/preferences.dart';
+import '../themes/app_themes.dart';
+import '../utils/utils.dart';
+import 'widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import '../helpers/helpers.dart';
 
 class FormPartidaPredefinida extends StatelessWidget {
-  const FormPartidaPredefinida({Key? key}) : super(key: key);
+  const FormPartidaPredefinida({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,6 @@ class FormPartidaPredefinida extends StatelessWidget {
               formGroup: form,
               child: IntrinsicHeight(
                 child: Column(
-                  mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Nombre
@@ -56,8 +55,8 @@ class FormPartidaPredefinida extends StatelessWidget {
                             formControlName: 'tipo',
                             labelText: AppLocalizations.of(context)!.type,
                             items: [
-                              DropdownMenuItem(value: "Rondas", child: Text(AppLocalizations.of(context)!.rounds)),
-                              DropdownMenuItem(value: "Puntuación", child: Text(AppLocalizations.of(context)!.score))
+                              DropdownMenuItem(value: 'Rondas', child: Text(AppLocalizations.of(context)!.rounds)),
+                              DropdownMenuItem(value: 'Puntuación', child: Text(AppLocalizations.of(context)!.score))
                             ],
                             onChanged: (value) => formPartidaPredefinidaProvider.changeTipo(value),
                           ),
@@ -67,7 +66,7 @@ class FormPartidaPredefinida extends StatelessWidget {
                           Expanded(
                             child: CustomReactiveInput(
                               formControlName: 'maxPuntuacion',
-                              labelText: tipoPartida == "Rondas" ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScore,
+                              labelText: tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScore,
                               inputType: TextInputType.number,
                             ),
                           ),
@@ -78,10 +77,10 @@ class FormPartidaPredefinida extends StatelessWidget {
 
                     // Cantidad de jugadores
                     _JugadoresCounter(
-                      cantidad: formPartidaPredefinidaProvider.form.control("cantidadJugadores").value ?? 2,
-                      onRemove: () => formPartidaPredefinidaProvider.changeCantidadJugadores(context: context, tipo: "-"),
+                      cantidad: formPartidaPredefinidaProvider.form.control('cantidadJugadores').value ?? 2,
+                      onRemove: () => formPartidaPredefinidaProvider.changeCantidadJugadores(context: context, tipo: '-'),
                       onAdd: () {
-                        PremiumProvider premiumProvider = context.read<PremiumProvider>();
+                        final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
                         if (!premiumProvider.canAddPlayer(formPartidaPredefinidaProvider.cantidadJugadores)) {
                           final l10n = AppLocalizations.of(context)!;
@@ -94,7 +93,7 @@ class FormPartidaPredefinida extends StatelessWidget {
                           return;
                         }
 
-                        formPartidaPredefinidaProvider.changeCantidadJugadores(context: context, tipo: "+");
+                        formPartidaPredefinidaProvider.changeCantidadJugadores(context: context, tipo: '+');
                       },
                     ),
                     const SizedBox(height: 30),
@@ -177,9 +176,9 @@ class FormPartidaPredefinida extends StatelessWidget {
 
 // Header del formulario con neumorfismo
 class _FormHeader extends StatelessWidget {
-  final bool isEditing;
 
   const _FormHeader({required this.isEditing});
+  final bool isEditing;
 
   @override
   Widget build(BuildContext context) {
@@ -274,15 +273,15 @@ class _FormHeader extends StatelessWidget {
 
 // Contador de jugadores
 class _JugadoresCounter extends StatelessWidget {
-  final int cantidad;
-  final VoidCallback onRemove;
-  final VoidCallback onAdd;
 
   const _JugadoresCounter({
     required this.cantidad,
     required this.onRemove,
     required this.onAdd,
   });
+  final int cantidad;
+  final VoidCallback onRemove;
+  final VoidCallback onAdd;
 
   @override
   Widget build(BuildContext context) {
@@ -391,15 +390,15 @@ class _JugadoresCounter extends StatelessWidget {
 
 // Botón del contador
 class _CounterButton extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
 
   const _CounterButton({
     required this.icon,
     required this.color,
     required this.onTap,
   });
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -437,11 +436,6 @@ class _CounterButton extends StatelessWidget {
 
 // Botón de acción
 class _ActionButton extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final bool isPrimary;
-  final bool isDestructive;
-  final VoidCallback onTap;
 
   const _ActionButton({
     required this.label,
@@ -450,6 +444,11 @@ class _ActionButton extends StatelessWidget {
     this.isDestructive = false,
     required this.onTap,
   });
+  final String label;
+  final IconData icon;
+  final bool isPrimary;
+  final bool isDestructive;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {

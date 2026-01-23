@@ -1,23 +1,23 @@
 import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:game_score/helpers/helpers.dart';
-import 'package:game_score/l10n/app_localizations.dart';
-import 'package:game_score/models/models.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/themes/app_themes.dart';
-import 'package:game_score/utils/alert_dialog.dart';
+import '../helpers/helpers.dart';
+import '../l10n/app_localizations.dart';
+import '../models/models.dart';
+import '../shared_preferences/preferences.dart';
+import '../themes/app_themes.dart';
+import '../utils/alert_dialog.dart';
 
 class PartidaCard extends StatefulWidget {
   const PartidaCard({
-    Key? key,
+    super.key,
     required this.partida,
     required this.functionBorrar,
     required this.functionEditar,
     required this.functionReiniciar,
     required this.index,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   final int index;
   final Partida partida;
@@ -43,7 +43,7 @@ class _PartidaCardState extends State<PartidaCard> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: AppThemes.themeColor_2,
         borderRadius: ResponsiveApp.borderRadius(16),
@@ -51,7 +51,6 @@ class _PartidaCardState extends State<PartidaCard> {
           color: Preferences.isDarkMode
               ? Colors.white.withValues(alpha: 0.08)
               : Colors.grey.withValues(alpha: 0.15),
-          width: 1,
         ),
         boxShadow: [
           BoxShadow(
@@ -92,15 +91,15 @@ class _PartidaCardState extends State<PartidaCard> {
                       dialogType: DialogType.warning,
                       buttonsList: [
                         CustomActionsButtons.cancelButton({
-                          "label": l10n.cancel,
-                          "onTap": () {
+                          'label': l10n.cancel,
+                          'onTap': () {
                             Navigator.pop(context);
                             handler(false);
                           }
                         }),
                         CustomActionsButtons.aceptarButton({
-                          "label": l10n.accept,
-                          "onTap": () async {
+                          'label': l10n.accept,
+                          'onTap': () async {
                             Navigator.pop(context);
                             await widget.functionReiniciar();
                             await handler(false);
@@ -162,7 +161,7 @@ class _PartidaCardState extends State<PartidaCard> {
                                   borderRadius: ResponsiveApp.borderRadius(20),
                                 ),
                                 child: Text(
-                                  widget.partida.tipo == "Rondas" 
+                                  widget.partida.tipo == 'Rondas' 
                                       ? l10n.gameType_rounds 
                                       : l10n.gameType_score,
                                   style: TextStyle(
@@ -220,10 +219,10 @@ class _PartidaCardState extends State<PartidaCard> {
 }
 
 class _InfoChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
 
   const _InfoChip({required this.icon, required this.label});
+  final IconData icon;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
@@ -256,7 +255,7 @@ class _InfoChip extends StatelessWidget {
 }
 
 class EstadoPartida extends StatelessWidget {
-  const EstadoPartida({Key? key, required this.partida}) : super(key: key);
+  const EstadoPartida({super.key, required this.partida});
 
   final Partida partida;
 
@@ -283,12 +282,12 @@ class EstadoPartida extends StatelessWidget {
 }
 
 class _EstadoChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
 
   const _EstadoChip(
       {required this.icon, required this.label, required this.color});
+  final IconData icon;
+  final String label;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -319,7 +318,7 @@ class _EstadoChip extends StatelessWidget {
 }
 
 class _GanadorPerdedor extends StatelessWidget {
-  const _GanadorPerdedor({Key? key, required this.partida}) : super(key: key);
+  const _GanadorPerdedor({super.key, required this.partida});
   final Partida partida;
 
   String _getTranslatedName(BuildContext context, String name) {
@@ -357,16 +356,16 @@ class _GanadorPerdedor extends StatelessWidget {
 }
 
 class _PlayerStatus extends StatelessWidget {
-  final IconData icon;
-  final String name;
-  final num puntuacion;
-  final Color color;
 
   const _PlayerStatus(
       {required this.icon,
       required this.name,
       required this.puntuacion,
       required this.color});
+  final IconData icon;
+  final String name;
+  final num puntuacion;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {

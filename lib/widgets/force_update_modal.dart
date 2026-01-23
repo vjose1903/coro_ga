@@ -1,15 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:game_score/l10n/app_localizations.dart';
-import 'package:game_score/services/version_service.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/themes/app_themes.dart';
+import '../l10n/app_localizations.dart';
+import '../services/version_service.dart';
+import '../shared_preferences/preferences.dart';
+import '../themes/app_themes.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../helpers/helpers.dart';
 
 class ForceUpdateModal extends StatelessWidget {
-  const ForceUpdateModal({Key? key}) : super(key: key);
+  const ForceUpdateModal({super.key});
 
   static Future<void> showIfNeeded(BuildContext context, {bool forceShow = false}) async {
     // En desarrollo solo mostrar si se pasa forceShow
