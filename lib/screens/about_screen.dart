@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import '../helpers/helpers.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -9,139 +10,43 @@ import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 import '../widgets/widgets.dart';
 
-class AboutScreen extends StatelessWidget {
+class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});
 
-  // Mismo gradiente del Layout principal
-  static const _backgroundDecoration = BoxDecoration(
-    gradient: LinearGradient(
-      transform: GradientRotation(-0.4),
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      stops: [0.0, 0.4, 1.0],
-      colors: [
-        Color(0xFF3D47D9),
-        Color(0xFF1A237E),
-        Color(0xFF0D1442),
-      ],
-    ),
-  );
+  @override
+  State<AboutScreen> createState() => _AboutScreenState();
+}
+
+class _AboutScreenState extends State<AboutScreen> {
+  late final PanelController panelController;
+
+  @override
+  void initState() {
+    super.initState();
+    panelController = PanelController();
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final topPadding = MediaQuery.of(context).padding.top;
 
     return ScreenTracker(
       screenName: 'AboutScreen',
       child: Scaffold(
-        body: Stack(
-          children: [
-            // Fondo con gradiente
-            Container(decoration: _backgroundDecoration),
-            // Decoración de círculos sutiles
-            const _BackgroundCircles(),
-            // AppBar custom
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Row(
-                  children: [
-                    CustomIconButtom(
-                      iconSize: ResponsiveApp.isSmallHeight ? 18 : 22,
-                      iconColor: Colors.white,
-                      icon: Icons.arrow_back_ios_new,
-                      onTap: () => Navigator.pop(context),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        l10n.aboutTitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.bold,
-                          fontSize: ResponsiveApp.scaleText(20),
-                          letterSpacing: 1.5,
-                          shadows: const [
-                            Shadow(
-                              color: Colors.black26,
-                              blurRadius: 4,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            // Body con el contenido
-            Column(
-              children: [
-                SizedBox(height: topPadding + 65),
-                Expanded(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.only(topLeft: Radius.circular(50)),
-                      color: AppThemes.themeColor_1,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 20,
-                          offset: const Offset(0, -5),
-                        ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.only(topLeft: Radius.circular(50)),
-                      child: _AboutContent(l10n: l10n),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+        body: Layout(
+          panelController: panelController,
+          appBarTitle: l10n.aboutTitle,
+          appBarLeading: CustomIconButtom(
+            iconSize: ResponsiveApp.isSmallHeight ? 18 : 22,
+            iconColor: Colors.white,
+            icon: Icons.arrow_back_ios_new,
+            onTap: () => Navigator.pop(context),
+          ),
+          bodyContent: _AboutContent(l10n: l10n),
         ),
       ),
     );
   }
-}
-
-class _BackgroundCircles extends StatelessWidget {
-  const _BackgroundCircles();
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned.fill(
-      child: IgnorePointer(
-        child: CustomPaint(painter: _CirclesPainter()),
-      ),
-    );
-  }
-}
-
-class _CirclesPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.03)
-      ..style = PaintingStyle.fill;
-
-    canvas.drawCircle(Offset(size.width * 0.9, size.height * 0.1), 80, paint);
-    canvas.drawCircle(Offset(size.width * 0.1, size.height * 0.3), 60, paint);
-    canvas.drawCircle(
-      Offset(size.width * 0.8, size.height * 0.6),
-      40,
-      paint..color = Colors.white.withValues(alpha: 0.02),
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _AboutContent extends StatelessWidget {
@@ -185,14 +90,16 @@ class _AboutContent extends StatelessWidget {
               fontFamily: 'Poppins',
               fontSize: ResponsiveApp.scaleText(28),
               fontWeight: FontWeight.bold,
-              color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
+              color:
+                  Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
             ),
           ),
           const SizedBox(height: 8),
           FutureBuilder<PackageInfo>(
             future: PackageInfo.fromPlatform(),
             builder: (context, snapshot) {
-              final version = snapshot.hasData ? 'v${snapshot.data!.version}' : '';
+              final version =
+                  snapshot.hasData ? 'v${snapshot.data!.version}' : '';
               return Text(
                 version,
                 style: TextStyle(
@@ -214,7 +121,8 @@ class _AboutContent extends StatelessWidget {
                 fontFamily: 'Poppins',
                 fontSize: ResponsiveApp.scaleText(14),
                 height: 1.6,
-                color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[700],
+                color:
+                    Preferences.isDarkMode ? Colors.white70 : Colors.grey[700],
               ),
               textAlign: TextAlign.center,
             ),
@@ -232,7 +140,9 @@ class _AboutContent extends StatelessWidget {
                     fontFamily: 'Poppins',
                     fontSize: ResponsiveApp.scaleText(14),
                     height: 1.6,
-                    color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[700],
+                    color: Preferences.isDarkMode
+                        ? Colors.white70
+                        : Colors.grey[700],
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -264,7 +174,8 @@ class _PrivacyPolicyButton extends StatelessWidget {
 
   void _launchPrivacyPolicy() async {
     final uri = Uri.parse('https://coro-games.netlify.app/');
-    if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (await canLaunchUrl(uri))
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   @override
@@ -316,7 +227,6 @@ class _PrivacyPolicyButton extends StatelessWidget {
 }
 
 class _SectionCard extends StatelessWidget {
-
   const _SectionCard({
     required this.icon,
     required this.title,
@@ -337,7 +247,9 @@ class _SectionCard extends StatelessWidget {
         color: AppThemes.themeColor_2,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.grey.withValues(alpha: 0.15),
         ),
         boxShadow: [
           BoxShadow(
