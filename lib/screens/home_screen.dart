@@ -202,6 +202,7 @@ class _Body extends StatelessWidget {
       children: [
         Expanded(child: ListPartidas(panelController: panelController)),
         // Banner de anuncios
+        const SizedBox(height: 10),
         Padding(
           padding: ResponsiveApp.only(bottom: 16),
           child: GoogleBannerAd(location: AdLocation.home),
