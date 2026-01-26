@@ -872,41 +872,43 @@ class _ActionScoreButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 7),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [color, color.withValues(alpha: 0.8)],
-            ),
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: [
-              BoxShadow(
-                color: color.withValues(alpha: 0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
+      child: Ink(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [color, color.withValues(alpha: 0.8)],
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 22, color: Colors.white),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: ResponsiveApp.scaleText(15),
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: color.withValues(alpha: 0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 7),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 22, color: Colors.white),
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: ResponsiveApp.scaleText(15),
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
