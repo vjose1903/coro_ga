@@ -405,6 +405,7 @@ class _ListHistorialState extends State<_ListHistorial>
             itemBuilder: (context, index) {
               final HistorialJugada historial = jugador.historialJugadas![index];
               return _HistorialItem(
+                key: ValueKey('hist-${historial.id ?? index}'),
                 historial: historial,
                 jugadorNombre: jugador.nombre!,
                 index: index,
@@ -419,6 +420,7 @@ class _ListHistorialState extends State<_ListHistorial>
 
 class _HistorialItem extends StatefulWidget {
   const _HistorialItem({
+    super.key,
     required this.historial,
     required this.jugadorNombre,
     required this.index,
@@ -482,12 +484,13 @@ class _HistorialItemState extends State<_HistorialItem> {
                     'label': l10n.accept,
                     'onTap': () async {
                       Navigator.pop(context);
+                      await handler(true);
                       final jugadorProvider = context.read<JugadorProvider>();
                       final partidaProvider = context.read<PartidaProvider>();
                       await jugadorProvider.deleteHistorial(
-                          historial: widget.historial);
+                        historial: widget.historial,
+                      );
                       partidaProvider.refresh();
-                      await handler(true);
                     }
                   }),
                 ],

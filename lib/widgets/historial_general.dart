@@ -541,6 +541,7 @@ class _ListHistorialGeneralState extends State<_ListHistorialGeneral>
       itemBuilder: (context, index) {
         final item = widget.historiales[index];
         return _HistorialGeneralItem(
+          key: ValueKey('hist-general-${item.historial.id ?? index}'),
           historial: item.historial,
           jugador: item.jugador,
           index: index,
@@ -552,6 +553,7 @@ class _ListHistorialGeneralState extends State<_ListHistorialGeneral>
 
 class _HistorialGeneralItem extends StatefulWidget {
   const _HistorialGeneralItem({
+    super.key,
     required this.historial,
     required this.jugador,
     required this.index,
@@ -717,6 +719,7 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
           'label': l10n.accept,
           'onTap': () async {
             Navigator.pop(context);
+            await handler(true);
             final jugadorProvider = context.read<JugadorProvider>();
             final partidaProvider = context.read<PartidaProvider>();
 
@@ -729,8 +732,6 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
             if (jugadorAnterior != null) {
               jugadorProvider.changeJugadorEnTurno(jugadorAnterior);
             }
-
-            await handler(true);
           }
         }),
       ],
