@@ -223,7 +223,7 @@ class ListPartidas extends StatelessWidget {
     final List<Partida> partidas = partidaProvider.partidas;
 
     if (partidas.isEmpty) {
-      if (!partidaProvider.isFirstSearch) return const _EmptyState();
+      if (!partidaProvider.isFirstSearch) return _EmptyState();
       return _LoadingState();
     }
 
@@ -349,8 +349,8 @@ class _EmptyState extends StatelessWidget {
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w600,
                         fontSize: ResponsiveApp.scaleText(20),
-                        color: Preferences.isDarkMode
-                            ? Colors.white.withValues(alpha: 0.9)
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white.withValues(alpha: 0.8)
                             : AppThemes.colorCuarto,
                       ),
                     ),
