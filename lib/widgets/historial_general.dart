@@ -596,9 +596,9 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
                 color: Colors.white, size: 20),
             title: AppLocalizations.of(context)!.delete,
             style: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: ResponsiveApp.scaleText(11),
-            ),
+                fontFamily: 'Poppins',
+                fontSize: ResponsiveApp.scaleText(11),
+                color: Colors.white),
             onTap: (handler) => _deleteHistorial(context, handler),
             color: Colors.red[400]!,
           ),

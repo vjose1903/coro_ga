@@ -403,8 +403,7 @@ class _ListHistorialState extends State<_ListHistorial>
             ),
             itemCount: jugador.historialJugadas!.length,
             itemBuilder: (context, index) {
-              final HistorialJugada historial =
-                  jugador.historialJugadas![index];
+              final HistorialJugada historial = jugador.historialJugadas![index];
               return _HistorialItem(
                 historial: historial,
                 jugadorNombre: jugador.nombre!,
@@ -460,9 +459,9 @@ class _HistorialItemState extends State<_HistorialItem> {
                 color: Colors.white, size: 20),
             title: AppLocalizations.of(context)!.delete,
             style: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: ResponsiveApp.scaleText(11),
-            ),
+                fontFamily: 'Poppins',
+                fontSize: ResponsiveApp.scaleText(11),
+                color: Colors.white),
             onTap: (CompletionHandler handler) async {
               final l10n = AppLocalizations.of(context)!;
               CustomAlertDialog.show(

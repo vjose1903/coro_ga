@@ -73,7 +73,10 @@ class _PartidaCardState extends State<PartidaCard> {
                 icon: const Icon(Icons.delete_outline_rounded,
                     color: Colors.white, size: 22),
                 title: l10n.delete,
-                style: TextStyle(fontFamily: 'Poppins', fontSize: ResponsiveApp.scaleText(12)),
+                style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: ResponsiveApp.scaleText(12),
+                    color: Colors.white),
                 onTap: (CompletionHandler handler) async =>
                     widget.functionBorrar(handler),
                 color: Colors.red[400]!),
@@ -82,7 +85,10 @@ class _PartidaCardState extends State<PartidaCard> {
                   icon: const Icon(Icons.restart_alt_rounded,
                       color: Colors.white, size: 22),
                   title: l10n.restart,
-                  style: TextStyle(fontFamily: 'Poppins', fontSize: ResponsiveApp.scaleText(12)),
+                  style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: ResponsiveApp.scaleText(12),
+                      color: Colors.white),
                   onTap: (CompletionHandler handler) async {
                     CustomAlertDialog.show(
                       context,
@@ -113,7 +119,10 @@ class _PartidaCardState extends State<PartidaCard> {
                 icon: const Icon(Icons.edit_outlined,
                     color: Colors.white, size: 22),
                 title: l10n.edit,
-                style: TextStyle(fontFamily: 'Poppins', fontSize: ResponsiveApp.scaleText(12)),
+                style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: ResponsiveApp.scaleText(12),
+                    color: Colors.white),
                 onTap: (CompletionHandler handler) async {
                   widget.functionEditar();
                   await handler(false);
@@ -153,16 +162,16 @@ class _PartidaCardState extends State<PartidaCard> {
                                 ),
                               ),
                               Container(
-                                padding:
-                                    ResponsiveApp.symmetric(horizontal: 10, vertical: 4),
+                                padding: ResponsiveApp.symmetric(
+                                    horizontal: 10, vertical: 4),
                                 decoration: BoxDecoration(
                                   color: AppThemes.colorPrimero
                                       .withValues(alpha: 0.12),
                                   borderRadius: ResponsiveApp.borderRadius(20),
                                 ),
                                 child: Text(
-                                  widget.partida.tipo == 'Rondas' 
-                                      ? l10n.gameType_rounds 
+                                  widget.partida.tipo == 'Rondas'
+                                      ? l10n.gameType_rounds
                                       : l10n.gameType_score,
                                   style: TextStyle(
                                     fontFamily: 'Poppins',
@@ -194,7 +203,7 @@ class _PartidaCardState extends State<PartidaCard> {
                     SizedBox(width: ResponsiveApp.scaleWidth(8)),
                     // Flecha
                     Container(
-                    padding: ResponsiveApp.all(8),
+                      padding: ResponsiveApp.all(8),
                       decoration: BoxDecoration(
                         color: Preferences.isDarkMode
                             ? Colors.white.withValues(alpha: 0.05)
@@ -219,7 +228,6 @@ class _PartidaCardState extends State<PartidaCard> {
 }
 
 class _InfoChip extends StatelessWidget {
-
   const _InfoChip({required this.icon, required this.label});
   final IconData icon;
   final String label;
@@ -228,16 +236,17 @@ class _InfoChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: ResponsiveApp.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: Preferences.isDarkMode
-              ? Colors.white.withValues(alpha: 0.08)
-              : Colors.grey.withValues(alpha: 0.1),
-          borderRadius: ResponsiveApp.borderRadius(20),
-        ),
+      decoration: BoxDecoration(
+        color: Preferences.isDarkMode
+            ? Colors.white.withValues(alpha: 0.08)
+            : Colors.grey.withValues(alpha: 0.1),
+        borderRadius: ResponsiveApp.borderRadius(20),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          FaIcon(icon, size: ResponsiveApp.scaleWidth(12), color: Colors.grey[500]),
+          FaIcon(icon,
+              size: ResponsiveApp.scaleWidth(12), color: Colors.grey[500]),
           SizedBox(width: ResponsiveApp.scaleWidth(6)),
           Text(
             label,
@@ -282,7 +291,6 @@ class EstadoPartida extends StatelessWidget {
 }
 
 class _EstadoChip extends StatelessWidget {
-
   const _EstadoChip(
       {required this.icon, required this.label, required this.color});
   final IconData icon;
@@ -293,10 +301,10 @@ class _EstadoChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: ResponsiveApp.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.12),
-          borderRadius: ResponsiveApp.borderRadius(20),
-        ),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: ResponsiveApp.borderRadius(20),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -356,7 +364,6 @@ class _GanadorPerdedor extends StatelessWidget {
 }
 
 class _PlayerStatus extends StatelessWidget {
-
   const _PlayerStatus(
       {required this.icon,
       required this.name,

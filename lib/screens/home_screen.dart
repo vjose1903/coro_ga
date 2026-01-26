@@ -298,8 +298,7 @@ class ListPartidas extends StatelessWidget {
       List<Partida> partidas, int index) async {
     Navigator.pop(context);
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-    return partidaProvider.deletePartida(context,
-        partida: partidas[index], handler: handler);
+    return partidaProvider.deletePartida(context, partida: partidas[index], handler: handler);
   }
 }
 

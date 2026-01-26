@@ -1,6 +1,10 @@
 # Configuración optimizada de análisis estático para Flutter
 include: package:flutter_lints/flutter.yaml
 
+dart:
+  format:
+    line-length: 350
+
 analyzer:
   errors:
     # Tratar como errores
