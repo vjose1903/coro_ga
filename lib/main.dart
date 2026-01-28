@@ -12,7 +12,6 @@ import 'providers/providers.dart';
 import 'routes/app_routes.dart';
 import 'screens/screens.dart';
 import 'services/banner_prefetch_service.dart';
-import 'services/consent_service.dart';
 import 'services/purchase_service.dart';
 import 'shared_preferences/preferences.dart';
 
@@ -67,9 +66,6 @@ void _initializeServicesDeferred(PremiumProvider premiumProvider) {
 /// Inicializa MobileAds con configuración COPPA y contenido apropiado
 Future<void> _initializeMobileAds() async {
   await MobileAds.instance.initialize();
-
-  // IMPORTANTE: Inicializar consentimiento GDPR/UMP ANTES de configurar/cargar anuncios
-  await ConsentService.instance.initialize();
 
   // Configurar restricciones de contenido para todos los anuncios
   await MobileAds.instance.updateRequestConfiguration(
