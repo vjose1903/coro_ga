@@ -53,8 +53,8 @@ android {
         applicationId "com.inSpot.coro_games"
         minSdkVersion flutter.minSdkVersion
         targetSdk 36
-        versionCode 41
-        versionName "4.0.1"
+        versionCode 42
+        versionName "4.0.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }

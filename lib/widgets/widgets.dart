@@ -10,6 +10,7 @@ export 'package:game_score/widgets/editar_entidad.dart';
 export 'package:game_score/widgets/expanded_buttom.dart';
 export 'package:game_score/widgets/form_partida_predefinida.dart';
 export 'package:game_score/widgets/google_banner_ad.dart';
+export 'package:game_score/widgets/no_internet_modal.dart';
 export 'package:game_score/widgets/historial_general.dart';
 export 'package:game_score/widgets/icon_rounded.dart';
 export 'package:game_score/widgets/jugadores_actuales.dart';

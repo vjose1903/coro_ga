@@ -9,40 +9,17 @@ enum RewardedAdLocation {
 class AdHelper {
   // IDs de prueba de Google (solo para desarrollo)
   static const String _testBannerId = 'ca-app-pub-3940256099942544/6300978111';
-  static const String _testInterstitialId =
-      'ca-app-pub-3940256099942544/1033173712';
-  static const String _testRewardedId =
-      'ca-app-pub-3940256099942544/5224354917';
+  static const String _testInterstitialId = 'ca-app-pub-3940256099942544/1033173712';
+  static const String _testRewardedId = 'ca-app-pub-3940256099942544/5224354917';
 
-  // IDs de producción Android desde variables de entorno (--dart-define)
-  static const String _bannerHome = String.fromEnvironment('AD_BANNER_HOME');
-  static const String _bannerPartida =
-      String.fromEnvironment('AD_BANNER_PARTIDA');
-  static const String _bannerPuntuacion =
-      String.fromEnvironment('AD_BANNER_PUNTUACION');
-  static const String _bannerAgregarJugador =
-      String.fromEnvironment('AD_BANNER_AGREGAR_JUGADOR');
-  static const String _bannerEditarEntidad =
-      String.fromEnvironment('AD_BANNER_EDITAR_ENTIDAD');
-  static const String _interstitial = String.fromEnvironment('AD_INTERSTITIAL');
-  static const String _rewardedRevancha =
-      String.fromEnvironment('AD_REWARDED_REVANCHA');
+  static final Map<String, String> _remoteIds = {};
 
-  // IDs de producción iOS desde variables de entorno (--dart-define)
-  static const String _iosBannerHome =
-      String.fromEnvironment('AD_IOS_BANNER_HOME');
-  static const String _iosBannerPartida =
-      String.fromEnvironment('AD_IOS_BANNER_PARTIDA');
-  static const String _iosBannerPuntuacion =
-      String.fromEnvironment('AD_IOS_BANNER_PUNTUACION');
-  static const String _iosBannerAgregarJugador =
-      String.fromEnvironment('AD_IOS_BANNER_AGREGAR_JUGADOR');
-  static const String _iosBannerEditarEntidad =
-      String.fromEnvironment('AD_IOS_BANNER_EDITAR_ENTIDAD');
-  static const String _iosInterstitial =
-      String.fromEnvironment('AD_IOS_INTERSTITIAL');
-  static const String _iosRewardedRevancha =
-      String.fromEnvironment('AD_IOS_REWARDED_REVANCHA');
+  /// Recibe el mapa de IDs obtenido desde Remote Config.
+  static void setRemoteIds(Map<String, dynamic> ids) {
+    _remoteIds
+      ..clear()
+      ..addAll(ids.map((key, value) => MapEntry(key, value.toString())));
+  }
 
   /// Retorna el Ad Unit ID correcto según el entorno (debug/release)
   static String getBannerAdUnitId(AdLocation location) {
@@ -50,14 +27,15 @@ class AdHelper {
     if (kDebugMode) return _testBannerId;
 
     final productionId = _getProductionBannerId(location);
-    return productionId.isNotEmpty ? productionId : _testBannerId;
+    return productionId;
   }
 
   /// Retorna el Interstitial Ad Unit ID correcto según el entorno
   static String getInterstitialAdUnitId() {
     if (kDebugMode) return _testInterstitialId;
-    final productionId = Platform.isIOS ? _iosInterstitial : _interstitial;
-    return productionId.isNotEmpty ? productionId : _testInterstitialId;
+    final productionId = _getRemoteValue(
+        Platform.isIOS ? 'AD_IOS_INTERSTITIAL' : 'AD_INTERSTITIAL');
+    return productionId;
   }
 
   /// Retorna el Rewarded Ad Unit ID correcto según el entorno y ubicación
@@ -65,32 +43,44 @@ class AdHelper {
     if (kDebugMode) return _testRewardedId;
 
     final productionId = _getProductionRewardedId(location);
-    return productionId.isNotEmpty ? productionId : _testRewardedId;
+    return productionId;
   }
 
   static String _getProductionRewardedId(RewardedAdLocation location) {
     if (location == RewardedAdLocation.revancha) {
-      return Platform.isIOS ? _iosRewardedRevancha : _rewardedRevancha;
+      return _getRemoteValue(
+          Platform.isIOS ? 'AD_IOS_REWARDED_REVANCHA' : 'AD_REWARDED_REVANCHA');
     }
     throw UnimplementedError('RewardedAdLocation $location is not mapped');
   }
 
   static String _getProductionBannerId(AdLocation location) {
     if (location == AdLocation.home) {
-      return Platform.isIOS ? _iosBannerHome : _bannerHome;
+      return _getRemoteValue(
+          Platform.isIOS ? 'AD_IOS_BANNER_HOME' : 'AD_BANNER_HOME');
     }
     if (location == AdLocation.partida) {
-      return Platform.isIOS ? _iosBannerPartida : _bannerPartida;
+      return _getRemoteValue(
+          Platform.isIOS ? 'AD_IOS_BANNER_PARTIDA' : 'AD_BANNER_PARTIDA');
     }
     if (location == AdLocation.puntuacion) {
-      return Platform.isIOS ? _iosBannerPuntuacion : _bannerPuntuacion;
+      return _getRemoteValue(
+          Platform.isIOS ? 'AD_IOS_BANNER_PUNTUACION' : 'AD_BANNER_PUNTUACION');
     }
     if (location == AdLocation.agregarJugador) {
-      return Platform.isIOS ? _iosBannerAgregarJugador : _bannerAgregarJugador;
+      return _getRemoteValue(Platform.isIOS
+          ? 'AD_IOS_BANNER_AGREGAR_JUGADOR'
+          : 'AD_BANNER_AGREGAR_JUGADOR');
     }
     if (location == AdLocation.editarEntidad) {
-      return Platform.isIOS ? _iosBannerEditarEntidad : _bannerEditarEntidad;
+      return _getRemoteValue(Platform.isIOS
+          ? 'AD_IOS_BANNER_EDITAR_ENTIDAD'
+          : 'AD_BANNER_EDITAR_ENTIDAD');
     }
     throw UnimplementedError('AdLocation $location is not mapped');
+  }
+
+  static String _getRemoteValue(String key) {
+    return _remoteIds[key] ?? '';
   }
 }

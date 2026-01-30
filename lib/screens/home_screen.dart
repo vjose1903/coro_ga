@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:async';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/foundation.dart';
@@ -19,6 +20,7 @@ import '../themes/app_themes.dart';
 import '../utils/utils.dart';
 import '../widgets/force_update_modal.dart';
 import '../widgets/widgets.dart';
+import '../services/connectivity_service.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -46,6 +48,8 @@ class _MainHomeState extends State<MainHome>
     with SingleTickerProviderStateMixin {
   late final PanelController panelController;
   late final AnimationController _fabAnimController;
+  Route<dynamic>? _noInternetRoute;
+  StreamSubscription<bool>? _internetSub;
 
   @override
   void initState() {
@@ -60,6 +64,7 @@ class _MainHomeState extends State<MainHome>
       ForceUpdateModal.showIfNeeded(context);
       _fabAnimController.forward();
       _showPendingAdIfNeeded();
+      _handleInternetGate();
     });
   }
 
@@ -81,8 +86,44 @@ class _MainHomeState extends State<MainHome>
 
   @override
   void dispose() {
+    _internetSub?.cancel();
     _fabAnimController.dispose();
     super.dispose();
+  }
+
+  void _handleInternetGate() {
+    if (Preferences.isPremium) return;
+    ConnectivityService.instance.initialize();
+    _internetSub ??=
+        ConnectivityService.instance.statusStream.listen((hasInternet) {
+      if (!mounted) return;
+      if (!hasInternet) {
+        _showNoInternetDialog();
+      } else {
+        _dismissNoInternetDialog();
+      }
+    });
+  }
+
+  void _showNoInternetDialog() {
+    if (_noInternetRoute != null) return;
+    final route = DialogRoute(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withValues(alpha: 0.85),
+      builder: (_) => const NoInternetModal(),
+    );
+    _noInternetRoute = route;
+    Navigator.of(context, rootNavigator: true).push(route);
+  }
+
+  void _dismissNoInternetDialog() {
+    final route = _noInternetRoute;
+    if (route == null) return;
+    if (route.isActive) {
+      Navigator.of(context, rootNavigator: true).removeRoute(route);
+    }
+    _noInternetRoute = null;
   }
 
   void openMenuSlideUp() {

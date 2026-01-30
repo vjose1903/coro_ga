@@ -3,15 +3,25 @@ import 'dart:async';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../helpers/helpers.dart';
+import 'ad_ids_service.dart';
 
 /// Servicio que precarga y mantiene en memoria los banners por ubicación.
 class BannerPrefetchService {
+  BannerPrefetchService() {
+    AdIdsService.idsUpdatedStream.listen((_) {
+      for (final location in _requestedLocations) {
+        ensurePrefetched(location);
+      }
+    });
+  }
+
   final Duration _cacheDuration = const Duration(minutes: 10);
   final Map<AdLocation, BannerAd?> _readyAds = {};
   final Map<AdLocation, DateTime> _readyAt = {};
   final Map<AdLocation, bool> _isLoading = {};
   final Map<AdLocation, List<Completer<BannerAd>>> _pendingCompleters = {};
-  final Map<AdLocation, BannerAd?> _leasedAds = {};
+  final Map<AdLocation, Set<BannerAd>> _leasedAds = {};
+  final Set<AdLocation> _requestedLocations = {};
 
   /// Devuelve un banner ya precargado cuando está disponible.
   BannerAd? getBanner(AdLocation location) {
@@ -25,7 +35,8 @@ class BannerPrefetchService {
   /// Garantiza que la ubicación tenga un banner en caché.
   void ensurePrefetched(AdLocation location) {
     _refreshIfStale(location);
-    if (_readyAds[location] != null || _leasedAds[location] != null || _isLoading[location] == true) return;
+    _requestedLocations.add(location);
+    if (_readyAds[location] != null || _isLoading[location] == true) return;
     _startLoading(location);
   }
 
@@ -34,7 +45,7 @@ class BannerPrefetchService {
     _refreshIfStale(location);
     final readyAd = _readyAds.remove(location);
     if (readyAd != null) {
-      _leasedAds[location] = readyAd;
+      _getLeasedSet(location).add(readyAd);
       _readyAt.remove(location);
     }
     return readyAd;
@@ -42,10 +53,16 @@ class BannerPrefetchService {
 
   /// Devuelve un banner listo o espera uno nuevo.
   Future<BannerAd> acquireBannerAd(AdLocation location) {
+    _requestedLocations.add(location);
     final readyAd = leaseReadyBanner(location);
     if (readyAd != null) {
       _startLoading(location);
       return Future.value(readyAd);
+    }
+
+    final adUnitId = AdHelper.getBannerAdUnitId(location);
+    if (adUnitId.isEmpty) {
+      return Future.error(StateError('AdUnitId not available'));
     }
 
     final completer = Completer<BannerAd>();
@@ -56,9 +73,20 @@ class BannerPrefetchService {
 
   /// Libera un banner (por ejemplo cuando el widget es desmontado) para poder reutilizarlo.
   void releaseBanner(AdLocation location, BannerAd ad) {
-    final leased = _leasedAds[location];
-    if (leased != ad) return;
-    _leasedAds.remove(location);
+    final leasedSet = _leasedAds[location];
+    if (leasedSet == null || !leasedSet.remove(ad)) return;
+
+    final pending = _pendingCompleters[location];
+    if (pending != null && pending.isNotEmpty) {
+      final completer = pending.removeAt(0);
+      completer.complete(ad);
+      _getLeasedSet(location).add(ad);
+      if (pending.isNotEmpty) {
+        _startLoading(location);
+      }
+      return;
+    }
+
     _readyAds[location] = ad;
     _readyAt[location] = DateTime.now();
   }
@@ -76,9 +104,12 @@ class BannerPrefetchService {
   void _startLoading(AdLocation location) {
     if (_isLoading[location] == true) return;
 
+    final adUnitId = AdHelper.getBannerAdUnitId(location);
+    if (adUnitId.isEmpty) return;
+
     _isLoading[location] = true;
     BannerAd(
-      adUnitId: AdHelper.getBannerAdUnitId(location),
+      adUnitId: adUnitId,
       request: const AdRequest(),
       size: AdSize.banner,
       listener: BannerAdListener(
@@ -94,7 +125,7 @@ class BannerPrefetchService {
     if (pending != null && pending.isNotEmpty) {
       final completer = pending.removeAt(0);
       completer.complete(ad);
-      _leasedAds[location] = ad;
+      _getLeasedSet(location).add(ad);
       if (pending.isNotEmpty) {
         _startLoading(location);
       }
@@ -129,13 +160,19 @@ class BannerPrefetchService {
     for (final ad in _readyAds.values) {
       ad?.dispose();
     }
-    for (final ad in _leasedAds.values) {
-      ad?.dispose();
+    for (final ads in _leasedAds.values) {
+      for (final ad in ads) {
+        ad.dispose();
+      }
     }
     _readyAds.clear();
     _readyAt.clear();
     _isLoading.clear();
     _pendingCompleters.clear();
     _leasedAds.clear();
+  }
+
+  Set<BannerAd> _getLeasedSet(AdLocation location) {
+    return _leasedAds.putIfAbsent(location, () => <BannerAd>{});
   }
 }

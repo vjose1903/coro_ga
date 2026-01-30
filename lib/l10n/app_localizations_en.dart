@@ -523,4 +523,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get reviewFallbackMessage =>
       'Unable to open the review prompt. Search for Coro Games in the store to leave your feedback.';
+
+  @override
+  String get noInternetTitle => 'No internet connection';
+
+  @override
+  String get noInternetMessage =>
+      'To use the app you need an internet connection.';
+
+  @override
+  String get noInternetWaiting => 'Waiting for connection...';
 }

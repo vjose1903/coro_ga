@@ -12,6 +12,7 @@ import 'providers/providers.dart';
 import 'routes/app_routes.dart';
 import 'screens/screens.dart';
 import 'services/banner_prefetch_service.dart';
+import 'services/ad_ids_service.dart';
 import 'services/purchase_service.dart';
 import 'shared_preferences/preferences.dart';
 
@@ -53,14 +54,20 @@ void main() async {
 /// Inicializa servicios pesados de forma diferida (sin bloquear el arranque)
 void _initializeServicesDeferred(PremiumProvider premiumProvider) {
   // Ejecutar en paralelo después de que la UI se muestre
-  Future.wait([
+  final tasks = <Future<void>>[
     _initializeMobileAds(),
     PurchaseService.instance.initialize(
       onPurchaseComplete: (success) {
         if (success) premiumProvider.setPremium(true);
       },
     ),
-  ]);
+  ];
+
+  if (!Preferences.isPremium) {
+    tasks.add(AdIdsService.instance.initialize());
+  }
+
+  Future.wait(tasks);
 }
 
 /// Inicializa MobileAds con configuración COPPA y contenido apropiado

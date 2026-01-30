@@ -533,4 +533,14 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get reviewFallbackMessage =>
       'No pudimos abrir el cuadro de reseñas. Busca Coro Games en la tienda para dejar tu opinión.';
+
+  @override
+  String get noInternetTitle => 'Sin conexión a internet';
+
+  @override
+  String get noInternetMessage =>
+      'Para utilizar la app necesitas conexión a internet.';
+
+  @override
+  String get noInternetWaiting => 'Esperando conexión...';
 }

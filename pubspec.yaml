@@ -3,7 +3,7 @@ description: Aplicación para anotar puntuaciones de juegos favoritos.
 
 publish_to: "none"
 
-version: 4.0.1
+version: 4.0.2
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -17,6 +17,8 @@ dependencies:
 
   firebase_core: ^4.4.0
   firebase_analytics: ^12.1.1
+  firebase_remote_config: ^6.0.0
+  connectivity_plus: ^6.1.4
   cupertino_icons: ^1.0.8
   flutter_custom_clippers: ^2.1.0
   font_awesome_flutter: ^10.12.0

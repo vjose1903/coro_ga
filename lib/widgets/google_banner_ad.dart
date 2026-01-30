@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../helpers/helpers.dart';
 import '../providers/premium_provider.dart';
 import '../services/banner_prefetch_service.dart';
+import '../services/ad_ids_service.dart';
 import '../shared_preferences/preferences.dart';
 
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -23,12 +26,19 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
   bool _isHideSkeleton = false;
   bool _timerStarted = false;
   bool _isRequesting = false;
+  bool _retryScheduled = false;
   late final BannerPrefetchService _bannerService;
+  StreamSubscription<void>? _idsUpdatedSub;
+  static const Duration _retryDelay = Duration(seconds: 8);
 
   @override
   void initState() {
     super.initState();
     _bannerService = context.read<BannerPrefetchService>();
+    _idsUpdatedSub = AdIdsService.idsUpdatedStream.listen((_) {
+      if (!mounted || _bannerAd != null) return;
+      _requestBanner();
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _bannerService.ensurePrefetched(widget.location);
       _requestBanner();
@@ -67,6 +77,7 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
         _bannerAd = readyAd;
         _isHideSkeleton = false;
       });
+      _retryScheduled = false;
       _isRequesting = false;
       return;
     }
@@ -80,9 +91,25 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
         _bannerAd = ad;
         _isHideSkeleton = false;
       });
+      _retryScheduled = false;
     }).catchError((_) {
-      // Ignorar errores silenciosamente.
-    }).whenComplete(() => _isRequesting = false);
+      _scheduleRetry();
+    }).whenComplete(() {
+      _isRequesting = false;
+      if (_bannerAd == null) {
+        _scheduleRetry();
+      }
+    });
+  }
+
+  void _scheduleRetry() {
+    if (_retryScheduled || _bannerAd != null || !mounted) return;
+    _retryScheduled = true;
+    Future.delayed(_retryDelay, () {
+      if (!mounted || _bannerAd != null) return;
+      _retryScheduled = false;
+      _requestBanner();
+    });
   }
 
   @override
@@ -128,6 +155,7 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
 
   @override
   void dispose() {
+    _idsUpdatedSub?.cancel();
     if (_bannerAd != null) {
       _bannerService.releaseBanner(widget.location, _bannerAd!);
       _bannerAd = null;

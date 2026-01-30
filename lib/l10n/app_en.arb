@@ -252,5 +252,8 @@
   "reviewCardTitle": "Do you like the app?",
   "reviewCardDescription": "Your rating keeps Coro Games improving. Leave it on the store so other players can discover it.",
   "reviewCardButton": "Rate now",
-  "reviewFallbackMessage": "Unable to open the review prompt. Search for Coro Games in the store to leave your feedback."
+  "reviewFallbackMessage": "Unable to open the review prompt. Search for Coro Games in the store to leave your feedback.",
+  "noInternetTitle": "No internet connection",
+  "noInternetMessage": "To use the app you need an internet connection.",
+  "noInternetWaiting": "Waiting for connection..."
 }
