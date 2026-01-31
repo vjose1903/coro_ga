@@ -231,7 +231,9 @@ class _Body extends StatelessWidget {
         partidaProvider.changePartidaEnTurno(newPartida);
         formPartidaProvider.resetForm();
         googleAdsProvider.markAdForAfterNavigation();
-        Navigator.pushReplacementNamed(context, 'partida');
+        final nav = context.read<AppNavigationProvider>();
+        Navigator.pop(context);
+        nav.showPartida();
       } else {
         Toast.show(
             type: ToastType.error,

@@ -11,6 +11,8 @@
   "swipeToEditOrDelete": "Desliza para editar o borrar",
   "loadingGames": "Cargando partidas...",
   "loading": "Cargando...",
+  "loadingData": "Cargando datos...",
+  "loadingDataError": "Error al cargar datos.",
   
   "freeVersionLimitGames": "La versión gratis solo permite {count} partidas simultáneas.",
   "@freeVersionLimitGames": {

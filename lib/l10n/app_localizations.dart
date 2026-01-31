@@ -146,6 +146,18 @@ abstract class AppLocalizations {
   /// **'Loading...'**
   String get loading;
 
+  /// No description provided for @loadingData.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading data...'**
+  String get loadingData;
+
+  /// No description provided for @loadingDataError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading data.'**
+  String get loadingDataError;
+
   /// No description provided for @freeVersionLimitGames.
   ///
   /// In en, this message translates to:

@@ -4,7 +4,6 @@ import '../helpers/helpers.dart';
 import '../l10n/app_localizations.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
-import '../services/banner_prefetch_service.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 import '../utils/utils.dart';
@@ -150,7 +149,6 @@ class _AddJugadorState extends State<AddJugador> {
     ).then((_) {
       // Esperar al siguiente frame para asegurar que los datos estén sincronizados
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<BannerPrefetchService>().ensurePrefetched(AdLocation.editarEntidad);
         slideUpProvider.openSlideUp(
           controller: widget.panelController,
           bodyContent: AddJugadorPartida(panelController: widget.panelController),

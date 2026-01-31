@@ -11,6 +11,8 @@
   "swipeToEditOrDelete": "Swipe to edit or delete",
   "loadingGames": "Loading games...",
   "loading": "Loading...",
+  "loadingData": "Loading data...",
+  "loadingDataError": "Error loading data.",
   
   "freeVersionLimitGames": "Free version only allows {count} simultaneous games.",
   "@freeVersionLimitGames": {

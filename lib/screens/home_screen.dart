@@ -14,7 +14,6 @@ import '../helpers/helpers.dart';
 import '../l10n/app_localizations.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
-import '../services/banner_prefetch_service.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 import '../utils/utils.dart';
@@ -63,25 +62,8 @@ class _MainHomeState extends State<MainHome>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ForceUpdateModal.showIfNeeded(context);
       _fabAnimController.forward();
-      _showPendingAdIfNeeded();
       _handleInternetGate();
     });
-  }
-
-  /// Muestra el anuncio intersticial si estaba pendiente (después de navegación)
-  void _showPendingAdIfNeeded() {
-    final googleAdsProvider = context.read<GoogleAdsProvider>();
-    if (googleAdsProvider.showAdAfterNavigation) {
-      googleAdsProvider.clearAdAfterNavigation();
-      // Esperar a que la pantalla esté completamente cargada
-      Future.delayed(const Duration(milliseconds: 800), () {
-        if (mounted) {
-          googleAdsProvider.showInterstitialAd(onCloseFunction: () {
-            googleAdsProvider.loadInterstitialAd();
-          });
-        }
-      });
-    }
   }
 
   @override
@@ -285,7 +267,7 @@ class ListPartidas extends StatelessWidget {
               partida: partida,
               onTap: () {
                 partidaProvider.changePartidaEnTurno(partida);
-                Navigator.pushNamed(context, 'partida');
+                context.read<AppNavigationProvider>().showPartida();
               },
               functionBorrar: (handler) async {
                 final l10n = AppLocalizations.of(context)!;
@@ -312,9 +294,6 @@ class ListPartidas extends StatelessWidget {
                 final FormPartidaProvider formPartidaProvider =
                     context.read<FormPartidaProvider>();
                 final SlideUpProvider slideUp = context.read<SlideUpProvider>();
-                context
-                    .read<BannerPrefetchService>()
-                    .ensurePrefetched(AdLocation.editarEntidad);
                 formPartidaProvider.form.patchValue(partida.toMap());
                 partidaProvider.partidaEditar = partida;
                 slideUp.openSlideUp(

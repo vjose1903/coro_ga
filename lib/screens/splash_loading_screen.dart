@@ -8,6 +8,8 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 
 import '../firebase_options.dart';
+import '../l10n/app_localizations.dart';
+import '../themes/app_themes.dart';
 import '../providers/premium_provider.dart';
 import '../services/ad_ids_service.dart';
 import '../services/purchase_service.dart';
@@ -22,9 +24,7 @@ class SplashLoadingScreen extends StatefulWidget {
 
 class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
   double _progress = 0;
-  String _status = 'Inicializando...';
   bool _hasError = false;
-  String _errorMessage = '';
 
   @override
   void initState() {
@@ -37,9 +37,7 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
   Future<void> _startInitialization() async {
     setState(() {
       _progress = 0;
-      _status = 'Inicializando...';
       _hasError = false;
-      _errorMessage = '';
     });
 
     final steps = _buildSteps();
@@ -48,14 +46,12 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
 
     for (final step in steps) {
       if (!mounted) return;
-      setState(() => _status = step.label);
       try {
         await step.action();
       } catch (e) {
         if (!mounted) return;
         setState(() {
           _hasError = true;
-          _errorMessage = 'Error al ${step.label.toLowerCase()}.';
         });
         return;
       }
@@ -128,40 +124,87 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface.withValues(alpha: 0.85);
+    final backgroundColor = Preferences.isDarkMode ? AppThemes.colorTercero : Colors.white;
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: backgroundColor,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 360),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  const SizedBox(height: 16),
-                  Icon(Icons.sports_esports, size: 64, color: theme.colorScheme.primary),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Coro Games',
-                    style: theme.textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 24),
-                  LinearProgressIndicator(value: _hasError ? null : _progress),
-                  const SizedBox(height: 12),
-                  Text(
-                    _hasError ? _errorMessage : _status,
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                  if (_hasError) ...[
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _startInitialization,
-                      child: const Text('Reintentar'),
+                  Positioned(
+                    top: -80,
+                    right: -60,
+                    child: _GlowCircle(
+                      size: 220,
+                      color: theme.colorScheme.primary.withValues(alpha: 0.12),
                     ),
-                  ],
+                  ),
+                  Positioned(
+                    bottom: -90,
+                    left: -70,
+                    child: _GlowCircle(
+                      size: 240,
+                      color: theme.colorScheme.secondary.withValues(alpha: 0.12),
+                    ),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 12),
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.25),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(24),
+                          child: Image.asset(
+                            'assets/icon/icon.png',
+                            width: 120,
+                            height: 120,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Coro Games',
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      LinearProgressIndicator(value: _hasError ? null : _progress),
+                      const SizedBox(height: 12),
+                      Text(
+                        _hasError ? l10n.loadingDataError : l10n.loadingData,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
+                      ),
+                      if (_hasError) ...[
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: _startInitialization,
+                          child: Text(l10n.loading),
+                        ),
+                      ],
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -182,4 +225,31 @@ class _InitStep {
   final String label;
   final double weight;
   final Future<void> Function() action;
+}
+
+class _GlowCircle extends StatelessWidget {
+  const _GlowCircle({
+    required this.size,
+    required this.color,
+  });
+
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: [
+            color,
+            color.withValues(alpha: 0),
+          ],
+        ),
+      ),
+    );
+  }
 }

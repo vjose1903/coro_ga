@@ -1,4 +1,5 @@
 export 'package:game_score/providers/form_partida_provider.dart';
+export 'package:game_score/providers/app_navigation_provider.dart';
 export 'package:game_score/providers/google_ads_provider.dart';
 export 'package:game_score/providers/jugador_provider.dart';
 export 'package:game_score/providers/locale_provider.dart';

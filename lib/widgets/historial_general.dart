@@ -242,7 +242,7 @@ class _HistorialGeneralState extends State<HistorialGeneral>
       final int newPuntuacion = response.data.puntuacion;
       if (newPuntuacion >=
           partidaProvider.partidaEnTurno!.maxPuntuacion!.toInt()) {
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           PageRouteBuilder(
             settings: RouteSettings(arguments: {

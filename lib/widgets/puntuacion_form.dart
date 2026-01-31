@@ -6,7 +6,6 @@ import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import '../l10n/app_localizations.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
-import '../services/banner_prefetch_service.dart';
 import '../screens/ganador.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
@@ -52,7 +51,10 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final JugadorProvider jugadorProvider = context.watch<JugadorProvider>();
-    final bool hasTeclado = partidaProvider.partidaEnTurno!.tipo == 'Puntuación';
+    final partida = partidaProvider.partidaEnTurno;
+    final jugador = jugadorProvider.jugadorEnTurno;
+    if (partida == null || jugador == null) return const SizedBox.shrink();
+    final bool hasTeclado = partida.tipo == 'Puntuación';
     final isDark = Preferences.isDarkMode;
 
     // Usar ClipRect para evitar overflow visual cuando el panel se reduce
@@ -62,16 +64,15 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
           // Header del jugador - FIJO arriba
           _JugadorHeader(
             nombre: jugadorProvider.nombreJugador,
-            puntuacion: jugadorProvider.jugadorEnTurno?.puntuacion ?? 0,
-            canDelete: partidaProvider.partidaEnTurno!.jugadores!.length > 2,
+            puntuacion: jugador.puntuacion ?? 0,
+            canDelete: partida.jugadores!.length > 2,
             panelController: widget.panelController,
             onEdit: () {
-              jugadorProvider.jugadorEditar = jugadorProvider.jugadorEnTurno;
-              jugadorProvider.formJugador.patchValue(jugadorProvider.jugadorEnTurno!.toMap());
+              jugadorProvider.jugadorEditar = jugador;
+              jugadorProvider.formJugador.patchValue(jugador.toMap());
               _showEditarJugadorModal(context);
             },
             onDelete: () {
-              final Jugador jugador = jugadorProvider.jugadorEnTurno!;
               jugadorProvider.deleteJugador(context, jugador: jugador, panelController: widget.panelController, callBack: (value) {});
             },
           ),
@@ -148,19 +149,18 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                     changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: 'aumentar', context: context).then((newPuntuacion) {
                       if (newPuntuacion != 0) {
                         puntuacionController.text = '';
-                        if (newPuntuacion >= partidaProvider.partidaEnTurno!.maxPuntuacion!.toInt()) {
-                          Navigator.pushReplacement(
+                        slideUpProvider.closeSlideUp(controller: widget.panelController);
+                        if (newPuntuacion >= partida.maxPuntuacion!.toInt()) {
+                          Navigator.push(
                               context,
                               PageRouteBuilder(
                                   settings: RouteSettings(arguments: {
-                                    'partida': partidaProvider.partidaEnTurno!.nombre,
-                                    'jugador': jugadorProvider.jugadorEnTurno!.nombre,
+                                    'partida': partida.nombre,
+                                    'jugador': jugador.nombre,
                                   }),
                                   pageBuilder: (context, animation, secondaryAnimation) => const GanadorScreen(),
                                   transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
                                   transitionDuration: const Duration(milliseconds: 400)));
-                        } else {
-                          slideUpProvider.closeSlideUp(controller: widget.panelController);
                         }
                       }
                     });
@@ -202,7 +202,6 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
     ).then((_) {
       // Esperar al siguiente frame para asegurar que los datos estén sincronizados
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<BannerPrefetchService>().ensurePrefetched(AdLocation.editarEntidad);
         slideUpProvider.openSlideUp(
           controller: widget.panelController,
           bodyContent: PuntuacionForm(panelController: widget.panelController),
@@ -213,16 +212,18 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
 
   Future<int> changePuntuacion({required String puntuacion, required String tipo, required JugadorProvider jugadorProvider, required BuildContext context}) async {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+    final partida = partidaProvider.partidaEnTurno;
+    final jugador = jugadorProvider.jugadorEnTurno;
+    if (partida == null || jugador == null) return 0;
 
     if (puntuacion.isNotEmpty && puntuacion != '0') {
       final int puntuacionInt = int.parse(puntuacion);
 
-      final Jugador jugador = jugadorProvider.jugadorEnTurno!;
       final int puntuacionActual = jugador.puntuacion!;
 
       if (tipo == 'reducir' && puntuacionActual - puntuacionInt < 0) {
         final l10n = AppLocalizations.of(context)!;
-        final String msgErrorReducir = partidaProvider.partidaEnTurno!.tipo == 'Puntuación' ? l10n.minScoreWarning : l10n.minRoundWarning;
+        final String msgErrorReducir = partida.tipo == 'Puntuación' ? l10n.minScoreWarning : l10n.minRoundWarning;
         Toast.show(type: ToastType.warning, context: context, title: l10n.warning, message: msgErrorReducir);
 
         return puntuacionActual;
@@ -290,15 +291,15 @@ class _ListHistorialState extends State<_ListHistorial> with SlideUpAutoScrollMi
     final JugadorProvider? jugadorProvider = context.watch<JugadorProvider?>();
     final Jugador? jugador = jugadorProvider?.jugadorEnTurno;
     final l10n = AppLocalizations.of(context)!;
-    final msgNoRgistros = partidaProvider!.partidaEnTurno!.tipo == 'Puntuación' ? l10n.noScoresRegistered : l10n.noRoundsRegistered;
+    final partida = partidaProvider?.partidaEnTurno;
+    if (partida == null || jugador == null) return const SizedBox.shrink();
+    final msgNoRgistros = partida.tipo == 'Puntuación' ? l10n.noScoresRegistered : l10n.noRoundsRegistered;
 
     // Scroll cuando cambia el jugador (después de init)
     if (_lastJugadorId != null && _lastJugadorId != jugador?.id && jugador?.historialJugadas != null && jugador!.historialJugadas!.isNotEmpty) {
       _lastJugadorId = jugador.id;
       scheduleScrollToBottom(context, effectiveController);
     }
-
-    if (jugador == null) return Container();
 
     if (jugador.historialJugadas != null && jugador.historialJugadas!.isEmpty) {
       return Center(

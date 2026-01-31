@@ -34,6 +34,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get loading => 'Cargando...';
 
   @override
+  String get loadingData => 'Cargando datos...';
+
+  @override
+  String get loadingDataError => 'Error al cargar datos.';
+
+  @override
   String freeVersionLimitGames(int count) {
     return 'La versión gratis solo permite $count partidas simultáneas.';
   }

@@ -8,7 +8,6 @@ import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import '../helpers/helpers.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
-import '../services/banner_prefetch_service.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 import '../widgets/widgets.dart';
@@ -27,6 +26,7 @@ class _PartidaScreenState extends State<PartidaScreen>
   late final PanelController panelController;
   late final AnimationController _fabAnimController;
   late final GoogleBannerAd anuncio;
+  bool _didResetOnEntry = false;
 
   @override
   void initState() {
@@ -38,26 +38,15 @@ class _PartidaScreenState extends State<PartidaScreen>
       duration: const Duration(milliseconds: 600),
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Resetear estado del panel al entrar a la pantalla
+      if (mounted) {
+        context
+            .read<SlideUpProvider>()
+            .closeSlideUp(controller: panelController, skipClean: true);
+      }
       Future.delayed(const Duration(milliseconds: 300),
           () => _fabAnimController.forward());
-      _showPendingAdIfNeeded();
     });
-  }
-
-  /// Muestra el anuncio intersticial si estaba pendiente (después de navegación)
-  void _showPendingAdIfNeeded() {
-    final googleAdsProvider = context.read<GoogleAdsProvider>();
-    if (googleAdsProvider.showAdAfterNavigation) {
-      googleAdsProvider.clearAdAfterNavigation();
-      // Esperar a que la pantalla esté completamente cargada antes de mostrar
-      Future.delayed(const Duration(milliseconds: 800), () {
-        if (mounted) {
-          googleAdsProvider.showInterstitialAd(onCloseFunction: () {
-            googleAdsProvider.loadInterstitialAd();
-          });
-        }
-      });
-    }
   }
 
   @override
@@ -73,6 +62,25 @@ class _PartidaScreenState extends State<PartidaScreen>
       child: Consumer(
         builder: (BuildContext context, value, Widget? child) {
           context.watch<SlideUpProvider>();
+          final nav = context.watch<AppNavigationProvider>();
+          final partidaProvider = context.watch<PartidaProvider>();
+          if (nav.index == 1 && !_didResetOnEntry) {
+            _didResetOnEntry = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              context
+                  .read<SlideUpProvider>()
+                  .closeSlideUp(controller: panelController, skipClean: true);
+            });
+          } else if (nav.index != 1 && _didResetOnEntry) {
+            _didResetOnEntry = false;
+          }
+          if (partidaProvider.partidaEnTurno == null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) context.read<AppNavigationProvider>().showHome();
+            });
+            return const SizedBox.shrink();
+          }
 
           return Scaffold(
             body: _Body(panelController: panelController, anuncio: anuncio),
@@ -114,7 +122,7 @@ class _PartidaScreenState extends State<PartidaScreen>
 
                       if (premiumProvider
                           .canCreateGame(partidaProvider.partidas.length)) {
-                        Navigator.pushReplacementNamed(context, 'formulario');
+                        Navigator.pushNamed(context, 'formulario');
                       } else {
                         Toast.show(
                             type: ToastType.info,
@@ -172,7 +180,7 @@ class _Body extends StatelessWidget {
           iconSize: ResponsiveApp.isSmallHeight ? 18 : 22,
           iconColor: Colors.white,
           icon: Icons.arrow_back_ios_new,
-          onTap: () => Navigator.pop(context),
+          onTap: () => context.read<AppNavigationProvider>().showHome(),
         ),
         appBarTrailing: CustomIconButtom(
           iconSize: ResponsiveApp.isSmallHeight ? 18 : 22,
@@ -181,9 +189,6 @@ class _Body extends StatelessWidget {
           onTap: () {
             formPartidaProvider.form.patchValue(partida.toMap());
             partidaProvider.partidaEditar = partida;
-            context
-                .read<BannerPrefetchService>()
-                .ensurePrefetched(AdLocation.editarEntidad);
             slideUpProvider.openSlideUp(
               controller: panelController,
               maxHeightFraction: 0.5,
@@ -215,9 +220,6 @@ class JugadoresCard extends StatelessWidget {
     openSlideUp() {
       final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
       final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
-      context
-          .read<BannerPrefetchService>()
-          .ensurePrefetched(AdLocation.agregarJugador);
       jugadorProvider.formJugador.reset();
       slideUpProvider.openSlideUp(
           controller: panelController,
@@ -256,9 +258,6 @@ class JugadoresCard extends StatelessWidget {
                     onTap: () {
                       final SlideUpProvider slideUpProvider =
                           context.read<SlideUpProvider>();
-                      context
-                          .read<BannerPrefetchService>()
-                          .ensurePrefetched(AdLocation.puntuacion);
                       slideUpProvider.openSlideUp(
                           controller: panelController,
                           bodyContent: HistorialGeneral(
@@ -435,9 +434,6 @@ class JugadorInfo extends StatelessWidget {
       onTap: () {
         final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
         final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
-        context
-            .read<BannerPrefetchService>()
-            .ensurePrefetched(AdLocation.puntuacion);
         jugadorProvider.changeJugadorEnTurno(jugador);
         slideUpProvider.openSlideUp(
             controller: panelController,

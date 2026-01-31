@@ -85,6 +85,8 @@ class PartidaProvider extends ChangeNotifier {
       if (handler != null) await handler(true);
 
       partidas.remove(partida);
+      // Siempre volver a Home cuando se elimina una partida.
+      partidaEnTurno = null;
       notifyListeners();
       return response;
     } else {

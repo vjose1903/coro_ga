@@ -7,7 +7,6 @@ import 'l10n/app_localizations.dart';
 import 'providers/providers.dart';
 import 'routes/app_routes.dart';
 import 'screens/screens.dart';
-import 'services/banner_prefetch_service.dart';
 import 'shared_preferences/preferences.dart';
 
 void main() async {
@@ -27,10 +26,10 @@ void main() async {
     ChangeNotifierProvider(create: (_) => SlideUpProvider()),
     ChangeNotifierProvider(create: (_) => JugadorProvider()),
     ChangeNotifierProvider(create: (_) => GoogleAdsProvider()),
-    Provider(create: (_) => BannerPrefetchService()),
     ChangeNotifierProvider(create: (_) => ReorderableProvider()),
     ChangeNotifierProvider(create: (_) => PageEditarProvider()),
     ChangeNotifierProvider(create: (_) => PartidaPredefinidaProvider()),
+    ChangeNotifierProvider(create: (_) => AppNavigationProvider()),
     ChangeNotifierProvider(create: (_) => ThemeProvider(isDarkMode_: initInDarkMode)),
     ChangeNotifierProvider.value(value: premiumProvider),
     ChangeNotifierProvider.value(value: localeProvider),

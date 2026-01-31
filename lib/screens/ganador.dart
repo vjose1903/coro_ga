@@ -3,16 +3,13 @@ import '../helpers/helpers.dart';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import '../l10n/app_localizations.dart';
 import '../models/models.dart';
 import '../providers/partida_provider.dart';
 import '../providers/providers.dart';
-import 'screens.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 import '../utils/utils.dart';
-import '../helpers/ad_helper.dart';
 import '../widgets/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:widget_and_text_animator/widget_and_text_animator.dart';
@@ -28,13 +25,6 @@ class _GanadorScreenState extends State<GanadorScreen> {
   @override
   void initState() {
     super.initState();
-
-    SchedulerBinding.instance.addPostFrameCallback((_) async {
-      await Future.delayed(const Duration(seconds: 1));
-
-      final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-      partidaProvider.deletePartida(context, partida: partidaProvider.partidaEnTurno!);
-    });
   }
 
   @override
@@ -79,12 +69,15 @@ class _GanadorScreenState extends State<GanadorScreen> {
                   onTap: () {
                     // IMPORTANTE: Navegar PRIMERO, mostrar anuncio DESPUÉS (pausa natural)
                     googleAdsProvider.markAdForAfterNavigation();
-                    Navigator.pushReplacement(
+                    final partidaProvider = context.read<PartidaProvider>();
+                    if (partidaProvider.partidaEnTurno != null) {
+                      partidaProvider.deletePartida(
                         context,
-                        PageRouteBuilder(
-                            pageBuilder: (context, animation, secondaryAnimation) => const HomeScreen(),
-                            transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
-                            transitionDuration: const Duration(milliseconds: 500)));
+                        partida: partidaProvider.partidaEnTurno!,
+                      );
+                    }
+                    Navigator.pop(context);
+                    context.read<AppNavigationProvider>().showHome();
                   })),
           Container(
               margin: const EdgeInsets.only(top: 150),
@@ -156,32 +149,31 @@ class _GanadorScreenState extends State<GanadorScreen> {
     final GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
     final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
-    void startNewGame(Partida newPartida) {
-      partidaProvider.changePartidaEnTurno(newPartida);
-      Navigator.pushReplacementNamed(context, 'partida');
+    final partida = partidaProvider.partidaEnTurno;
+    if (partida == null) {
+      final nav = context.read<AppNavigationProvider>();
+      Navigator.pop(context);
+      nav.showHome();
+      return;
     }
 
-    MyLoading.show();
-    for (final Jugador jugador in partidaProvider.partidaEnTurno!.jugadores!) {
-      jugador.puntuacion = 0;
+    Future<void> restartAndGo() async {
+      MyLoading.show();
+      await partida.restartPartida();
+      partidaProvider.refresh();
+      MyLoading.close();
+      final nav = context.read<AppNavigationProvider>();
+      Navigator.pop(context);
+      nav.showPartida();
     }
 
-    final response = await partidaProvider.newPartida(partidaProvider.partidaEnTurno!, context);
-    MyLoading.close();
-    if (!response.hasError!) {
-      final newPartida = response.data;
-
-      if (!premiumProvider.isPremium) {
-        googleAdsProvider.showRewardedAd(
-          onCloseFunction: () => startNewGame(newPartida),
-          onRewardEarned: () {},
-        );
-      } else {
-        startNewGame(newPartida);
-      }
+    if (!premiumProvider.isPremium) {
+      googleAdsProvider.showRewardedAd(
+        onCloseFunction: () => restartAndGo(),
+        onRewardEarned: () {},
+      );
     } else {
-      Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.errorRenewingGame);
-      Navigator.pushReplacementNamed(context, 'home');
+      await restartAndGo();
     }
   }
 }
