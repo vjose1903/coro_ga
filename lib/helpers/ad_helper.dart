@@ -16,9 +16,13 @@ class AdHelper {
 
   /// Recibe el mapa de IDs obtenido desde Remote Config.
   static void setRemoteIds(Map<String, dynamic> ids) {
-    _remoteIds
-      ..clear()
-      ..addAll(ids.map((key, value) => MapEntry(key, value.toString())));
+    // Mergea solo valores no vacíos para no borrar IDs válidos con datos parciales.
+    for (final entry in ids.entries) {
+      final value = entry.value.toString();
+      if (value.isNotEmpty) {
+        _remoteIds[entry.key] = value;
+      }
+    }
   }
 
   /// Retorna el Ad Unit ID correcto según el entorno (debug/release)

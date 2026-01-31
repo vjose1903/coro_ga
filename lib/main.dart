@@ -1,39 +1,25 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'helpers/helpers.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
-import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
 import 'providers/providers.dart';
 import 'routes/app_routes.dart';
 import 'screens/screens.dart';
 import 'services/banner_prefetch_service.dart';
-import 'services/ad_ids_service.dart';
-import 'services/purchase_service.dart';
 import 'shared_preferences/preferences.dart';
 
 void main() async {
-  // Preservar el splash nativo mientras inicializamos
-  final WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  WidgetsFlutterBinding.ensureInitialized();
 
   await Preferences.init();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
 
   final isPlatformDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
   final bool initInDarkMode = Preferences.isSystemMode ? isPlatformDark : Preferences.isDarkMode;
 
   final premiumProvider = PremiumProvider();
   final localeProvider = LocaleProvider();
-
-  // ⚡ Inicializar ads y compras de forma DIFERIDA (no bloquear el arranque)
-  _initializeServicesDeferred(premiumProvider);
 
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => PartidaProvider()),
@@ -49,40 +35,6 @@ void main() async {
     ChangeNotifierProvider.value(value: premiumProvider),
     ChangeNotifierProvider.value(value: localeProvider),
   ], child: const MyApp()));
-}
-
-/// Inicializa servicios pesados de forma diferida (sin bloquear el arranque)
-void _initializeServicesDeferred(PremiumProvider premiumProvider) {
-  // Ejecutar en paralelo después de que la UI se muestre
-  final tasks = <Future<void>>[
-    _initializeMobileAds(),
-    PurchaseService.instance.initialize(
-      onPurchaseComplete: (success) {
-        if (success) premiumProvider.setPremium(true);
-      },
-    ),
-  ];
-
-  if (!Preferences.isPremium) {
-    tasks.add(AdIdsService.instance.initialize());
-  }
-
-  Future.wait(tasks);
-}
-
-/// Inicializa MobileAds con configuración COPPA y contenido apropiado
-Future<void> _initializeMobileAds() async {
-  await MobileAds.instance.initialize();
-
-  // Configurar restricciones de contenido para todos los anuncios
-  await MobileAds.instance.updateRequestConfiguration(
-    RequestConfiguration(
-      // El dominó es un juego familiar atractivo para niños -> marcar como sí
-      tagForChildDirectedTreatment: TagForChildDirectedTreatment.yes,
-      // Clasificación máxima de contenido: G = General (apto para todos)
-      maxAdContentRating: MaxAdContentRating.g,
-    ),
-  );
 }
 
 /// Consistent, glow-free physics so scrolls feel snappier across the app.
@@ -110,11 +62,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-
-    // Remover splash nativo cuando la UI esté lista (solo una vez)
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      FlutterNativeSplash.remove();
-    });
   }
 
   @override
@@ -158,7 +105,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           locale: localeProvider.locale,
-          home: const HomeScreen(),
+          home: const SplashLoadingScreen(),
           scrollBehavior: const SmoothScrollBehavior(),
           builder: EasyLoading.init(
             builder: (context, child) {

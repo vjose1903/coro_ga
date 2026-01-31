@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 import '../helpers/helpers.dart';
 import 'ad_ids_service.dart';
@@ -105,7 +106,12 @@ class BannerPrefetchService {
     if (_isLoading[location] == true) return;
 
     final adUnitId = AdHelper.getBannerAdUnitId(location);
-    if (adUnitId.isEmpty) return;
+    if (adUnitId.isEmpty) {
+      FirebaseCrashlytics.instance.log(
+        'BannerPrefetchService: empty adUnitId for $location',
+      );
+      return;
+    }
 
     _isLoading[location] = true;
     BannerAd(
@@ -138,6 +144,12 @@ class BannerPrefetchService {
   void _onBannerFailed(AdLocation location, Ad ad, LoadAdError error) {
     (ad as BannerAd).dispose();
     _isLoading[location] = false;
+    FirebaseCrashlytics.instance.recordError(
+      error,
+      StackTrace.current,
+      fatal: false,
+      reason: 'Banner failed to load for $location',
+    );
 
     final pending = _pendingCompleters[location];
     if (pending != null && pending.isNotEmpty) {

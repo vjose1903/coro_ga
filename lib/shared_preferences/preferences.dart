@@ -85,4 +85,24 @@ class Preferences {
   static set isPremium(bool value) {
     _prefs.setBool('isPremium', value);
   }
+
+  // ==============================================================
+  // Cached ad unit ids (Remote Config fallback)
+  // ==============================================================
+
+  static String get cachedAndroidAdIds {
+    return _prefs.getString('cachedAndroidAdIds') ?? '';
+  }
+
+  static set cachedAndroidAdIds(String value) {
+    _prefs.setString('cachedAndroidAdIds', value);
+  }
+
+  static String get cachedIosAdIds {
+    return _prefs.getString('cachedIosAdIds') ?? '';
+  }
+
+  static set cachedIosAdIds(String value) {
+    _prefs.setString('cachedIosAdIds', value);
+  }
 }

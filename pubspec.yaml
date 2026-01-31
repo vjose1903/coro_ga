@@ -17,6 +17,7 @@ dependencies:
 
   firebase_core: ^4.4.0
   firebase_analytics: ^12.1.1
+  firebase_crashlytics: ^5.0.0
   firebase_remote_config: ^6.0.0
   connectivity_plus: ^6.1.4
   cupertino_icons: ^1.0.8
@@ -47,7 +48,6 @@ dependencies:
   in_app_purchase: ^3.2.0
   url_launcher: ^6.3.1
   in_app_review: ^2.0.11
-  flutter_native_splash: ^2.4.0
 
 dev_dependencies:
   flutter_test:
@@ -74,16 +74,3 @@ flutter:
     - family: Poppins
       fonts:
         - asset: assets/fonts/Poppins-Regular.ttf
-
-# 👇 CONFIGURACIÓN DE SPLASH NATIVO
-flutter_native_splash:
-  color: "#0E1265"
-  image: assets/img/logo_dark.png
-  color_dark: "#0E1265"
-  image_dark: assets/img/logo_dark.png
-  
-  android_12:
-    color: "#0E1265"
-    image: assets/img/logo_dark.png
-    color_dark: "#0E1265"
-    image_dark: assets/img/logo_dark.png
