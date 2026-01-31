@@ -7,6 +7,7 @@ import '../services/ad_ids_service.dart';
 class GoogleAdsProvider extends ChangeNotifier {
   InterstitialAd? interstitialAd;
   Function? onCloseFunction_;
+  bool _showOnLoad = false;
   
   // Flag para mostrar anuncio después de navegación
   bool _showAdAfterNavigation = false;
@@ -48,10 +49,15 @@ class GoogleAdsProvider extends ChangeNotifier {
             );
 
             interstitialAd = ad;
+            if (_showOnLoad) {
+              _showOnLoad = false;
+              interstitialAd!.show();
+            }
           },
           onAdFailedToLoad: (err) {
             Fun.logColor(color: Colores.red, body: 'Failed to load an interstitial ad: ${err.message}');
             onCloseFunction_ != null ? onCloseFunction_!() : null;
+            _showOnLoad = false;
             cleanInterstitialAd();
           },
         ),
@@ -60,12 +66,13 @@ class GoogleAdsProvider extends ChangeNotifier {
   }
 
   showInterstitialAd({required Function onCloseFunction}) {
+    onCloseFunction_ = onCloseFunction;
     if (interstitialAd != null) {
-      onCloseFunction_ = onCloseFunction;
       interstitialAd!.show();
-    } else {
-      onCloseFunction();
+      return;
     }
+    _showOnLoad = true;
+    loadInterstitialAd();
   }
 
   cleanInterstitialAd() {

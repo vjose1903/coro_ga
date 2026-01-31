@@ -47,6 +47,27 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
     super.dispose();
   }
 
+  void _maybeShowScoreInterstitial({
+    required BuildContext context,
+    required int previousScore,
+    required int newScore,
+    required int maxScore,
+  }) {
+    if (maxScore <= 0) return;
+    final halfScore = maxScore / 2;
+    if (newScore >= maxScore) return;
+    if (newScore < halfScore) return;
+    if (previousScore >= halfScore) return;
+
+    final premiumProvider = context.read<PremiumProvider>();
+    if (premiumProvider.isPremium) return;
+
+    final googleAdsProvider = context.read<GoogleAdsProvider>();
+    googleAdsProvider.showInterstitialAd(onCloseFunction: () {
+      googleAdsProvider.loadInterstitialAd();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
@@ -54,6 +75,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
     final partida = partidaProvider.partidaEnTurno;
     final jugador = jugadorProvider.jugadorEnTurno;
     if (partida == null || jugador == null) return const SizedBox.shrink();
+    final maxScore = partida.maxPuntuacion!.toInt();
     final bool hasTeclado = partida.tipo == 'Puntuación';
     final isDark = Preferences.isDarkMode;
 
@@ -125,12 +147,19 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                   color: Colors.red[400]!,
                   onTap: () {
                     final slideUpProvider = context.read<SlideUpProvider>();
+                    final previousScore = jugador.puntuacion ?? 0;
                     final String puntuacion = hasTeclado ? puntuacionController.text : '1';
 
                     changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: 'reducir', context: context).then((newPuntuacion) {
                       if (newPuntuacion != 0) {
                         puntuacionController.text = '';
                         slideUpProvider.closeSlideUp(controller: widget.panelController);
+                        _maybeShowScoreInterstitial(
+                          context: context,
+                          previousScore: previousScore,
+                          newScore: newPuntuacion,
+                          maxScore: maxScore,
+                        );
                       }
                     });
                   },
@@ -145,12 +174,19 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                   color: Colors.green,
                   onTap: () {
                     final slideUpProvider = context.read<SlideUpProvider>();
+                    final previousScore = jugador.puntuacion ?? 0;
                     final String puntuacion = hasTeclado ? puntuacionController.text : '1';
                     changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: 'aumentar', context: context).then((newPuntuacion) {
                       if (newPuntuacion != 0) {
                         puntuacionController.text = '';
                         slideUpProvider.closeSlideUp(controller: widget.panelController);
-                        if (newPuntuacion >= partida.maxPuntuacion!.toInt()) {
+                        _maybeShowScoreInterstitial(
+                          context: context,
+                          previousScore: previousScore,
+                          newScore: newPuntuacion,
+                          maxScore: maxScore,
+                        );
+                        if (newPuntuacion >= maxScore) {
                           Navigator.push(
                               context,
                               PageRouteBuilder(

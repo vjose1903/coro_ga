@@ -54,12 +54,45 @@ class _HomeShellState extends State<HomeShell> {
         }
         return true;
       },
-      child: IndexedStack(
-        index: displayIndex,
+      child: Stack(
         children: [
-          _home,
-          _partida,
+          _AnimatedKeepAlive(
+            isVisible: displayIndex == 0,
+            child: _home,
+          ),
+          _AnimatedKeepAlive(
+            isVisible: displayIndex == 1,
+            child: _partida,
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class _AnimatedKeepAlive extends StatelessWidget {
+  const _AnimatedKeepAlive({
+    required this.isVisible,
+    required this.child,
+  });
+
+  final bool isVisible;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      ignoring: !isVisible,
+      child: AnimatedOpacity(
+        opacity: isVisible ? 1 : 0,
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
+        child: AnimatedSlide(
+          offset: isVisible ? Offset.zero : const Offset(0.02, 0),
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          child: child,
+        ),
       ),
     );
   }
