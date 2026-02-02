@@ -32,7 +32,7 @@ class FormPartidaPredefinida extends StatelessWidget {
             // Header
             _FormHeader(isEditing: isEditing),
             const SizedBox(height: 20),
-            
+
             ReactiveForm(
               formGroup: form,
               child: IntrinsicHeight(
@@ -54,10 +54,7 @@ class FormPartidaPredefinida extends StatelessWidget {
                           child: CustomReactiveDropDown(
                             formControlName: 'tipo',
                             labelText: AppLocalizations.of(context)!.type,
-                            items: [
-                              DropdownMenuItem(value: 'Rondas', child: Text(AppLocalizations.of(context)!.rounds)),
-                              DropdownMenuItem(value: 'Puntuación', child: Text(AppLocalizations.of(context)!.score))
-                            ],
+                            items: [DropdownMenuItem(value: 'Rondas', child: Text(AppLocalizations.of(context)!.rounds)), DropdownMenuItem(value: 'Puntuación', child: Text(AppLocalizations.of(context)!.score))],
                             onChanged: (value) => formPartidaPredefinidaProvider.changeTipo(value),
                           ),
                         ),
@@ -83,13 +80,7 @@ class FormPartidaPredefinida extends StatelessWidget {
                         final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
                         if (!premiumProvider.canAddPlayer(formPartidaPredefinidaProvider.cantidadJugadores)) {
-                          final l10n = AppLocalizations.of(context)!;
-                          Toast.show(
-                              type: ToastType.info,
-                              context: context,
-                              message: AppLocalizations.of(context)!.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
-                              actionLabel: AppLocalizations.of(context)!.getPro,
-                              onAction: () => Navigator.pushNamed(context, 'premium'));
+                          Toast.show(type: ToastType.info, context: context, message: AppLocalizations.of(context)!.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers), actionLabel: AppLocalizations.of(context)!.getPro, onAction: () => Navigator.pushNamed(context, 'premium'));
                           return;
                         }
 
@@ -147,8 +138,7 @@ class FormPartidaPredefinida extends StatelessWidget {
       SqlResponse response = SqlResponse();
 
       if (formPartidaPredefinidaProvider.partidaPredefinidaEditar != null) {
-        response = await partidaPredefinidaProvider.editPartida(context,
-            partida: formPartidaPredefinidaProvider.partidaPredefinidaEditar!, partidaEdit: form.value);
+        response = await partidaPredefinidaProvider.editPartida(context, partida: formPartidaPredefinidaProvider.partidaPredefinidaEditar!, partidaEdit: form.value);
       } else {
         final PartidaPredefinida partida = PartidaPredefinida.fromMap(form.value);
         response = await partidaPredefinidaProvider.newPartida(partida: partida);
@@ -158,7 +148,7 @@ class FormPartidaPredefinida extends StatelessWidget {
         // IMPORTANTE: Cerrar diálogo PRIMERO, mostrar anuncio DESPUÉS (pausa natural)
         DialogNavigator.of(context).pop();
         formPartidaPredefinidaProvider.resetForm();
-        
+
         // Mostrar anuncio después de un delay para dar pausa natural
         Future.delayed(const Duration(milliseconds: 600), () {
           googleAdsProvider.showInterstitialAd(onCloseFunction: () {
@@ -176,7 +166,6 @@ class FormPartidaPredefinida extends StatelessWidget {
 
 // Header del formulario con neumorfismo
 class _FormHeader extends StatelessWidget {
-
   const _FormHeader({required this.isEditing});
   final bool isEditing;
 
@@ -187,22 +176,16 @@ class _FormHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
       decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.03)
-            : Colors.black.withValues(alpha: 0.02),
+        color: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.04)
-                : Colors.white.withValues(alpha: 0.7),
+            color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.white.withValues(alpha: 0.7),
             offset: const Offset(-2, -2),
             blurRadius: 4,
           ),
           BoxShadow(
-            color: isDark
-                ? Colors.black.withValues(alpha: 0.3)
-                : Colors.black.withValues(alpha: 0.08),
+            color: isDark ? Colors.black.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.08),
             offset: const Offset(2, 2),
             blurRadius: 4,
           ),
@@ -216,9 +199,7 @@ class _FormHeader extends StatelessWidget {
             height: 40,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: isEditing
-                    ? [const Color(0xFF4FC3F7), const Color(0xFF29B6F6)]
-                    : [const Color(0xFF81C784), const Color(0xFF66BB6A)],
+                colors: isEditing ? [const Color(0xFF4FC3F7), const Color(0xFF29B6F6)] : [const Color(0xFF81C784), const Color(0xFF66BB6A)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -273,7 +254,6 @@ class _FormHeader extends StatelessWidget {
 
 // Contador de jugadores
 class _JugadoresCounter extends StatelessWidget {
-
   const _JugadoresCounter({
     required this.cantidad,
     required this.onRemove,
@@ -290,22 +270,16 @@ class _JugadoresCounter extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.03)
-            : Colors.black.withValues(alpha: 0.02),
+        color: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.04)
-                : Colors.white.withValues(alpha: 0.7),
+            color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.white.withValues(alpha: 0.7),
             offset: const Offset(-2, -2),
             blurRadius: 4,
           ),
           BoxShadow(
-            color: isDark
-                ? Colors.black.withValues(alpha: 0.3)
-                : Colors.black.withValues(alpha: 0.08),
+            color: isDark ? Colors.black.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.08),
             offset: const Offset(2, 2),
             blurRadius: 4,
           ),
@@ -352,9 +326,7 @@ class _JugadoresCounter extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: isDark
-                            ? Colors.black.withValues(alpha: 0.2)
-                            : Colors.black.withValues(alpha: 0.05),
+                        color: isDark ? Colors.black.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.05),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
@@ -390,7 +362,6 @@ class _JugadoresCounter extends StatelessWidget {
 
 // Botón del contador
 class _CounterButton extends StatelessWidget {
-
   const _CounterButton({
     required this.icon,
     required this.color,
@@ -436,7 +407,6 @@ class _CounterButton extends StatelessWidget {
 
 // Botón de acción
 class _ActionButton extends StatelessWidget {
-
   const _ActionButton({
     required this.label,
     required this.icon,

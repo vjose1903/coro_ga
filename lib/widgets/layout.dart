@@ -371,7 +371,7 @@ class _PanelHandleState extends State<_PanelHandle> {
     if (!widget.panelController.isAttached) return;
     final height = _panelMaxHeight;
     if (height == null || height <= 0) return;
-    final currentPosition = widget.panelController.panelPosition;
+
     _dragAccumulated += delta;
     final fraction = _dragAccumulated / height;
     final newPosition = (_dragStartPosition - fraction).clamp(0.0, 1.0);

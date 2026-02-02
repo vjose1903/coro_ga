@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../shared_preferences/preferences.dart';
-import '../themes/app_themes.dart';
 
 class IconSize {
   static const double xMin = 20;
@@ -10,15 +9,7 @@ class IconSize {
 }
 
 class CustomIconButtom extends StatelessWidget {
-  const CustomIconButtom(
-      {super.key,
-      required this.icon,
-      this.onTap,
-      this.size = IconSize.max,
-      this.iconSize = 30,
-      this.splashColor = Colors.grey,
-      this.backgroundColor = Colors.transparent,
-      this.iconColor});
+  const CustomIconButtom({super.key, required this.icon, this.onTap, this.size = IconSize.max, this.iconSize = 30, this.splashColor = Colors.grey, this.backgroundColor = Colors.transparent, this.iconColor});
 
   final IconData icon;
   final double? iconSize;

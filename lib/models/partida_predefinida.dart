@@ -1,11 +1,9 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'models.dart';
 import '../helpers/helpers.dart';
 import '../utils/utils.dart';
 
 class PartidaPredefinida extends DynamicClass {
-
   factory PartidaPredefinida.fromJson(String str) => PartidaPredefinida.fromMap(json.decode(str));
 
   factory PartidaPredefinida.fromMap(Map<String, dynamic> json) => PartidaPredefinida(

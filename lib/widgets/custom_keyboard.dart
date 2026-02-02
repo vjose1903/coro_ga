@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
-import '../helpers/helpers.dart';
 
 enum KeyboardType { number }
 
@@ -20,26 +19,10 @@ class CustomKeyboard extends StatelessWidget {
 
     return Table(
       children: [
-        TableRow(children: [
-          _Tecla(label: '1', onChanged: (value) => onChanged(value), height: height),
-          _Tecla(label: '2', onChanged: (value) => onChanged(value), height: height),
-          _Tecla(label: '3', onChanged: (value) => onChanged(value), height: height)
-        ]),
-        TableRow(children: [
-          _Tecla(label: '4', onChanged: (value) => onChanged(value), height: height),
-          _Tecla(label: '5', onChanged: (value) => onChanged(value), height: height),
-          _Tecla(label: '6', onChanged: (value) => onChanged(value), height: height)
-        ]),
-        TableRow(children: [
-          _Tecla(label: '7', onChanged: (value) => onChanged(value), height: height),
-          _Tecla(label: '8', onChanged: (value) => onChanged(value), height: height),
-          _Tecla(label: '9', onChanged: (value) => onChanged(value), height: height)
-        ]),
-        TableRow(children: [
-          Container(),
-          _Tecla(label: '0', onChanged: (value) => onChanged(value), height: height),
-          _Tecla(label: 'DEL', icon: Icons.backspace_rounded, onChanged: (value) => onChanged(value), backgroundColor: Colors.transparent, height: height)
-        ]),
+        TableRow(children: [_Tecla(label: '1', onChanged: (value) => onChanged(value), height: height), _Tecla(label: '2', onChanged: (value) => onChanged(value), height: height), _Tecla(label: '3', onChanged: (value) => onChanged(value), height: height)]),
+        TableRow(children: [_Tecla(label: '4', onChanged: (value) => onChanged(value), height: height), _Tecla(label: '5', onChanged: (value) => onChanged(value), height: height), _Tecla(label: '6', onChanged: (value) => onChanged(value), height: height)]),
+        TableRow(children: [_Tecla(label: '7', onChanged: (value) => onChanged(value), height: height), _Tecla(label: '8', onChanged: (value) => onChanged(value), height: height), _Tecla(label: '9', onChanged: (value) => onChanged(value), height: height)]),
+        TableRow(children: [Container(), _Tecla(label: '0', onChanged: (value) => onChanged(value), height: height), _Tecla(label: 'DEL', icon: Icons.backspace_rounded, onChanged: (value) => onChanged(value), backgroundColor: Colors.transparent, height: height)]),
       ],
     );
   }
@@ -68,27 +51,29 @@ class _Tecla extends StatelessWidget {
     final bool isTransparent = backgroundColor == Colors.transparent;
     final Color backColor = backgroundColor ?? (Preferences.isDarkMode ? const Color(0xff505050) : const Color(0xffFFFFFF));
     final margin = height < 34 ? 3.0 : 5.0;
-    
+
     return Container(
       margin: EdgeInsets.all(margin),
-      decoration: isTransparent ? null : BoxDecoration(
-        color: backColor,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          // Sombra oscura sutil
-          BoxShadow(
-            color: Colors.black.withValues(alpha: Preferences.isDarkMode ? 0.15 : 0.08),
-            blurRadius: 3,
-            offset: const Offset(1, 1),
-          ),
-          // Sombra clara sutil
-          BoxShadow(
-            color: Colors.white.withValues(alpha: Preferences.isDarkMode ? 0.08 : 0.6),
-            blurRadius: 3,
-            offset: const Offset(-1, -1),
-          ),
-        ],
-      ),
+      decoration: isTransparent
+          ? null
+          : BoxDecoration(
+              color: backColor,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                // Sombra oscura sutil
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: Preferences.isDarkMode ? 0.15 : 0.08),
+                  blurRadius: 3,
+                  offset: const Offset(1, 1),
+                ),
+                // Sombra clara sutil
+                BoxShadow(
+                  color: Colors.white.withValues(alpha: Preferences.isDarkMode ? 0.08 : 0.6),
+                  blurRadius: 3,
+                  offset: const Offset(-1, -1),
+                ),
+              ],
+            ),
       child: SizedBox(
         height: height,
         child: Material(

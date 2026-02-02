@@ -84,13 +84,7 @@ class PartidasDefaultAlert extends StatelessWidget {
     final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
     if (!premiumProvider.canCreatePredefinedGame(partidaPredefinidaProvider.partidasPredefinidas.length)) {
-      final l10n = AppLocalizations.of(context)!;
-      Toast.show(
-          type: ToastType.info,
-          context: context,
-          message: AppLocalizations.of(context)!.freeVersionLimitPredefined(PremiumProvider.freeMaxPredefinedGames),
-          actionLabel: AppLocalizations.of(context)!.getPro,
-          onAction: () => Navigator.pushNamed(context, 'premium'));
+      Toast.show(type: ToastType.info, context: context, message: AppLocalizations.of(context)!.freeVersionLimitPredefined(PremiumProvider.freeMaxPredefinedGames), actionLabel: AppLocalizations.of(context)!.getPro, onAction: () => Navigator.pushNamed(context, 'premium'));
       return;
     }
 
@@ -121,9 +115,7 @@ class _PredefinidaHeader extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: isDark
-              ? [Colors.white.withValues(alpha: 0.08), Colors.white.withValues(alpha: 0.03)]
-              : [AppThemes.colorPrimero.withValues(alpha: 0.08), AppThemes.colorPrimero.withValues(alpha: 0.03)],
+          colors: isDark ? [Colors.white.withValues(alpha: 0.08), Colors.white.withValues(alpha: 0.03)] : [AppThemes.colorPrimero.withValues(alpha: 0.08), AppThemes.colorPrimero.withValues(alpha: 0.03)],
         ),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
@@ -197,10 +189,7 @@ class _PredefinidaHeader extends StatelessWidget {
           ),
 
           // Botones
-          if (isReordering)
-            _DoneButton(onTap: onDone)
-          else
-            _AddButton(onTap: onAdd),
+          if (isReordering) _DoneButton(onTap: onDone) else _AddButton(onTap: onAdd),
         ],
       ),
     );
@@ -354,7 +343,6 @@ class PartidasScrollView extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator(color: AppThemes.colorPrimero));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          final l10n = AppLocalizations.of(context)!;
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -403,13 +391,13 @@ class PartidasScrollView extends StatelessWidget {
                 const double padding = 10;
                 final double itemWidth = (constraints.maxWidth - (padding * 2) - (spacing * 2)) / 3;
 
-              return SingleChildScrollView(
-                physics: const ClampingScrollPhysics(),
-                padding: const EdgeInsets.all(padding),
-                child: ReorderableWrap(
-                    enableReorder: reorderableProvider.isReording,
-                    needsLongPressDraggable: false,
-                    runSpacing: 15,
+                return SingleChildScrollView(
+                  physics: const ClampingScrollPhysics(),
+                  padding: const EdgeInsets.all(padding),
+                  child: ReorderableWrap(
+                      enableReorder: reorderableProvider.isReording,
+                      needsLongPressDraggable: false,
+                      runSpacing: 15,
                       spacing: spacing,
                       maxMainAxisCount: 3,
                       scrollPhysics: const ClampingScrollPhysics(),
@@ -483,9 +471,7 @@ class ReordenableItem extends StatelessWidget {
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  onTap: () => !reorderableProvider.isReording
-                      ? selectPartidaPredefinida(context: context)
-                      : patchFormPartida(context: context, partida: partidaPredefinida),
+                  onTap: () => !reorderableProvider.isReording ? selectPartidaPredefinida(context: context) : patchFormPartida(context: context, partida: partidaPredefinida),
                   onLongPress: () => reorderableProvider.isReording = true,
                   borderRadius: BorderRadius.circular(14),
                   child: Stack(
@@ -499,12 +485,12 @@ class ReordenableItem extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             maxLines: 2,
                             textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: ResponsiveApp.scaleText(13),
-                          ),
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: ResponsiveApp.scaleText(13),
+                            ),
                           ),
                         ),
                       ),
@@ -523,12 +509,12 @@ class ReordenableItem extends StatelessWidget {
                             const SizedBox(width: 3),
                             Text(
                               '${partidaPredefinida.cantidadJugadores ?? 0}',
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: ResponsiveApp.scaleText(9),
-                              color: Colors.white.withValues(alpha: 0.6),
-                              fontWeight: FontWeight.w500,
-                            ),
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: ResponsiveApp.scaleText(9),
+                                color: Colors.white.withValues(alpha: 0.6),
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ],
                         ),
@@ -595,20 +581,16 @@ class ReordenableItem extends StatelessWidget {
     final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
     final l10n = AppLocalizations.of(context)!;
 
-    CustomAlertDialog.show(context,
-        menssage: l10n.confirmDeletePredefined(partida.nombre!),
-        title: l10n.confirm,
-        dialogType: DialogType.error,
-        buttonsList: [
-          CustomActionsButtons.cancelButton({'label': l10n.cancel, 'onTap': () => Navigator.pop(context)}),
-          CustomActionsButtons.aceptarButton({
-            'label': l10n.accept,
-            'onTap': () {
-              Navigator.pop(context);
-              formPartidaPredefinidaProvider.deletePartidaPredefinida(context, partida: partida);
-            }
-          })
-        ]);
+    CustomAlertDialog.show(context, menssage: l10n.confirmDeletePredefined(partida.nombre!), title: l10n.confirm, dialogType: DialogType.error, buttonsList: [
+      CustomActionsButtons.cancelButton({'label': l10n.cancel, 'onTap': () => Navigator.pop(context)}),
+      CustomActionsButtons.aceptarButton({
+        'label': l10n.accept,
+        'onTap': () {
+          Navigator.pop(context);
+          formPartidaPredefinidaProvider.deletePartidaPredefinida(context, partida: partida);
+        }
+      })
+    ]);
   }
 
   selectPartidaPredefinida({required BuildContext context}) {

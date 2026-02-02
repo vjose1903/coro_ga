@@ -4,7 +4,6 @@ import '../helpers/helpers.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
-import '../models/models.dart';
 import '../providers/partida_provider.dart';
 import '../providers/providers.dart';
 import '../shared_preferences/preferences.dart';
@@ -56,92 +55,80 @@ class _GanadorScreenState extends State<GanadorScreen> {
       screenName: 'GanadorScreen',
       child: Scaffold(
         body: Stack(
-        children: [
-          Container(decoration: boxDecoration),
-          Container(
-              alignment: Alignment.topRight,
-              width: double.infinity,
-              margin: const EdgeInsets.only(top: 70, right: 30),
-              child: CustomIconButtom(
-                  iconSize: 40,
-                  iconColor: ganadorColor,
-                  icon: Icons.close,
-                  onTap: () {
-                    // IMPORTANTE: Navegar PRIMERO, mostrar anuncio DESPUÉS (pausa natural)
-                    googleAdsProvider.markAdForAfterNavigation();
-                    final partidaProvider = context.read<PartidaProvider>();
-                    if (partidaProvider.partidaEnTurno != null) {
-                      partidaProvider.deletePartida(
-                        context,
-                        partida: partidaProvider.partidaEnTurno!,
-                      );
-                    }
-                    Navigator.pop(context);
-                    context.read<AppNavigationProvider>().showHome();
-                  })),
-          Container(
-              margin: const EdgeInsets.only(top: 150),
-              width: double.infinity,
-              child: Column(
-                children: [
-                  TextAnimator(AppLocalizations.of(context)!.winner,
-                      initialDelay: const Duration(seconds: 1),
-                      incomingEffect: WidgetTransitionEffects.incomingOffsetThenScaleAndStep(duration: const Duration(milliseconds: 800)),
-                      style: TextStyle(color: ganadorColor, fontFamily: 'Poppins', fontSize: ResponsiveApp.scaleText(30), fontWeight: FontWeight.bold, letterSpacing: 3)),
-                  TextAnimator(partida,
-                      initialDelay: const Duration(seconds: 1, milliseconds: 800),
-                      incomingEffect: WidgetTransitionEffects.incomingScaleDown(duration: const Duration(seconds: 1)),
-                      style: TextStyle(color: partidaColor, fontFamily: 'Poppins', fontSize: ResponsiveApp.scaleText(20))),
-                  //
-                  const SizedBox(height: 20),
+          children: [
+            Container(decoration: boxDecoration),
+            Container(
+                alignment: Alignment.topRight,
+                width: double.infinity,
+                margin: const EdgeInsets.only(top: 70, right: 30),
+                child: CustomIconButtom(
+                    iconSize: 40,
+                    iconColor: ganadorColor,
+                    icon: Icons.close,
+                    onTap: () {
+                      // IMPORTANTE: Navegar PRIMERO, mostrar anuncio DESPUÉS (pausa natural)
+                      googleAdsProvider.markAdForAfterNavigation();
+                      final partidaProvider = context.read<PartidaProvider>();
+                      if (partidaProvider.partidaEnTurno != null) {
+                        partidaProvider.deletePartida(
+                          context,
+                          partida: partidaProvider.partidaEnTurno!,
+                        );
+                      }
+                      Navigator.pop(context);
+                      context.read<AppNavigationProvider>().showHome();
+                    })),
+            Container(
+                margin: const EdgeInsets.only(top: 150),
+                width: double.infinity,
+                child: Column(
+                  children: [
+                    TextAnimator(AppLocalizations.of(context)!.winner,
+                        initialDelay: const Duration(seconds: 1), incomingEffect: WidgetTransitionEffects.incomingOffsetThenScaleAndStep(duration: const Duration(milliseconds: 800)), style: TextStyle(color: ganadorColor, fontFamily: 'Poppins', fontSize: ResponsiveApp.scaleText(30), fontWeight: FontWeight.bold, letterSpacing: 3)),
+                    TextAnimator(partida, initialDelay: const Duration(seconds: 1, milliseconds: 800), incomingEffect: WidgetTransitionEffects.incomingScaleDown(duration: const Duration(seconds: 1)), style: TextStyle(color: partidaColor, fontFamily: 'Poppins', fontSize: ResponsiveApp.scaleText(20))),
+                    //
+                    const SizedBox(height: 20),
 
-                  SizedBox(
-                    height: 300,
-                    child: Bounce(
-                        delay: const Duration(seconds: 1),
-                        infinite: true,
-                        child: const LottieAnimation(animationJson: 'assets/animations/trophy.json')),
-                  ),
+                    SizedBox(
+                      height: 300,
+                      child: Bounce(delay: const Duration(seconds: 1), infinite: true, child: const LottieAnimation(animationJson: 'assets/animations/trophy.json')),
+                    ),
 
-                  const SizedBox(height: 10),
+                    const SizedBox(height: 10),
 
-                  TextAnimator(jugador,
-                      spaceDelay: const Duration(),
-                      characterDelay: const Duration(milliseconds: 180),
-                      incomingEffect: WidgetTransitionEffects.incomingScaleUp(),
-                      atRestEffect: WidgetRestingEffects.pulse(effectStrength: 0.8),
-                      initialDelay: const Duration(seconds: 2),
-                      style: TextStyle(color: ganadorColor, fontFamily: 'Poppins', fontSize: ResponsiveApp.scaleText(30), fontWeight: FontWeight.bold, letterSpacing: 3)),
+                    TextAnimator(jugador,
+                        spaceDelay: const Duration(),
+                        characterDelay: const Duration(milliseconds: 180),
+                        incomingEffect: WidgetTransitionEffects.incomingScaleUp(),
+                        atRestEffect: WidgetRestingEffects.pulse(effectStrength: 0.8),
+                        initialDelay: const Duration(seconds: 2),
+                        style: TextStyle(color: ganadorColor, fontFamily: 'Poppins', fontSize: ResponsiveApp.scaleText(30), fontWeight: FontWeight.bold, letterSpacing: 3)),
 
-                  const SizedBox(height: 40),
+                    const SizedBox(height: 40),
 
-                  WidgetAnimator(
-                    incomingEffect: WidgetTransitionEffects.outgoingScaleUp(
-                        delay: const Duration(seconds: 2, milliseconds: 500), duration: const Duration(seconds: 1)),
-                    child: ElevatedButton(
-                      style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.green[400])),
-                      onPressed: () => revanchaFunction(),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(AppLocalizations.of(context)!.rematch,
-                                style: TextStyle(fontSize: ResponsiveApp.scaleText(15), fontFamily: 'Poppins', fontWeight: FontWeight.bold, letterSpacing: 2)),
-                            if (!premiumProvider.isPremium)
-                              Text(AppLocalizations.of(context)!.watchAd,
-                                  style: TextStyle(fontSize: ResponsiveApp.scaleText(10), fontFamily: 'Poppins', fontWeight: FontWeight.normal)),
-                          ],
+                    WidgetAnimator(
+                      incomingEffect: WidgetTransitionEffects.outgoingScaleUp(delay: const Duration(seconds: 2, milliseconds: 500), duration: const Duration(seconds: 1)),
+                      child: ElevatedButton(
+                        style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.green[400])),
+                        onPressed: () => revanchaFunction(),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(AppLocalizations.of(context)!.rematch, style: TextStyle(fontSize: ResponsiveApp.scaleText(15), fontFamily: 'Poppins', fontWeight: FontWeight.bold, letterSpacing: 2)),
+                              if (!premiumProvider.isPremium) Text(AppLocalizations.of(context)!.watchAd, style: TextStyle(fontSize: ResponsiveApp.scaleText(10), fontFamily: 'Poppins', fontWeight: FontWeight.normal)),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  )
-                ],
-              )),
-        ],
+                    )
+                  ],
+                )),
+          ],
+        ),
       ),
-    ),
-  );
+    );
   }
 
   revanchaFunction() async {

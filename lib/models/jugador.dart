@@ -1,12 +1,9 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import '../helpers/helpers.dart';
 import 'models.dart';
-import '../utils/functions.dart';
 import '../utils/utils.dart';
 
 class Jugador extends DynamicClass {
-
   factory Jugador.fromJson(String str) => Jugador.fromMap(json.decode(str));
 
   factory Jugador.fromMap(Map<String, dynamic> json) => Jugador(
@@ -14,8 +11,7 @@ class Jugador extends DynamicClass {
         partidaId: json["partida_id"],
         nombre: json["nombre"],
         puntuacion: json["puntuacion"] ?? 0,
-        historialJugadas:
-            json["historial_jugadas"] != null ? List<HistorialJugada>.from(json["historial_jugadas"].map((x) => HistorialJugada.fromMap(x))) : [],
+        historialJugadas: json["historial_jugadas"] != null ? List<HistorialJugada>.from(json["historial_jugadas"].map((x) => HistorialJugada.fromMap(x))) : [],
       );
   Jugador({this.id, this.nombre, this.puntuacion = 0, this.partidaId, this.historialJugadas});
 
@@ -70,8 +66,7 @@ class Jugador extends DynamicClass {
     return response;
   }
 
-  static Future<SqlResponse> changePuntuacion(
-      {required Jugador jugador, required int newPuntuacion, required String tipo, required Map newData}) async {
+  static Future<SqlResponse> changePuntuacion({required Jugador jugador, required int newPuntuacion, required String tipo, required Map newData}) async {
     //
     final SqlResponse response = SqlResponse();
 
@@ -95,9 +90,7 @@ class Jugador extends DynamicClass {
 
     if (!res.hasError!) {
       jugador.historialJugadas!.remove(historial);
-      final int newPuntuacion = historial.tipo == 'aumentar'
-          ? jugador.puntuacion! - historial.puntuacion!
-          : jugador.puntuacion! + historial.puntuacion!;
+      final int newPuntuacion = historial.tipo == 'aumentar' ? jugador.puntuacion! - historial.puntuacion! : jugador.puntuacion! + historial.puntuacion!;
 
       await CrudHelper.updateOne(tableName: Jugador.tableName, id: jugador.id!, newData: {'puntuacion': newPuntuacion});
 

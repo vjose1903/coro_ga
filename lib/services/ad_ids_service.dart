@@ -88,9 +88,7 @@ class AdIdsService {
   }
 
   Map<String, dynamic> _platformDefaults() {
-    return Platform.isIOS
-        ? Map<String, dynamic>.from(_defaultIosIds)
-        : Map<String, dynamic>.from(_defaultAndroidIds);
+    return Platform.isIOS ? Map<String, dynamic>.from(_defaultIosIds) : Map<String, dynamic>.from(_defaultAndroidIds);
   }
 
   Map<String, dynamic>? _tryParseIds(String raw) {
@@ -125,13 +123,6 @@ class AdIdsService {
     }
   }
 
-  bool _hasAnyValue(Map<String, dynamic> ids) {
-    for (final value in ids.values) {
-      if (value.toString().isNotEmpty) return true;
-    }
-    return false;
-  }
-
   Map<String, dynamic> _mergeIds(Map<String, dynamic> base, Map<String, dynamic>? incoming) {
     final merged = Map<String, dynamic>.from(base);
     if (incoming == null) return merged;
@@ -155,9 +146,7 @@ class AdIdsService {
     required Map<String, dynamic>? parsed,
     required Map<String, dynamic>? cachedIds,
   }) {
-    final source = parsed != null
-        ? 'remote'
-        : (cachedIds != null ? 'cache' : 'defaults');
+    final source = parsed != null ? 'remote' : (cachedIds != null ? 'cache' : 'defaults');
     FirebaseCrashlytics.instance.setCustomKey('ad_ids_source', source);
     FirebaseCrashlytics.instance.setCustomKey('ad_ids_ready', _isReady);
     FirebaseCrashlytics.instance.log(
