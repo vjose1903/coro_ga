@@ -75,7 +75,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
     final partida = partidaProvider.partidaEnTurno;
     final jugador = jugadorProvider.jugadorEnTurno;
     if (partida == null || jugador == null) return const SizedBox.shrink();
-    final maxScore = partida.maxPuntuacion!.toInt();
+    final maxScore = (partida.maxPuntuacion ?? 0).toInt();
     final bool hasTeclado = partida.tipo == 'Puntuación';
     final isDark = Preferences.isDarkMode;
 
@@ -238,6 +238,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
     ).then((_) {
       // Esperar al siguiente frame para asegurar que los datos estén sincronizados
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
         slideUpProvider.openSlideUp(
           controller: widget.panelController,
           bodyContent: PuntuacionForm(panelController: widget.panelController),
@@ -255,7 +256,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
     if (puntuacion.isNotEmpty && puntuacion != '0') {
       final int puntuacionInt = int.parse(puntuacion);
 
-      final int puntuacionActual = jugador.puntuacion!;
+    final int puntuacionActual = jugador.puntuacion ?? 0;
 
       if (tipo == 'reducir' && puntuacionActual - puntuacionInt < 0) {
         final l10n = AppLocalizations.of(context)!;

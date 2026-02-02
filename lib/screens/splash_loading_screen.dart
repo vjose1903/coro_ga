@@ -73,11 +73,6 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
         action: _initializeFirebase,
       ),
       _InitStep(
-        label: 'Configurando anuncios',
-        weight: 1,
-        action: _initializeMobileAds,
-      ),
-      _InitStep(
         label: 'Cargando compras',
         weight: 1,
         action: () => PurchaseService.instance.initialize(
@@ -87,6 +82,14 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
         ),
       ),
     ];
+
+    if (!Preferences.isPremium) {
+      steps.add(_InitStep(
+        label: 'Configurando anuncios',
+        weight: 1,
+        action: _initializeMobileAds,
+      ));
+    }
 
     if (!Preferences.isPremium) {
       steps.add(_InitStep(
@@ -108,8 +111,7 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
       return true;
     };
-    await FirebaseCrashlytics.instance
-        .setCrashlyticsCollectionEnabled(!kDebugMode);
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(!kDebugMode);
   }
 
   Future<void> _initializeMobileAds() async {
@@ -127,7 +129,8 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final textColor = theme.colorScheme.onSurface.withValues(alpha: 0.85);
-    final backgroundColor = Preferences.isDarkMode ? AppThemes.colorTercero : Colors.white;
+    final backgroundColor = Preferences.isDarkMode ? AppThemes.themeColor_1 : Colors.white;
+
     return Scaffold(
       backgroundColor: backgroundColor,
       body: SafeArea(
@@ -139,22 +142,6 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  Positioned(
-                    top: -80,
-                    right: -60,
-                    child: _GlowCircle(
-                      size: 220,
-                      color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: -90,
-                    left: -70,
-                    child: _GlowCircle(
-                      size: 240,
-                      color: theme.colorScheme.secondary.withValues(alpha: 0.12),
-                    ),
-                  ),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -189,7 +176,11 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      LinearProgressIndicator(value: _hasError ? null : _progress),
+                      LinearProgressIndicator(
+                        value: _hasError ? null : _progress,
+                        color: AppThemes.colorPrimero,
+                        backgroundColor: AppThemes.themeColor_3,
+                      ),
                       const SizedBox(height: 12),
                       Text(
                         _hasError ? l10n.loadingDataError : l10n.loadingData,
@@ -225,31 +216,4 @@ class _InitStep {
   final String label;
   final double weight;
   final Future<void> Function() action;
-}
-
-class _GlowCircle extends StatelessWidget {
-  const _GlowCircle({
-    required this.size,
-    required this.color,
-  });
-
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadialGradient(
-          colors: [
-            color,
-            color.withValues(alpha: 0),
-          ],
-        ),
-      ),
-    );
-  }
 }

@@ -23,63 +23,64 @@ class GoogleBannerAd extends StatefulWidget {
 
 class _GoogleBannerAdState extends State<GoogleBannerAd> {
   BannerAd? _bannerAd;
-  bool _isHideSkeleton = false;
-  bool _timerStarted = false;
   bool _isLoading = false;
   bool _retryScheduled = false;
   Timer? _retryTimer;
   int _retryCount = 0;
+  DateTime? _lastLogAt;
+  DateTime? _lastRetryLogAt;
   StreamSubscription<void>? _idsUpdatedSub;
   static const Duration _baseRetryDelay = Duration(seconds: 8);
   static const Duration _maxRetryDelay = Duration(seconds: 60);
+  static const Duration _logCooldown = Duration(minutes: 4);
 
   @override
   void initState() {
     super.initState();
+    if (Preferences.isPremium) {
+      return;
+    }
     _idsUpdatedSub = AdIdsService.idsUpdatedStream.listen((_) {
       if (!mounted || _bannerAd != null) return;
       _loadBanner();
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadBanner();
-      _startSkeletonTimer();
     });
   }
 
   @override
   void didUpdateWidget(covariant GoogleBannerAd oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (Preferences.isPremium) {
+      _disposeBanner();
+      _retryScheduled = false;
+      _isLoading = false;
+      _retryTimer?.cancel();
+      _retryCount = 0;
+      return;
+    }
     if (oldWidget.location != widget.location) {
-      if (_bannerAd != null) {
-        _bannerAd!.dispose();
-        _bannerAd = null;
-      }
-      _timerStarted = false;
-      _isHideSkeleton = false;
+      _disposeBanner();
       _retryScheduled = false;
       _isLoading = false;
       _retryTimer?.cancel();
       _retryCount = 0;
       _loadBanner();
-      _startSkeletonTimer();
     }
   }
 
-  void _startSkeletonTimer() {
-    if (_timerStarted || _bannerAd != null) return;
-    _timerStarted = true;
-    Future.delayed(const Duration(seconds: 30)).then((_) {
-      if (!mounted) return;
-      if (_bannerAd == null) setState(() => _isHideSkeleton = true);
-    });
-  }
-
   void _loadBanner() {
-    if (_isLoading || _bannerAd != null || !mounted) return;
+    if (Preferences.isPremium) return;
+    if (_isLoading || !mounted) return;
+    _disposeBanner();
     _isLoading = true;
     final adUnitId = AdHelper.getBannerAdUnitId(widget.location);
     if (adUnitId.isEmpty) {
       _isLoading = false;
+      _logThrottled(
+        'GoogleBannerAd: empty adUnitId for ${widget.location}',
+      );
       FirebaseCrashlytics.instance.log(
         'GoogleBannerAd: empty adUnitId for ${widget.location}',
       );
@@ -99,16 +100,19 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
           }
           setState(() {
             _bannerAd = ad as BannerAd;
-            _isHideSkeleton = false;
           });
           _retryScheduled = false;
           _retryTimer?.cancel();
           _retryCount = 0;
           _isLoading = false;
+          _logThrottled('GoogleBannerAd: loaded for ${widget.location}');
         },
         onAdFailedToLoad: (ad, error) {
           ad.dispose();
           _isLoading = false;
+          _logThrottled(
+            'GoogleBannerAd: failed for ${widget.location} code=${error.code}',
+          );
           FirebaseCrashlytics.instance.recordError(
             error,
             StackTrace.current,
@@ -125,6 +129,9 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     if (_retryScheduled || _bannerAd != null || !mounted) return;
     _retryScheduled = true;
     final delay = _nextRetryDelay();
+    _logRetryThrottled(
+      'GoogleBannerAd: retry in ${delay.inSeconds}s for ${widget.location} (attempt $_retryCount)',
+    );
     _retryTimer?.cancel();
     _retryTimer = Timer(delay, () {
       if (!mounted || _bannerAd != null) return;
@@ -152,14 +159,8 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     final double height = _bannerAd?.size.height.toDouble() ?? 50;
 
     // No mostrar anuncios si es premium
-    if (premiumProvider.isPremium || (_isHideSkeleton && _bannerAd == null)) {
+    if (premiumProvider.isPremium) {
       return const SizedBox.shrink();
-    }
-
-    if (_bannerAd != null && _isHideSkeleton) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && _isHideSkeleton) setState(() => _isHideSkeleton = false);
-      });
     }
 
     return Container(
@@ -186,14 +187,36 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     );
   }
 
-  @override
-  void dispose() {
-    _idsUpdatedSub?.cancel();
-    _retryTimer?.cancel();
+  void _disposeBanner() {
     if (_bannerAd != null) {
       _bannerAd!.dispose();
       _bannerAd = null;
     }
+  }
+
+  void _logThrottled(String message) {
+    final now = DateTime.now();
+    if (_lastLogAt != null && now.difference(_lastLogAt!) < _logCooldown) {
+      return;
+    }
+    _lastLogAt = now;
+    FirebaseCrashlytics.instance.log(message);
+  }
+
+  void _logRetryThrottled(String message) {
+    final now = DateTime.now();
+    if (_lastRetryLogAt != null && now.difference(_lastRetryLogAt!) < _logCooldown) {
+      return;
+    }
+    _lastRetryLogAt = now;
+    FirebaseCrashlytics.instance.log(message);
+  }
+
+  @override
+  void dispose() {
+    _idsUpdatedSub?.cancel();
+    _retryTimer?.cancel();
+    _disposeBanner();
     _isLoading = false;
     _retryScheduled = false;
     _retryCount = 0;

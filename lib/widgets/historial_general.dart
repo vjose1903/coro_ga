@@ -177,7 +177,9 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
       return;
     }
 
-    final String puntuacion = partidaProvider.partidaEnTurno!.tipo == 'Puntuación' ? puntuacionController.text : '1';
+    final partida = partidaProvider.partidaEnTurno;
+    if (partida == null) return;
+    final String puntuacion = partida.tipo == 'Puntuación' ? puntuacionController.text : '1';
 
     if (puntuacion.isEmpty || puntuacion == '0') {
       setState(() {
@@ -187,11 +189,11 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
     }
 
     final int puntuacionInt = int.parse(puntuacion);
-    final int puntuacionActual = jugadorSeleccionado!.puntuacion!;
-    final maxScore = partidaProvider.partidaEnTurno!.maxPuntuacion!.toInt();
+    final int puntuacionActual = jugadorSeleccionado?.puntuacion ?? 0;
+    final maxScore = (partidaProvider.partidaEnTurno?.maxPuntuacion ?? 0).toInt();
 
     if (tipo == 'reducir' && puntuacionActual - puntuacionInt < 0) {
-      final String msgError = partidaProvider.partidaEnTurno!.tipo == 'Puntuación' ? l10n.minScoreWarning : l10n.minRoundWarning;
+      final String msgError = partida.tipo == 'Puntuación' ? l10n.minScoreWarning : l10n.minRoundWarning;
       Toast.show(type: ToastType.warning, context: context, title: l10n.warning, message: msgError);
       return;
     }
@@ -222,7 +224,7 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
       setState(() {}); // Refrescar la lista
 
       final int newPuntuacion = response.data.puntuacion;
-      if (newPuntuacion >= maxScore) {
+      if (maxScore > 0 && newPuntuacion >= maxScore) {
         final slideUpProvider = context.read<SlideUpProvider>();
         slideUpProvider.closeSlideUp(
           controller: widget.panelController,

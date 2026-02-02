@@ -149,6 +149,7 @@ class _AddJugadorState extends State<AddJugador> {
     ).then((_) {
       // Esperar al siguiente frame para asegurar que los datos estén sincronizados
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
         slideUpProvider.openSlideUp(
           controller: widget.panelController,
           bodyContent: AddJugadorPartida(panelController: widget.panelController),
@@ -160,8 +161,10 @@ class _AddJugadorState extends State<AddJugador> {
   void _agregarJugador(BuildContext context, FormGroup form) async {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     final PremiumProvider premiumProvider = context.read<PremiumProvider>();
+    final partida = partidaProvider.partidaEnTurno;
+    if (partida == null || partida.jugadores == null) return;
 
-    if (!premiumProvider.canAddPlayer(partidaProvider.partidaEnTurno!.jugadores!.length)) {
+    if (!premiumProvider.canAddPlayer(partida.jugadores!.length)) {
       Toast.show(
           type: ToastType.info,
           context: context,
@@ -174,7 +177,7 @@ class _AddJugadorState extends State<AddJugador> {
     if (form.valid) {
       final Jugador nuevoJugador = Jugador.fromMap(form.value);
 
-      partidaProvider.addJugadorToPartida(context, jugador: nuevoJugador, partida: partidaProvider.partidaEnTurno!).then((value) async {
+      partidaProvider.addJugadorToPartida(context, jugador: nuevoJugador, partida: partida).then((value) async {
         form.reset();
         rebuildWidget();
 

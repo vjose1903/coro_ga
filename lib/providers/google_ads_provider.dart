@@ -3,6 +3,7 @@ import '../helpers/helpers.dart';
 import '../utils/utils.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../services/ad_ids_service.dart';
+import '../shared_preferences/preferences.dart';
 
 class GoogleAdsProvider extends ChangeNotifier {
   InterstitialAd? interstitialAd;
@@ -26,6 +27,7 @@ class GoogleAdsProvider extends ChangeNotifier {
   Function? onRewardEarnedFunction_;
 
   loadInterstitialAd() {
+    if (Preferences.isPremium) return;
     if (interstitialAd == null) {
       final adUnitId = AdHelper.getInterstitialAdUnitId();
       if (adUnitId.isEmpty) {
@@ -66,6 +68,10 @@ class GoogleAdsProvider extends ChangeNotifier {
   }
 
   showInterstitialAd({required Function onCloseFunction}) {
+    if (Preferences.isPremium) {
+      onCloseFunction();
+      return;
+    }
     onCloseFunction_ = onCloseFunction;
     if (interstitialAd != null) {
       interstitialAd!.show();
@@ -81,6 +87,7 @@ class GoogleAdsProvider extends ChangeNotifier {
   }
 
   loadRewardedAd(RewardedAdLocation location) {
+    if (Preferences.isPremium) return;
     if (rewardedAd == null) {
       final adUnitId = AdHelper.getRewardedAdUnitId(location);
       if (adUnitId.isEmpty) {
@@ -118,6 +125,10 @@ class GoogleAdsProvider extends ChangeNotifier {
     required Function onCloseFunction,
     required Function onRewardEarned,
   }) {
+    if (Preferences.isPremium) {
+      onCloseFunction();
+      return;
+    }
     if (rewardedAd != null) {
       onRewardedCloseFunction_ = onCloseFunction;
       onRewardEarnedFunction_ = onRewardEarned;

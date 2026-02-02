@@ -14,6 +14,13 @@ class AdIdsService {
   static final AdIdsService instance = AdIdsService._();
   static final StreamController<void> _idsUpdatedController = StreamController<void>.broadcast();
   static bool _isReady = false;
+  static bool _isInitializing = false;
+  static Timer? _retryTimer;
+  static int _retryCount = 0;
+  static DateTime? _lastRetryLogAt;
+  static const Duration _logCooldown = Duration(minutes: 4);
+  static const Duration _baseRetryDelay = Duration(seconds: 10);
+  static const Duration _maxRetryDelay = Duration(minutes: 2);
 
   static Stream<void> get idsUpdatedStream => _idsUpdatedController.stream;
   static bool get isReady => _isReady;
@@ -39,6 +46,8 @@ class AdIdsService {
   };
 
   Future<void> initialize() async {
+    if (_isInitializing) return;
+    _isInitializing = true;
     final remoteConfig = FirebaseRemoteConfig.instance;
     final cachedIds = _loadCachedIds();
     final baseIds = cachedIds ?? _platformDefaults();
@@ -46,7 +55,7 @@ class AdIdsService {
 
     await remoteConfig.setConfigSettings(RemoteConfigSettings(
       fetchTimeout: const Duration(seconds: 10),
-      minimumFetchInterval: const Duration(minutes: 20),
+      minimumFetchInterval: const Duration(hours: 1),
     ));
 
     await remoteConfig.setDefaults({
@@ -70,6 +79,12 @@ class AdIdsService {
     _cacheIds(ids);
     _logStatus(ids: ids, parsed: parsed, cachedIds: cachedIds);
     _idsUpdatedController.add(null);
+    _isInitializing = false;
+    if (!_isReady) {
+      _scheduleRetry();
+    } else {
+      _resetRetry();
+    }
   }
 
   Map<String, dynamic> _platformDefaults() {
@@ -163,5 +178,49 @@ class AdIdsService {
       if (value.isEmpty) return false;
     }
     return true;
+  }
+
+  void _scheduleRetry() {
+    if (_isInitializing) return;
+    if (_retryTimer != null) return;
+    final delay = _nextRetryDelay();
+    _logRetryThrottled(
+      'AdIdsService: scheduling retry in ${delay.inSeconds}s (attempt $_retryCount)',
+    );
+    _retryTimer = Timer(delay, () {
+      _retryTimer = null;
+      if (_isReady) {
+        _resetRetry();
+        return;
+      }
+      initialize();
+    });
+  }
+
+  Duration _nextRetryDelay() {
+    _retryCount = (_retryCount + 1).clamp(1, 8);
+    final multiplier = 1.6 * (_retryCount - 1);
+    final baseMs = _baseRetryDelay.inMilliseconds;
+    var delayMs = (baseMs * (1 + multiplier)).round();
+    if (delayMs > _maxRetryDelay.inMilliseconds) {
+      delayMs = _maxRetryDelay.inMilliseconds;
+    }
+    final jitterMs = DateTime.now().microsecondsSinceEpoch % 1500;
+    return Duration(milliseconds: delayMs + jitterMs);
+  }
+
+  void _resetRetry() {
+    _retryTimer?.cancel();
+    _retryTimer = null;
+    _retryCount = 0;
+  }
+
+  void _logRetryThrottled(String message) {
+    final now = DateTime.now();
+    if (_lastRetryLogAt != null && now.difference(_lastRetryLogAt!) < _logCooldown) {
+      return;
+    }
+    _lastRetryLogAt = now;
+    FirebaseCrashlytics.instance.log(message);
   }
 }

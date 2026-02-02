@@ -205,7 +205,10 @@ class _Body extends StatelessWidget {
               JugadoresCard(panelController: panelController),
               SizedBox(height: betweenCardGap),
               // Anuncio separado de la lista de jugadores
-              anuncio,
+              KeyedSubtree(
+                key: ValueKey('partida_ad_${partida.id ?? 'none'}'),
+                child: anuncio,
+              ),
               SizedBox(height: adSpacing),
             ])));
   }
