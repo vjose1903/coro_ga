@@ -8,6 +8,7 @@ import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import '../helpers/helpers.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
+import 'ganador.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 import '../widgets/widgets.dart';
@@ -171,6 +172,7 @@ class _Body extends StatelessWidget {
         ? ResponsiveApp.scaleHeight(22)
         : ResponsiveApp.scaleHeight(25);
     final double adSpacing = ResponsiveApp.scaleHeight(15);
+    final l10n = AppLocalizations.of(context)!;
 
     return Layout(
         panelController: panelController,
@@ -204,6 +206,13 @@ class _Body extends StatelessWidget {
               SizedBox(height: contentSpacing),
               JugadoresCard(panelController: panelController),
               SizedBox(height: betweenCardGap),
+              if (partida.esSinMaxPuntuacion) ...[
+                _EndGameButton(
+                  label: l10n.endGame,
+                  onTap: () => _confirmEndGame(context, partida),
+                ),
+                SizedBox(height: adSpacing),
+              ],
               // Anuncio separado de la lista de jugadores
               KeyedSubtree(
                 key: ValueKey('partida_ad_${partida.id ?? 'none'}'),
@@ -211,6 +220,94 @@ class _Body extends StatelessWidget {
               ),
               SizedBox(height: adSpacing),
             ])));
+  }
+
+  void _confirmEndGame(BuildContext context, Partida partida) {
+    final l10n = AppLocalizations.of(context)!;
+    final ganador = partida.getGanadorOrPerdedor(tipo: Estado.ganador);
+    final partidaNombre = partida.nombre ?? l10n.noName;
+    CustomAlertDialog.show(
+      context,
+      title: l10n.confirm,
+      menssage: l10n.confirmEndGame(partidaNombre),
+      dialogType: DialogType.warning,
+      buttonsList: [
+        CustomActionsButtons.cancelButton({
+          'label': l10n.cancel,
+          'onTap': () => Navigator.pop(context),
+        }),
+        CustomActionsButtons.aceptarButton({
+          'label': l10n.endGame,
+          'onTap': () {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                settings: RouteSettings(arguments: {
+                  'partida': partidaNombre,
+                  'jugador': ganador['nombre'],
+                }),
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const GanadorScreen(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) =>
+                        FadeTransition(opacity: animation, child: child),
+                transitionDuration: const Duration(milliseconds: 400),
+              ),
+            );
+          },
+        }),
+      ],
+    );
+  }
+}
+
+class _EndGameButton extends StatelessWidget {
+  const _EndGameButton({required this.label, required this.onTap});
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.orange[600]!, Colors.red[400]!],
+            ),
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.red.withValues(alpha: 0.25),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.flag_rounded, color: Colors.white, size: 18),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: ResponsiveApp.scaleText(13),
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 

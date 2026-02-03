@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +22,7 @@ class PartidasDefaultAlert extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
+    final l10n = AppLocalizations.of(context)!;
     final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
     formPartidaPredefinidaProvider.getPartidasPredefinidas();
 
@@ -55,7 +58,7 @@ class PartidasDefaultAlert extends StatelessWidget {
                     child: const PartidasScrollView(),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
 
                 // Botón cerrar
                 Consumer<ReorderableProvider>(
@@ -327,6 +330,7 @@ class PartidasScrollView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.watch<PartidaPredefinidaProvider>();
+    final l10n = AppLocalizations.of(context)!;
 
     return FutureBuilder<List<Widget>>(
       future: getPartidas(context, formPartidaPredefinidaProvider),
@@ -391,30 +395,55 @@ class PartidasScrollView extends StatelessWidget {
                 const double padding = 10;
                 final double itemWidth = (constraints.maxWidth - (padding * 2) - (spacing * 2)) / 3;
 
-                return SingleChildScrollView(
-                  physics: const ClampingScrollPhysics(),
-                  padding: const EdgeInsets.all(padding),
-                  child: ReorderableWrap(
-                      enableReorder: reorderableProvider.isReording,
-                      needsLongPressDraggable: false,
-                      runSpacing: 15,
-                      spacing: spacing,
-                      maxMainAxisCount: 3,
-                      scrollPhysics: const ClampingScrollPhysics(),
-                      onReorder: (oldIndex, newIndex) {
-                        reorderableProvider.onReorder(oldIndex: oldIndex, newIndex: newIndex, reordenableList: snapshot.data);
-                        reordenarDataBase();
-                      },
-                      onNoReorder: (index) => reordenarDataBase(),
-                      children: snapshot.data!.map<Widget>((widget) {
-                        if (widget is ReordenableItem) {
-                          return ReordenableItem(
-                            partidaPredefinida: widget.partidaPredefinida,
-                            itemWidth: itemWidth,
-                          );
-                        }
-                        return widget;
-                      }).toList()),
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 4),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const FaIcon(
+                          FontAwesomeIcons.circleInfo,
+                          size: 12,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            l10n.predefinedEditHint,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 3),
+                    SingleChildScrollView(
+                      physics: const ClampingScrollPhysics(),
+                      padding: const EdgeInsets.all(padding),
+                      child: ReorderableWrap(
+                          enableReorder: reorderableProvider.isReording,
+                          needsLongPressDraggable: false,
+                          runSpacing: 15,
+                          spacing: spacing,
+                          maxMainAxisCount: 3,
+                          scrollPhysics: const ClampingScrollPhysics(),
+                          onReorder: (oldIndex, newIndex) {
+                            reorderableProvider.onReorder(oldIndex: oldIndex, newIndex: newIndex, reordenableList: snapshot.data);
+                            reordenarDataBase();
+                          },
+                          onNoReorder: (index) => reordenarDataBase(),
+                          children: snapshot.data!.map<Widget>((widget) {
+                            if (widget is ReordenableItem) {
+                              return ReordenableItem(
+                                partidaPredefinida: widget.partidaPredefinida,
+                                itemWidth: itemWidth,
+                              );
+                            }
+                            return widget;
+                          }).toList()),
+                    ),
+                  ],
                 );
               },
             );
@@ -442,6 +471,7 @@ class ReordenableItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer(builder: (BuildContext context, value, Widget? child) {
       final ReorderableProvider reorderableProvider = context.watch<ReorderableProvider>();
+      final l10n = AppLocalizations.of(context)!;
 
       return ShakeWidget(
         shakeConstant: ShakeRotateConstant1(),
@@ -538,6 +568,53 @@ class ReordenableItem extends StatelessWidget {
                 ),
               ),
             ),
+            if (reorderableProvider.isReording)
+              Positioned.fill(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: Stack(
+                    children: [
+                      BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                        child: Container(
+                          color: Colors.black.withValues(alpha: 0.25),
+                        ),
+                      ),
+                      Center(
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () => patchFormPartida(context: context, partida: partidaPredefinida),
+                            borderRadius: BorderRadius.circular(20),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: const BoxDecoration(
+                                color: Colors.transparent,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const FaIcon(FontAwesomeIcons.penToSquare, size: 12, color: Colors.white),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    l10n.edit,
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontSize: ResponsiveApp.scaleText(12),
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             // Botón eliminar
             if (reorderableProvider.isReording)
               Positioned(

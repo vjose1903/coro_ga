@@ -31,6 +31,9 @@ class Partida extends DynamicClass {
   DateTime? createdAt;
   int? maxPuntuacion;
 
+  bool get tieneMaxPuntuacion => (maxPuntuacion ?? 0) > 0;
+  bool get esSinMaxPuntuacion => !tieneMaxPuntuacion;
+
   get cantJugadores {
     if (jugadores == null) return 0;
 

@@ -111,6 +111,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get maxScore => 'Max score';
 
   @override
+  String get noMaxScore => 'No max score';
+
+  @override
+  String get noMaxRounds => 'No round limit';
+
+  @override
   String get players => 'Players';
 
   @override
@@ -133,6 +139,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dragToReorder => 'Drag to reorder';
+
+  @override
+  String get predefinedEditHint => 'Press and hold to reorder or delete.';
 
   @override
   String get tapToSelect => 'Tap to select';
@@ -174,6 +183,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String confirmDeleteScore(int score, String player) {
     return 'Are you sure you want to delete score $score from player $player?';
+  }
+
+  @override
+  String get endGame => 'End game';
+
+  @override
+  String confirmEndGame(String name) {
+    return 'Are you sure you want to end the game: $name?';
   }
 
   @override

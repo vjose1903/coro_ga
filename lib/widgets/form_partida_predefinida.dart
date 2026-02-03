@@ -21,6 +21,7 @@ class FormPartidaPredefinida extends StatelessWidget {
     final form = formPartidaPredefinidaProvider.form;
     final dynamic tipoPartida = form.control('tipo').value;
     final bool isEditing = formPartidaPredefinidaProvider.partidaPredefinidaEditar != null;
+    final bool sinMaxPuntuacion = formPartidaPredefinidaProvider.sinMaxPuntuacion;
 
     return Consumer(builder: (BuildContext context, value, Widget? child) {
       return Padding(
@@ -50,26 +51,82 @@ class FormPartidaPredefinida extends StatelessWidget {
                     // Tipo y puntuación máxima
                     Row(
                       children: [
-                        Expanded(
-                          child: CustomReactiveDropDown(
-                            formControlName: 'tipo',
-                            labelText: AppLocalizations.of(context)!.type,
-                            items: [DropdownMenuItem(value: 'Rondas', child: Text(AppLocalizations.of(context)!.rounds)), DropdownMenuItem(value: 'Puntuación', child: Text(AppLocalizations.of(context)!.score))],
-                            onChanged: (value) => formPartidaPredefinidaProvider.changeTipo(value),
-                          ),
+                      Expanded(
+                        child: CustomReactiveDropDown(
+                          formControlName: 'tipo',
+                          labelText: AppLocalizations.of(context)!.type,
+                          items: [DropdownMenuItem(value: 'Rondas', child: Text(AppLocalizations.of(context)!.rounds)), DropdownMenuItem(value: 'Puntuación', child: Text(AppLocalizations.of(context)!.score))],
+                          onChanged: (value) => formPartidaPredefinidaProvider.changeTipo(value),
                         ),
-                        if (tipoPartida != '' && tipoPartida != null) ...[
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: CustomReactiveInput(
-                              formControlName: 'maxPuntuacion',
-                              labelText: tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScore,
-                              inputType: TextInputType.number,
+                      ),
+                      if (tipoPartida != null && tipoPartida != '' && !sinMaxPuntuacion) const SizedBox(width: 12),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeOut,
+                        width: tipoPartida == '' || tipoPartida == null || sinMaxPuntuacion ? 0 : ResponsiveApp.size.width * 0.43,
+                        child: ClipRect(
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: SizedBox(
+                              width: ResponsiveApp.size.width * 0.43,
+                              child: CustomReactiveInput(formControlName: 'maxPuntuacion', labelText: tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScore, inputType: TextInputType.number),
                             ),
                           ),
-                        ],
-                      ],
+                        ),
+                      ),
+                    ],
                     ),
+                    const SizedBox(height: 14),
+
+                    if (tipoPartida != '' && tipoPartida != null)
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          splashColor: AppThemes.colorPrimero.withValues(alpha: 0.12),
+                          highlightColor: AppThemes.colorPrimero.withValues(alpha: 0.06),
+                          onTap: () => formPartidaPredefinidaProvider.setSinMaxPuntuacion(!sinMaxPuntuacion),
+                          child: Ink(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: AppThemes.inputColor.withValues(alpha: 0.05),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.2),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Preferences.isDarkMode ? Colors.black.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.05),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.noMaxRounds : AppLocalizations.of(context)!.noMaxScore,
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontSize: ResponsiveApp.scaleText(12),
+                                      color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[700],
+                                    ),
+                                  ),
+                                ),
+                                Switch(
+                                  value: sinMaxPuntuacion,
+                                  activeThumbColor: AppThemes.colorPrimero,
+                                  activeTrackColor: AppThemes.colorPrimero.withValues(alpha: 0.35),
+                                  inactiveThumbColor: Preferences.isDarkMode ? Colors.white70 : Colors.grey[600],
+                                  inactiveTrackColor: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.3),
+                                  onChanged: (value) => formPartidaPredefinidaProvider.setSinMaxPuntuacion(value),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     const SizedBox(height: 20),
 
                     // Cantidad de jugadores

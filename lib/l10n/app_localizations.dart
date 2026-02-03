@@ -290,6 +290,18 @@ abstract class AppLocalizations {
   /// **'Max score'**
   String get maxScore;
 
+  /// No description provided for @noMaxScore.
+  ///
+  /// In en, this message translates to:
+  /// **'No max score'**
+  String get noMaxScore;
+
+  /// No description provided for @noMaxRounds.
+  ///
+  /// In en, this message translates to:
+  /// **'No round limit'**
+  String get noMaxRounds;
+
   /// No description provided for @players.
   ///
   /// In en, this message translates to:
@@ -337,6 +349,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Drag to reorder'**
   String get dragToReorder;
+
+  /// No description provided for @predefinedEditHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Press and hold to reorder or delete.'**
+  String get predefinedEditHint;
 
   /// No description provided for @tapToSelect.
   ///
@@ -409,6 +427,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Are you sure you want to delete score {score} from player {player}?'**
   String confirmDeleteScore(int score, String player);
+
+  /// No description provided for @endGame.
+  ///
+  /// In en, this message translates to:
+  /// **'End game'**
+  String get endGame;
+
+  /// No description provided for @confirmEndGame.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to end the game: {name}?'**
+  String confirmEndGame(String name);
 
   /// No description provided for @playerScore.
   ///

@@ -9,6 +9,7 @@ import 'package:reactive_forms/reactive_forms.dart';
 class PartidaPredefinidaProvider extends ChangeNotifier {
   List<PartidaPredefinida> partidasPredefinidas = [];
   PartidaPredefinida? partidaPredefinidaEditar;
+  bool sinMaxPuntuacion = false;
 
   FormGroup form = fb.group({
     'nombre': ['', Validators.required],
@@ -25,6 +26,24 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
   }
 
   void changeTipo(value) {
+    notifyListeners();
+  }
+
+  void setSinMaxPuntuacion(bool value) {
+    if (sinMaxPuntuacion == value) return;
+    sinMaxPuntuacion = value;
+    final control = form.control('maxPuntuacion');
+    if (sinMaxPuntuacion) {
+      control.setValidators([]);
+      control.value = null;
+    } else {
+      control.setValidators([Validators.min(1)]);
+      final current = control.value;
+      if (current == null || current == '' || current == 0 || current == '0') {
+        control.value = 1;
+      }
+    }
+    control.updateValueAndValidity();
     notifyListeners();
   }
 
@@ -48,14 +67,17 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
   rellenarFormulario(PartidaPredefinida partida) {
     form.patchValue(partida.toMap());
     partidaPredefinidaEditar = partida;
+    _syncSinMaxWithValue();
     notifyListeners();
   }
 
   resetForm() async {
     form.reset();
     form.control('maxPuntuacion').value = 1;
+    form.control('maxPuntuacion').setValidators([Validators.min(1)]);
     form.control('cantidadJugadores').value = 2;
     partidaPredefinidaEditar = null;
+    sinMaxPuntuacion = false;
     notifyListeners();
 
     return Future.delayed(const Duration(milliseconds: 10));
@@ -120,5 +142,18 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
       Toast.show(type: ToastType.error, context: context, message: response.messages!.first);
       return response;
     }
+  }
+
+  void _syncSinMaxWithValue() {
+    final control = form.control('maxPuntuacion');
+    final value = control.value;
+    final bool isSinMax = value == null || value == 0 || value == '0';
+    sinMaxPuntuacion = isSinMax;
+    if (isSinMax) {
+      control.setValidators([]);
+    } else {
+      control.setValidators([Validators.min(1)]);
+    }
+    control.updateValueAndValidity();
   }
 }

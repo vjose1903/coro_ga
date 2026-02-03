@@ -54,6 +54,8 @@
   "score": "Score",
   "roundCount": "Round count",
   "maxScore": "Max score",
+  "noMaxScore": "No max score",
+  "noMaxRounds": "No round limit",
   "players": "Players",
   "createGame": "Create Game",
   "errorRegisteringGame": "Error registering game.",
@@ -63,6 +65,7 @@
   
   "predefinedGames": "Predefined Games",
   "dragToReorder": "Drag to reorder",
+  "predefinedEditHint": "Press and hold to reorder or delete.",
   "tapToSelect": "Tap to select",
   "done": "Done",
   "close": "Close",
@@ -90,6 +93,13 @@
     "placeholders": {
       "score": {"type": "int"},
       "player": {"type": "String"}
+    }
+  },
+  "endGame": "End game",
+  "confirmEndGame": "Are you sure you want to end the game: {name}?",
+  "@confirmEndGame": {
+    "placeholders": {
+      "name": {"type": "String"}
     }
   },
   

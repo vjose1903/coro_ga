@@ -12,9 +12,12 @@ class FormPartidaProvider extends ChangeNotifier {
     'jugadores': fb.array([])
   });
 
+  bool sinMaxPuntuacion = false;
+
   void rellenarFormulario(PartidaPredefinida partidaPredefinida, {BuildContext? context}) async {
     await resetForm(restoreJugadores: false);
     form.patchValue(partidaPredefinida.toMap());
+    _syncSinMaxWithValue();
 
     for (var index = 0; index < partidaPredefinida.cantidadJugadores!; index++) {
       final String playerName = context != null 
@@ -27,6 +30,26 @@ class FormPartidaProvider extends ChangeNotifier {
   }
 
   void changeTipo(value) {
+    notifyListeners();
+  }
+
+  void setSinMaxPuntuacion(bool value) {
+    if (sinMaxPuntuacion == value) return;
+    sinMaxPuntuacion = value;
+    final control = form.control('maxPuntuacion');
+
+    if (sinMaxPuntuacion) {
+      control.setValidators([]);
+      control.value = null;
+    } else {
+      control.setValidators([Validators.min(1)]);
+      final current = control.value;
+      if (current == null || current == '' || current == 0 || current == '0') {
+        control.value = 1;
+      }
+    }
+
+    control.updateValueAndValidity();
     notifyListeners();
   }
 
@@ -49,6 +72,9 @@ class FormPartidaProvider extends ChangeNotifier {
     }
 
     form.control('activo').value = 'true';
+    form.control('maxPuntuacion').setValidators([Validators.min(1)]);
+    form.control('maxPuntuacion').value = 1;
+    sinMaxPuntuacion = false;
     notifyListeners();
     // return Future.delayed(const Duration(milliseconds: 10));
   }
@@ -83,5 +109,18 @@ class FormPartidaProvider extends ChangeNotifier {
       }));
     }
     return jugadoresForm;
+  }
+
+  void _syncSinMaxWithValue() {
+    final control = form.control('maxPuntuacion');
+    final value = control.value;
+    final bool isSinMax = value == null || value == 0 || value == '0';
+    sinMaxPuntuacion = isSinMax;
+    if (isSinMax) {
+      control.setValidators([]);
+    } else {
+      control.setValidators([Validators.min(1)]);
+    }
+    control.updateValueAndValidity();
   }
 }

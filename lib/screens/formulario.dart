@@ -26,8 +26,7 @@ class _FormularioScreenState extends State<FormularioScreen> {
     super.initState();
 
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      if (Preferences.isFirstTimeOpen)
-        context.read<PartidaPredefinidaProvider>().seed();
+      if (Preferences.isFirstTimeOpen) context.read<PartidaPredefinidaProvider>().seed();
 
       openDefaultsPartidasDialog(context);
     });
@@ -35,8 +34,7 @@ class _FormularioScreenState extends State<FormularioScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final GoogleAdsProvider googleAdsProvider =
-        context.read<GoogleAdsProvider>();
+    final GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
 
     googleAdsProvider.loadInterstitialAd();
 
@@ -57,8 +55,7 @@ class _FormularioScreenState extends State<FormularioScreen> {
               Navigator.pop(context, 'home');
             },
           ),
-          bodyContent: SingleChildScrollView(
-              physics: const ClampingScrollPhysics(), child: _Body()),
+          bodyContent: SingleChildScrollView(physics: const ClampingScrollPhysics(), child: _Body()),
         ),
       ),
     );
@@ -66,8 +63,7 @@ class _FormularioScreenState extends State<FormularioScreen> {
 }
 
 openDefaultsPartidasDialog(BuildContext context) {
-  final PartidaPredefinidaProvider formPartidaPredefinidaProvider =
-      context.read<PartidaPredefinidaProvider>();
+  final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
   formPartidaPredefinidaProvider.resetForm();
 
   FluidAlerts.show(context,
@@ -86,17 +82,15 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (BuildContext context, value, Widget? child) {
-      final FormPartidaProvider formPartidaProvider =
-          context.watch<FormPartidaProvider>();
+      final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
       final form = formPartidaProvider.form;
       final isDark = Preferences.isDarkMode;
+      final bool sinMaxPuntuacion = formPartidaProvider.sinMaxPuntuacion;
 
       final dynamic tipoPartida = form.control('tipo').value;
 
       return Container(
-          height: ((ResponsiveApp.size.height -
-                  (ResponsiveApp.size.height * 0.125)) -
-              80),
+          height: ((ResponsiveApp.size.height - (ResponsiveApp.size.height * 0.125)) - 80),
           margin: ResponsiveApp.only(top: 15, bottom: 40),
           padding: ResponsiveApp.symmetric(horizontal: 20),
           child: ReactiveForm(
@@ -115,10 +109,7 @@ class _Body extends StatelessWidget {
                   const SizedBox(height: 14),
 
                   // Nombre de la partida
-                  CustomReactiveInput(
-                      formControlName: 'nombre',
-                      labelText: AppLocalizations.of(context)!.gameName,
-                      textCapitalization: TextCapitalization.words),
+                  CustomReactiveInput(formControlName: 'nombre', labelText: AppLocalizations.of(context)!.gameName, textCapitalization: TextCapitalization.words),
                   const SizedBox(height: 14),
 
                   // Tipo y puntuación
@@ -129,41 +120,78 @@ class _Body extends StatelessWidget {
                         child: CustomReactiveDropDown(
                           formControlName: 'tipo',
                           labelText: AppLocalizations.of(context)!.type,
-                          items: [
-                            DropdownMenuItem(
-                                value: 'Rondas',
-                                child:
-                                    Text(AppLocalizations.of(context)!.rounds)),
-                            DropdownMenuItem(
-                                value: 'Puntuación',
-                                child:
-                                    Text(AppLocalizations.of(context)!.score))
-                          ],
-                          onChanged: (value) =>
-                              formPartidaProvider.changeTipo(value),
+                          items: [DropdownMenuItem(value: 'Rondas', child: Text(AppLocalizations.of(context)!.rounds)), DropdownMenuItem(value: 'Puntuación', child: Text(AppLocalizations.of(context)!.score))],
+                          onChanged: (value) => formPartidaProvider.changeTipo(value),
                         ),
                       ),
-                      if (tipoPartida != null && tipoPartida != '')
-                        const SizedBox(width: 12),
-                      AnimatedSize(
+                      if (tipoPartida != null && tipoPartida != '' && !sinMaxPuntuacion) const SizedBox(width: 12),
+                      AnimatedContainer(
                         duration: const Duration(milliseconds: 500),
                         curve: Curves.easeOut,
-                        child: tipoPartida == '' || tipoPartida == null
-                            ? const SizedBox.shrink()
-                            : SizedBox(
-                                width: ResponsiveApp.size.width * 0.43,
-                                child: CustomReactiveInput(
-                                    formControlName: 'maxPuntuacion',
-                                    labelText: tipoPartida == 'Rondas'
-                                        ? AppLocalizations.of(context)!
-                                            .roundCount
-                                        : AppLocalizations.of(context)!
-                                            .maxScore,
-                                    inputType: TextInputType.number),
-                              ),
+                        width: tipoPartida == '' || tipoPartida == null || sinMaxPuntuacion ? 0 : ResponsiveApp.size.width * 0.43,
+                        child: ClipRect(
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: SizedBox(
+                              width: ResponsiveApp.size.width * 0.43,
+                              child: CustomReactiveInput(formControlName: 'maxPuntuacion', labelText: tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScore, inputType: TextInputType.number),
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
+                  const SizedBox(height: 14),
+
+                  if (tipoPartida != null && tipoPartida != '')
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        splashColor: AppThemes.colorPrimero.withValues(alpha: 0.12),
+                        highlightColor: AppThemes.colorPrimero.withValues(alpha: 0.06),
+                        onTap: () => formPartidaProvider.setSinMaxPuntuacion(!sinMaxPuntuacion),
+                        child: Ink(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: AppThemes.inputColor.withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.2),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: isDark ? Colors.black.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.noMaxRounds : AppLocalizations.of(context)!.noMaxScore,
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    fontSize: ResponsiveApp.scaleText(12),
+                                    color: isDark ? Colors.white70 : Colors.grey[700],
+                                  ),
+                                ),
+                              ),
+                              Switch(
+                                value: sinMaxPuntuacion,
+                                activeColor: AppThemes.colorPrimero,
+                                activeTrackColor: AppThemes.colorPrimero.withValues(alpha: 0.35),
+                                inactiveThumbColor: isDark ? Colors.white70 : Colors.grey[600],
+                                inactiveTrackColor: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.3),
+                                onChanged: (value) => formPartidaProvider.setSinMaxPuntuacion(value),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   const SizedBox(height: 20),
 
                   // Sección Jugadores
@@ -178,16 +206,12 @@ class _Body extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: isDark
-                                ? Colors.white.withValues(alpha: 0.04)
-                                : Colors.white.withValues(alpha: 0.7),
+                            color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.white.withValues(alpha: 0.7),
                             offset: const Offset(-2, -2),
                             blurRadius: 4,
                           ),
                           BoxShadow(
-                            color: isDark
-                                ? Colors.black.withValues(alpha: 0.3)
-                                : Colors.black.withValues(alpha: 0.08),
+                            color: isDark ? Colors.black.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.08),
                             offset: const Offset(2, 2),
                             blurRadius: 4,
                           ),
@@ -200,8 +224,7 @@ class _Body extends StatelessWidget {
 
                   // Botón Crear
                   _CreateButton(
-                    onTap: () =>
-                        _crearPartida(context, form, formPartidaProvider),
+                    onTap: () => _crearPartida(context, form, formPartidaProvider),
                   ),
                 ],
               ),
@@ -210,14 +233,12 @@ class _Body extends StatelessWidget {
     });
   }
 
-  void _crearPartida(BuildContext context, FormGroup form,
-      FormPartidaProvider formPartidaProvider) async {
+  void _crearPartida(BuildContext context, FormGroup form, FormPartidaProvider formPartidaProvider) async {
     form.markAllAsTouched();
 
     if (form.valid) {
       final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-      final GoogleAdsProvider googleAdsProvider =
-          context.read<GoogleAdsProvider>();
+      final GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
 
       MyLoading.show();
       final Partida partida = Partida.fromMap(form.value);
@@ -235,16 +256,10 @@ class _Body extends StatelessWidget {
         Navigator.pop(context);
         nav.showPartida();
       } else {
-        Toast.show(
-            type: ToastType.error,
-            context: context,
-            message: AppLocalizations.of(context)!.errorRegisteringGame);
+        Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.errorRegisteringGame);
       }
     } else {
-      Toast.show(
-          type: ToastType.warning,
-          context: context,
-          message: AppLocalizations.of(context)!.checkAllFields);
+      Toast.show(type: ToastType.warning, context: context, message: AppLocalizations.of(context)!.checkAllFields);
     }
   }
 }
@@ -314,8 +329,7 @@ class _JugadoresSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FormPartidaProvider formPartidaProvider =
-        context.watch<FormPartidaProvider>();
+    final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
     final isDark = Preferences.isDarkMode;
 
     return Row(
@@ -328,10 +342,7 @@ class _JugadoresSection extends StatelessWidget {
               height: 32,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    AppThemes.colorPrimero,
-                    AppThemes.colorPrimero.withValues(alpha: 0.7)
-                  ],
+                  colors: [AppThemes.colorPrimero, AppThemes.colorPrimero.withValues(alpha: 0.7)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -382,18 +393,12 @@ class _JugadoresSection extends StatelessWidget {
     );
   }
 
-  void _addJugador(
-      BuildContext context, FormPartidaProvider formPartidaProvider) {
+  void _addJugador(BuildContext context, FormPartidaProvider formPartidaProvider) {
     final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
     if (!premiumProvider.canAddPlayer(formPartidaProvider.jugadores.length)) {
       final l10n = AppLocalizations.of(context)!;
-      Toast.show(
-          type: ToastType.info,
-          context: context,
-          message: l10n.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
-          actionLabel: l10n.getPro,
-          onAction: () => Navigator.pushNamed(context, 'premium'));
+      Toast.show(type: ToastType.info, context: context, message: l10n.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers), actionLabel: l10n.getPro, onAction: () => Navigator.pushNamed(context, 'premium'));
       return;
     }
 
@@ -402,19 +407,13 @@ class _JugadoresSection extends StatelessWidget {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (jugadoresController.hasClients) {
-        jugadoresController.animateTo(
-            jugadoresController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 800),
-            curve: Curves.easeOutCubic);
+        jugadoresController.animateTo(jugadoresController.position.maxScrollExtent, duration: const Duration(milliseconds: 800), curve: Curves.easeOutCubic);
       }
     });
 
     if (formPartidaProvider.jugadores.length == 20) {
       final l10n = AppLocalizations.of(context)!;
-      Toast.show(
-          type: ToastType.info,
-          context: context,
-          message: l10n.maxPlayersReached);
+      Toast.show(type: ToastType.info, context: context, message: l10n.maxPlayersReached);
     }
   }
 }
@@ -491,8 +490,7 @@ class _CreateButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const FaIcon(FontAwesomeIcons.plus,
-                  size: 16, color: Colors.white),
+              const FaIcon(FontAwesomeIcons.plus, size: 16, color: Colors.white),
               const SizedBox(width: 10),
               Text(
                 AppLocalizations.of(context)!.createGame,
@@ -517,18 +515,13 @@ class _Inputs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final jugadoresLength = context.select<FormPartidaProvider, int>(
-        (provider) => provider.jugadores.length);
+    final jugadoresLength = context.select<FormPartidaProvider, int>((provider) => provider.jugadores.length);
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
     return ListView.separated(
       controller: jugadoresController,
       physics: const ClampingScrollPhysics(),
-      padding: EdgeInsets.only(
-          top: 12,
-          left: 12,
-          right: 12,
-          bottom: (ResponsiveApp.isSmallHeight ? 0 : 12) + keyboardHeight),
+      padding: EdgeInsets.only(top: 12, left: 12, right: 12, bottom: (ResponsiveApp.isSmallHeight ? 0 : 12) + keyboardHeight),
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemCount: jugadoresLength,
       itemBuilder: (_, index) => _JugadorInput(
@@ -555,8 +548,7 @@ class _JugadorInput extends StatefulWidget {
   State<_JugadorInput> createState() => _JugadorInputState();
 }
 
-class _JugadorInputState extends State<_JugadorInput>
-    with AutomaticKeepAliveClientMixin {
+class _JugadorInputState extends State<_JugadorInput> with AutomaticKeepAliveClientMixin {
   late final TextEditingController _controller;
   late final FormPartidaProvider _provider;
   late final FocusNode _focusNode;
@@ -567,8 +559,7 @@ class _JugadorInputState extends State<_JugadorInput>
 
   FormControl<String> get _formControl {
     final array = _provider.form.control('jugadores') as FormArray;
-    return (array.controls[widget.index] as FormGroup).control('nombre')
-        as FormControl<String>;
+    return (array.controls[widget.index] as FormGroup).control('nombre') as FormControl<String>;
   }
 
   void _syncToForm() {
@@ -580,11 +571,8 @@ class _JugadorInputState extends State<_JugadorInput>
   void _onFocusChange() {
     if (_focusNode.hasFocus && _inputKey.currentContext != null) {
       Future.delayed(const Duration(milliseconds: 400), () {
-        if (mounted &&
-            _inputKey.currentContext != null &&
-            widget.scrollController.hasClients) {
-          final RenderBox? renderBox =
-              _inputKey.currentContext?.findRenderObject() as RenderBox?;
+        if (mounted && _inputKey.currentContext != null && widget.scrollController.hasClients) {
+          final RenderBox? renderBox = _inputKey.currentContext?.findRenderObject() as RenderBox?;
           if (renderBox != null) {
             final position = renderBox.localToGlobal(Offset.zero);
             final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
@@ -593,12 +581,9 @@ class _JugadorInputState extends State<_JugadorInput>
             final visibleBottom = screenHeight - keyboardHeight;
 
             if (itemBottom > visibleBottom - 50) {
-              final scrollOffset = widget.scrollController.offset +
-                  (itemBottom - visibleBottom) +
-                  80;
+              final scrollOffset = widget.scrollController.offset + (itemBottom - visibleBottom) + 80;
               widget.scrollController.animateTo(
-                scrollOffset.clamp(
-                    0, widget.scrollController.position.maxScrollExtent),
+                scrollOffset.clamp(0, widget.scrollController.position.maxScrollExtent),
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeOut,
               );
@@ -670,8 +655,7 @@ class _JugadorInputState extends State<_JugadorInput>
             controller: _controller,
             focusNode: _focusNode,
             textCapitalization: TextCapitalization.words,
-            textInputAction:
-                widget.isLast ? TextInputAction.done : TextInputAction.next,
+            textInputAction: widget.isLast ? TextInputAction.done : TextInputAction.next,
             style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: ResponsiveApp.scaleText(14),
@@ -721,8 +705,7 @@ class _JugadorInputState extends State<_JugadorInput>
                   ],
                 ),
                 child: const Center(
-                  child: FaIcon(FontAwesomeIcons.minus,
-                      size: 12, color: Colors.white),
+                  child: FaIcon(FontAwesomeIcons.minus, size: 12, color: Colors.white),
                 ),
               ),
             ),

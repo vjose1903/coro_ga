@@ -186,7 +186,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                           newScore: newPuntuacion,
                           maxScore: maxScore,
                         );
-                        if (newPuntuacion >= maxScore) {
+                        if (maxScore > 0 && newPuntuacion >= maxScore) {
                           Navigator.push(
                               context,
                               PageRouteBuilder(

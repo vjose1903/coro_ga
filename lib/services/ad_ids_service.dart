@@ -19,11 +19,14 @@ class AdIdsService {
   static int _retryCount = 0;
   static DateTime? _lastRetryLogAt;
   static const Duration _logCooldown = Duration(minutes: 4);
-  static const Duration _baseRetryDelay = Duration(seconds: 10);
-  static const Duration _maxRetryDelay = Duration(minutes: 2);
+  static const Duration _baseRetryDelay = Duration(seconds: 3);
+  static const Duration _maxRetryDelay = Duration(minutes: 1);
 
   static Stream<void> get idsUpdatedStream => _idsUpdatedController.stream;
   static bool get isReady => _isReady;
+
+  static bool _isInitialized = false;
+  static bool get isInitialized => _isInitialized;
 
   static const Map<String, String> _defaultAndroidIds = {
     'AD_BANNER_HOME': '',
@@ -54,7 +57,7 @@ class AdIdsService {
     FirebaseCrashlytics.instance.log('AdIdsService.initialize: start');
 
     await remoteConfig.setConfigSettings(RemoteConfigSettings(
-      fetchTimeout: const Duration(seconds: 10),
+      fetchTimeout: const Duration(seconds: 4),
       minimumFetchInterval: const Duration(hours: 1),
     ));
 
@@ -78,6 +81,7 @@ class AdIdsService {
     _isReady = _allIdsPresent(ids);
     _cacheIds(ids);
     _logStatus(ids: ids, parsed: parsed, cachedIds: cachedIds);
+    _isInitialized = true;
     _idsUpdatedController.add(null);
     _isInitializing = false;
     if (!_isReady) {

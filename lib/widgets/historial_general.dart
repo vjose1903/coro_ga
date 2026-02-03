@@ -242,7 +242,9 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
             transitionDuration: const Duration(milliseconds: 400),
           ),
         );
-      } else if (puntuacionActual < (maxScore / 2) && newPuntuacion >= (maxScore / 2)) {
+      } else if (maxScore > 0 &&
+          puntuacionActual < (maxScore / 2) &&
+          newPuntuacion >= (maxScore / 2)) {
         final premiumProvider = context.read<PremiumProvider>();
         if (!premiumProvider.isPremium) {
           final googleAdsProvider = context.read<GoogleAdsProvider>();

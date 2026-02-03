@@ -30,8 +30,8 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
   DateTime? _lastLogAt;
   DateTime? _lastRetryLogAt;
   StreamSubscription<void>? _idsUpdatedSub;
-  static const Duration _baseRetryDelay = Duration(seconds: 8);
-  static const Duration _maxRetryDelay = Duration(seconds: 60);
+  static const Duration _baseRetryDelay = Duration(seconds: 2);
+  static const Duration _maxRetryDelay = Duration(seconds: 30);
   static const Duration _logCooldown = Duration(minutes: 4);
 
   @override
@@ -44,6 +44,9 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
       if (!mounted || _bannerAd != null) return;
       _loadBanner();
     });
+
+    // Intentar cargar inmediatamente si ya estamos listos,
+    // o si no, esperamos al stream pero verificamos post frame por seguridad.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadBanner();
     });
@@ -73,20 +76,30 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
   void _loadBanner() {
     if (Preferences.isPremium) return;
     if (_isLoading || !mounted) return;
-    _disposeBanner();
-    _isLoading = true;
+
+    // Si ya tenemos un banner, no cargamos otro sobre él
+    if (_bannerAd != null) return;
+
     final adUnitId = AdHelper.getBannerAdUnitId(widget.location);
     if (adUnitId.isEmpty) {
-      _isLoading = false;
+      // Si el servicio no está listo, esperamos el evento del stream.
+      // No programamos reintento todavía para no hacer polling innecesario.
+      if (!AdIdsService.isInitialized) {
+        _logThrottled('GoogleBannerAd: Waiting for AdIdsService...');
+        return;
+      }
+
+      // Si el servicio ESTÁ listo pero el ID es vacío, es un error de configuración.
+      // Reintentamos por si acaso se actualiza la config remota.
       _logThrottled(
-        'GoogleBannerAd: empty adUnitId for ${widget.location}',
-      );
-      FirebaseCrashlytics.instance.log(
-        'GoogleBannerAd: empty adUnitId for ${widget.location}',
+        'GoogleBannerAd: empty adUnitId for ${widget.location} but Service is Ready',
       );
       _scheduleRetry();
       return;
     }
+
+    _disposeBanner();
+    _isLoading = true;
 
     BannerAd(
       adUnitId: adUnitId,
@@ -142,26 +155,51 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
 
   Duration _nextRetryDelay() {
     _retryCount = (_retryCount + 1).clamp(1, 10);
-    final multiplier = 1.7 * (_retryCount - 1);
+    // Crecimiento más suave: 2s, 4s, 6s...
+    final multiplier = 1.0 * (_retryCount - 1);
     final baseMs = _baseRetryDelay.inMilliseconds;
     var delayMs = (baseMs * (1 + multiplier)).round();
     if (delayMs > _maxRetryDelay.inMilliseconds) {
       delayMs = _maxRetryDelay.inMilliseconds;
     }
-    final jitterMs = DateTime.now().microsecondsSinceEpoch % 2000;
+    final jitterMs = DateTime.now().microsecondsSinceEpoch % 1000;
     return Duration(milliseconds: delayMs + jitterMs);
   }
 
   @override
   Widget build(BuildContext context) {
+    // Usamos watch para reconstruir cuando cambie el estado premium
     final premiumProvider = context.watch<PremiumProvider>();
+    final isPremium = premiumProvider.isPremium;
+
+    // Gestión reactiva del banner basada en el estado premium
+    if (isPremium) {
+      // Si nos volvimos premium y tenemos un banner cargado, hay que liberarlo
+      if (_bannerAd != null || _isLoading || _retryScheduled) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _disposeBanner();
+            _retryScheduled = false;
+            _isLoading = false;
+            _retryTimer?.cancel();
+            _retryCount = 0;
+            // Forzar rebuild para limpiar UI si es necesario (aunque el if de abajo ya lo oculta)
+            setState(() {});
+          }
+        });
+      }
+      return const SizedBox.shrink();
+    } else {
+      // Si NO somos premium y no tenemos banner ni estamos cargando, intentamos cargar
+      if (_bannerAd == null && !_isLoading && !_retryScheduled) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _loadBanner();
+        });
+      }
+    }
+
     final double width = _bannerAd?.size.width.toDouble() ?? 300;
     final double height = _bannerAd?.size.height.toDouble() ?? 50;
-
-    // No mostrar anuncios si es premium
-    if (premiumProvider.isPremium) {
-      return const SizedBox.shrink();
-    }
 
     return Container(
       width: width,

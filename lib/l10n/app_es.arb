@@ -54,6 +54,8 @@
   "score": "Puntuación",
   "roundCount": "Cant. rondas",
   "maxScore": "Punt. Máxima",
+  "noMaxScore": "Sin puntuación máxima",
+  "noMaxRounds": "Sin límite de rondas",
   "players": "Jugadores",
   "createGame": "Crear Partida",
   "errorRegisteringGame": "Error registrando partida.",
@@ -63,6 +65,7 @@
   
   "predefinedGames": "Partidas Predefinidas",
   "dragToReorder": "Arrastra para reordenar",
+  "predefinedEditHint": "Mantén presionado para reordenar o eliminar.",
   "tapToSelect": "Toca para seleccionar",
   "done": "Listo",
   "close": "Cerrar",
@@ -90,6 +93,13 @@
     "placeholders": {
       "score": {"type": "int"},
       "player": {"type": "String"}
+    }
+  },
+  "endGame": "Terminar partida",
+  "confirmEndGame": "¿Seguro que desea terminar la partida: {name}?",
+  "@confirmEndGame": {
+    "placeholders": {
+      "name": {"type": "String"}
     }
   },
   

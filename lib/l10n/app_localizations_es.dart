@@ -112,6 +112,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get maxScore => 'Punt. Máxima';
 
   @override
+  String get noMaxScore => 'Sin puntuación máxima';
+
+  @override
+  String get noMaxRounds => 'Sin límite de rondas';
+
+  @override
   String get players => 'Jugadores';
 
   @override
@@ -134,6 +140,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get dragToReorder => 'Arrastra para reordenar';
+
+  @override
+  String get predefinedEditHint =>
+      'Mantén presionado para reordenar o eliminar.';
 
   @override
   String get tapToSelect => 'Toca para seleccionar';
@@ -175,6 +185,14 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String confirmDeleteScore(int score, String player) {
     return '¿Seguro que desea eliminar la puntuación $score del jugador $player?';
+  }
+
+  @override
+  String get endGame => 'Terminar partida';
+
+  @override
+  String confirmEndGame(String name) {
+    return '¿Seguro que desea terminar la partida: $name?';
   }
 
   @override
