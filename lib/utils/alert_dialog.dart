@@ -3,30 +3,30 @@ import '../helpers/helpers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import '../providers/slide_up_provider.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 
 enum DialogType { error, success, warning, info, custom }
 
 class CustomActionsButtons {
-
-  factory CustomActionsButtons.cancelButton(Map<String, dynamic> json) =>
-      CustomActionsButtons(
+  factory CustomActionsButtons.cancelButton(Map<String, dynamic> json) => CustomActionsButtons(
         label: json["label"] ?? "Cancelar",
         onTap: json["onTap"] ?? () {},
         textColor: json["textColor"],
         isDestructive: true,
       );
 
-  factory CustomActionsButtons.aceptarButton(Map<String, dynamic> json) =>
-      CustomActionsButtons(
+  factory CustomActionsButtons.aceptarButton(Map<String, dynamic> json) => CustomActionsButtons(
         label: json["label"] ?? "Aceptar",
         onTap: json["onTap"] ?? () {},
         textColor: json["textColor"],
         isPrimary: true,
       );
   CustomActionsButtons({
-    required this.label, this.textColor,
+    required this.label,
+    this.textColor,
     this.onTap,
     this.isPrimary = false,
     this.isDestructive = false,
@@ -38,9 +38,7 @@ class CustomActionsButtons {
   final bool isPrimary;
   final bool isDestructive;
 
-  static Color? defaultTextColor = Preferences.isDarkMode
-      ? Colors.white.withValues(alpha: 0.7)
-      : Colors.blueGrey[600]!.withValues(alpha: 0.7);
+  static Color? defaultTextColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.7) : Colors.blueGrey[600]!.withValues(alpha: 0.7);
 }
 
 class CustomAlertDialog {
@@ -53,21 +51,9 @@ class CustomAlertDialog {
     List<CustomActionsButtons>? buttonsList,
   }) {
     if (Platform.isAndroid) {
-      displayDialogAndroid(
-          context: context,
-          menssage: menssage,
-          title: title,
-          dialogType: dialogType,
-          body: body,
-          buttonsList: buttonsList);
+      displayDialogAndroid(context: context, menssage: menssage, title: title, dialogType: dialogType, body: body, buttonsList: buttonsList);
     } else {
-      displayDialogIOs(
-          context: context,
-          menssage: menssage,
-          title: title,
-          dialogType: dialogType,
-          body: body,
-          buttonsList: buttonsList);
+      displayDialogIOs(context: context, menssage: menssage, title: title, dialogType: dialogType, body: body, buttonsList: buttonsList);
     }
   }
 
@@ -80,6 +66,9 @@ class CustomAlertDialog {
     DialogType? dialogType,
   }) {
     final isDark = Preferences.isDarkMode;
+    // Notificar apertura de diálogo
+    final slideUpProvider = context.read<SlideUpProvider>();
+    slideUpProvider.setDialogOpen(true);
 
     showDialog(
       barrierDismissible: buttonsList == null || buttonsList.isEmpty,
@@ -115,14 +104,16 @@ class CustomAlertDialog {
                   ),
                 ),
                 // Botones
-                if (buttonsList != null && buttonsList.isNotEmpty)
-                  _DialogActions(buttons: buttonsList),
+                if (buttonsList != null && buttonsList.isNotEmpty) _DialogActions(buttons: buttonsList),
               ],
             ),
           ),
         );
       },
-    );
+    ).then((_) {
+      // Notificar cierre de diálogo
+      slideUpProvider.setDialogOpen(false);
+    });
   }
 
   static void displayDialogIOs({
@@ -133,6 +124,10 @@ class CustomAlertDialog {
     List<CustomActionsButtons>? buttonsList,
     DialogType? dialogType,
   }) {
+    // Notificar apertura de diálogo
+    final slideUpProvider = context.read<SlideUpProvider>();
+    slideUpProvider.setDialogOpen(true);
+
     showCupertinoDialog(
       barrierDismissible: buttonsList == null || buttonsList.isEmpty,
       context: context,
@@ -170,7 +165,10 @@ class CustomAlertDialog {
           ),
         );
       },
-    );
+    ).then((_) {
+      // Notificar cierre de diálogo
+      slideUpProvider.setDialogOpen(false);
+    });
   }
 
   static Widget _getIconWidget(DialogType? type, {double size = 28}) {
@@ -214,8 +212,7 @@ class CustomAlertDialog {
     );
   }
 
-  static List<CupertinoDialogAction> _makeActionsButtonsIOS(
-      List<CustomActionsButtons>? buttons) {
+  static List<CupertinoDialogAction> _makeActionsButtonsIOS(List<CustomActionsButtons>? buttons) {
     if (buttons == null) return [];
 
     return buttons.map((button) {
@@ -245,7 +242,6 @@ class CustomAlertDialog {
 
 // Header del diálogo
 class _DialogHeader extends StatelessWidget {
-
   const _DialogHeader({required this.title, this.dialogType});
   final String title;
   final DialogType? dialogType;
@@ -258,9 +254,7 @@ class _DialogHeader extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.03)
-            : Colors.black.withValues(alpha: 0.02),
+        color: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.02),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
@@ -316,7 +310,6 @@ class _DialogHeader extends StatelessWidget {
 
 // Botones del diálogo
 class _DialogActions extends StatelessWidget {
-
   const _DialogActions({required this.buttons});
   final List<CustomActionsButtons> buttons;
 
@@ -348,7 +341,6 @@ class _DialogActions extends StatelessWidget {
 
 // Botón de acción individual
 class _ActionButton extends StatelessWidget {
-
   const _ActionButton({
     required this.label,
     this.isPrimary = false,
@@ -370,14 +362,10 @@ class _ActionButton extends StatelessWidget {
     } else if (isDestructive) {
       gradientColors = [const Color(0xFFEF5350), const Color(0xFFE53935)];
     } else {
-      gradientColors = isDark
-          ? [Colors.white.withValues(alpha: 0.1), Colors.white.withValues(alpha: 0.05)]
-          : [Colors.grey.withValues(alpha: 0.15), Colors.grey.withValues(alpha: 0.1)];
+      gradientColors = isDark ? [Colors.white.withValues(alpha: 0.1), Colors.white.withValues(alpha: 0.05)] : [Colors.grey.withValues(alpha: 0.15), Colors.grey.withValues(alpha: 0.1)];
     }
 
-    final textColor = (isPrimary || isDestructive)
-        ? Colors.white
-        : (isDark ? Colors.white70 : AppThemes.colorCuarto);
+    final textColor = (isPrimary || isDestructive) ? Colors.white : (isDark ? Colors.white70 : AppThemes.colorCuarto);
 
     return Material(
       color: Colors.transparent,

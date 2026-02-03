@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../helpers/helpers.dart';
 import '../providers/premium_provider.dart';
+import '../providers/slide_up_provider.dart';
 import '../services/ad_ids_service.dart';
 import '../shared_preferences/preferences.dart';
 
@@ -176,9 +177,22 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     final premiumProvider = context.watch<PremiumProvider>();
     final isPremium = premiumProvider.isPremium;
 
-    // Gestión reactiva del banner basada en el estado premium
-    if (isPremium) {
-      // Si nos volvimos premium y tenemos un banner cargado, hay que liberarlo
+    // Verificamos si hay un slide-up O un diálogo abierto que pueda estar tapando este anuncio
+    final slideUpProvider = context.watch<SlideUpProvider>();
+    // Identificamos si este banner pertenece a una pantalla de fondo (Home o Partida)
+    final bool isBackgroundLocation = widget.location == AdLocation.partida || widget.location == AdLocation.home;
+
+    // Lógica refinada de obstrucción:
+    // 1. Panel abierto obstruye SOLO a las ubicaciones de fondo.
+    final bool isObstructedByPanel = isBackgroundLocation && slideUpProvider.isPanelOpen;
+    // 2. Diálogo abierto obstruye a TODOS, EXCEPTO si el anuncio está dentro del propio diálogo (editarEntidad).
+    final bool isObstructedByDialog = slideUpProvider.isDialogOpen && widget.location != AdLocation.editarEntidad;
+
+    final bool isObstructed = isObstructedByPanel || isObstructedByDialog;
+
+    // Gestión reactiva del banner basada en el estado premium O si está obstruido
+    if (isPremium || isObstructed) {
+      // Si nos volvimos premium O hay un panel encima, liberamos recursos
       if (_bannerAd != null || _isLoading || _retryScheduled) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
@@ -187,14 +201,21 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
             _isLoading = false;
             _retryTimer?.cancel();
             _retryCount = 0;
-            // Forzar rebuild para limpiar UI si es necesario (aunque el if de abajo ya lo oculta)
+            // Forzar rebuild para limpiar UI
             setState(() {});
           }
         });
       }
+      // Mantenemos el espacio ocupado si es por obstrucción para evitar saltos bruscos de layout,
+      // o devolvemos shrink si es premium.
+      if (isPremium) return const SizedBox.shrink();
+
+      // Si es obstrucción, devolvemos un SizedBox transparente del tamaño del banner
+      // para minimizar saltos, o shrink si preferimos que colapse.
+      // Generalmente colapsar es mejor si el panel va a cubrir esa área.
       return const SizedBox.shrink();
     } else {
-      // Si NO somos premium y no tenemos banner ni estamos cargando, intentamos cargar
+      // Si NO somos premium y NO estamos obstruidos, intentamos cargar
       if (_bannerAd == null && !_isLoading && !_retryScheduled) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) _loadBanner();

@@ -25,6 +25,17 @@ class SlideUpProvider extends ChangeNotifier {
   bool get isResizing => _isResizing;
   bool get skipCleanOnClose => _skipCleanOnClose;
   bool get isDraggable => _isDraggable;
+  bool get isPanelOpen => _panelPosition > 0.1;
+
+  bool _isDialogOpen = false;
+  bool get isDialogOpen => _isDialogOpen;
+
+  void setDialogOpen(bool value) {
+    if (_isDialogOpen != value) {
+      _isDialogOpen = value;
+      notifyListeners();
+    }
+  }
 
   set isResizing(bool value) {
     if (_isResizing != value) {

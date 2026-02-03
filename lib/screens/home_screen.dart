@@ -62,6 +62,17 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
       ForceUpdateModal.showIfNeeded(context);
       _fabAnimController.forward();
       _handleInternetGate();
+
+      // Verificar anuncio pendiente tras navegación (ej: volver de Ganador)
+      if (mounted) {
+        final googleAdsProvider = context.read<GoogleAdsProvider>();
+        if (googleAdsProvider.showAdAfterNavigation) {
+          googleAdsProvider.showInterstitialAd(onCloseFunction: () {
+            googleAdsProvider.loadInterstitialAd();
+          });
+          googleAdsProvider.clearAdAfterNavigation();
+        }
+      }
     });
   }
 

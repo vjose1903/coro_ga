@@ -220,6 +220,8 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
     // Cerrar el slideUp cuando se abre el modal (sin limpiar jugadorEditar)
     slideUpProvider.closeSlideUp(controller: widget.panelController, skipClean: true);
 
+    slideUpProvider.setDialogOpen(true);
+
     showDialog(
       context: context,
       builder: (dialogContext) => Dialog(
@@ -236,6 +238,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
         ),
       ),
     ).then((_) {
+      slideUpProvider.setDialogOpen(false);
       // Esperar al siguiente frame para asegurar que los datos estén sincronizados
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
@@ -256,7 +259,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
     if (puntuacion.isNotEmpty && puntuacion != '0') {
       final int puntuacionInt = int.parse(puntuacion);
 
-    final int puntuacionActual = jugador.puntuacion ?? 0;
+      final int puntuacionActual = jugador.puntuacion ?? 0;
 
       if (tipo == 'reducir' && puntuacionActual - puntuacionInt < 0) {
         final l10n = AppLocalizations.of(context)!;

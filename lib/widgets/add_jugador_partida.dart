@@ -131,6 +131,8 @@ class _AddJugadorState extends State<AddJugador> {
     // Cerrar el slideUp cuando se abre el modal (sin limpiar jugadorEditar)
     slideUpProvider.closeSlideUp(controller: widget.panelController, skipClean: true);
 
+    slideUpProvider.setDialogOpen(true);
+
     showDialog(
       context: context,
       builder: (dialogContext) => Dialog(
@@ -147,6 +149,7 @@ class _AddJugadorState extends State<AddJugador> {
         ),
       ),
     ).then((_) {
+      slideUpProvider.setDialogOpen(false);
       // Esperar al siguiente frame para asegurar que los datos estén sincronizados
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
@@ -165,12 +168,7 @@ class _AddJugadorState extends State<AddJugador> {
     if (partida == null || partida.jugadores == null) return;
 
     if (!premiumProvider.canAddPlayer(partida.jugadores!.length)) {
-      Toast.show(
-          type: ToastType.info,
-          context: context,
-          message: AppLocalizations.of(context)!.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
-          actionLabel: AppLocalizations.of(context)!.getPro,
-          onAction: () => Navigator.pushNamed(context, 'premium'));
+      Toast.show(type: ToastType.info, context: context, message: AppLocalizations.of(context)!.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers), actionLabel: AppLocalizations.of(context)!.getPro, onAction: () => Navigator.pushNamed(context, 'premium'));
       return;
     }
 
