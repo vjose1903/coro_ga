@@ -23,6 +23,7 @@ class GoogleBannerAd extends StatefulWidget {
 
 class _GoogleBannerAdState extends State<GoogleBannerAd> {
   BannerAd? _bannerAd;
+  BannerAd? _loadingAd;
   bool _isLoading = false;
   bool _retryScheduled = false;
   Timer? _retryTimer;
@@ -46,9 +47,13 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     });
 
     // Intentar cargar inmediatamente si ya estamos listos,
-    // o si no, esperamos al stream pero verificamos post frame por seguridad.
+    // pero damos un pequeño respiro para que cualquier instancia previa se limpie.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadBanner();
+      if (mounted) {
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (mounted) _loadBanner();
+        });
+      }
     });
   }
 
@@ -77,20 +82,16 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     if (Preferences.isPremium) return;
     if (_isLoading || !mounted) return;
 
-    // Si ya tenemos un banner, no cargamos otro sobre él
+    // Si ya tenemos un banner mostrado, no cargamos otro sobre él
     if (_bannerAd != null) return;
 
     final adUnitId = AdHelper.getBannerAdUnitId(widget.location);
     if (adUnitId.isEmpty) {
-      // Si el servicio no está listo, esperamos el evento del stream.
-      // No programamos reintento todavía para no hacer polling innecesario.
       if (!AdIdsService.isInitialized) {
         _logThrottled('GoogleBannerAd: Waiting for AdIdsService...');
         return;
       }
 
-      // Si el servicio ESTÁ listo pero el ID es vacío, es un error de configuración.
-      // Reintentamos por si acaso se actualiza la config remota.
       _logThrottled(
         'GoogleBannerAd: empty adUnitId for ${widget.location} but Service is Ready',
       );
@@ -101,12 +102,13 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     _disposeBanner();
     _isLoading = true;
 
-    BannerAd(
+    _loadingAd = BannerAd(
       adUnitId: adUnitId,
       request: const AdRequest(),
       size: AdSize.banner,
       listener: BannerAdListener(
         onAdLoaded: (ad) {
+          _loadingAd = null;
           if (!mounted) {
             ad.dispose();
             return;
@@ -121,6 +123,7 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
           _logThrottled('GoogleBannerAd: loaded for ${widget.location}');
         },
         onAdFailedToLoad: (ad, error) {
+          _loadingAd = null;
           ad.dispose();
           _isLoading = false;
           _logThrottled(
@@ -135,7 +138,8 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
           _scheduleRetry();
         },
       ),
-    ).load();
+    );
+    _loadingAd!.load();
   }
 
   void _scheduleRetry() {
@@ -202,6 +206,7 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     final double height = _bannerAd?.size.height.toDouble() ?? 50;
 
     return Container(
+      key: _bannerAd != null ? ObjectKey(_bannerAd) : null,
       width: width,
       alignment: Alignment.topCenter,
       child: _bannerAd == null
@@ -226,6 +231,10 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
   }
 
   void _disposeBanner() {
+    if (_loadingAd != null) {
+      _loadingAd!.dispose();
+      _loadingAd = null;
+    }
     if (_bannerAd != null) {
       _bannerAd!.dispose();
       _bannerAd = null;
