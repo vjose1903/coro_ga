@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:reactive_forms/reactive_forms.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
+
 import '../helpers/helpers.dart';
 import '../l10n/app_localizations.dart';
 import '../models/models.dart';
@@ -7,11 +11,8 @@ import '../providers/providers.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 import '../utils/utils.dart';
-import 'widgets.dart';
 import 'slide_up_header.dart';
-import 'package:provider/provider.dart';
-import 'package:reactive_forms/reactive_forms.dart';
-import 'package:sliding_up_panel2/sliding_up_panel2.dart';
+import 'widgets.dart';
 
 class AddJugadorPartida extends StatelessWidget {
   const AddJugadorPartida({super.key, required this.panelController});
@@ -20,15 +21,13 @@ class AddJugadorPartida extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final GoogleBannerAd anuncio = const GoogleBannerAd(location: AdLocation.agregarJugador);
-    return AddJugador(anuncio: anuncio, panelController: panelController);
+    return AddJugador(panelController: panelController);
   }
 }
 
 class AddJugador extends StatefulWidget {
-  const AddJugador({super.key, required this.anuncio, required this.panelController});
+  const AddJugador({super.key, required this.panelController});
 
-  final GoogleBannerAd anuncio;
   final PanelController panelController;
 
   @override
@@ -109,11 +108,7 @@ class _AddJugadorState extends State<AddJugador> {
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-
-            // Anuncios (separado de la lista de jugadores)
-            widget.anuncio
+            )
           ],
         ),
       ),
@@ -131,8 +126,6 @@ class _AddJugadorState extends State<AddJugador> {
     // Cerrar el slideUp cuando se abre el modal (sin limpiar jugadorEditar)
     slideUpProvider.closeSlideUp(controller: widget.panelController, skipClean: true);
 
-    slideUpProvider.setDialogOpen(true);
-
     showDialog(
       context: context,
       builder: (dialogContext) => Dialog(
@@ -149,7 +142,6 @@ class _AddJugadorState extends State<AddJugador> {
         ),
       ),
     ).then((_) {
-      slideUpProvider.setDialogOpen(false);
       // Esperar al siguiente frame para asegurar que los datos estén sincronizados
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
@@ -168,7 +160,12 @@ class _AddJugadorState extends State<AddJugador> {
     if (partida == null || partida.jugadores == null) return;
 
     if (!premiumProvider.canAddPlayer(partida.jugadores!.length)) {
-      Toast.show(type: ToastType.info, context: context, message: AppLocalizations.of(context)!.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers), actionLabel: AppLocalizations.of(context)!.getPro, onAction: () => Navigator.pushNamed(context, 'premium'));
+      Toast.show(
+          type: ToastType.info,
+          context: context,
+          message: AppLocalizations.of(context)!.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
+          actionLabel: AppLocalizations.of(context)!.getPro,
+          onAction: () => Navigator.pushNamed(context, 'premium'));
       return;
     }
 

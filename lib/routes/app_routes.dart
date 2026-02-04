@@ -4,7 +4,8 @@ import '../models/menu_option.dart';
 
 class AppRoutes {
   static final menuOptions = <MenuOption>[
-    MenuOption(route: 'home', screen: const HomeShell()),
+    MenuOption(route: 'home', screen: const HomeScreen()),
+    MenuOption(route: 'partida', screen: const PartidaScreen()),
     MenuOption(route: 'formulario', screen: const FormularioScreen()),
     MenuOption(route: 'ganador', screen: const GanadorScreen()),
     MenuOption(route: 'premium', screen: const PremiumScreen()),

@@ -14,6 +14,7 @@ import '../themes/app_themes.dart';
 import '../widgets/widgets.dart';
 import '../l10n/app_localizations.dart';
 import '../utils/utils.dart';
+import '../routes/route_observer.dart';
 
 class PartidaScreen extends StatefulWidget {
   const PartidaScreen({super.key});
@@ -22,17 +23,15 @@ class PartidaScreen extends StatefulWidget {
   State<PartidaScreen> createState() => _PartidaScreenState();
 }
 
-class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProviderStateMixin {
+class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProviderStateMixin, RouteAware {
   late final PanelController panelController;
   late final AnimationController _fabAnimController;
-  late final GoogleBannerAd anuncio;
-  bool _didResetOnEntry = false;
+  bool _showBanner = true;
 
   @override
   void initState() {
     super.initState();
     panelController = PanelController();
-    anuncio = const GoogleBannerAd(location: AdLocation.partida);
     _fabAnimController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -57,7 +56,37 @@ class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProvider
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void didPushNext() {
+    if (!_showBanner) return;
+    setState(() => _showBanner = false);
+  }
+
+  @override
+  void didPopNext() {
+    if (_showBanner) return;
+    setState(() => _showBanner = true);
+    if (!mounted) return;
+    final googleAdsProvider = context.read<GoogleAdsProvider>();
+    if (googleAdsProvider.showAdAfterNavigation) {
+      googleAdsProvider.showInterstitialAd(onCloseFunction: () {
+        googleAdsProvider.loadInterstitialAd();
+      });
+      googleAdsProvider.clearAdAfterNavigation();
+    }
+  }
+
+  @override
   void dispose() {
+    routeObserver.unsubscribe(this);
     _fabAnimController.dispose();
     super.dispose();
   }
@@ -69,26 +98,17 @@ class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProvider
       child: Consumer(
         builder: (BuildContext context, value, Widget? child) {
           context.watch<SlideUpProvider>();
-          final nav = context.watch<AppNavigationProvider>();
           final partidaProvider = context.watch<PartidaProvider>();
-          if (nav.index == 1 && !_didResetOnEntry) {
-            _didResetOnEntry = true;
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (!mounted) return;
-              context.read<SlideUpProvider>().closeSlideUp(controller: panelController, skipClean: true);
-            });
-          } else if (nav.index != 1 && _didResetOnEntry) {
-            _didResetOnEntry = false;
-          }
           if (partidaProvider.partidaEnTurno == null) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) context.read<AppNavigationProvider>().showHome();
+              if (!mounted) return;
+              Navigator.of(context).pop();
             });
             return const SizedBox.shrink();
           }
 
           return Scaffold(
-            body: _Body(panelController: panelController, anuncio: anuncio),
+            body: _Body(panelController: panelController, showBanner: _showBanner),
             floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
             floatingActionButton: Visibility(
               visible: !panelController.isAttached || panelController.isPanelClosed,
@@ -140,10 +160,10 @@ class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProvider
 }
 
 class _Body extends StatelessWidget {
-  const _Body({super.key, required this.panelController, required this.anuncio});
+  const _Body({super.key, required this.panelController, required this.showBanner});
 
   final PanelController panelController;
-  final GoogleBannerAd anuncio;
+  final bool showBanner;
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
@@ -167,7 +187,7 @@ class _Body extends StatelessWidget {
           iconSize: ResponsiveApp.isSmallHeight ? 18 : 22,
           iconColor: Colors.white,
           icon: Icons.arrow_back_ios_new,
-          onTap: () => context.read<AppNavigationProvider>().showHome(),
+          onTap: () => Navigator.pop(context),
         ),
         appBarTrailing: CustomIconButtom(
           iconSize: ResponsiveApp.isSmallHeight ? 18 : 22,
@@ -198,12 +218,14 @@ class _Body extends StatelessWidget {
                 ),
                 SizedBox(height: adSpacing),
               ],
-              // Anuncio separado de la lista de jugadores
-              KeyedSubtree(
-                key: ValueKey('partida_ad_${partida.id ?? 'none'}'),
-                child: anuncio,
-              ),
-              SizedBox(height: adSpacing),
+              if (showBanner) ...[
+                // Anuncio separado de la lista de jugadores
+                KeyedSubtree(
+                  key: ValueKey('partida_ad_${partida.id ?? 'none'}'),
+                  child: const GoogleBannerAd(location: AdLocation.partida),
+                ),
+                SizedBox(height: adSpacing),
+              ],
             ])));
   }
 

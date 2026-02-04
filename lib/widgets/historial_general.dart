@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
+
 import '../helpers/helpers.dart';
 import '../l10n/app_localizations.dart';
 import '../models/models.dart';
@@ -9,12 +11,9 @@ import '../providers/providers.dart';
 import '../screens/ganador.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
-import 'widgets.dart';
-import 'layout.dart';
-import 'slide_up_header.dart';
 import '../utils/utils.dart';
-import '../helpers/ad_locations.dart';
-import 'package:provider/provider.dart';
+import 'slide_up_header.dart';
+import 'widgets.dart';
 
 class HistorialGeneral extends StatefulWidget {
   const HistorialGeneral({super.key, required this.panelController});
@@ -27,7 +26,6 @@ class HistorialGeneral extends StatefulWidget {
 class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScrollMixin {
   final TextEditingController puntuacionController = TextEditingController();
   final ScrollController historialController = ScrollController();
-  final GoogleBannerAd anuncio = const GoogleBannerAd(location: AdLocation.puntuacion);
   Jugador? jugadorSeleccionado;
   String? _errorText;
 
@@ -154,10 +152,7 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
               ),
             ),
           ],
-        ),
-        const SizedBox(height: 20),
-        // Anuncio (separado de los botones de acción)
-        anuncio,
+        )
       ],
     );
   }
@@ -229,7 +224,7 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
         slideUpProvider.closeSlideUp(
           controller: widget.panelController,
         );
-        
+
         Navigator.push(
           context,
           PageRouteBuilder(
@@ -242,9 +237,7 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
             transitionDuration: const Duration(milliseconds: 400),
           ),
         );
-      } else if (maxScore > 0 &&
-          puntuacionActual < (maxScore / 2) &&
-          newPuntuacion >= (maxScore / 2)) {
+      } else if (maxScore > 0 && puntuacionActual < (maxScore / 2) && newPuntuacion >= (maxScore / 2)) {
         final premiumProvider = context.read<PremiumProvider>();
         if (!premiumProvider.isPremium) {
           final googleAdsProvider = context.read<GoogleAdsProvider>();

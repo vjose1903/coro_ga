@@ -125,10 +125,7 @@ class EditarEntidad extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-          SizedBox(height: ResponsiveApp.scaleHeight(25)),
-          // Anuncio separado de los botones de acción
-          const GoogleBannerAd(location: AdLocation.editarEntidad)
+          )
         ],
       ),
     );

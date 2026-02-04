@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../helpers/helpers.dart';
 import '../utils/utils.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import '../services/ad_ids_service.dart';
 import '../shared_preferences/preferences.dart';
 
 class GoogleAdsProvider extends ChangeNotifier {
@@ -31,7 +30,6 @@ class GoogleAdsProvider extends ChangeNotifier {
     if (interstitialAd == null) {
       final adUnitId = AdHelper.getInterstitialAdUnitId();
       if (adUnitId.isEmpty) {
-        AdIdsService.idsUpdatedStream.first.then((_) => loadInterstitialAd());
         return;
       }
       InterstitialAd.load(
@@ -91,7 +89,6 @@ class GoogleAdsProvider extends ChangeNotifier {
     if (rewardedAd == null) {
       final adUnitId = AdHelper.getRewardedAdUnitId(location);
       if (adUnitId.isEmpty) {
-        AdIdsService.idsUpdatedStream.first.then((_) => loadRewardedAd(location));
         return;
       }
       RewardedAd.load(

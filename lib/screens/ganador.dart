@@ -76,7 +76,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
                         );
                       }
                       Navigator.pop(context);
-                      context.read<AppNavigationProvider>().showHome();
+                      Navigator.of(context).popUntil((route) => route.isFirst);
                     })),
             Container(
                 margin: const EdgeInsets.only(top: 150),
@@ -138,9 +138,8 @@ class _GanadorScreenState extends State<GanadorScreen> {
 
     final partida = partidaProvider.partidaEnTurno;
     if (partida == null) {
-      final nav = context.read<AppNavigationProvider>();
       Navigator.pop(context);
-      nav.showHome();
+      Navigator.of(context).popUntil((route) => route.isFirst);
       return;
     }
 
@@ -149,9 +148,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
       await partida.restartPartida();
       partidaProvider.refresh();
       MyLoading.close();
-      final nav = context.read<AppNavigationProvider>();
       Navigator.pop(context);
-      nav.showPartida();
     }
 
     if (!premiumProvider.isPremium) {

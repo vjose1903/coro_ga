@@ -19,6 +19,7 @@ import '../themes/app_themes.dart';
 import '../utils/utils.dart';
 import '../widgets/force_update_modal.dart';
 import '../widgets/widgets.dart';
+import '../routes/route_observer.dart';
 import '../services/connectivity_service.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -43,11 +44,12 @@ class MainHome extends StatefulWidget {
   State<MainHome> createState() => _MainHomeState();
 }
 
-class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin {
+class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin, RouteAware {
   late final PanelController panelController;
   late final AnimationController _fabAnimController;
   Route<dynamic>? _noInternetRoute;
   StreamSubscription<bool>? _internetSub;
+  bool _showBanner = true;
 
   @override
   void initState() {
@@ -77,7 +79,37 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void didPushNext() {
+    if (!_showBanner) return;
+    setState(() => _showBanner = false);
+  }
+
+  @override
+  void didPopNext() {
+    if (_showBanner) return;
+    setState(() => _showBanner = true);
+    if (!mounted) return;
+    final googleAdsProvider = context.read<GoogleAdsProvider>();
+    if (googleAdsProvider.showAdAfterNavigation) {
+      googleAdsProvider.showInterstitialAd(onCloseFunction: () {
+        googleAdsProvider.loadInterstitialAd();
+      });
+      googleAdsProvider.clearAdAfterNavigation();
+    }
+  }
+
+  @override
   void dispose() {
+    routeObserver.unsubscribe(this);
     _internetSub?.cancel();
     _fabAnimController.dispose();
     super.dispose();
@@ -141,7 +173,7 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
           body: Layout(
             appBarTitle: l10n.myGames,
             appBarTrailing: _AnimatedMenuButton(onTap: openMenuSlideUp),
-            bodyContent: _Body(panelController: panelController),
+            bodyContent: _Body(panelController: panelController, showBanner: _showBanner),
             panelController: panelController,
           ),
           floatingActionButton: Padding(
@@ -208,8 +240,9 @@ class _AnimatedMenuButton extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({Key? key, required this.panelController}) : super(key: key);
+  const _Body({Key? key, required this.panelController, required this.showBanner}) : super(key: key);
   final PanelController panelController;
+  final bool showBanner;
 
   @override
   Widget build(BuildContext context) {
@@ -218,10 +251,11 @@ class _Body extends StatelessWidget {
         Expanded(child: ListPartidas(panelController: panelController)),
         // Banner de anuncios
         const SizedBox(height: 10),
-        Padding(
-          padding: ResponsiveApp.only(bottom: 16),
-          child: GoogleBannerAd(location: AdLocation.home),
-        ),
+        if (showBanner)
+          Padding(
+            padding: ResponsiveApp.only(bottom: 16),
+            child: GoogleBannerAd(location: AdLocation.home),
+          ),
       ],
     );
   }
@@ -256,7 +290,7 @@ class ListPartidas extends StatelessWidget {
               partida: partida,
               onTap: () {
                 partidaProvider.changePartidaEnTurno(partida);
-                context.read<AppNavigationProvider>().showPartida();
+                Navigator.pushNamed(context, 'partida');
               },
               functionBorrar: (handler) async {
                 final l10n = AppLocalizations.of(context)!;

@@ -11,7 +11,6 @@ import '../firebase_options.dart';
 import '../l10n/app_localizations.dart';
 import '../themes/app_themes.dart';
 import '../providers/premium_provider.dart';
-import '../services/ad_ids_service.dart';
 import '../services/purchase_service.dart';
 import '../shared_preferences/preferences.dart';
 
@@ -50,10 +49,13 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
         await step.action();
       } catch (e) {
         if (!mounted) return;
-        setState(() {
-          _hasError = true;
-        });
-        return;
+        debugPrint('Init step failed: ${step.label} -> $e');
+        if (step.isRequired) {
+          setState(() {
+            _hasError = true;
+          });
+          return;
+        }
       }
       completedWeight += step.weight;
       if (!mounted) return;
@@ -80,6 +82,7 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
             if (success) premiumProvider.setPremium(true);
           },
         ),
+        isRequired: false,
       ),
     ];
 
@@ -88,14 +91,7 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
         label: 'Configurando anuncios',
         weight: 1,
         action: _initializeMobileAds,
-      ));
-    }
-
-    if (!Preferences.isPremium) {
-      steps.add(_InitStep(
-        label: 'Cargando IDs de anuncios',
-        weight: 1,
-        action: () => AdIdsService.instance.initialize(),
+        isRequired: false,
       ));
     }
 
@@ -211,9 +207,11 @@ class _InitStep {
     required this.label,
     required this.weight,
     required this.action,
+    this.isRequired = true,
   });
 
   final String label;
   final double weight;
   final Future<void> Function() action;
+  final bool isRequired;
 }

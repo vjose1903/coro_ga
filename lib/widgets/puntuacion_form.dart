@@ -34,8 +34,6 @@ class PuntuacionPage extends StatefulWidget {
 }
 
 class _PuntuacionPageState extends State<PuntuacionPage> {
-  // El widget GoogleBannerAd maneja su propio dispose internamente
-  final GoogleBannerAd anuncio = const GoogleBannerAd(location: AdLocation.puntuacion);
   final ScrollController historialController = ScrollController();
   final TextEditingController puntuacionController = TextEditingController();
   String? _errorText;
@@ -150,7 +148,8 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                     final previousScore = jugador.puntuacion ?? 0;
                     final String puntuacion = hasTeclado ? puntuacionController.text : '1';
 
-                    changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: 'reducir', context: context).then((newPuntuacion) {
+                    changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: 'reducir', context: context)
+                        .then((newPuntuacion) {
                       if (newPuntuacion != 0) {
                         puntuacionController.text = '';
                         slideUpProvider.closeSlideUp(controller: widget.panelController);
@@ -176,7 +175,8 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                     final slideUpProvider = context.read<SlideUpProvider>();
                     final previousScore = jugador.puntuacion ?? 0;
                     final String puntuacion = hasTeclado ? puntuacionController.text : '1';
-                    changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: 'aumentar', context: context).then((newPuntuacion) {
+                    changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: 'aumentar', context: context)
+                        .then((newPuntuacion) {
                       if (newPuntuacion != 0) {
                         puntuacionController.text = '';
                         slideUpProvider.closeSlideUp(controller: widget.panelController);
@@ -195,7 +195,8 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                                     'jugador': jugador.nombre,
                                   }),
                                   pageBuilder: (context, animation, secondaryAnimation) => const GanadorScreen(),
-                                  transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
+                                  transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+                                      FadeTransition(opacity: animation, child: child),
                                   transitionDuration: const Duration(milliseconds: 400)));
                         }
                       }
@@ -204,10 +205,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 18),
-          // ANUNCIOS - FIJO abajo
-          anuncio
+          )
         ],
       ),
     );
@@ -219,8 +217,6 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
 
     // Cerrar el slideUp cuando se abre el modal (sin limpiar jugadorEditar)
     slideUpProvider.closeSlideUp(controller: widget.panelController, skipClean: true);
-
-    slideUpProvider.setDialogOpen(true);
 
     showDialog(
       context: context,
@@ -238,7 +234,6 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
         ),
       ),
     ).then((_) {
-      slideUpProvider.setDialogOpen(false);
       // Esperar al siguiente frame para asegurar que los datos estén sincronizados
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
@@ -250,7 +245,8 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
     });
   }
 
-  Future<int> changePuntuacion({required String puntuacion, required String tipo, required JugadorProvider jugadorProvider, required BuildContext context}) async {
+  Future<int> changePuntuacion(
+      {required String puntuacion, required String tipo, required JugadorProvider jugadorProvider, required BuildContext context}) async {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     final partida = partidaProvider.partidaEnTurno;
     final jugador = jugadorProvider.jugadorEnTurno;
@@ -786,7 +782,9 @@ class _MiniIconButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: isDestructive ? Colors.red.withValues(alpha: 0.1) : (Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.15)),
+            color: isDestructive
+                ? Colors.red.withValues(alpha: 0.1)
+                : (Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.15)),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(

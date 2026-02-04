@@ -6,8 +6,6 @@ import '../services/version_service.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:provider/provider.dart';
-import '../providers/slide_up_provider.dart';
 import '../helpers/helpers.dart';
 
 class ForceUpdateModal extends StatelessWidget {
@@ -20,10 +18,6 @@ class ForceUpdateModal extends StatelessWidget {
     final updateAvailable = await VersionService.instance.checkForUpdate();
 
     if ((updateAvailable || forceShow) && context.mounted) {
-      // Necesitamos SlideUpProvider para ocultar anuncios
-      final slideUpProvider = context.read<SlideUpProvider>();
-      slideUpProvider.setDialogOpen(true);
-
       showDialog(
         context: context,
         barrierDismissible: false,

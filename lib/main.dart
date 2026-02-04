@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'l10n/app_localizations.dart';
 import 'providers/providers.dart';
 import 'routes/app_routes.dart';
+import 'routes/route_observer.dart';
 import 'screens/screens.dart';
 import 'shared_preferences/preferences.dart';
 
@@ -29,7 +30,6 @@ void main() async {
     ChangeNotifierProvider(create: (_) => ReorderableProvider()),
     ChangeNotifierProvider(create: (_) => PageEditarProvider()),
     ChangeNotifierProvider(create: (_) => PartidaPredefinidaProvider()),
-    ChangeNotifierProvider(create: (_) => AppNavigationProvider()),
     ChangeNotifierProvider(create: (_) => ThemeProvider(isDarkMode_: initInDarkMode)),
     ChangeNotifierProvider.value(value: premiumProvider),
     ChangeNotifierProvider.value(value: localeProvider),
@@ -113,6 +113,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             },
           ),
           routes: AppRoutes.getAppRoutes(),
+          navigatorObservers: [routeObserver],
           theme: themeProvider.getCurrentTheme),
     );
   }

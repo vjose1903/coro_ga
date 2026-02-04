@@ -3,8 +3,6 @@ import '../helpers/helpers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:provider/provider.dart';
-import '../providers/slide_up_provider.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 
@@ -66,10 +64,6 @@ class CustomAlertDialog {
     DialogType? dialogType,
   }) {
     final isDark = Preferences.isDarkMode;
-    // Notificar apertura de diálogo
-    final slideUpProvider = context.read<SlideUpProvider>();
-    slideUpProvider.setDialogOpen(true);
-
     showDialog(
       barrierDismissible: buttonsList == null || buttonsList.isEmpty,
       context: context,
@@ -110,10 +104,7 @@ class CustomAlertDialog {
           ),
         );
       },
-    ).then((_) {
-      // Notificar cierre de diálogo
-      slideUpProvider.setDialogOpen(false);
-    });
+    );
   }
 
   static void displayDialogIOs({
@@ -124,10 +115,6 @@ class CustomAlertDialog {
     List<CustomActionsButtons>? buttonsList,
     DialogType? dialogType,
   }) {
-    // Notificar apertura de diálogo
-    final slideUpProvider = context.read<SlideUpProvider>();
-    slideUpProvider.setDialogOpen(true);
-
     showCupertinoDialog(
       barrierDismissible: buttonsList == null || buttonsList.isEmpty,
       context: context,
@@ -165,10 +152,7 @@ class CustomAlertDialog {
           ),
         );
       },
-    ).then((_) {
-      // Notificar cierre de diálogo
-      slideUpProvider.setDialogOpen(false);
-    });
+    );
   }
 
   static Widget _getIconWidget(DialogType? type, {double size = 28}) {

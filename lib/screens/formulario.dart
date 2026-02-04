@@ -252,9 +252,12 @@ class _Body extends StatelessWidget {
         partidaProvider.changePartidaEnTurno(newPartida);
         formPartidaProvider.resetForm();
         googleAdsProvider.markAdForAfterNavigation();
-        final nav = context.read<AppNavigationProvider>();
-        Navigator.pop(context);
-        nav.showPartida();
+        final navigator = Navigator.of(context);
+        navigator.pop();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!context.mounted) return;
+          navigator.pushNamed('partida');
+        });
       } else {
         Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.errorRegisteringGame);
       }
