@@ -23,7 +23,7 @@ class AdHelper {
 
   static const Map<String, String> _androidIds = {
     'AD_BANNER_HOME': 'ca-app-pub-7138392349989063/3603900094',
-    'AD_BANNER_PARTIDA': 'ca-app-pub-7138392349989063/9555188441',
+    'AD_BANNER_PARTIDA': 'ca-app-pub-7138392349989063/7931387210',
     'AD_INTERSTITIAL': 'ca-app-pub-7138392349989063/3081850257',
     'AD_REWARDED_REVANCHA': 'ca-app-pub-7138392349989063/4035569961',
   };

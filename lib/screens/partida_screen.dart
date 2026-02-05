@@ -208,9 +208,9 @@ class _Body extends StatelessWidget {
               ],
               if (showBanner) ...[
                 // Anuncio separado de la lista de jugadores
-                KeyedSubtree(
-                  key: ValueKey('partida_ad_${partida.id ?? 'none'}'),
-                  child: const GoogleBannerAd(location: AdLocation.partida),
+                GoogleBannerAd(
+                  key: ValueKey('partida_banner_${partida.id ?? 'none'}'),
+                  location: AdLocation.partida,
                 ),
                 SizedBox(height: adSpacing),
               ],

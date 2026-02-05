@@ -235,7 +235,10 @@ class _Body extends StatelessWidget {
         if (showBanner)
           Padding(
             padding: ResponsiveApp.only(bottom: 16),
-            child: GoogleBannerAd(location: AdLocation.home),
+            child: const GoogleBannerAd(
+              key: ValueKey('home_banner'),
+              location: AdLocation.home,
+            ),
           ),
       ],
     );
