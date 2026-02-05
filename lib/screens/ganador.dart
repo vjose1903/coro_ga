@@ -58,26 +58,39 @@ class _GanadorScreenState extends State<GanadorScreen> {
           children: [
             Container(decoration: boxDecoration),
             Container(
-                alignment: Alignment.topRight,
-                width: double.infinity,
-                margin: const EdgeInsets.only(top: 70, right: 30),
+              alignment: Alignment.topRight,
+              width: double.infinity,
+              margin: const EdgeInsets.only(top: 70, right: 30),
+              child: WidgetAnimator(
+                incomingEffect: WidgetTransitionEffects.incomingSlideInFromRight(delay: const Duration(seconds: 2, milliseconds: 500), duration: const Duration(seconds: 1)),
                 child: CustomIconButtom(
                     iconSize: 40,
                     iconColor: ganadorColor,
                     icon: Icons.close,
                     onTap: () {
-                      // IMPORTANTE: Navegar PRIMERO, mostrar anuncio DESPUÉS (pausa natural)
-                      googleAdsProvider.markAdForAfterNavigation();
-                      final partidaProvider = context.read<PartidaProvider>();
-                      if (partidaProvider.partidaEnTurno != null) {
-                        partidaProvider.deletePartida(
-                          context,
-                          partida: partidaProvider.partidaEnTurno!,
-                        );
+                      void goHome() {
+                        final partidaProvider = context.read<PartidaProvider>();
+                        if (partidaProvider.partidaEnTurno != null) {
+                          partidaProvider.deletePartida(
+                            context,
+                            partida: partidaProvider.partidaEnTurno!,
+                          );
+                        }
+                        Navigator.of(context).pushReplacementNamed('home');
                       }
-                      Navigator.pop(context);
-                      Navigator.of(context).popUntil((route) => route.isFirst);
-                    })),
+
+                      if (Preferences.isPremium) {
+                        goHome();
+                      } else {
+                        googleAdsProvider.showInterstitialAd(onCloseFunction: () {
+                          if (!context.mounted) return;
+                          goHome();
+                          googleAdsProvider.loadInterstitialAd();
+                        });
+                      }
+                    }),
+              ),
+            ),
             Container(
                 margin: const EdgeInsets.only(top: 150),
                 width: double.infinity,
@@ -107,7 +120,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
                     const SizedBox(height: 40),
 
                     WidgetAnimator(
-                      incomingEffect: WidgetTransitionEffects.outgoingScaleUp(delay: const Duration(seconds: 2, milliseconds: 500), duration: const Duration(seconds: 1)),
+                      incomingEffect: WidgetTransitionEffects.outgoingScaleUp(delay: const Duration(seconds: 2), duration: const Duration(seconds: 1)),
                       child: ElevatedButton(
                         style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.green[400])),
                         onPressed: () => revanchaFunction(),
@@ -138,8 +151,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
 
     final partida = partidaProvider.partidaEnTurno;
     if (partida == null) {
-      Navigator.pop(context);
-      Navigator.of(context).popUntil((route) => route.isFirst);
+      Navigator.of(context).pushReplacementNamed('home');
       return;
     }
 
@@ -152,9 +164,26 @@ class _GanadorScreenState extends State<GanadorScreen> {
     }
 
     if (!premiumProvider.isPremium) {
+      bool rewardEarned = false;
       googleAdsProvider.showRewardedAd(
-        onCloseFunction: () => restartAndGo(),
-        onRewardEarned: () {},
+        onCloseFunction: () {
+          if (!context.mounted) return;
+          if (rewardEarned) {
+            restartAndGo();
+            return;
+          }
+          // No obtuvo recompensa: borrar partida y volver a Home
+          if (partidaProvider.partidaEnTurno != null) {
+            partidaProvider.deletePartida(
+              context,
+              partida: partidaProvider.partidaEnTurno!,
+            );
+          }
+          Navigator.of(context).pushReplacementNamed('home');
+        },
+        onRewardEarned: () {
+          rewardEarned = true;
+        },
       );
     } else {
       await restartAndGo();

@@ -41,15 +41,6 @@ class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProvider
       if (mounted) {
         context.read<SlideUpProvider>().closeSlideUp(controller: panelController, skipClean: true);
 
-        // Check for pending ads action (interstitial from creation)
-        final googleAdsProvider = context.read<GoogleAdsProvider>();
-        if (googleAdsProvider.showAdAfterNavigation) {
-          googleAdsProvider.showInterstitialAd(onCloseFunction: () {
-            // Recargar intersticial para la próxima vez
-            googleAdsProvider.loadInterstitialAd();
-          });
-          googleAdsProvider.clearAdAfterNavigation();
-        }
       }
       Future.delayed(const Duration(milliseconds: 300), () => _fabAnimController.forward());
     });
@@ -74,14 +65,6 @@ class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProvider
   void didPopNext() {
     if (_showBanner) return;
     setState(() => _showBanner = true);
-    if (!mounted) return;
-    final googleAdsProvider = context.read<GoogleAdsProvider>();
-    if (googleAdsProvider.showAdAfterNavigation) {
-      googleAdsProvider.showInterstitialAd(onCloseFunction: () {
-        googleAdsProvider.loadInterstitialAd();
-      });
-      googleAdsProvider.clearAdAfterNavigation();
-    }
   }
 
   @override
@@ -102,7 +85,12 @@ class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProvider
           if (partidaProvider.partidaEnTurno == null) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (!mounted) return;
-              Navigator.of(context).pop();
+              final navigator = Navigator.of(context);
+              if (navigator.canPop()) {
+                navigator.pop();
+              } else {
+                navigator.pushNamedAndRemoveUntil('home', (route) => false);
+              }
             });
             return const SizedBox.shrink();
           }

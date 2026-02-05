@@ -64,17 +64,6 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
       ForceUpdateModal.showIfNeeded(context);
       _fabAnimController.forward();
       _handleInternetGate();
-
-      // Verificar anuncio pendiente tras navegación (ej: volver de Ganador)
-      if (mounted) {
-        final googleAdsProvider = context.read<GoogleAdsProvider>();
-        if (googleAdsProvider.showAdAfterNavigation) {
-          googleAdsProvider.showInterstitialAd(onCloseFunction: () {
-            googleAdsProvider.loadInterstitialAd();
-          });
-          googleAdsProvider.clearAdAfterNavigation();
-        }
-      }
     });
   }
 
@@ -97,14 +86,6 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
   void didPopNext() {
     if (_showBanner) return;
     setState(() => _showBanner = true);
-    if (!mounted) return;
-    final googleAdsProvider = context.read<GoogleAdsProvider>();
-    if (googleAdsProvider.showAdAfterNavigation) {
-      googleAdsProvider.showInterstitialAd(onCloseFunction: () {
-        googleAdsProvider.loadInterstitialAd();
-      });
-      googleAdsProvider.clearAdAfterNavigation();
-    }
   }
 
   @override
@@ -156,7 +137,7 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
 
   void navigateToForm() {
     FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
-    formPartidaProvider.resetForm();
+    formPartidaProvider.resetForm(context: context);
     Navigator.pushNamed(context, 'formulario');
   }
 

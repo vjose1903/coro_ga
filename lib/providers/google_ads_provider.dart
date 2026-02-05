@@ -8,18 +8,6 @@ class GoogleAdsProvider extends ChangeNotifier {
   InterstitialAd? interstitialAd;
   Function? onCloseFunction_;
   bool _showOnLoad = false;
-  
-  // Flag para mostrar anuncio después de navegación
-  bool _showAdAfterNavigation = false;
-  bool get showAdAfterNavigation => _showAdAfterNavigation;
-  
-  void markAdForAfterNavigation() {
-    _showAdAfterNavigation = true;
-  }
-  
-  void clearAdAfterNavigation() {
-    _showAdAfterNavigation = false;
-  }
 
   RewardedAd? rewardedAd;
   Function? onRewardedCloseFunction_;
@@ -39,6 +27,7 @@ class GoogleAdsProvider extends ChangeNotifier {
           onAdLoaded: (ad) {
             ad.fullScreenContentCallback = FullScreenContentCallback(
               onAdFailedToShowFullScreenContent: (ad, error) {
+                onCloseFunction_ != null ? onCloseFunction_!() : null;
                 cleanInterstitialAd();
               },
               onAdDismissedFullScreenContent: (ad) {

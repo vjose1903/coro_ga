@@ -20,10 +20,7 @@ class FormPartidaProvider extends ChangeNotifier {
     _syncSinMaxWithValue();
 
     for (var index = 0; index < partidaPredefinida.cantidadJugadores!; index++) {
-      final String playerName = context != null 
-          ? AppLocalizations.of(context)!.playerNumber(index + 1)
-          : 'Player ${index + 1}';
-      addJugadorToList(name: playerName);
+      addJugadorToList(name: _defaultPlayerName(context, index + 1));
     }
 
     notifyListeners();
@@ -53,7 +50,7 @@ class FormPartidaProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  resetForm({bool restoreJugadores = true}) {
+  resetForm({bool restoreJugadores = true, BuildContext? context}) {
     form.reset();
 
     final jugadoresArray = form.control('jugadores') as FormArray<dynamic>;
@@ -67,7 +64,7 @@ class FormPartidaProvider extends ChangeNotifier {
 
     if (restoreJugadores) {
       for (var i = 0; i < List.from([1, 2]).length; i++) {
-        addJugadorToList();
+        addJugadorToList(name: _defaultPlayerName(context, i + 1));
       }
     }
 
@@ -109,6 +106,11 @@ class FormPartidaProvider extends ChangeNotifier {
       }));
     }
     return jugadoresForm;
+  }
+
+  String _defaultPlayerName(BuildContext? context, int number) {
+    if (context == null) return 'Jugador $number';
+    return AppLocalizations.of(context)!.playerNumber(number);
   }
 
   void _syncSinMaxWithValue() {

@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
+
 import '../helpers/helpers.dart';
 import '../l10n/app_localizations.dart';
+import '../models/models.dart';
 import '../providers/providers.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 import '../utils/utils.dart';
 import '../widgets/widgets.dart';
-import '../models/models.dart';
-import 'package:provider/provider.dart';
-import 'package:reactive_forms/reactive_forms.dart';
 
 class FormularioScreen extends StatefulWidget {
   const FormularioScreen({super.key});
@@ -181,7 +182,7 @@ class _Body extends StatelessWidget {
                               ),
                               Switch(
                                 value: sinMaxPuntuacion,
-                                activeColor: AppThemes.colorPrimero,
+                                activeThumbColor: AppThemes.colorPrimero,
                                 activeTrackColor: AppThemes.colorPrimero.withValues(alpha: 0.35),
                                 inactiveThumbColor: isDark ? Colors.white70 : Colors.grey[600],
                                 inactiveTrackColor: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.3),
@@ -248,16 +249,29 @@ class _Body extends StatelessWidget {
       if (!response.hasError!) {
         final newPartida = response.data;
 
-        // IMPORTANTE: Navegar PRIMERO, mostrar anuncio DESPUÉS (evita bloquear resultado)
+        // IMPORTANTE: En FREE, mostrar anuncio ANTES de navegar. En premium, navegar directo.
         partidaProvider.changePartidaEnTurno(newPartida);
-        formPartidaProvider.resetForm();
-        googleAdsProvider.markAdForAfterNavigation();
+        formPartidaProvider.resetForm(context: context);
         final navigator = Navigator.of(context);
-        navigator.pop();
-        WidgetsBinding.instance.addPostFrameCallback((_) {
+
+        void goToPartida() {
           if (!context.mounted) return;
-          navigator.pushNamed('partida');
-        });
+          navigator.pop();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!context.mounted) return;
+            navigator.pushNamed('partida');
+          });
+        }
+
+        if (Preferences.isPremium) {
+          goToPartida();
+        } else {
+          googleAdsProvider.showInterstitialAd(onCloseFunction: () {
+            if (!context.mounted) return;
+            goToPartida();
+            googleAdsProvider.loadInterstitialAd();
+          });
+        }
       } else {
         Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.errorRegisteringGame);
       }
