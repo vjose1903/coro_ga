@@ -65,7 +65,7 @@ class _PartidaCardState extends State<PartidaCard> {
             ],
           ),
           child: ClipRRect(
-            borderRadius: ResponsiveApp.borderRadius(16),
+            borderRadius: isLandscape ? ResponsiveApp.borderRadius(10) : ResponsiveApp.borderRadius(16),
             child: SwipeActionCell(
               backgroundColor: Colors.transparent,
               key: ValueKey(widget.partida.id),
@@ -253,7 +253,7 @@ class EstadoPartida extends StatelessWidget {
     } else if (partida.isEmpate) {
       return _EstadoChip(icon: Icons.swap_horiz_rounded, label: l10n.tie, color: Colors.amber[700]!, isLandscape: isLandscape);
     } else {
-      return _GanadorPerdedor(partida: partida);
+      return _GanadorPerdedor(partida: partida, isLandscape: isLandscape);
     }
   }
 }
@@ -276,13 +276,13 @@ class _EstadoChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: isLandscape ? ResponsiveApp.scaleWidth(10) : ResponsiveApp.scaleWidth(14), color: color),
+          Icon(icon, size: isLandscape ? ResponsiveApp.scaleWidth(8) : ResponsiveApp.scaleWidth(14), color: color),
           SizedBox(width: isLandscape ? ResponsiveApp.scaleWidth(3) : ResponsiveApp.scaleWidth(5)),
           Text(
             label,
             style: TextStyle(
               color: color,
-              fontSize: isLandscape ? ResponsiveApp.scaleText(18) : ResponsiveApp.scaleText(12),
+              fontSize: isLandscape ? ResponsiveApp.scaleText(16) : ResponsiveApp.scaleText(12),
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w600,
             ),
@@ -294,8 +294,9 @@ class _EstadoChip extends StatelessWidget {
 }
 
 class _GanadorPerdedor extends StatelessWidget {
-  const _GanadorPerdedor({super.key, required this.partida});
+  const _GanadorPerdedor({super.key, required this.partida, required this.isLandscape});
   final Partida partida;
+  final bool isLandscape;
 
   String _getTranslatedName(BuildContext context, String name) {
     if (name == Estado.empate) return AppLocalizations.of(context)!.tie;
@@ -315,6 +316,7 @@ class _GanadorPerdedor extends StatelessWidget {
             name: _getTranslatedName(context, ganador['nombre']),
             puntuacion: ganador['puntuacion'],
             color: Colors.green,
+            isLandscape: isLandscape,
           ),
         ),
         SizedBox(width: ResponsiveApp.scaleWidth(8)),
@@ -324,6 +326,7 @@ class _GanadorPerdedor extends StatelessWidget {
             name: _getTranslatedName(context, perdedor['nombre']),
             puntuacion: perdedor['puntuacion'],
             color: Colors.red[400]!,
+            isLandscape: isLandscape,
           ),
         ),
       ],
@@ -332,16 +335,17 @@ class _GanadorPerdedor extends StatelessWidget {
 }
 
 class _PlayerStatus extends StatelessWidget {
-  const _PlayerStatus({required this.icon, required this.name, required this.puntuacion, required this.color});
+  const _PlayerStatus({required this.icon, required this.name, required this.puntuacion, required this.color, required this.isLandscape});
   final IconData icon;
   final String name;
   final num puntuacion;
   final Color color;
+  final bool isLandscape;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: ResponsiveApp.symmetric(horizontal: 8, vertical: 5),
+      padding: ResponsiveApp.symmetric(horizontal: isLandscape ? 4 : 8, vertical: isLandscape ? 3 : 5),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: ResponsiveApp.borderRadius(16),
@@ -349,8 +353,8 @@ class _PlayerStatus extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: ResponsiveApp.scaleWidth(12), color: color),
-          SizedBox(width: ResponsiveApp.scaleWidth(4)),
+          Icon(icon, size: isLandscape ? ResponsiveApp.scaleWidth(7) : ResponsiveApp.scaleWidth(12), color: color),
+          SizedBox(width: isLandscape ? ResponsiveApp.scaleWidth(2) : ResponsiveApp.scaleWidth(4)),
           Flexible(
             child: Text(
               name,
@@ -358,13 +362,13 @@ class _PlayerStatus extends StatelessWidget {
               maxLines: 1,
               style: TextStyle(
                 color: color,
-                fontSize: ResponsiveApp.scaleText(11),
+                fontSize: isLandscape ? ResponsiveApp.scaleText(16) : ResponsiveApp.scaleText(11),
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
-          SizedBox(width: ResponsiveApp.scaleWidth(5)),
+          SizedBox(width: isLandscape ? ResponsiveApp.scaleWidth(3) : ResponsiveApp.scaleWidth(5)),
           Text(
             puntuacion.toString(),
             style: TextStyle(fontFamily: 'Poppins', fontSize: ResponsiveApp.scaleText(11), fontWeight: FontWeight.w900, color: color),

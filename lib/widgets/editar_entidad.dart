@@ -48,87 +48,80 @@ class EditarEntidad extends StatelessWidget {
 
     final FormGroup form = isPartida ? formPartidaProvider.form : jugadorProvider.formJugador;
 
-    return Container(
-      height: double.infinity,
-      padding: ResponsiveApp.only(bottom: 10),
-      child: Column(
-        children: [
-          // Header con avatar e información
-          _EditHeader(
-            tipo: tipo,
-            nombre: entidad?.nombre ?? '',
-            icon: icon,
-            noNameLabel: AppLocalizations.of(context)!.noName,
-            panelController: panelController,
-            partida: partida,
-            onRestart: partida != null && !partida.isSinIniciar
-                ? () async {
-                    await partida.restartPartida();
-                    partidaProvider.refresh();
-                    if (panelController != null) slideUpProvider.closeSlideUp(controller: panelController!);
-                  }
-                : null,
-          ),
-          SizedBox(height: ResponsiveApp.scaleHeight(16)),
+    return ResponsiveLayoutBuilder(builder: (context, constraints, info) {
+      final isLandscape = constraints.maxWidth > constraints.maxHeight;
 
-          // Formulario
-          if (isPartida)
-            EditPartida(key: const ValueKey('edit_partida'), form: form)
-          else
-            EditJugador(key: const ValueKey('edit_jugador'), form: form),
-          SizedBox(height: ResponsiveApp.scaleHeight(16)),
-
-          // Botones de acción
-          Row(
-            children: [
-              // CANCELAR
-              Expanded(
-                child: _ActionButton(
-                  label: l10n.cancel,
-                  icon: FontAwesomeIcons.xmark,
-                  isDestructive: true,
-                  onTap: () async {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                    if (onClose != null) {
-                      onClose!();
-                    } else if (pageController != null) {
-                      previusPage(pageController);
-                    } else if (panelController != null) {
-                      slideUpProvider.closeSlideUp(controller: panelController!);
+      return Container(
+        height: double.infinity,
+        padding: ResponsiveApp.only(bottom: 10),
+        child: Column(
+          children: [
+            // Header con avatar e información
+            _EditHeader(
+              tipo: tipo,
+              nombre: entidad?.nombre ?? '',
+              icon: icon,
+              noNameLabel: AppLocalizations.of(context)!.noName,
+              isLandscape: isLandscape,
+              panelController: panelController,
+              partida: partida,
+              onRestart: partida != null && !partida.isSinIniciar
+                  ? () async {
+                      await partida.restartPartida();
+                      partidaProvider.refresh();
+                      if (panelController != null) slideUpProvider.closeSlideUp(controller: panelController!);
                     }
-                    resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
-                    await Future.delayed(const Duration(milliseconds: 200));
-                    jugadorProvider.formJugador.reset();
-                    formPartidaProvider.form.reset();
-                  },
+                  : null,
+            ),
+            SizedBox(height: ResponsiveApp.scaleHeight(16)),
+
+            // Formulario
+            if (isPartida) EditPartida(key: const ValueKey('edit_partida'), form: form) else EditJugador(key: const ValueKey('edit_jugador'), form: form),
+            SizedBox(height: ResponsiveApp.scaleHeight(16)),
+
+            // Botones de acción
+            Row(
+              children: [
+                // CANCELAR
+                Expanded(
+                  child: _ActionButton(
+                    label: l10n.cancel,
+                    icon: FontAwesomeIcons.xmark,
+                    isDestructive: true,
+                    onTap: () async {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      if (onClose != null) {
+                        onClose!();
+                      } else if (pageController != null) {
+                        previusPage(pageController);
+                      } else if (panelController != null) {
+                        slideUpProvider.closeSlideUp(controller: panelController!);
+                      }
+                      resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
+                      await Future.delayed(const Duration(milliseconds: 200));
+                      jugadorProvider.formJugador.reset();
+                      formPartidaProvider.form.reset();
+                    },
+                  ),
                 ),
-              ),
-              SizedBox(width: ResponsiveApp.scaleWidth(12)),
-              // ACEPTAR
-              Expanded(
-                child: _ActionButton(
-                  label: l10n.save,
-                  icon: FontAwesomeIcons.check,
-                  isPrimary: true,
-                  onTap: () {
-                    aceptarFunction(context, entidad,
-                        form: form,
-                        jugadorProvider: jugadorProvider,
-                        partidaProvider: partidaProvider,
-                        previusPage: previusPage,
-                        resetEntidadesEditar: resetEntidadesEditar,
-                        isPartida: isPartida,
-                        pageController: pageController,
-                        panelController: panelController,
-                        onClose: onClose);
-                  },
+                SizedBox(width: ResponsiveApp.scaleWidth(12)),
+                // ACEPTAR
+                Expanded(
+                  child: _ActionButton(
+                    label: l10n.save,
+                    icon: FontAwesomeIcons.check,
+                    isPrimary: true,
+                    onTap: () {
+                      aceptarFunction(context, entidad, form: form, jugadorProvider: jugadorProvider, partidaProvider: partidaProvider, previusPage: previusPage, resetEntidadesEditar: resetEntidadesEditar, isPartida: isPartida, pageController: pageController, panelController: panelController, onClose: onClose);
+                    },
+                  ),
                 ),
-              ),
-            ],
-          )
-        ],
-      ),
-    );
+              ],
+            )
+          ],
+        ),
+      );
+    });
   }
 
   previusPage(pageController) async {
@@ -183,14 +176,7 @@ class _EditJugadorState extends State<EditJugador> {
     return Expanded(
         child: ReactiveForm(
       formGroup: widget.form,
-      child: Column(children: <Widget>[
-        CustomReactiveInput(
-            key: const ValueKey('edit_jugador_nombre'),
-            formControlName: 'nombre',
-            labelText: AppLocalizations.of(context)!.name,
-            textCapitalization: TextCapitalization.words,
-            focusNode: _focusNode)
-      ]),
+      child: Column(children: <Widget>[CustomReactiveInput(key: const ValueKey('edit_jugador_nombre'), formControlName: 'nombre', labelText: AppLocalizations.of(context)!.name, textCapitalization: TextCapitalization.words, focusNode: _focusNode)]),
     ));
   }
 }
@@ -242,12 +228,7 @@ class _EditPartidaState extends State<EditPartida> {
             child: ReactiveForm(
           formGroup: widget.form,
           child: Column(children: <Widget>[
-            CustomReactiveInput(
-                key: const ValueKey('edit_partida_nombre'),
-                formControlName: 'nombre',
-                labelText: AppLocalizations.of(context)!.name,
-                textCapitalization: TextCapitalization.words,
-                focusNode: _focusNode),
+            CustomReactiveInput(key: const ValueKey('edit_partida_nombre'), formControlName: 'nombre', labelText: AppLocalizations.of(context)!.name, textCapitalization: TextCapitalization.words, focusNode: _focusNode),
             SizedBox(height: ResponsiveApp.scaleHeight(10)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -261,10 +242,7 @@ class _EditPartidaState extends State<EditPartida> {
                   child: CustomReactiveDropDown(
                     formControlName: 'tipo',
                     labelText: AppLocalizations.of(context)!.type,
-                    items: [
-                      DropdownMenuItem(value: 'Rondas', child: Text(AppLocalizations.of(context)!.rounds)),
-                      DropdownMenuItem(value: 'Puntuación', child: Text(AppLocalizations.of(context)!.score))
-                    ],
+                    items: [DropdownMenuItem(value: 'Rondas', child: Text(AppLocalizations.of(context)!.rounds)), DropdownMenuItem(value: 'Puntuación', child: Text(AppLocalizations.of(context)!.score))],
                     onChanged: (value) => formPartidaProvider.changeTipo(value),
                   ),
                 ),
@@ -272,10 +250,7 @@ class _EditPartidaState extends State<EditPartida> {
                     duration: const Duration(milliseconds: 500),
                     curve: Curves.easeOut,
                     width: tipoPartida == '' ? 0.01 : ResponsiveApp.size.width * 0.46,
-                    child: CustomReactiveInput(
-                        formControlName: 'maxPuntuacion',
-                        labelText: tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScoreFull,
-                        inputType: TextInputType.number)),
+                    child: CustomReactiveInput(formControlName: 'maxPuntuacion', labelText: tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScoreFull, inputType: TextInputType.number)),
               ],
             ),
           ]),
@@ -286,15 +261,7 @@ class _EditPartidaState extends State<EditPartida> {
 }
 
 aceptarFunction(BuildContext context, dynamic entidad,
-    {required FormGroup form,
-    required bool isPartida,
-    required JugadorProvider jugadorProvider,
-    required PartidaProvider partidaProvider,
-    required Function previusPage,
-    required Function resetEntidadesEditar,
-    PanelController? panelController,
-    PageController? pageController,
-    VoidCallback? onClose}) {
+    {required FormGroup form, required bool isPartida, required JugadorProvider jugadorProvider, required PartidaProvider partidaProvider, required Function previusPage, required Function resetEntidadesEditar, PanelController? panelController, PageController? pageController, VoidCallback? onClose}) {
   if (isPartida) {
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
     if (form.valid) {
@@ -341,6 +308,7 @@ class _EditHeader extends StatelessWidget {
     required this.nombre,
     required this.icon,
     required this.noNameLabel,
+    required this.isLandscape,
     this.panelController,
     this.partida,
     this.onRestart,
@@ -350,6 +318,7 @@ class _EditHeader extends StatelessWidget {
   final String nombre;
   final IconData icon;
   final String noNameLabel;
+  final bool isLandscape;
   final PanelController? panelController;
   final Partida? partida;
   final Future<void> Function()? onRestart;
@@ -363,8 +332,8 @@ class _EditHeader extends StatelessWidget {
       children: [
         // Avatar con icono
         Container(
-          width: ResponsiveApp.scaleWidth(42),
-          height: ResponsiveApp.scaleHeight(42),
+          width: isLandscape ? ResponsiveApp.scaleWidth(20) : ResponsiveApp.scaleWidth(42),
+          height: isLandscape ? ResponsiveApp.scaleHeight(35) : ResponsiveApp.scaleHeight(42),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -387,11 +356,11 @@ class _EditHeader extends StatelessWidget {
             child: FaIcon(
               icon,
               color: Colors.white,
-              size: ResponsiveApp.scaleWidth(18),
+              size: isLandscape ? ResponsiveApp.scaleWidth(10) : ResponsiveApp.scaleWidth(18),
             ),
           ),
         ),
-        SizedBox(width: ResponsiveApp.scaleWidth(12)),
+        SizedBox(width: isLandscape ? ResponsiveApp.scaleWidth(8) : ResponsiveApp.scaleWidth(12)),
 
         // Información
         Expanded(
@@ -401,18 +370,18 @@ class _EditHeader extends StatelessWidget {
               Text(
                 '${l10n.edit} $tipo',
                 style: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: ResponsiveApp.scaleText(11),
+                  fontFamily: 'Poppins',
+                  fontSize: ResponsiveApp.scaleText(11),
                   color: isDark ? Colors.grey[400] : Colors.grey[600],
                   fontWeight: FontWeight.w500,
                 ),
               ),
-          SizedBox(height: ResponsiveApp.scaleHeight(1)),
+              SizedBox(height: ResponsiveApp.scaleHeight(1)),
               Text(
                 nombre.isNotEmpty ? nombre : l10n.noName,
                 style: TextStyle(
                   fontFamily: 'Poppins',
-              fontSize: ResponsiveApp.scaleText(16),
+                  fontSize: ResponsiveApp.scaleText(16),
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.white : AppThemes.colorQuinto,
                 ),
@@ -470,8 +439,7 @@ class _EditHeader extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.restart_alt_rounded,
-                        color: Colors.white, size: ResponsiveApp.scaleWidth(16)),
+                    Icon(Icons.restart_alt_rounded, color: Colors.white, size: ResponsiveApp.scaleWidth(16)),
                     SizedBox(width: ResponsiveApp.scaleWidth(4)),
                     Text(
                       l10n.restart,
@@ -511,9 +479,7 @@ class _HeaderContainer extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: isDark
-              ? [Colors.white.withValues(alpha: 0.08), Colors.white.withValues(alpha: 0.03)]
-              : [AppThemes.colorPrimero.withValues(alpha: 0.08), AppThemes.colorPrimero.withValues(alpha: 0.03)],
+          colors: isDark ? [Colors.white.withValues(alpha: 0.08), Colors.white.withValues(alpha: 0.03)] : [AppThemes.colorPrimero.withValues(alpha: 0.08), AppThemes.colorPrimero.withValues(alpha: 0.03)],
         ),
         borderRadius: ResponsiveApp.borderRadius(14),
         border: Border.all(

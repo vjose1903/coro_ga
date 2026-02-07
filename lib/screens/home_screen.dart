@@ -312,7 +312,7 @@ class ListPartidas extends StatelessWidget {
                       final SlideUpProvider slideUp = context.read<SlideUpProvider>();
                       formPartidaProvider.form.patchValue(partida.toMap());
                       partidaProvider.partidaEditar = partida;
-                      slideUp.openSlideUp(controller: panelController, maxHeightFraction: 0.5, bodyContent: EditarEntidad(panelController: panelController));
+                      slideUp.openSlideUp(controller: panelController, maxHeightFraction: isLandscape ? 0.9 : 0.5, bodyContent: EditarEntidad(panelController: panelController));
                     },
                     functionReiniciar: () async {
                       await partida.restartPartida();
@@ -366,7 +366,7 @@ class ListPartidas extends StatelessWidget {
                   final SlideUpProvider slideUp = context.read<SlideUpProvider>();
                   formPartidaProvider.form.patchValue(partida.toMap());
                   partidaProvider.partidaEditar = partida;
-                  slideUp.openSlideUp(controller: panelController, maxHeightFraction: 0.5, bodyContent: EditarEntidad(panelController: panelController));
+                  slideUp.openSlideUp(controller: panelController, maxHeightFraction: isLandscape ? 0.9 : 0.5, bodyContent: EditarEntidad(panelController: panelController));
                 },
                 functionReiniciar: () async {
                   await partida.restartPartida();
@@ -400,9 +400,7 @@ class _EmptyState extends StatelessWidget {
         final iconPadding = useLandscapeLayout ? ResponsiveApp.all(24) : ResponsiveApp.all(40);
 
         final availableHeight = constraints.maxHeight;
-        final double contentHeight = useLandscapeLayout
-            ? (availableHeight * 0.62).clamp(260.0, 420.0)
-            : (availableHeight * 0.68).clamp(320.0, 520.0);
+        final double contentHeight = useLandscapeLayout ? (availableHeight * 0.62).clamp(260.0, 420.0) : (availableHeight * 0.68).clamp(320.0, 520.0);
         final double targetIcon = useLandscapeLayout ? 140.0 : 120.0;
         final effectiveIcon = targetIcon.clamp(100.0, (availableHeight * 0.30).clamp(100.0, 160.0));
         final double effectiveTitle = ResponsiveApp.scaleText(useLandscapeLayout ? 22 : 20);
@@ -417,88 +415,88 @@ class _EmptyState extends StatelessWidget {
             Container(
               width: effectiveIcon,
               height: effectiveIcon,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      AppThemes.colorPrimero.withValues(alpha: 0.15),
-                      AppThemes.colorTercero.withValues(alpha: 0.1),
-                    ],
-                  ),
-                  shape: BoxShape.circle,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppThemes.colorPrimero.withValues(alpha: 0.15),
+                    AppThemes.colorTercero.withValues(alpha: 0.1),
+                  ],
                 ),
-                child: Center(
-                  child: FaIcon(
-                    FontAwesomeIcons.gamepad,
-                    size: useLandscapeLayout ? 50 : 48,
-                    color: AppThemes.colorPrimero.withValues(alpha: 0.6),
-                  ),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: FaIcon(
+                  FontAwesomeIcons.gamepad,
+                  size: useLandscapeLayout ? 50 : 48,
+                  color: AppThemes.colorPrimero.withValues(alpha: 0.6),
                 ),
               ),
-              SizedBox(height: useLandscapeLayout ? 20 : 28),
-              Builder(builder: (context) {
-                final l10n = AppLocalizations.of(context)!;
-                return Column(
-                  children: [
-                    Text(
-                      l10n.emptyGamesTitle,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w600,
-                        fontSize: effectiveTitle,
-                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorCuarto,
-                      ),
+            ),
+            SizedBox(height: useLandscapeLayout ? 20 : 28),
+            Builder(builder: (context) {
+              final l10n = AppLocalizations.of(context)!;
+              return Column(
+                children: [
+                  Text(
+                    l10n.emptyGamesTitle,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w600,
+                      fontSize: effectiveTitle,
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorCuarto,
                     ),
-                    SizedBox(height: useLandscapeLayout ? 8 : 12),
-                    Text(
-                      l10n.emptyGamesSubtitle,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: effectiveSubtitle,
-                        height: 1.5,
-                        color: Colors.grey[500],
-                      ),
+                  ),
+                  SizedBox(height: useLandscapeLayout ? 8 : 12),
+                  Text(
+                    l10n.emptyGamesSubtitle,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: effectiveSubtitle,
+                      height: 1.5,
+                      color: Colors.grey[500],
                     ),
-                    SizedBox(height: useLandscapeLayout ? 15 : 32),
-                    ConstrainedBox(
-                      constraints: BoxConstraints(maxWidth: badgeMaxWidth),
-                      child: Container(
-                        padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 18 : 20, vertical: useLandscapeLayout ? 10 : 10),
-                        decoration: BoxDecoration(
-                          color: AppThemes.colorPrimero.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(30),
-                          border: Border.all(
-                            color: AppThemes.colorPrimero.withValues(alpha: 0.3),
-                            width: 1,
-                          ),
+                  ),
+                  SizedBox(height: useLandscapeLayout ? 15 : 32),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: badgeMaxWidth),
+                    child: Container(
+                      padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 18 : 20, vertical: useLandscapeLayout ? 10 : 10),
+                      decoration: BoxDecoration(
+                        color: AppThemes.colorPrimero.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(
+                          color: AppThemes.colorPrimero.withValues(alpha: 0.3),
+                          width: 1,
                         ),
-                        child: Wrap(
-                          alignment: WrapAlignment.center,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          spacing: 8,
-                          runSpacing: 4,
-                          children: [
-                            Icon(Icons.swipe_left_rounded, size: useLandscapeLayout ? 18 : 18, color: AppThemes.colorPrimero),
-                            Text(
-                              l10n.swipeToEditOrDelete,
-                              textAlign: TextAlign.center,
-                              softWrap: true,
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: effectiveBadge,
-                                color: AppThemes.colorPrimero,
-                              ),
+                      ),
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 8,
+                        runSpacing: 4,
+                        children: [
+                          Icon(Icons.swipe_left_rounded, size: useLandscapeLayout ? 18 : 18, color: AppThemes.colorPrimero),
+                          Text(
+                            l10n.swipeToEditOrDelete,
+                            textAlign: TextAlign.center,
+                            softWrap: true,
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: effectiveBadge,
+                              color: AppThemes.colorPrimero,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                );
-              }),
+                  ),
+                ],
+              );
+            }),
           ],
         );
 
