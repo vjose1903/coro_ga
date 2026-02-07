@@ -1,12 +1,15 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:sliding_up_panel2/sliding_up_panel2.dart';
-import 'package:game_score/helpers/helpers.dart';
-import 'package:game_score/providers/providers.dart';
-import 'package:game_score/shared_preferences/preferences.dart';
-import 'package:game_score/themes/app_themes.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
+
+import '../helpers/helpers.dart';
+import '../providers/providers.dart';
+import '../shared_preferences/preferences.dart';
+import '../themes/app_themes.dart';
+import 'responsive_layout_builder.dart';
 
 class Layout extends StatefulWidget {
   const Layout({
@@ -33,7 +36,7 @@ class Layout extends StatefulWidget {
   State<Layout> createState() => _LayoutState();
 }
 
-class _LayoutState extends State<Layout> {
+class _LayoutState extends State<Layout> with WidgetsBindingObserver {
   late final ScrollController _panelScrollController;
 
   // Gradiente moderno para el fondo
@@ -55,99 +58,129 @@ class _LayoutState extends State<Layout> {
   void initState() {
     super.initState();
     _panelScrollController = ScrollController();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _panelScrollController.dispose();
     super.dispose();
   }
 
   @override
+  void didChangeMetrics() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final SlideUpProvider slideUpProvider = context.watch<SlideUpProvider>();
-    final mediaQuery = MediaQuery.of(context);
-    final screenHeight = mediaQuery.size.height;
-    final keyboardHeight = mediaQuery.viewInsets.bottom;
-    final topPadding = mediaQuery.padding.top;
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        ResponsiveApp.setMq(context);
+        final SlideUpProvider slideUpProvider = context.watch<SlideUpProvider>();
+        final mediaQuery = MediaQuery.of(context);
+        final screenHeight = mediaQuery.size.height;
+        final keyboardHeight = mediaQuery.viewInsets.bottom;
+        final topPadding = mediaQuery.padding.top;
 
-    final fraction = slideUpProvider.maxHeightFraction ?? widget.maxPanelHeightFraction;
-    final visibleHeight = screenHeight - keyboardHeight;
-    final minTopMargin = topPadding + 40;
+        final fraction = slideUpProvider.maxHeightFraction ?? widget.maxPanelHeightFraction;
+        final visibleHeight = screenHeight - keyboardHeight;
+        final minTopMargin = topPadding + 40;
 
-    final maxHeight = max(
-      100.0,
-      min(
-        screenHeight * fraction,
-        min(visibleHeight * widget.maxPanelHeightFraction, visibleHeight - minTopMargin),
-      ),
-    );
-    slideUpProvider.panelMaxHeight = maxHeight;
-
-    final isDark = Preferences.isDarkMode;
-
-    return Padding(
-      padding: EdgeInsets.only(bottom: keyboardHeight),
-      child: SlidingUpPanel(
-        controller: widget.panelController,
-        scrollController: _panelScrollController,
-        minHeight: 0,
-        maxHeight: maxHeight,
-        backdropEnabled: true,
-        parallaxEnabled: true,
-        backdropOpacity: 0.7,
-        backdropTapClosesPanel: slideUpProvider.closeOnOutsideClick,
-        isDraggable: slideUpProvider.isDraggable,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
-        ),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 20,
-            spreadRadius: 2,
-            color: Colors.black.withValues(alpha: 0.5),
+        final maxHeight = max(
+          100.0,
+          min(
+            screenHeight * fraction,
+            min(visibleHeight * widget.maxPanelHeightFraction, visibleHeight - minTopMargin),
           ),
-          if (!isDark)
-            BoxShadow(
-              blurRadius: 10,
-              offset: const Offset(0, -2),
-              color: Colors.white.withValues(alpha: 0.1),
+        );
+        slideUpProvider.panelMaxHeight = maxHeight;
+
+        final isDark = Preferences.isDarkMode;
+
+        final size = mediaQuery.size;
+
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle.light.copyWith(
+            statusBarColor: Colors.transparent,
+          ),
+          child: Padding(
+            padding: EdgeInsets.only(bottom: keyboardHeight),
+            child: SlidingUpPanel(
+              key: ValueKey(size),
+              controller: widget.panelController,
+              scrollController: _panelScrollController,
+              minHeight: 0,
+              maxHeight: maxHeight,
+              backdropEnabled: true,
+              parallaxEnabled: true,
+              backdropOpacity: 0.7,
+              backdropTapClosesPanel: slideUpProvider.closeOnOutsideClick,
+              isDraggable: slideUpProvider.isDraggable,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                  color: Colors.black.withValues(alpha: 0.5),
+                ),
+                if (!isDark)
+                  BoxShadow(
+                    blurRadius: 10,
+                    offset: const Offset(0, -2),
+                    color: Colors.white.withValues(alpha: 0.1),
+                  ),
+              ],
+              color: AppThemes.themeColor_2,
+              onPanelOpened: () {
+                slideUpProvider.onPanelOpened();
+              },
+              onPanelSlide: (position) {
+                // Actualizar la posición del panel para animar el BottomBar
+                slideUpProvider.updatePanelPosition(position);
+                // Si el panel está bajando (posición < 1), marcar que no está completamente abierto
+                if (position < 1.0 && slideUpProvider.isPanelFullyOpen) {
+                  slideUpProvider.onPanelClosing();
+                }
+              },
+              onPanelClosed: () {
+                cleanSlideUp(slideUpProvider, true);
+              },
+              panelBuilder: () => _SlideUpContent(
+                panelController: widget.panelController,
+                scrollController: _panelScrollController,
+              ),
+              body: ResponsiveLayoutBuilder(
+                builder: (context, constraints, info) {
+                  return Stack(
+                    children: [
+                      Container(decoration: boxDecoration),
+                      // Efecto de partículas/decoración sutil
+                      _BackgroundDecoration(),
+                      _AppBar(
+                        title: widget.appBarTitle,
+                        leading: widget.appBarLeading,
+                        trailing: widget.appBarTrailing,
+                        useLandscapeLayout: info.useLandscapeLayout,
+                      ),
+                      _Body(
+                        child: widget.bodyContent,
+                        useLandscapeLayout: info.useLandscapeLayout,
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
-        ],
-        color: AppThemes.themeColor_2,
-        onPanelOpened: () {
-          slideUpProvider.onPanelOpened();
-        },
-        onPanelSlide: (position) {
-          // Actualizar la posición del panel para animar el BottomBar
-          slideUpProvider.updatePanelPosition(position);
-          // Si el panel está bajando (posición < 1), marcar que no está completamente abierto
-          if (position < 1.0 && slideUpProvider.isPanelFullyOpen) {
-            slideUpProvider.onPanelClosing();
-          }
-        },
-        onPanelClosed: () {
-          cleanSlideUp(slideUpProvider, true);
-        },
-        panelBuilder: () => _SlideUpContent(
-          panelController: widget.panelController,
-          scrollController: _panelScrollController,
-        ),
-        body: Stack(
-          children: [
-            Container(decoration: boxDecoration),
-            // Efecto de partículas/decoración sutil
-            _BackgroundDecoration(),
-            _AppBar(
-              title: widget.appBarTitle,
-              leading: widget.appBarLeading,
-              trailing: widget.appBarTrailing,
-            ),
-            _Body(child: widget.bodyContent),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -210,22 +243,31 @@ class _CirclesPainter extends CustomPainter {
 }
 
 class _AppBar extends StatelessWidget {
-  const _AppBar({Key? key, this.title, this.leading, this.trailing}) : super(key: key);
+  const _AppBar({
+    Key? key,
+    this.title,
+    this.leading,
+    this.trailing,
+    required this.useLandscapeLayout,
+  }) : super(key: key);
 
   final String? title;
   final Widget? leading;
   final Widget? trailing;
+  final bool useLandscapeLayout;
 
   @override
   Widget build(BuildContext context) {
+    final bool isLandscape = useLandscapeLayout;
+
     return SafeArea(
       child: Padding(
-        padding: ResponsiveApp.symmetric(horizontal: 12, vertical: 10),
+        padding: ResponsiveApp.symmetric(horizontal: isLandscape ? 8 : 12, vertical: isLandscape ? 3 : 5),
         child: Row(
           children: [
             if (leading != null)
               Container(
-                margin: ResponsiveApp.only(right: 3),
+                margin: ResponsiveApp.only(right: 2),
                 child: leading!,
               ),
             if (title != null)
@@ -238,9 +280,9 @@ class _AppBar extends StatelessWidget {
                     color: Colors.white,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.bold,
-                    fontSize: ResponsiveApp.scaleText(18),
+                    fontSize: ResponsiveApp.scaleText(isLandscape ? 22 : 15),
                     letterSpacing: 1.2,
-                    shadows: [
+                    shadows: const [
                       Shadow(
                         color: Colors.black26,
                         blurRadius: 4,
@@ -259,13 +301,15 @@ class _AppBar extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({Key? key, required this.child}) : super(key: key);
+  const _Body({Key? key, required this.child, required this.useLandscapeLayout}) : super(key: key);
   final Widget child;
+  final bool useLandscapeLayout;
 
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
-    final appBarHeight = topPadding + 65;
+    final appBarHeight = topPadding + (useLandscapeLayout ? 44 : 65);
+    final topRadius = ResponsiveApp.scaleWidth(useLandscapeLayout ? 32 : 50);
 
     return Column(
       children: [
@@ -273,7 +317,7 @@ class _Body extends StatelessWidget {
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(ResponsiveApp.scaleWidth(50))),
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(topRadius)),
               color: AppThemes.themeColor_1,
               boxShadow: [
                 BoxShadow(
@@ -284,7 +328,7 @@ class _Body extends StatelessWidget {
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(ResponsiveApp.scaleWidth(50))),
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(topRadius)),
               child: child,
             ),
           ),

@@ -90,147 +90,66 @@ class _Body extends StatelessWidget {
 
       final dynamic tipoPartida = form.control('tipo').value;
 
-      return Container(
-          height: ((ResponsiveApp.size.height - (ResponsiveApp.size.height * 0.125)) - 80),
-          margin: ResponsiveApp.only(top: 15, bottom: 40),
-          padding: ResponsiveApp.symmetric(horizontal: 20),
-          child: ReactiveForm(
-            formGroup: form,
-            child: IntrinsicHeight(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Botón plantillas
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: _PlantillasButton(
-                      onTap: () => openDefaultsPartidasDialog(context),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
+      return ResponsiveLayoutBuilder(
+        builder: (context, constraints, info) {
+          final bool useLandscapeLayout = info.useLandscapeLayout;
+          final double contentHeight = useLandscapeLayout
+              ? (ResponsiveApp.size.height - 80)
+              : ((ResponsiveApp.size.height - (ResponsiveApp.size.height * 0.125)) - 80);
+          final EdgeInsets contentPadding = ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 16 : 20);
 
-                  // Nombre de la partida
-                  CustomReactiveInput(formControlName: 'nombre', labelText: AppLocalizations.of(context)!.gameName, textCapitalization: TextCapitalization.words),
-                  const SizedBox(height: 14),
-
-                  // Tipo y puntuación
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: CustomReactiveDropDown(
-                          formControlName: 'tipo',
-                          labelText: AppLocalizations.of(context)!.type,
-                          items: [DropdownMenuItem(value: 'Rondas', child: Text(AppLocalizations.of(context)!.rounds)), DropdownMenuItem(value: 'Puntuación', child: Text(AppLocalizations.of(context)!.score))],
-                          onChanged: (value) => formPartidaProvider.changeTipo(value),
-                        ),
-                      ),
-                      if (tipoPartida != null && tipoPartida != '' && !sinMaxPuntuacion) const SizedBox(width: 12),
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeOut,
-                        width: tipoPartida == '' || tipoPartida == null || sinMaxPuntuacion ? 0 : ResponsiveApp.size.width * 0.43,
-                        child: ClipRect(
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: SizedBox(
-                              width: ResponsiveApp.size.width * 0.43,
-                              child: CustomReactiveInput(formControlName: 'maxPuntuacion', labelText: tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScore, inputType: TextInputType.number),
+          return Container(
+              height: contentHeight,
+              margin: ResponsiveApp.only(top: useLandscapeLayout ? 10 : 15, bottom: useLandscapeLayout ? 20 : 40),
+              padding: contentPadding,
+              child: ReactiveForm(
+                formGroup: form,
+                child: IntrinsicHeight(
+                  child: useLandscapeLayout
+                      ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: _FormDetailsColumn(
+                                tipoPartida: tipoPartida,
+                                sinMaxPuntuacion: sinMaxPuntuacion,
+                                isDark: isDark,
+                                formPartidaProvider: formPartidaProvider,
+                                onOpenDefaults: () => openDefaultsPartidasDialog(context),
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-
-                  if (tipoPartida != null && tipoPartida != '')
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(12),
-                        splashColor: AppThemes.colorPrimero.withValues(alpha: 0.12),
-                        highlightColor: AppThemes.colorPrimero.withValues(alpha: 0.06),
-                        onTap: () => formPartidaProvider.setSinMaxPuntuacion(!sinMaxPuntuacion),
-                        child: Ink(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: AppThemes.inputColor.withValues(alpha: 0.05),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.2),
+                            const SizedBox(width: 20),
+                            Expanded(
+                              child: _FormPlayersColumn(
+                                isDark: isDark,
+                                jugadoresController: jugadoresController,
+                                onCreate: () => _crearPartida(context, form, formPartidaProvider),
+                              ),
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: isDark ? Colors.black.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.05),
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.noMaxRounds : AppLocalizations.of(context)!.noMaxScore,
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontSize: ResponsiveApp.scaleText(12),
-                                    color: isDark ? Colors.white70 : Colors.grey[700],
-                                  ),
-                                ),
-                              ),
-                              Switch(
-                                value: sinMaxPuntuacion,
-                                activeThumbColor: AppThemes.colorPrimero,
-                                activeTrackColor: AppThemes.colorPrimero.withValues(alpha: 0.35),
-                                inactiveThumbColor: isDark ? Colors.white70 : Colors.grey[600],
-                                inactiveTrackColor: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.3),
-                                onChanged: (value) => formPartidaProvider.setSinMaxPuntuacion(value),
-                              ),
-                            ],
-                          ),
+                          ],
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _FormDetailsColumn(
+                              tipoPartida: tipoPartida,
+                              sinMaxPuntuacion: sinMaxPuntuacion,
+                              isDark: isDark,
+                              formPartidaProvider: formPartidaProvider,
+                              onOpenDefaults: () => openDefaultsPartidasDialog(context),
+                            ),
+                            const SizedBox(height: 20),
+                            _FormPlayersColumn(
+                              isDark: isDark,
+                              jugadoresController: jugadoresController,
+                              onCreate: () => _crearPartida(context, form, formPartidaProvider),
+                            ),
+                          ],
                         ),
-                      ),
-                    ),
-                  const SizedBox(height: 20),
-
-                  // Sección Jugadores
-                  _JugadoresSection(jugadoresController: jugadoresController),
-                  const SizedBox(height: 12),
-
-                  // Lista de jugadores
-                  Expanded(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: AppThemes.themeColor_2,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.white.withValues(alpha: 0.7),
-                            offset: const Offset(-2, -2),
-                            blurRadius: 4,
-                          ),
-                          BoxShadow(
-                            color: isDark ? Colors.black.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.08),
-                            offset: const Offset(2, 2),
-                            blurRadius: 4,
-                          ),
-                        ],
-                      ),
-                      child: _Inputs(jugadoresController: jugadoresController),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Botón Crear
-                  _CreateButton(
-                    onTap: () => _crearPartida(context, form, formPartidaProvider),
-                  ),
-                ],
-              ),
-            ),
-          ));
+                ),
+              ));
+        },
+      );
     });
   }
 
@@ -278,6 +197,185 @@ class _Body extends StatelessWidget {
     } else {
       Toast.show(type: ToastType.warning, context: context, message: AppLocalizations.of(context)!.checkAllFields);
     }
+  }
+}
+
+class _FormDetailsColumn extends StatelessWidget {
+  const _FormDetailsColumn({
+    required this.tipoPartida,
+    required this.sinMaxPuntuacion,
+    required this.isDark,
+    required this.formPartidaProvider,
+    required this.onOpenDefaults,
+  });
+
+  final dynamic tipoPartida;
+  final bool sinMaxPuntuacion;
+  final bool isDark;
+  final FormPartidaProvider formPartidaProvider;
+  final VoidCallback onOpenDefaults;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Botón plantillas
+        Align(
+          alignment: Alignment.centerRight,
+          child: _PlantillasButton(onTap: onOpenDefaults),
+        ),
+        const SizedBox(height: 14),
+        // Nombre de la partida
+        CustomReactiveInput(
+          formControlName: 'nombre',
+          labelText: AppLocalizations.of(context)!.gameName,
+          textCapitalization: TextCapitalization.words,
+        ),
+        const SizedBox(height: 14),
+        // Tipo y puntuación
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final useLandscapeLayout = ResponsiveApp.isLandscapeFor(constraints) || constraints.maxWidth >= 700;
+            final scoreFieldWidth = constraints.maxWidth * (useLandscapeLayout ? 0.45 : 0.43);
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: CustomReactiveDropDown(
+                    formControlName: 'tipo',
+                    labelText: AppLocalizations.of(context)!.type,
+                    items: [
+                      DropdownMenuItem(value: 'Rondas', child: Text(AppLocalizations.of(context)!.rounds)),
+                      DropdownMenuItem(value: 'Puntuación', child: Text(AppLocalizations.of(context)!.score)),
+                    ],
+                    onChanged: (value) => formPartidaProvider.changeTipo(value),
+                  ),
+                ),
+                if (tipoPartida != null && tipoPartida != '' && !sinMaxPuntuacion) const SizedBox(width: 12),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeOut,
+                  width: tipoPartida == '' || tipoPartida == null || sinMaxPuntuacion ? 0 : scoreFieldWidth,
+                  child: ClipRect(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: SizedBox(
+                        width: scoreFieldWidth,
+                        child: CustomReactiveInput(
+                          formControlName: 'maxPuntuacion',
+                          labelText: tipoPartida == 'Rondas'
+                              ? AppLocalizations.of(context)!.roundCount
+                              : AppLocalizations.of(context)!.maxScore,
+                          inputType: TextInputType.number,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+        const SizedBox(height: 14),
+        if (tipoPartida != null && tipoPartida != '')
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              splashColor: AppThemes.colorPrimero.withValues(alpha: 0.12),
+              highlightColor: AppThemes.colorPrimero.withValues(alpha: 0.06),
+              onTap: () => formPartidaProvider.setSinMaxPuntuacion(!sinMaxPuntuacion),
+              child: Ink(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppThemes.inputColor.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.2),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDark ? Colors.black.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        tipoPartida == 'Rondas'
+                            ? AppLocalizations.of(context)!.noMaxRounds
+                            : AppLocalizations.of(context)!.noMaxScore,
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: ResponsiveApp.scaleText(12),
+                          color: isDark ? Colors.white70 : Colors.grey[700],
+                        ),
+                      ),
+                    ),
+                    Switch(
+                      value: sinMaxPuntuacion,
+                      activeThumbColor: AppThemes.colorPrimero,
+                      activeTrackColor: AppThemes.colorPrimero.withValues(alpha: 0.35),
+                      inactiveThumbColor: isDark ? Colors.white70 : Colors.grey[600],
+                      inactiveTrackColor: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.3),
+                      onChanged: (value) => formPartidaProvider.setSinMaxPuntuacion(value),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _FormPlayersColumn extends StatelessWidget {
+  const _FormPlayersColumn({
+    required this.isDark,
+    required this.jugadoresController,
+    required this.onCreate,
+  });
+
+  final bool isDark;
+  final ScrollController jugadoresController;
+  final VoidCallback onCreate;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _JugadoresSection(jugadoresController: jugadoresController),
+        const SizedBox(height: 12),
+        Expanded(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppThemes.themeColor_2,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.white.withValues(alpha: 0.7),
+                  offset: const Offset(-2, -2),
+                  blurRadius: 4,
+                ),
+                BoxShadow(
+                  color: isDark ? Colors.black.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.08),
+                  offset: const Offset(2, 2),
+                  blurRadius: 4,
+                ),
+              ],
+            ),
+            child: _Inputs(jugadoresController: jugadoresController),
+          ),
+        ),
+        const SizedBox(height: 16),
+        _CreateButton(onTap: onCreate),
+      ],
+    );
   }
 }
 

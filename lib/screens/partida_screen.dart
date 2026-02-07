@@ -159,62 +159,103 @@ class _Body extends StatelessWidget {
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
     final Partida partida = partidaProvider.partidaEnTurno!;
     final bool compactHeight = ResponsiveApp.isSmallHeight;
-    final double topMargin = compactHeight ? 24 : 40;
-    final double bottomMargin = compactHeight ? 60 : 90;
-    final double horizontalPadding = ResponsiveApp.scaleWidth(20);
-    final double contentSpacing = ResponsiveApp.scaleHeight(20);
-    final double betweenCardGap = compactHeight ? ResponsiveApp.scaleHeight(22) : ResponsiveApp.scaleHeight(25);
-    final double adSpacing = ResponsiveApp.scaleHeight(15);
     final l10n = AppLocalizations.of(context)!;
 
-    return Layout(
-        panelController: panelController,
-        hasFooter: true,
-        appBarTitle: partida.nombre,
-        appBarLeading: CustomIconButtom(
-          iconSize: ResponsiveApp.isSmallHeight ? 18 : 22,
-          iconColor: Colors.white,
-          icon: Icons.arrow_back_ios_new,
-          onTap: () => Navigator.pop(context),
-        ),
-        appBarTrailing: CustomIconButtom(
-          iconSize: ResponsiveApp.isSmallHeight ? 18 : 22,
-          iconColor: Colors.white,
-          icon: Icons.edit_outlined,
-          onTap: () {
-            formPartidaProvider.form.patchValue(partida.toMap());
-            partidaProvider.partidaEditar = partida;
-            slideUpProvider.openSlideUp(
-              controller: panelController,
-              maxHeightFraction: 0.5,
-              bodyContent: EditarEntidad(panelController: panelController),
-            );
-          },
-        ),
-        bodyContent: Container(
-            margin: EdgeInsets.only(top: topMargin, bottom: bottomMargin),
-            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-            child: Column(children: [
-              const CustomEstadoPartida(),
-              SizedBox(height: contentSpacing),
-              JugadoresCard(panelController: panelController),
-              SizedBox(height: betweenCardGap),
-              if (partida.esSinMaxPuntuacion) ...[
-                _EndGameButton(
-                  label: l10n.endGame,
-                  onTap: () => _confirmEndGame(context, partida),
-                ),
-                SizedBox(height: adSpacing),
-              ],
-              if (showBanner) ...[
-                // Anuncio separado de la lista de jugadores
-                GoogleBannerAd(
-                  key: ValueKey('partida_banner_${partida.id ?? 'none'}'),
-                  location: AdLocation.partida,
-                ),
-                SizedBox(height: adSpacing),
-              ],
-            ])));
+    return ResponsiveLayoutBuilder(
+      builder: (context, constraints, info) {
+        final bool useLandscapeLayout = info.useLandscapeLayout;
+        final double topMargin = compactHeight ? (useLandscapeLayout ? 12 : 24) : (useLandscapeLayout ? 20 : 40);
+        final double bottomMargin = compactHeight ? (useLandscapeLayout ? 16 : 60) : (useLandscapeLayout ? 24 : 90);
+        final double horizontalPadding = ResponsiveApp.scaleWidth(20);
+        final double contentSpacing = ResponsiveApp.scaleHeight(20);
+        final double betweenCardGap = compactHeight ? ResponsiveApp.scaleHeight(22) : ResponsiveApp.scaleHeight(25);
+        final double adSpacing = ResponsiveApp.scaleHeight(15);
+
+        return Layout(
+            panelController: panelController,
+            hasFooter: true,
+            appBarTitle: partida.nombre,
+            appBarLeading: CustomIconButtom(
+              iconSize: ResponsiveApp.isSmallHeight ? 18 : 22,
+              iconColor: Colors.white,
+              icon: Icons.arrow_back_ios_new,
+              onTap: () => Navigator.pop(context),
+            ),
+            appBarTrailing: CustomIconButtom(
+              iconSize: ResponsiveApp.isSmallHeight ? 18 : 22,
+              iconColor: Colors.white,
+              icon: Icons.edit_outlined,
+              onTap: () {
+                formPartidaProvider.form.patchValue(partida.toMap());
+                partidaProvider.partidaEditar = partida;
+                slideUpProvider.openSlideUp(
+                  controller: panelController,
+                  maxHeightFraction: 0.5,
+                  bodyContent: EditarEntidad(panelController: panelController),
+                );
+              },
+            ),
+            bodyContent: Container(
+                margin: EdgeInsets.only(top: topMargin, bottom: bottomMargin),
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                child: useLandscapeLayout
+                    ? Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              children: [
+                                const CustomEstadoPartida(),
+                                SizedBox(height: contentSpacing),
+                                if (partida.esSinMaxPuntuacion) ...[
+                                  _EndGameButton(
+                                    label: l10n.endGame,
+                                    onTap: () => _confirmEndGame(context, partida),
+                                  ),
+                                  SizedBox(height: adSpacing),
+                                ],
+                                if (showBanner) ...[
+                                  GoogleBannerAd(
+                                    key: ValueKey('partida_banner_${partida.id ?? 'none'}'),
+                                    location: AdLocation.partida,
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: ResponsiveApp.scaleWidth(16)),
+                          Expanded(
+                            flex: 2,
+                            child: JugadoresCard(
+                              panelController: panelController,
+                              expand: false,
+                              useLandscapeLayout: useLandscapeLayout,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(children: [
+                        const CustomEstadoPartida(),
+                        SizedBox(height: contentSpacing),
+                        JugadoresCard(panelController: panelController, useLandscapeLayout: useLandscapeLayout),
+                        SizedBox(height: betweenCardGap),
+                        if (partida.esSinMaxPuntuacion) ...[
+                          _EndGameButton(
+                            label: l10n.endGame,
+                            onTap: () => _confirmEndGame(context, partida),
+                          ),
+                          SizedBox(height: adSpacing),
+                        ],
+                        if (showBanner) ...[
+                          // Anuncio separado de la lista de jugadores
+                          GoogleBannerAd(
+                            key: ValueKey('partida_banner_${partida.id ?? 'none'}'),
+                            location: AdLocation.partida,
+                          ),
+                          SizedBox(height: adSpacing),
+                        ],
+                      ])));
+      },
+    );
   }
 
   void _confirmEndGame(BuildContext context, Partida partida) {
@@ -304,8 +345,10 @@ class _EndGameButton extends StatelessWidget {
 }
 
 class JugadoresCard extends StatelessWidget {
-  const JugadoresCard({super.key, required this.panelController});
+  const JugadoresCard({super.key, required this.panelController, this.expand = true, required this.useLandscapeLayout});
   final PanelController panelController;
+  final bool expand;
+  final bool useLandscapeLayout;
 
   @override
   Widget build(BuildContext context) {
@@ -316,52 +359,53 @@ class JugadoresCard extends StatelessWidget {
       slideUpProvider.openSlideUp(controller: panelController, bodyContent: AddJugadorPartida(panelController: panelController));
     }
 
-    return Expanded(
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppThemes.themeColor_2,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppThemes.colorCuarto.withValues(alpha: Preferences.isDarkMode ? 0.2 : 0.1),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
+    final card = DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppThemes.themeColor_2,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            children: [
-              // Header con botones
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _ActionButton(
-                    icon: Icons.history_rounded,
-                    onTap: () {
-                      final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
-                      slideUpProvider.openSlideUp(controller: panelController, bodyContent: HistorialGeneral(panelController: panelController));
-                    },
-                  ),
-                  _ActionButton(
-                    icon: Icons.manage_accounts_rounded,
-                    isPrimary: true,
-                    onTap: openSlideUp,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              // Lista de jugadores
-              Expanded(child: JugadoresList(panelController: panelController)),
-            ],
+        boxShadow: [
+          BoxShadow(
+            color: AppThemes.colorCuarto.withValues(alpha: Preferences.isDarkMode ? 0.2 : 0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          children: [
+            // Header con botones
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _ActionButton(
+                  icon: Icons.history_rounded,
+                  onTap: () {
+                    final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
+                    slideUpProvider.openSlideUp(controller: panelController, bodyContent: HistorialGeneral(panelController: panelController));
+                  },
+                ),
+                _ActionButton(
+                  icon: Icons.manage_accounts_rounded,
+                  isPrimary: true,
+                  onTap: openSlideUp,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            // Lista de jugadores
+            Expanded(child: JugadoresList(panelController: panelController, useLandscapeLayout: useLandscapeLayout)),
+          ],
         ),
       ),
     );
+
+    if (!expand) return card;
+    return Expanded(child: card);
   }
 }
 
@@ -405,8 +449,9 @@ class _ActionButton extends StatelessWidget {
 }
 
 class JugadoresList extends StatelessWidget {
-  const JugadoresList({super.key, required this.panelController});
+  const JugadoresList({super.key, required this.panelController, required this.useLandscapeLayout});
   final PanelController panelController;
+  final bool useLandscapeLayout;
 
   @override
   Widget build(BuildContext context) {
@@ -419,9 +464,13 @@ class JugadoresList extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         const horizontalSpacing = 10.0;
-        const columns = 2;
         final availableWidth = constraints.maxWidth.isFinite ? constraints.maxWidth : MediaQuery.of(context).size.width;
+        final columns = useLandscapeLayout && availableWidth >= 700 ? 3 : 2;
         final columnWidth = (availableWidth - horizontalSpacing * (columns - 1)) / columns;
+        final maxHeight = constraints.maxHeight.isFinite ? constraints.maxHeight : ResponsiveApp.size.height;
+        final cardHeight = useLandscapeLayout
+            ? (maxHeight * 0.45).clamp(90.0, 120.0)
+            : ResponsiveApp.scaleHeight(130);
 
         return SizedBox(
           width: double.infinity,
@@ -437,6 +486,8 @@ class JugadoresList extends StatelessWidget {
                   jugador: jugador,
                   panelController: panelController,
                   forcedWidth: columnWidth,
+                  forcedHeight: cardHeight,
+                  useLandscapeLayout: useLandscapeLayout,
                 );
 
                 return SizedBox(
@@ -458,10 +509,12 @@ class JugadoresList extends StatelessWidget {
 }
 
 class JugadorInfo extends StatelessWidget {
-  const JugadorInfo({super.key, required this.jugador, required this.panelController, this.forcedWidth});
+  const JugadorInfo({super.key, required this.jugador, required this.panelController, this.forcedWidth, this.forcedHeight, required this.useLandscapeLayout});
   final Jugador jugador;
   final PanelController panelController;
   final double? forcedWidth;
+  final double? forcedHeight;
+  final bool useLandscapeLayout;
 
   @override
   Widget build(BuildContext context) {
@@ -499,6 +552,8 @@ class JugadorInfo extends StatelessWidget {
       estado: estado,
       config: config,
       width: forcedWidth,
+      height: forcedHeight,
+      useLandscapeLayout: useLandscapeLayout,
       onTap: () {
         final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
         final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
@@ -515,12 +570,16 @@ class _JugadorCard extends StatelessWidget {
     required this.estado,
     required this.config,
     this.width,
+    this.height,
+    required this.useLandscapeLayout,
     required this.onTap,
   });
   final Jugador jugador;
   final String estado;
   final Map<String, dynamic> config;
   final double? width;
+  final double? height;
+  final bool useLandscapeLayout;
   final VoidCallback onTap;
 
   @override
@@ -528,14 +587,14 @@ class _JugadorCard extends StatelessWidget {
     final bool isWinner = estado == Estado.ganador;
     final bool isLoser = estado == Estado.perdedor;
     final bool compactWidth = ResponsiveApp.isSmallWidth;
-    final double cardHeight = ResponsiveApp.scaleHeight(130);
+    final double cardHeight = height ?? (useLandscapeLayout ? ResponsiveApp.scaleWidth(120) : ResponsiveApp.scaleHeight(130));
     final double defaultCardWidth = ResponsiveApp.size.width * (compactWidth ? 0.48 : 0.4);
     final double cardWidth = width ?? defaultCardWidth;
-    final double contentPadding = ResponsiveApp.scaleWidth(12);
-    final double nameFontSize = ResponsiveApp.scaleText(14);
-    final double scoreFontSize = ResponsiveApp.scaleText(42);
-    final double iconSize = ResponsiveApp.scaleWidth(14);
-    final double iconPadding = ResponsiveApp.scaleWidth(4);
+    final double contentPadding = ResponsiveApp.scaleWidth(useLandscapeLayout ? 10 : 12);
+    final double nameFontSize = ResponsiveApp.scaleText(useLandscapeLayout ? 13 : 14);
+    final double scoreFontSize = ResponsiveApp.scaleText(useLandscapeLayout ? 30 : 42);
+    final double iconSize = ResponsiveApp.scaleWidth(useLandscapeLayout ? 12 : 14);
+    final double iconPadding = ResponsiveApp.scaleWidth(useLandscapeLayout ? 3 : 4);
 
     return Container(
       height: cardHeight,

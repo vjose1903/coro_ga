@@ -68,9 +68,10 @@ class _PremiumScreenState extends State<PremiumScreen> {
             child: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Row(
+                child: ResponsiveLayoutBuilder(
+                  builder: (context, constraints, info) {
+                    final useLandscapeLayout = info.useLandscapeLayout;
+                    final headerRow = Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _BackButton(),
@@ -114,15 +115,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
                           ),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 20),
+                    );
 
-                    // Logo Premium con efecto shine
-                    _PremiumLogo(),
-                    const SizedBox(height: 24),
-
-                    // Título
-                    FadeInUp(
+                    final title = FadeInUp(
                       delay: const Duration(milliseconds: 200),
                       child: ShaderMask(
                         shaderCallback: (bounds) => const LinearGradient(
@@ -140,10 +135,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
+                    );
 
-                    FadeInUp(
+                    final subtitle = FadeInUp(
                       delay: const Duration(milliseconds: 300),
                       child: Text(
                         AppLocalizations.of(context)!.unlockFullPotential,
@@ -153,45 +147,42 @@ class _PremiumScreenState extends State<PremiumScreen> {
                           color: isDark ? Colors.white54 : Colors.grey[600],
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 32),
+                    );
 
-                    // Features
-                    _FeatureItem(
-                      icon: FontAwesomeIcons.userGroup,
-                      title: AppLocalizations.of(context)!.unlimitedPlayers,
-                      description: AppLocalizations.of(context)!.unlimitedPlayersDesc,
-                      delay: 400,
-                    ),
-                    _FeatureItem(
-                      icon: FontAwesomeIcons.gamepad,
-                      title: AppLocalizations.of(context)!.unlimitedGames,
-                      description: AppLocalizations.of(context)!.unlimitedGamesDesc,
-                      delay: 500,
-                    ),
-                    _FeatureItem(
-                      icon: FontAwesomeIcons.gamepad,
-                      title: AppLocalizations.of(context)!.predefinedGamesFeature,
-                      description: AppLocalizations.of(context)!.predefinedGamesDesc,
-                      delay: 600,
-                    ),
-                    _FeatureItem(
-                      icon: FontAwesomeIcons.clockRotateLeft,
-                      title: AppLocalizations.of(context)!.fullHistory,
-                      description: AppLocalizations.of(context)!.fullHistoryDesc,
-                      delay: 700,
-                    ),
-                    _FeatureItem(
-                      icon: FontAwesomeIcons.ban,
-                      title: AppLocalizations.of(context)!.noAds,
-                      description: AppLocalizations.of(context)!.noAdsDesc,
-                      delay: 800,
-                    ),
+                    final features = [
+                      _FeatureItem(
+                        icon: FontAwesomeIcons.userGroup,
+                        title: AppLocalizations.of(context)!.unlimitedPlayers,
+                        description: AppLocalizations.of(context)!.unlimitedPlayersDesc,
+                        delay: 400,
+                      ),
+                      _FeatureItem(
+                        icon: FontAwesomeIcons.gamepad,
+                        title: AppLocalizations.of(context)!.unlimitedGames,
+                        description: AppLocalizations.of(context)!.unlimitedGamesDesc,
+                        delay: 500,
+                      ),
+                      _FeatureItem(
+                        icon: FontAwesomeIcons.gamepad,
+                        title: AppLocalizations.of(context)!.predefinedGamesFeature,
+                        description: AppLocalizations.of(context)!.predefinedGamesDesc,
+                        delay: 600,
+                      ),
+                      _FeatureItem(
+                        icon: FontAwesomeIcons.clockRotateLeft,
+                        title: AppLocalizations.of(context)!.fullHistory,
+                        description: AppLocalizations.of(context)!.fullHistoryDesc,
+                        delay: 700,
+                      ),
+                      _FeatureItem(
+                        icon: FontAwesomeIcons.ban,
+                        title: AppLocalizations.of(context)!.noAds,
+                        description: AppLocalizations.of(context)!.noAdsDesc,
+                        delay: 800,
+                      ),
+                    ];
 
-                    const SizedBox(height: 32),
-
-                    // Botón de compra
-                    Consumer<PremiumProvider>(
+                    final buySection = Consumer<PremiumProvider>(
                       builder: (context, premiumProvider, child) {
                         if (premiumProvider.isPremium) {
                           return _AlreadyPremiumCard();
@@ -202,11 +193,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
                           onTap: () => _buyPremium(context),
                         );
                       },
-                    ),
+                    );
 
-                    const SizedBox(height: 14),
-
-                    FadeInUp(
+                    final footnote = FadeInUp(
                       delay: const Duration(milliseconds: 1000),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -227,9 +216,60 @@ class _PremiumScreenState extends State<PremiumScreen> {
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: 30),
-                  ],
+                    );
+
+                    if (!useLandscapeLayout) {
+                      return Column(
+                        children: [
+                          headerRow,
+                          const SizedBox(height: 20),
+                          _PremiumLogo(),
+                          const SizedBox(height: 24),
+                          title,
+                          const SizedBox(height: 8),
+                          subtitle,
+                          const SizedBox(height: 32),
+                          ...features,
+                          const SizedBox(height: 32),
+                          buySection,
+                          const SizedBox(height: 14),
+                          footnote,
+                          const SizedBox(height: 30),
+                        ],
+                      );
+                    }
+
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            children: [
+                              headerRow,
+                              const SizedBox(height: 20),
+                              _PremiumLogo(),
+                              const SizedBox(height: 24),
+                              title,
+                              const SizedBox(height: 8),
+                              subtitle,
+                              const SizedBox(height: 24),
+                              buySection,
+                              const SizedBox(height: 14),
+                              footnote,
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 24),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              ...features,
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ),

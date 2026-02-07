@@ -7,12 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 
+import '../helpers/helpers.dart';
 import '../firebase_options.dart';
 import '../l10n/app_localizations.dart';
 import '../themes/app_themes.dart';
 import '../providers/premium_provider.dart';
 import '../services/purchase_service.dart';
 import '../shared_preferences/preferences.dart';
+import '../widgets/widgets.dart';
 
 class SplashLoadingScreen extends StatefulWidget {
   const SplashLoadingScreen({super.key});
@@ -126,7 +128,6 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
     final theme = Theme.of(context);
     final textColor = theme.colorScheme.onSurface.withValues(alpha: 0.85);
     final backgroundColor = Preferences.isDarkMode ? AppThemes.themeColor_1 : Colors.white;
-
     return Scaffold(
       backgroundColor: backgroundColor,
       body: SafeArea(
@@ -135,64 +136,131 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
             constraints: const BoxConstraints(maxWidth: 360),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+              child: ResponsiveLayoutBuilder(
+                builder: (context, constraints, info) {
+                  final useLandscapeLayout = info.useLandscapeLayout;
+                  return Stack(
+                    alignment: Alignment.center,
                     children: [
-                      const SizedBox(height: 12),
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.25),
-                              blurRadius: 20,
-                              offset: const Offset(0, 8),
+                      useLandscapeLayout
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(24),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.25),
+                                        blurRadius: 20,
+                                        offset: const Offset(0, 8),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(24),
+                                    child: Image.asset(
+                                      'assets/icon/icon.png',
+                                      width: 120,
+                                      height: 120,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 24),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Coro Games',
+                                        style: theme.textTheme.headlineSmall?.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                          letterSpacing: 0.2,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      LinearProgressIndicator(
+                                        value: _hasError ? null : _progress,
+                                        color: AppThemes.colorPrimero,
+                                        backgroundColor: AppThemes.themeColor_3,
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        _hasError ? l10n.loadingDataError : l10n.loadingData,
+                                        textAlign: TextAlign.left,
+                                        style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
+                                      ),
+                                      if (_hasError) ...[
+                                        const SizedBox(height: 16),
+                                        ElevatedButton(
+                                          onPressed: _startInitialization,
+                                          child: Text(l10n.loading),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const SizedBox(height: 12),
+                                DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(24),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.25),
+                                        blurRadius: 20,
+                                        offset: const Offset(0, 8),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(24),
+                                    child: Image.asset(
+                                      'assets/icon/icon.png',
+                                      width: 120,
+                                      height: 120,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                Text(
+                                  'Coro Games',
+                                  style: theme.textTheme.headlineSmall?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.2,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                LinearProgressIndicator(
+                                  value: _hasError ? null : _progress,
+                                  color: AppThemes.colorPrimero,
+                                  backgroundColor: AppThemes.themeColor_3,
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  _hasError ? l10n.loadingDataError : l10n.loadingData,
+                                  textAlign: TextAlign.center,
+                                  style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
+                                ),
+                                if (_hasError) ...[
+                                  const SizedBox(height: 16),
+                                  ElevatedButton(
+                                    onPressed: _startInitialization,
+                                    child: Text(l10n.loading),
+                                  ),
+                                ],
+                              ],
                             ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(24),
-                          child: Image.asset(
-                            'assets/icon/icon.png',
-                            width: 120,
-                            height: 120,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        'Coro Games',
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.2,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      LinearProgressIndicator(
-                        value: _hasError ? null : _progress,
-                        color: AppThemes.colorPrimero,
-                        backgroundColor: AppThemes.themeColor_3,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        _hasError ? l10n.loadingDataError : l10n.loadingData,
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
-                      ),
-                      if (_hasError) ...[
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: _startInitialization,
-                          child: Text(l10n.loading),
-                        ),
-                      ],
                     ],
-                  ),
-                ],
+                  );
+                },
               ),
             ),
           ),

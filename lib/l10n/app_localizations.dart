@@ -158,6 +158,18 @@ abstract class AppLocalizations {
   /// **'Error loading data.'**
   String get loadingDataError;
 
+  /// No description provided for @adErrorRematch.
+  ///
+  /// In en, this message translates to:
+  /// **'There was an error and the rematch could not be completed.'**
+  String get adErrorRematch;
+
+  /// No description provided for @rewardNotCompletedRematch.
+  ///
+  /// In en, this message translates to:
+  /// **'The reward was not completed to trigger the rematch.'**
+  String get rewardNotCompletedRematch;
+
   /// No description provided for @freeVersionLimitGames.
   ///
   /// In en, this message translates to:

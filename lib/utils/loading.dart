@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../helpers/helpers.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+
+import '../helpers/helpers.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class MyLoading {
   MyLoading();

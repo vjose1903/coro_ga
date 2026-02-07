@@ -12,6 +12,20 @@ class ResponsiveApp {
   static Size get size => _mediaQueryData!.size;
   static double get width => size.width;
   static double get height => size.height;
+  static Orientation get orientation => mq.orientation;
+
+  static bool get isLandscape => orientation == Orientation.landscape;
+  static bool get isPortrait => orientation == Orientation.portrait;
+  static double get aspectRatio => width / height;
+
+  static bool isLandscapeFor(BoxConstraints constraints) =>
+      constraints.maxWidth > constraints.maxHeight;
+
+  static const double _wideLayoutMinWidth = 600;
+  static bool get isWideLayout => width >= _wideLayoutMinWidth;
+  static bool get _isWidePortrait => isPortrait && isWideLayout;
+  // Use landscape layout only for landscape, or for wide/square-ish portrait screens (foldables/tablets).
+  static bool get useLandscapeLayout => isLandscape || (_isWidePortrait && aspectRatio >= 0.75);
 
   static void setMq(BuildContext context) {
     _mediaQueryData = MediaQuery.of(context);

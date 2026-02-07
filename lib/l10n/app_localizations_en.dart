@@ -39,6 +39,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadingDataError => 'Error loading data.';
 
   @override
+  String get adErrorRematch =>
+      'There was an error and the rematch could not be completed.';
+
+  @override
+  String get rewardNotCompletedRematch =>
+      'The reward was not completed to trigger the rematch.';
+
+  @override
   String freeVersionLimitGames(int count) {
     return 'Free version only allows $count simultaneous games.';
   }

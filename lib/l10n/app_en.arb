@@ -13,6 +13,8 @@
   "loading": "Loading...",
   "loadingData": "Loading data...",
   "loadingDataError": "Error loading data.",
+  "adErrorRematch": "There was an error and the rematch could not be completed.",
+  "rewardNotCompletedRematch": "The reward was not completed to trigger the rematch.",
   
   "freeVersionLimitGames": "Free version only allows {count} simultaneous games.",
   "@freeVersionLimitGames": {

@@ -1,21 +1,39 @@
 import 'package:flutter/material.dart';
-import '../helpers/helpers.dart';
-import '../utils/utils.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+
+import '../helpers/helpers.dart';
 import '../shared_preferences/preferences.dart';
+import '../utils/utils.dart';
 
 class GoogleAdsProvider extends ChangeNotifier {
   InterstitialAd? interstitialAd;
   Function? onCloseFunction_;
   bool _showOnLoad = false;
+  int _interstitialLoadAttempts = 0;
+  bool _adLoadingVisible = false;
 
   RewardedAd? rewardedAd;
   Function? onRewardedCloseFunction_;
   Function? onRewardEarnedFunction_;
+  Function? onRewardedErrorFunction_;
+  int _rewardedLoadAttempts = 0;
 
-  loadInterstitialAd() {
+  void _showAdLoading() {
+    if (_adLoadingVisible) return;
+    _adLoadingVisible = true;
+    MyLoading.show();
+  }
+
+  void _hideAdLoading() {
+    if (!_adLoadingVisible) return;
+    _adLoadingVisible = false;
+    MyLoading.close();
+  }
+
+  loadInterstitialAd({int attempt = 1}) {
     if (Preferences.isPremium) return;
     if (interstitialAd == null) {
+      _interstitialLoadAttempts = attempt;
       final adUnitId = AdHelper.getInterstitialAdUnitId();
       if (adUnitId.isEmpty) {
         return;
@@ -26,11 +44,16 @@ class GoogleAdsProvider extends ChangeNotifier {
         adLoadCallback: InterstitialAdLoadCallback(
           onAdLoaded: (ad) {
             ad.fullScreenContentCallback = FullScreenContentCallback(
+              onAdShowedFullScreenContent: (ad) {
+                _hideAdLoading();
+              },
               onAdFailedToShowFullScreenContent: (ad, error) {
+                _hideAdLoading();
                 onCloseFunction_ != null ? onCloseFunction_!() : null;
                 cleanInterstitialAd();
               },
               onAdDismissedFullScreenContent: (ad) {
+                _hideAdLoading();
                 onCloseFunction_ != null ? onCloseFunction_!() : null;
 
                 cleanInterstitialAd();
@@ -45,6 +68,11 @@ class GoogleAdsProvider extends ChangeNotifier {
           },
           onAdFailedToLoad: (err) {
             Fun.logColor(color: Colores.red, body: 'Failed to load an interstitial ad: ${err.message}');
+            if (_interstitialLoadAttempts < 2) {
+              loadInterstitialAd(attempt: _interstitialLoadAttempts + 1);
+              return;
+            }
+            _hideAdLoading();
             onCloseFunction_ != null ? onCloseFunction_!() : null;
             _showOnLoad = false;
             cleanInterstitialAd();
@@ -61,9 +89,11 @@ class GoogleAdsProvider extends ChangeNotifier {
     }
     onCloseFunction_ = onCloseFunction;
     if (interstitialAd != null) {
+      _showAdLoading();
       interstitialAd!.show();
       return;
     }
+    _showAdLoading();
     _showOnLoad = true;
     loadInterstitialAd();
   }
@@ -73,9 +103,10 @@ class GoogleAdsProvider extends ChangeNotifier {
     if (interstitialAd != null) interstitialAd = null;
   }
 
-  loadRewardedAd(RewardedAdLocation location) {
+  loadRewardedAd(RewardedAdLocation location, {int attempt = 1}) {
     if (Preferences.isPremium) return;
     if (rewardedAd == null) {
+      _rewardedLoadAttempts = attempt;
       final adUnitId = AdHelper.getRewardedAdUnitId(location);
       if (adUnitId.isEmpty) {
         return;
@@ -86,10 +117,16 @@ class GoogleAdsProvider extends ChangeNotifier {
         rewardedAdLoadCallback: RewardedAdLoadCallback(
           onAdLoaded: (ad) {
             ad.fullScreenContentCallback = FullScreenContentCallback(
+              onAdShowedFullScreenContent: (ad) {
+                _hideAdLoading();
+              },
               onAdFailedToShowFullScreenContent: (ad, error) {
+                _hideAdLoading();
+                onRewardedErrorFunction_?.call();
                 cleanRewardedAd();
               },
               onAdDismissedFullScreenContent: (ad) {
+                _hideAdLoading();
                 onRewardedCloseFunction_?.call();
                 cleanRewardedAd();
               },
@@ -99,7 +136,12 @@ class GoogleAdsProvider extends ChangeNotifier {
           },
           onAdFailedToLoad: (err) {
             Fun.logColor(color: Colores.red, body: 'Failed to load a rewarded ad: ${err.message}');
-            onRewardedCloseFunction_?.call();
+            if (_rewardedLoadAttempts < 2) {
+              loadRewardedAd(location, attempt: _rewardedLoadAttempts + 1);
+              return;
+            }
+            _hideAdLoading();
+            onRewardedErrorFunction_?.call();
             cleanRewardedAd();
           },
         ),
@@ -110,14 +152,17 @@ class GoogleAdsProvider extends ChangeNotifier {
   showRewardedAd({
     required Function onCloseFunction,
     required Function onRewardEarned,
+    Function? onAdFailed,
   }) {
     if (Preferences.isPremium) {
       onCloseFunction();
       return;
     }
     if (rewardedAd != null) {
+      _showAdLoading();
       onRewardedCloseFunction_ = onCloseFunction;
       onRewardEarnedFunction_ = onRewardEarned;
+      onRewardedErrorFunction_ = onAdFailed;
       rewardedAd!.show(
         onUserEarnedReward: (ad, reward) {
           onRewardEarnedFunction_?.call();
@@ -133,5 +178,6 @@ class GoogleAdsProvider extends ChangeNotifier {
     rewardedAd = null;
     onRewardedCloseFunction_ = null;
     onRewardEarnedFunction_ = null;
+    onRewardedErrorFunction_ = null;
   }
 }

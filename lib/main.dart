@@ -94,6 +94,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
     ]);
 
     return GestureDetector(

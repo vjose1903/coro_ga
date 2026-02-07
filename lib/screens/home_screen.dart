@@ -229,7 +229,11 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Expanded(child: ListPartidas(panelController: panelController)),
+        Expanded(
+          child: SizedBox.expand(
+            child: ListPartidas(panelController: panelController),
+          ),
+        ),
         // Banner de anuncios
         const SizedBox(height: 10),
         if (showBanner)
@@ -246,8 +250,10 @@ class _Body extends StatelessWidget {
 }
 
 class ListPartidas extends StatelessWidget {
-  const ListPartidas({Key? key, required this.panelController}) : super(key: key);
+  const ListPartidas({Key? key, required this.panelController, this.padding, this.centerEmptyState = false}) : super(key: key);
   final PanelController panelController;
+  final EdgeInsets? padding;
+  final bool centerEmptyState;
 
   @override
   Widget build(BuildContext context) {
@@ -255,54 +261,121 @@ class ListPartidas extends StatelessWidget {
     final List<Partida> partidas = partidaProvider.partidas;
 
     if (partidas.isEmpty) {
-      if (!partidaProvider.isFirstSearch) return _EmptyState();
+      if (!partidaProvider.isFirstSearch) return _EmptyState(centerInAvailableSpace: centerEmptyState);
       return _LoadingState();
     }
 
-    return ListView.builder(
-      itemCount: partidas.length,
-      padding: ResponsiveApp.symmetric(vertical: 30, horizontal: 20),
-      physics: const ClampingScrollPhysics(),
-      cacheExtent: 300,
-      itemBuilder: (_, index) {
-        final partida = partidas[index];
-        return Padding(
-          padding: EdgeInsets.only(bottom: index < partidas.length - 1 ? 16 : 100),
-          child: FadeInUp(
-            duration: Duration(milliseconds: 300 + (index < 5 ? index * 50 : 250)),
-            child: PartidaCard(
-              partida: partida,
-              onTap: () {
-                partidaProvider.changePartidaEnTurno(partida);
-                Navigator.pushNamed(context, 'partida');
-              },
-              functionBorrar: (handler) async {
-                final l10n = AppLocalizations.of(context)!;
-                CustomAlertDialog.show(context, menssage: l10n.confirmDeleteGame(partida.nombre!), title: l10n.confirm, dialogType: DialogType.error, buttonsList: [
-                  CustomActionsButtons.cancelButton({
-                    'label': l10n.cancel,
-                    'onTap': () {
-                      Navigator.pop(context);
-                      handler(false);
-                    }
-                  }),
-                  CustomActionsButtons.aceptarButton({'label': l10n.accept, 'onTap': () => removePartida(context, handler, partidas, index)})
-                ]);
-              },
-              functionEditar: () {
-                final FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
-                final SlideUpProvider slideUp = context.read<SlideUpProvider>();
-                formPartidaProvider.form.patchValue(partida.toMap());
-                partidaProvider.partidaEditar = partida;
-                slideUp.openSlideUp(controller: panelController, maxHeightFraction: 0.5, bodyContent: EditarEntidad(panelController: panelController));
-              },
-              functionReiniciar: () async {
-                await partida.restartPartida();
-                partidaProvider.refresh();
-              },
-              index: index,
-            ),
+    return ResponsiveLayoutBuilder(
+      builder: (context, constraints, info) {
+        final listPadding = padding ?? ResponsiveApp.symmetric(vertical: 30, horizontal: 20);
+        final maxWidth = constraints.maxWidth;
+        final isLandscape = constraints.maxWidth > constraints.maxHeight;
+        final useGrid = isLandscape;
+        final gridHorizontalPadding = listPadding.horizontal;
+        const crossSpacing = 16.0;
+        final availableWidth = maxWidth - gridHorizontalPadding - crossSpacing;
+        final itemWidth = availableWidth * 0.5;
+
+        if (!useGrid) {
+          return ListView.builder(
+            itemCount: partidas.length,
+            padding: listPadding,
+            physics: const ClampingScrollPhysics(),
+            cacheExtent: 300,
+            itemBuilder: (_, index) {
+              final partida = partidas[index];
+              return Padding(
+                padding: EdgeInsets.only(bottom: index < partidas.length - 1 ? 16 : 100),
+                child: FadeInUp(
+                  duration: Duration(milliseconds: 300 + (index < 5 ? index * 50 : 250)),
+                  child: PartidaCard(
+                    partida: partida,
+                    onTap: () {
+                      partidaProvider.changePartidaEnTurno(partida);
+                      Navigator.pushNamed(context, 'partida');
+                    },
+                    functionBorrar: (handler) async {
+                      final l10n = AppLocalizations.of(context)!;
+                      CustomAlertDialog.show(context, menssage: l10n.confirmDeleteGame(partida.nombre!), title: l10n.confirm, dialogType: DialogType.error, buttonsList: [
+                        CustomActionsButtons.cancelButton({
+                          'label': l10n.cancel,
+                          'onTap': () {
+                            Navigator.pop(context);
+                            handler(false);
+                          }
+                        }),
+                        CustomActionsButtons.aceptarButton({'label': l10n.accept, 'onTap': () => removePartida(context, handler, partidas, index)})
+                      ]);
+                    },
+                    functionEditar: () {
+                      final FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
+                      final SlideUpProvider slideUp = context.read<SlideUpProvider>();
+                      formPartidaProvider.form.patchValue(partida.toMap());
+                      partidaProvider.partidaEditar = partida;
+                      slideUp.openSlideUp(controller: panelController, maxHeightFraction: 0.5, bodyContent: EditarEntidad(panelController: panelController));
+                    },
+                    functionReiniciar: () async {
+                      await partida.restartPartida();
+                      partidaProvider.refresh();
+                    },
+                    index: index,
+                  ),
+                ),
+              );
+            },
+          );
+        }
+
+        final dynamicAspectRatio = (itemWidth / 100).clamp(0.5, 4.0);
+
+        return GridView.builder(
+          itemCount: partidas.length,
+          padding: listPadding,
+          physics: const ClampingScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: itemWidth,
+            crossAxisSpacing: crossSpacing,
+            mainAxisSpacing: 16,
+            childAspectRatio: dynamicAspectRatio,
           ),
+          itemBuilder: (_, index) {
+            final partida = partidas[index];
+            return FadeInUp(
+              duration: Duration(milliseconds: 300 + (index < 5 ? index * 50 : 250)),
+              child: PartidaCard(
+                partida: partida,
+                onTap: () {
+                  partidaProvider.changePartidaEnTurno(partida);
+                  Navigator.pushNamed(context, 'partida');
+                },
+                functionBorrar: (handler) async {
+                  final l10n = AppLocalizations.of(context)!;
+                  CustomAlertDialog.show(context, menssage: l10n.confirmDeleteGame(partida.nombre!), title: l10n.confirm, dialogType: DialogType.error, buttonsList: [
+                    CustomActionsButtons.cancelButton({
+                      'label': l10n.cancel,
+                      'onTap': () {
+                        Navigator.pop(context);
+                        handler(false);
+                      }
+                    }),
+                    CustomActionsButtons.aceptarButton({'label': l10n.accept, 'onTap': () => removePartida(context, handler, partidas, index)})
+                  ]);
+                },
+                functionEditar: () {
+                  final FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
+                  final SlideUpProvider slideUp = context.read<SlideUpProvider>();
+                  formPartidaProvider.form.patchValue(partida.toMap());
+                  partidaProvider.partidaEditar = partida;
+                  slideUp.openSlideUp(controller: panelController, maxHeightFraction: 0.5, bodyContent: EditarEntidad(panelController: panelController));
+                },
+                functionReiniciar: () async {
+                  await partida.restartPartida();
+                  partidaProvider.refresh();
+                },
+                index: index,
+              ),
+            );
+          },
         );
       },
     );
@@ -316,21 +389,34 @@ class ListPartidas extends StatelessWidget {
 }
 
 class _EmptyState extends StatelessWidget {
-  const _EmptyState();
+  const _EmptyState({this.centerInAvailableSpace = false});
+  final bool centerInAvailableSpace;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: FadeIn(
-        duration: const Duration(milliseconds: 600),
-        child: Padding(
-          padding: ResponsiveApp.all(40),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 120,
-                height: 120,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final useLandscapeLayout = ResponsiveApp.isLandscapeFor(constraints) || constraints.maxWidth >= 700;
+        final iconPadding = useLandscapeLayout ? ResponsiveApp.all(24) : ResponsiveApp.all(40);
+
+        final availableHeight = constraints.maxHeight;
+        final double contentHeight = useLandscapeLayout
+            ? (availableHeight * 0.62).clamp(260.0, 420.0)
+            : (availableHeight * 0.68).clamp(320.0, 520.0);
+        final double targetIcon = useLandscapeLayout ? 140.0 : 120.0;
+        final effectiveIcon = targetIcon.clamp(100.0, (availableHeight * 0.30).clamp(100.0, 160.0));
+        final double effectiveTitle = ResponsiveApp.scaleText(useLandscapeLayout ? 22 : 20);
+        final double effectiveSubtitle = ResponsiveApp.scaleText(useLandscapeLayout ? 16 : 14);
+        final double effectiveBadge = ResponsiveApp.scaleText(useLandscapeLayout ? 14 : 12);
+
+        final badgeMaxWidth = constraints.maxWidth * 0.9;
+
+        Widget content = Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: effectiveIcon,
+              height: effectiveIcon,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
@@ -345,12 +431,12 @@ class _EmptyState extends StatelessWidget {
                 child: Center(
                   child: FaIcon(
                     FontAwesomeIcons.gamepad,
-                    size: 48,
+                    size: useLandscapeLayout ? 50 : 48,
                     color: AppThemes.colorPrimero.withValues(alpha: 0.6),
                   ),
                 ),
               ),
-              const SizedBox(height: 28),
+              SizedBox(height: useLandscapeLayout ? 20 : 28),
               Builder(builder: (context) {
                 final l10n = AppLocalizations.of(context)!;
                 return Column(
@@ -361,55 +447,86 @@ class _EmptyState extends StatelessWidget {
                       style: TextStyle(
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w600,
-                        fontSize: ResponsiveApp.scaleText(20),
+                        fontSize: effectiveTitle,
                         color: Theme.of(context).brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorCuarto,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: useLandscapeLayout ? 8 : 12),
                     Text(
                       l10n.emptyGamesSubtitle,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: 'Poppins',
-                        fontSize: ResponsiveApp.scaleText(14),
+                        fontSize: effectiveSubtitle,
                         height: 1.5,
                         color: Colors.grey[500],
                       ),
                     ),
-                    const SizedBox(height: 32),
-                    Container(
-                      padding: ResponsiveApp.symmetric(horizontal: 20, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: AppThemes.colorPrimero.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(
-                          color: AppThemes.colorPrimero.withValues(alpha: 0.3),
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.swipe_left_rounded, size: 18, color: AppThemes.colorPrimero),
-                          const SizedBox(width: 8),
-                          Text(
-                            l10n.swipeToEditOrDelete,
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: ResponsiveApp.scaleText(12),
-                              color: AppThemes.colorPrimero,
-                            ),
+                    SizedBox(height: useLandscapeLayout ? 15 : 32),
+                    ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: badgeMaxWidth),
+                      child: Container(
+                        padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 18 : 20, vertical: useLandscapeLayout ? 10 : 10),
+                        decoration: BoxDecoration(
+                          color: AppThemes.colorPrimero.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                            color: AppThemes.colorPrimero.withValues(alpha: 0.3),
+                            width: 1,
                           ),
-                        ],
+                        ),
+                        child: Wrap(
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 8,
+                          runSpacing: 4,
+                          children: [
+                            Icon(Icons.swipe_left_rounded, size: useLandscapeLayout ? 18 : 18, color: AppThemes.colorPrimero),
+                            Text(
+                              l10n.swipeToEditOrDelete,
+                              textAlign: TextAlign.center,
+                              softWrap: true,
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: effectiveBadge,
+                                color: AppThemes.colorPrimero,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 );
               }),
-            ],
+          ],
+        );
+
+        final padding = iconPadding;
+        final estimatedTotalHeight = contentHeight + padding.vertical;
+        final needScroll = estimatedTotalHeight > availableHeight;
+
+        if (!needScroll) {
+          return Center(
+            child: Padding(
+              padding: padding,
+              child: FadeIn(
+                duration: const Duration(milliseconds: 600),
+                child: content,
+              ),
+            ),
+          );
+        }
+
+        return SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          padding: padding,
+          child: FadeIn(
+            duration: const Duration(milliseconds: 600),
+            child: content,
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

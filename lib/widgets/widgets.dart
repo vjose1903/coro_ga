@@ -19,4 +19,5 @@ export 'package:game_score/widgets/lottie_animation.dart';
 export 'package:game_score/widgets/partida_card.dart';
 export 'package:game_score/widgets/partidas_predefinidas_alert.dart';
 export 'package:game_score/widgets/puntuacion_form.dart';
+export 'package:game_score/widgets/responsive_layout_builder.dart';
 export 'package:game_score/widgets/screen_tracker.dart';

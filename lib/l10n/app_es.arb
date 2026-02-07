@@ -13,6 +13,8 @@
   "loading": "Cargando...",
   "loadingData": "Cargando datos...",
   "loadingDataError": "Error al cargar datos.",
+  "adErrorRematch": "Hubo un error y no se pudo completar la revancha.",
+  "rewardNotCompletedRematch": "No se completó la recompensa para hacer la revancha.",
   
   "freeVersionLimitGames": "La versión gratis solo permite {count} partidas simultáneas.",
   "@freeVersionLimitGames": {
