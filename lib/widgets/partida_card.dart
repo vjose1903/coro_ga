@@ -47,7 +47,7 @@ class _PartidaCardState extends State<PartidaCard> {
 
     return ResponsiveLayoutBuilder(
       builder: (context, constraints, info) {
-        final isLandscape = constraints.maxWidth > constraints.maxHeight;
+        final isLandscape = info.isLandscape;
 
         return DecoratedBox(
           decoration: BoxDecoration(
@@ -119,7 +119,7 @@ class _PartidaCardState extends State<PartidaCard> {
                 child: InkWell(
                   onTap: () => widget.onTap(),
                   onLongPress: () => _swipeController.openCellAt(index: widget.index, trailing: true),
-                  borderRadius: ResponsiveApp.borderRadius(16),
+                  borderRadius: isLandscape ? ResponsiveApp.borderRadius(10) : ResponsiveApp.borderRadius(16),
                   child: Padding(
                     padding: isLandscape ? ResponsiveApp.all(8) : ResponsiveApp.all(16),
                     child: Row(

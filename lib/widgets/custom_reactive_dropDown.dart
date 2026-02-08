@@ -3,9 +3,9 @@ import '../themes/app_themes.dart';
 import '../utils/l10n_helper.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import '../helpers/helpers.dart';
+import 'text_scale.dart';
 
 class CustomReactiveDropDown extends StatelessWidget {
-
   const CustomReactiveDropDown({
     Key? key,
     required this.formControlName,
@@ -40,43 +40,186 @@ class CustomReactiveDropDown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ReactiveDropdownField<dynamic>(
-        key: key,
-        formControlName: 'tipo',
-        items: items,
-        autofocus: autoFocus!,
-        onChanged: (value) => onChanged != null ? onChanged!(value) : null,
-        decoration: InputDecoration(
-          labelText: labelText,
-          hintText: hintText,
-          helperText: helperText,
-          suffixIcon: innerRight == null ? null : Icon(innerRight),
-          icon: innerLeft == null ? null : Icon(innerLeft),
+    return ReactiveValueListenableBuilder(
+      formControlName: formControlName,
+      builder: (context, control, child) {
+        final value = control.value;
+        final hasValue = value != null && value.toString().trim().isNotEmpty;
+        const itemTextSize = 16.0;
 
-          // FillColor --------
-          fillColor: enabled ? AppThemes.inputColor : AppThemes.inputDisabledColor,
-
-          // Labels -----------
-          labelStyle: TextStyle(color: enabled ? AppThemes.labelInputColor : AppThemes.labelInputDisabledColor, fontFamily: 'Poppins'),
-          floatingLabelStyle: WidgetStateTextStyle.resolveWith((Set<WidgetState> states) {
-            final Color? color = states.contains(WidgetState.error)
-                ? enabled
-                    ? Colors.red[900]
-                    : Colors.red[900]!.withValues(alpha: 0.6)
-                : enabled
-                    ? AppThemes.colorQuinto
-                    : AppThemes.colorQuinto.withValues(alpha: 0.6);
-            return TextStyle(
-              color: color,
-              fontSize: ResponsiveApp.scaleText(15),
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Poppins',
+        Widget scaleDropdownChild(Widget child) {
+          if (child is TextScale) {
+            if (child.textSpan != null) {
+              return TextScale.rich(
+                child.textSpan!,
+                size: itemTextSize,
+                style: child.style,
+                strutStyle: child.strutStyle,
+                textAlign: child.textAlign,
+                textDirection: child.textDirection,
+                locale: child.locale,
+                softWrap: child.softWrap,
+                overflow: child.overflow,
+                textScaler: child.textScaler,
+                maxLines: child.maxLines,
+                semanticsLabel: child.semanticsLabel,
+                textWidthBasis: child.textWidthBasis,
+                textHeightBehavior: child.textHeightBehavior,
+                selectionColor: child.selectionColor,
+              );
+            }
+            return TextScale(
+              child.data ?? '',
+              size: itemTextSize,
+              style: child.style,
+              strutStyle: child.strutStyle,
+              textAlign: child.textAlign,
+              textDirection: child.textDirection,
+              locale: child.locale,
+              softWrap: child.softWrap,
+              overflow: child.overflow,
+              textScaler: child.textScaler,
+              maxLines: child.maxLines,
+              semanticsLabel: child.semanticsLabel,
+              textWidthBasis: child.textWidthBasis,
+              textHeightBehavior: child.textHeightBehavior,
+              selectionColor: child.selectionColor,
             );
-          }),
-        ),
-        showErrors: (control) => control.invalid && (control.touched || control.dirty),
-        validationMessages: {
-          'required': (error) => L10n.fieldRequired,
-        });
+          }
+
+          if (child is Text) {
+            if (child.textSpan != null) {
+              final span = child.textSpan;
+              if (span is TextSpan) {
+                return TextScale.rich(
+                  span,
+                  size: itemTextSize,
+                  style: child.style,
+                  strutStyle: child.strutStyle,
+                  textAlign: child.textAlign,
+                  textDirection: child.textDirection,
+                  locale: child.locale,
+                  softWrap: child.softWrap,
+                  overflow: child.overflow,
+                  textScaler: child.textScaler,
+                  maxLines: child.maxLines,
+                  semanticsLabel: child.semanticsLabel,
+                  textWidthBasis: child.textWidthBasis,
+                  textHeightBehavior: child.textHeightBehavior,
+                  selectionColor: child.selectionColor,
+                );
+              }
+              return Text.rich(
+                span!,
+                style: child.style?.copyWith(
+                  fontSize: TextScale.resolveSize(context, size: itemTextSize),
+                ),
+                strutStyle: child.strutStyle,
+                textAlign: child.textAlign,
+                textDirection: child.textDirection,
+                locale: child.locale,
+                softWrap: child.softWrap,
+                overflow: child.overflow,
+                textScaler: child.textScaler,
+                maxLines: child.maxLines,
+                semanticsLabel: child.semanticsLabel,
+                textWidthBasis: child.textWidthBasis,
+                textHeightBehavior: child.textHeightBehavior,
+                selectionColor: child.selectionColor,
+              );
+            }
+            return TextScale(
+              child.data ?? '',
+              size: itemTextSize,
+              style: child.style,
+              strutStyle: child.strutStyle,
+              textAlign: child.textAlign,
+              textDirection: child.textDirection,
+              locale: child.locale,
+              softWrap: child.softWrap,
+              overflow: child.overflow,
+              textScaler: child.textScaler,
+              maxLines: child.maxLines,
+              semanticsLabel: child.semanticsLabel,
+              textWidthBasis: child.textWidthBasis,
+              textHeightBehavior: child.textHeightBehavior,
+              selectionColor: child.selectionColor,
+            );
+          }
+
+          return DefaultTextStyle.merge(
+            style: TextStyle(fontSize: TextScale.resolveSize(context, size: itemTextSize)),
+            child: child,
+          );
+        }
+
+        final effectiveItems = items
+            .map(
+              (item) => DropdownMenuItem(
+                value: item.value,
+                enabled: item.enabled,
+                child: scaleDropdownChild(item.child ?? const SizedBox.shrink()),
+              ),
+            )
+            .toList();
+
+        return ReactiveDropdownField<dynamic>(
+            key: key,
+            formControlName: formControlName,
+            items: effectiveItems,
+            autofocus: autoFocus!,
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: TextScale.resolveSize(context, size: itemTextSize),
+              color: enabled
+                  ? (Theme.of(context).textTheme.bodyLarge?.color ?? AppThemes.colorQuinto)
+                  : AppThemes.labelInputDisabledColor,
+            ),
+            onChanged: (value) => onChanged != null ? onChanged!(value) : null,
+            decoration: InputDecoration(
+              label: labelText == null
+                  ? null
+                  : TextScale(
+                      labelText!,
+                      size: 14,
+                      style: TextStyle(
+                        color: enabled ? (hasValue ? AppThemes.colorQuinto : AppThemes.labelInputColor) : AppThemes.labelInputDisabledColor,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+              hint: hintText == null
+                  ? null
+                  : TextScale(
+                      hintText!,
+                      size: 13,
+                      style: TextStyle(
+                        color: Colors.grey[500],
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+              helper: helperText == null
+                  ? null
+                  : TextScale(
+                      helperText!,
+                      size: 12,
+                      style: TextStyle(
+                        color: Colors.grey[500],
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+              suffixIcon: innerRight == null ? null : Icon(innerRight),
+              icon: innerLeft == null ? null : Icon(innerLeft),
+
+              // FillColor --------
+              fillColor: enabled ? AppThemes.inputColor : AppThemes.inputDisabledColor,
+
+            ),
+            showErrors: (control) => control.invalid && (control.touched || control.dirty),
+            validationMessages: {
+              'required': (error) => L10n.fieldRequired,
+            });
+      },
+    );
   }
 }

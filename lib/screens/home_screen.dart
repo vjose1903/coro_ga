@@ -269,7 +269,7 @@ class ListPartidas extends StatelessWidget {
       builder: (context, constraints, info) {
         final listPadding = padding ?? ResponsiveApp.symmetric(vertical: 30, horizontal: 20);
         final maxWidth = constraints.maxWidth;
-        final isLandscape = constraints.maxWidth > constraints.maxHeight;
+        final isLandscape = info.isLandscape;
         final useGrid = isLandscape;
         final gridHorizontalPadding = listPadding.horizontal;
         const crossSpacing = 16.0;
