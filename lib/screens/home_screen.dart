@@ -193,7 +193,7 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
                         Toast.show(type: ToastType.info, context: context, message: l10n.freeVersionLimitGames(PremiumProvider.freeMaxGames), actionLabel: l10n.getPro, onAction: () => Navigator.pushNamed(context, 'premium'));
                       }
                     },
-                    child: const Icon(Icons.add_rounded, size: 32, color: Colors.white),
+                    child: IconScale(Icons.add_rounded, size: 32, color: Colors.white),
                   ),
                 ),
               ),
@@ -401,11 +401,11 @@ class _EmptyState extends StatelessWidget {
 
         final availableHeight = constraints.maxHeight;
         final double contentHeight = useLandscapeLayout ? (availableHeight * 0.62).clamp(260.0, 420.0) : (availableHeight * 0.68).clamp(320.0, 520.0);
-        final double targetIcon = useLandscapeLayout ? 140.0 : 120.0;
-        final effectiveIcon = targetIcon.clamp(100.0, (availableHeight * 0.30).clamp(100.0, 160.0));
-        final double effectiveTitle = ResponsiveApp.scaleText(useLandscapeLayout ? 22 : 20);
-        final double effectiveSubtitle = ResponsiveApp.scaleText(useLandscapeLayout ? 16 : 14);
-        final double effectiveBadge = ResponsiveApp.scaleText(useLandscapeLayout ? 14 : 12);
+
+        final effectiveIcon = (availableHeight * 0.50).clamp(60.0, 120.0);
+        final double effectiveTitle = useLandscapeLayout ? 22 : 20;
+        final double effectiveSubtitle = useLandscapeLayout ? 16 : 14;
+        final double effectiveBadge = useLandscapeLayout ? 14 : 12;
 
         final badgeMaxWidth = constraints.maxWidth * 0.9;
 
@@ -426,10 +426,12 @@ class _EmptyState extends StatelessWidget {
                 ),
                 shape: BoxShape.circle,
               ),
-              child: Center(
-                child: FaIcon(
+              alignment: Alignment.center,
+              child: Transform.translate(
+                offset: Offset(effectiveIcon * -0.05, 0),
+                child: IconScale(
                   FontAwesomeIcons.gamepad,
-                  size: useLandscapeLayout ? 50 : 48,
+                  size: useLandscapeLayout ? 30 : 40,
                   color: AppThemes.colorPrimero.withValues(alpha: 0.6),
                 ),
               ),
@@ -438,24 +440,25 @@ class _EmptyState extends StatelessWidget {
             Builder(builder: (context) {
               final l10n = AppLocalizations.of(context)!;
               return Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
+                  TextScale(
                     l10n.emptyGamesTitle,
+                    size: effectiveTitle,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w600,
-                      fontSize: effectiveTitle,
                       color: Theme.of(context).brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorCuarto,
                     ),
                   ),
                   SizedBox(height: useLandscapeLayout ? 8 : 12),
-                  Text(
+                  TextScale(
                     l10n.emptyGamesSubtitle,
+                    size: effectiveSubtitle,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: effectiveSubtitle,
                       height: 1.5,
                       color: Colors.grey[500],
                     ),
@@ -479,14 +482,14 @@ class _EmptyState extends StatelessWidget {
                         spacing: 8,
                         runSpacing: 4,
                         children: [
-                          Icon(Icons.swipe_left_rounded, size: useLandscapeLayout ? 18 : 18, color: AppThemes.colorPrimero),
-                          Text(
+                          IconScale(Icons.swipe_left_rounded, size: useLandscapeLayout ? 18 : 18, color: AppThemes.colorPrimero),
+                          TextScale(
                             l10n.swipeToEditOrDelete,
+                            size: effectiveBadge,
                             textAlign: TextAlign.center,
                             softWrap: true,
                             style: TextStyle(
                               fontFamily: 'Poppins',
-                              fontSize: effectiveBadge,
                               color: AppThemes.colorPrimero,
                             ),
                           ),
@@ -546,11 +549,11 @@ class _LoadingState extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          Text(
+          TextScale(
             l10n.loadingGames,
+            size: 14,
             style: TextStyle(
               fontFamily: 'Poppins',
-              fontSize: ResponsiveApp.scaleText(14),
               color: Colors.grey[500],
             ),
           ),
@@ -731,13 +734,13 @@ class _MenuHeader extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text(
+                TextScale(
                   AppLocalizations.of(context)!.appTitle,
+                  size: 22,
                   style: TextStyle(
                     color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.bold,
-                    fontSize: ResponsiveApp.scaleText(22),
                     letterSpacing: 1,
                   ),
                 ),
@@ -751,12 +754,12 @@ class _MenuHeader extends StatelessWidget {
                       ),
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: Text(
+                    child: TextScale(
                       'PRO',
+                      size: 10,
                       style: TextStyle(
                         color: Colors.white,
                         fontFamily: 'Poppins',
-                        fontSize: ResponsiveApp.scaleText(10),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -764,12 +767,12 @@ class _MenuHeader extends StatelessWidget {
                 ],
               ],
             ),
-            Text(
+            TextScale(
               AppLocalizations.of(context)!.configuration,
+              size: 12,
               style: TextStyle(
                 color: Colors.grey[500],
                 fontFamily: 'Poppins',
-                fontSize: ResponsiveApp.scaleText(12),
               ),
             ),
           ],
@@ -809,16 +812,16 @@ class _MenuSection extends StatelessWidget {
                   color: AppThemes.colorPrimero.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(icon, size: 18, color: AppThemes.colorPrimero),
+                child: IconScale(icon, size: 18, color: AppThemes.colorPrimero),
               ),
               const SizedBox(width: 12),
-              Text(
+              TextScale(
                 title,
+                size: 16,
                 style: TextStyle(
                   color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w600,
-                  fontSize: ResponsiveApp.scaleText(16),
                 ),
               ),
             ],
@@ -852,21 +855,21 @@ class _ThemeToggleRow extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              TextScale(
                 title,
+                size: 14,
                 style: TextStyle(
                   color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.9) : Colors.grey[800],
                   fontFamily: 'Poppins',
-                  fontSize: ResponsiveApp.scaleText(14),
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              Text(
+              TextScale(
                 subtitle,
+                size: 11,
                 style: TextStyle(
                   color: Colors.grey[500],
                   fontFamily: 'Poppins',
-                  fontSize: ResponsiveApp.scaleText(11),
                 ),
               ),
             ],
@@ -939,18 +942,14 @@ class _ThemeOption extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 18,
-            color: isSelected ? Colors.white : Colors.grey[500],
-          ),
+          IconScale(icon, size: 18, color: isSelected ? Colors.white : Colors.grey[500]),
           const SizedBox(width: 6),
-          Text(
+          TextScale(
             label,
+            size: 13,
             style: TextStyle(
               color: isSelected ? Colors.white : Colors.grey[500],
               fontFamily: 'Poppins',
-              fontSize: ResponsiveApp.scaleText(13),
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
@@ -1024,13 +1023,13 @@ class _PremiumCard extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Text(
+                          TextScale(
                             isPremium ? AppLocalizations.of(context)!.youArePro : AppLocalizations.of(context)!.getPro,
+                            size: 17,
                             style: TextStyle(
                               color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.bold,
-                              fontSize: ResponsiveApp.scaleText(17),
                             ),
                           ),
                           if (isPremium) ...[
@@ -1044,14 +1043,14 @@ class _PremiumCard extends StatelessWidget {
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(Icons.check_circle, size: 12, color: Colors.green),
+                                  const IconScale(Icons.check_circle, size: 12, color: Colors.green),
                                   const SizedBox(width: 4),
-                                  Text(
+                                  TextScale(
                                     AppLocalizations.of(context)!.active,
+                                    size: 10,
                                     style: TextStyle(
                                       color: Colors.green,
                                       fontFamily: 'Poppins',
-                                      fontSize: ResponsiveApp.scaleText(10),
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -1062,12 +1061,12 @@ class _PremiumCard extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 4),
-                      Text(
+                      TextScale(
                         isPremium ? AppLocalizations.of(context)!.allFeaturesUnlocked : AppLocalizations.of(context)!.noAdsUnlimitedGames,
+                        size: 12,
                         style: TextStyle(
                           color: Colors.grey[500],
                           fontFamily: 'Poppins',
-                          fontSize: ResponsiveApp.scaleText(12),
                         ),
                       ),
                     ],
@@ -1080,7 +1079,7 @@ class _PremiumCard extends StatelessWidget {
                       color: AppThemes.colorPrimero.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppThemes.colorPrimero),
+                    child: IconScale(Icons.arrow_forward_ios_rounded, size: 16, color: AppThemes.colorPrimero),
                   ),
               ],
             ),
@@ -1095,15 +1094,15 @@ class _PremiumCard extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.bug_report_rounded, size: 18, color: Colors.orange[700]),
+                    IconScale(Icons.bug_report_rounded, size: 18, color: Colors.orange[700]),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: Text(
+                      child: TextScale(
                         AppLocalizations.of(context)!.simulatePremiumDev,
+                        size: 12,
                         style: TextStyle(
                           color: Colors.orange[700],
                           fontFamily: 'Poppins',
-                          fontSize: ResponsiveApp.scaleText(12),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -1147,22 +1146,23 @@ class _LanguageSwitcher extends StatelessWidget {
           isExpanded: true,
           dropdownColor: Preferences.isDarkMode ? Colors.grey[850] : Colors.white,
           borderRadius: BorderRadius.circular(12),
-          icon: Icon(
+          icon: IconScale(
             Icons.keyboard_arrow_down_rounded,
+            size: 20,
             color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[700],
           ),
           selectedItemBuilder: (context) {
             return languages.map((lang) {
               return Row(
                 children: [
-                  Text(lang['flag']!, style: TextStyle(fontSize: ResponsiveApp.scaleText(18))),
+                  TextScale(lang['flag']!, size: 18, style: const TextStyle(fontFamily: 'Poppins')),
                   const SizedBox(width: 10),
-                  Text(
+                  TextScale(
                     lang['short']!,
+                    size: 14,
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w600,
-                      fontSize: ResponsiveApp.scaleText(14),
                       color: Preferences.isDarkMode ? Colors.white : Colors.grey[800],
                     ),
                   ),
@@ -1175,13 +1175,13 @@ class _LanguageSwitcher extends StatelessWidget {
               value: lang['code'],
               child: Row(
                 children: [
-                  Text(lang['flag']!, style: TextStyle(fontSize: ResponsiveApp.scaleText(18))),
+                  TextScale(lang['flag']!, size: 18, style: const TextStyle(fontFamily: 'Poppins')),
                   const SizedBox(width: 10),
-                  Text(
+                  TextScale(
                     lang['name']!,
+                    size: 14,
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: ResponsiveApp.scaleText(14),
                       color: Preferences.isDarkMode ? Colors.white : Colors.grey[800],
                     ),
                   ),
@@ -1236,26 +1236,21 @@ class _MenuActionButton extends StatelessWidget {
                   color: AppThemes.colorPrimero.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: FaIcon(icon, size: 18, color: AppThemes.colorPrimero),
+                child: IconScale(icon, size: 18, color: AppThemes.colorPrimero),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: Text(
+                child: TextScale(
                   title,
+                  size: 16,
                   style: TextStyle(
                     color: isDark ? Colors.white : AppThemes.colorCuarto,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w600,
-                    fontSize: ResponsiveApp.scaleText(16),
                   ),
                 ),
               ),
-              trailing ??
-                  Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 16,
-                    color: isDark ? Colors.white70 : Colors.grey[500],
-                  ),
+              trailing ?? IconScale(Icons.arrow_forward_ios_rounded, size: 16, color: isDark ? Colors.white70 : Colors.grey[500]),
             ],
           ),
         ),
@@ -1315,11 +1310,7 @@ class _ReviewSectionState extends State<_ReviewSection> {
             ),
             const SizedBox(width: 6),
           ],
-          Icon(
-            Icons.arrow_forward_ios_rounded,
-            size: 16,
-            color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[500],
-          ),
+          IconScale(Icons.arrow_forward_ios_rounded, size: 16, color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[500]),
         ],
       ),
     );
