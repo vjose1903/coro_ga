@@ -259,11 +259,11 @@ class _AppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isLandscape = useLandscapeLayout;
+    
 
     return SafeArea(
       child: Padding(
-        padding: ResponsiveApp.symmetric(horizontal: isLandscape ? 10 : 12, vertical: isLandscape ? 1 : 5),
+        padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 10 : 12, vertical: useLandscapeLayout ? 1 : 5),
         child: Row(
           children: [
             if (leading != null)
@@ -275,7 +275,7 @@ class _AppBar extends StatelessWidget {
               Expanded(
                 child: TextScale(
                   title!,
-                  size: isLandscape ? 22 : 15,
+                  size: useLandscapeLayout ? 22 : 15,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(

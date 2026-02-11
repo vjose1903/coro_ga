@@ -139,12 +139,12 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
               child: ResponsiveLayoutBuilder(
                 useMediaQuery: true,
                 builder: (context, constraints, info) {
-                  final isLandscape = info.isLandscape;
+                  final useLandscapeLayout = info.useLandscapeLayout;
 
                   return Stack(
                     alignment: Alignment.center,
                     children: [
-                      isLandscape
+                      useLandscapeLayout
                           ? Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
 import '../helpers/helpers.dart';
+import 'responsive_layout_builder.dart';
 
 class TextScale extends StatelessWidget {
   static double resolveSize(BuildContext context, {double? size, TextStyle? style}) {
     final mediaSize = MediaQuery.sizeOf(context);
     final shortestSide = mediaSize.shortestSide;
-    final isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
+    final isLandscapeLayout = ResponsiveLayoutBuilder.maybeOf(context)?.useLandscapeLayout ?? ResponsiveApp.useLandscapeLayout;
     final isLargeDevice = shortestSide >= 600;
-    final landscapePhoneBoost = isLandscape && !isLargeDevice ? 1.7 : 1.0;
-    final portraitBias = isLandscape ? 1.0 : 0.95;
+    final landscapePhoneBoost = isLandscapeLayout && !isLargeDevice ? 1.7 : 1.0;
+    final portraitBias = isLandscapeLayout ? 1.0 : 0.95;
     final maxFactor = isLargeDevice ? 1.05 : 1.25;
 
     final resolvedBaseSize = size ?? style?.fontSize ?? 14.0;

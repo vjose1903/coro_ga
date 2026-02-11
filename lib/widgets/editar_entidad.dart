@@ -49,7 +49,7 @@ class EditarEntidad extends StatelessWidget {
     final FormGroup form = isPartida ? formPartidaProvider.form : jugadorProvider.formJugador;
 
     return ResponsiveLayoutBuilder(builder: (context, constraints, info) {
-      final isLandscape = info.isLandscape;
+      final useLandscapeLayout = info.useLandscapeLayout;
 
       return Container(
         height: double.infinity,
@@ -62,7 +62,7 @@ class EditarEntidad extends StatelessWidget {
               nombre: entidad?.nombre ?? '',
               icon: icon,
               noNameLabel: AppLocalizations.of(context)!.noName,
-              isLandscape: isLandscape,
+              useLandscapeLayout: useLandscapeLayout,
               panelController: panelController,
               partida: partida,
               onRestart: partida != null && !partida.isSinIniciar
@@ -102,7 +102,7 @@ class EditarEntidad extends StatelessWidget {
                         jugadorProvider.formJugador.reset();
                         formPartidaProvider.form.reset();
                       },
-                      isLandscape: isLandscape),
+                      useLandscapeLayout: useLandscapeLayout),
                 ),
                 SizedBox(width: ResponsiveApp.scaleWidth(12)),
                 // ACEPTAR
@@ -114,7 +114,7 @@ class EditarEntidad extends StatelessWidget {
                       onTap: () {
                         aceptarFunction(context, entidad, form: form, jugadorProvider: jugadorProvider, partidaProvider: partidaProvider, previusPage: previusPage, resetEntidadesEditar: resetEntidadesEditar, isPartida: isPartida, pageController: pageController, panelController: panelController, onClose: onClose);
                       },
-                      isLandscape: isLandscape),
+                      useLandscapeLayout: useLandscapeLayout),
                 ),
               ],
             )
@@ -308,7 +308,7 @@ class _EditHeader extends StatelessWidget {
     required this.nombre,
     required this.icon,
     required this.noNameLabel,
-    required this.isLandscape,
+    required this.useLandscapeLayout,
     this.panelController,
     this.partida,
     this.onRestart,
@@ -318,7 +318,7 @@ class _EditHeader extends StatelessWidget {
   final String nombre;
   final IconData icon;
   final String noNameLabel;
-  final bool isLandscape;
+  final bool useLandscapeLayout;
   final PanelController? panelController;
   final Partida? partida;
   final Future<void> Function()? onRestart;
@@ -327,8 +327,8 @@ class _EditHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
     final l10n = AppLocalizations.of(context)!;
-    final avatarSize = (isLandscape ? ResponsiveApp.scaleWidth(17) : ResponsiveApp.scaleWidth(42)).clamp(28.0, 52.0);
-    final iconSize = (isLandscape ? ResponsiveApp.scaleWidth(10) : ResponsiveApp.scaleWidth(18)).clamp(12.0, 22.0);
+    final avatarSize = (useLandscapeLayout ? ResponsiveApp.scaleWidth(17) : ResponsiveApp.scaleWidth(42)).clamp(28.0, 52.0);
+    final iconSize = (useLandscapeLayout ? ResponsiveApp.scaleWidth(10) : ResponsiveApp.scaleWidth(18)).clamp(12.0, 22.0);
 
     final content = Row(
       children: [
@@ -362,11 +362,11 @@ class _EditHeader extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(width: isLandscape ? ResponsiveApp.scaleWidth(8) : ResponsiveApp.scaleWidth(12)),
+        SizedBox(width: useLandscapeLayout ? ResponsiveApp.scaleWidth(8) : ResponsiveApp.scaleWidth(12)),
 
         // Información
         Expanded(
-          child: isLandscape
+          child: useLandscapeLayout
               ? Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -455,16 +455,16 @@ class _EditHeader extends StatelessWidget {
                   ],
                 );
               },
-              borderRadius: isLandscape ? ResponsiveApp.borderRadius(6) : ResponsiveApp.borderRadius(10),
+              borderRadius: useLandscapeLayout ? ResponsiveApp.borderRadius(6) : ResponsiveApp.borderRadius(10),
               child: Container(
-                padding: ResponsiveApp.symmetric(horizontal: isLandscape ? 6 : 10, vertical: 6),
+                padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 6 : 10, vertical: 6),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [Color(0xFFFFB300), Color(0xFFFF8F00)],
                   ),
-                  borderRadius: isLandscape ? ResponsiveApp.borderRadius(6) : ResponsiveApp.borderRadius(10),
+                  borderRadius: useLandscapeLayout ? ResponsiveApp.borderRadius(6) : ResponsiveApp.borderRadius(10),
                   boxShadow: [
                     BoxShadow(
                       color: const Color(0xFFFFA000).withValues(alpha: 0.3),
@@ -545,7 +545,7 @@ class _ActionButton extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.onTap,
-    required this.isLandscape,
+    required this.useLandscapeLayout,
     this.isPrimary = false,
     this.isDestructive = false,
   });
@@ -553,7 +553,7 @@ class _ActionButton extends StatelessWidget {
   final String label;
   final IconData icon;
   final VoidCallback onTap;
-  final bool isLandscape;
+  final bool useLandscapeLayout;
   final bool isPrimary;
   final bool isDestructive;
 
@@ -585,7 +585,7 @@ class _ActionButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: isLandscape ? ResponsiveApp.borderRadius(5) : ResponsiveApp.borderRadius(12),
+        borderRadius: useLandscapeLayout ? ResponsiveApp.borderRadius(5) : ResponsiveApp.borderRadius(12),
         child: Container(
           padding: ResponsiveApp.symmetric(vertical: 14),
           decoration: BoxDecoration(
@@ -594,7 +594,7 @@ class _ActionButton extends StatelessWidget {
               end: Alignment.bottomCenter,
               colors: gradientColors,
             ),
-            borderRadius: isLandscape ? ResponsiveApp.borderRadius(5) : ResponsiveApp.borderRadius(12),
+            borderRadius: useLandscapeLayout ? ResponsiveApp.borderRadius(5) : ResponsiveApp.borderRadius(12),
             boxShadow: [
               BoxShadow(
                 color: (isPrimary

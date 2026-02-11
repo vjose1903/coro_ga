@@ -28,6 +28,10 @@ class ResponsiveLayoutBuilder extends StatelessWidget {
   final bool useMediaQuery;
   final Widget Function(BuildContext context, BoxConstraints constraints, ResponsiveLayoutInfo info) builder;
 
+  static ResponsiveLayoutInfo? maybeOf(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<_ResponsiveLayoutScope>()?.info;
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -40,18 +44,39 @@ class ResponsiveLayoutBuilder extends StatelessWidget {
         final aspectRatio = maxHeight == 0 ? 0.0 : maxWidth / maxHeight;
         final useLandscapeLayout = isLandscape || isWide;
 
-        return builder(
-          context,
-          constraints,
-          ResponsiveLayoutInfo(
-            constraints: constraints,
-            isLandscape: isLandscape,
-            isWide: isWide,
-            aspectRatio: aspectRatio,
-            useLandscapeLayout: useLandscapeLayout,
+        final info = ResponsiveLayoutInfo(
+          constraints: constraints,
+          isLandscape: isLandscape,
+          isWide: isWide,
+          aspectRatio: aspectRatio,
+          useLandscapeLayout: useLandscapeLayout,
+        );
+
+        return _ResponsiveLayoutScope(
+          info: info,
+          child: Builder(
+            builder: (scopedContext) => builder(scopedContext, constraints, info),
           ),
         );
       },
     );
+  }
+}
+
+class _ResponsiveLayoutScope extends InheritedWidget {
+  const _ResponsiveLayoutScope({
+    required this.info,
+    required super.child,
+  });
+
+  final ResponsiveLayoutInfo info;
+
+  @override
+  bool updateShouldNotify(_ResponsiveLayoutScope oldWidget) {
+    return oldWidget.info.useLandscapeLayout != info.useLandscapeLayout ||
+        oldWidget.info.isLandscape != info.isLandscape ||
+        oldWidget.info.isWide != info.isWide ||
+        oldWidget.info.aspectRatio != info.aspectRatio ||
+        oldWidget.info.constraints != info.constraints;
   }
 }

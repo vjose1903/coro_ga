@@ -269,8 +269,8 @@ class ListPartidas extends StatelessWidget {
       builder: (context, constraints, info) {
         final listPadding = padding ?? ResponsiveApp.symmetric(vertical: 30, horizontal: 20);
         final maxWidth = constraints.maxWidth;
-        final isLandscape = info.isLandscape;
-        final useGrid = isLandscape;
+        final useLandscapeLayout = info.useLandscapeLayout;
+        final useGrid = useLandscapeLayout;
         final gridHorizontalPadding = listPadding.horizontal;
         const crossSpacing = 16.0;
         final availableWidth = maxWidth - gridHorizontalPadding - crossSpacing;
@@ -312,7 +312,7 @@ class ListPartidas extends StatelessWidget {
                       final SlideUpProvider slideUp = context.read<SlideUpProvider>();
                       formPartidaProvider.form.patchValue(partida.toMap());
                       partidaProvider.partidaEditar = partida;
-                      slideUp.openSlideUp(controller: panelController, maxHeightFraction: isLandscape ? 0.9 : 0.5, bodyContent: EditarEntidad(panelController: panelController));
+                      slideUp.openSlideUp(controller: panelController, maxHeightFraction: useLandscapeLayout ? 0.9 : 0.5, bodyContent: EditarEntidad(panelController: panelController));
                     },
                     functionReiniciar: () async {
                       await partida.restartPartida();
@@ -366,7 +366,7 @@ class ListPartidas extends StatelessWidget {
                   final SlideUpProvider slideUp = context.read<SlideUpProvider>();
                   formPartidaProvider.form.patchValue(partida.toMap());
                   partidaProvider.partidaEditar = partida;
-                  slideUp.openSlideUp(controller: panelController, maxHeightFraction: isLandscape ? 0.9 : 0.5, bodyContent: EditarEntidad(panelController: panelController));
+                  slideUp.openSlideUp(controller: panelController, maxHeightFraction: useLandscapeLayout ? 0.9 : 0.5, bodyContent: EditarEntidad(panelController: panelController));
                 },
                 functionReiniciar: () async {
                   await partida.restartPartida();

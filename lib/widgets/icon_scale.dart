@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../helpers/helpers.dart';
+import 'responsive_layout_builder.dart';
 
 class IconScale extends StatelessWidget {
   const IconScale(
@@ -32,12 +33,12 @@ class IconScale extends StatelessWidget {
   Widget build(BuildContext context) {
     final mediaSize = MediaQuery.sizeOf(context);
     final shortestSide = mediaSize.shortestSide;
-    final isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
+    final isLandscapeLayout =
+        ResponsiveLayoutBuilder.maybeOf(context)?.useLandscapeLayout ??
+            ResponsiveApp.useLandscapeLayout;
     final isLargeDevice = shortestSide >= 600;
-    final landscapePhoneBoost = isLandscape && !isLargeDevice ? 0.6 : 0.5;
-    final portraitBias = isLandscape ? 0.9 : 0.8;
-    
-    debugPrint('isLargeDevice ${isLargeDevice}' );
+    final landscapePhoneBoost = isLandscapeLayout && !isLargeDevice ? 0.6 : 0.5;
+    final portraitBias = isLandscapeLayout ? 0.9 : 0.8;
 
     final resolvedSize = size ?? 24.0;
     final scaledBase = ResponsiveApp.scaleWidth(resolvedSize) * portraitBias * landscapePhoneBoost;
