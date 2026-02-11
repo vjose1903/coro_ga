@@ -142,7 +142,7 @@ class _PartidaCardState extends State<PartidaCard> {
                                   Expanded(
                                     child: TextScale(
                                       widget.partida.nombre!,
-                                      size: 16,
+                                      size: 18,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
@@ -197,7 +197,7 @@ class _PartidaCardState extends State<PartidaCard> {
                           child: IconScale(
                             Icons.arrow_forward_ios_rounded,
                             color: Colors.grey[400],
-                            size: 6,
+                            size: useLandscapeLayout ? 12 : 14,
                           ),
                         ),
                       ],
@@ -222,16 +222,16 @@ class _InfoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 4 : 10, vertical: 6),
+      padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 3 : 10, vertical: 6),
       decoration: BoxDecoration(
         color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.1),
         borderRadius: ResponsiveApp.borderRadius(20),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.max,
         children: [
-          IconScale(icon, size: useLandscapeLayout ? 6 : 12, color: Colors.grey[500]),
-          SizedBox(width: useLandscapeLayout ? ResponsiveApp.scaleWidth(4) : ResponsiveApp.scaleWidth(6)),
+          IconScale(icon, size: 11, color: Colors.grey[500]),
+          SizedBox(width: ResponsiveApp.scaleWidth(5)),
           TextScale(
             label,
             size: useLandscapeLayout ? 20 : 13,
@@ -285,7 +285,7 @@ class _EstadoChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          IconScale(icon, size: useLandscapeLayout ? 8 : 14, color: color),
+          IconScale(icon, size: 14, color: color),
           SizedBox(width: useLandscapeLayout ? ResponsiveApp.scaleWidth(3) : ResponsiveApp.scaleWidth(5)),
           TextScale(
             label,
@@ -319,7 +319,7 @@ class _GanadorPerdedor extends StatelessWidget {
 
     return Row(
       children: [
-        Flexible(
+        Expanded(
           child: _PlayerStatus(
             icon: Icons.trending_up_rounded,
             name: _getTranslatedName(context, ganador['nombre']),
@@ -329,7 +329,7 @@ class _GanadorPerdedor extends StatelessWidget {
           ),
         ),
         SizedBox(width: ResponsiveApp.scaleWidth(8)),
-        Flexible(
+        Expanded(
           child: _PlayerStatus(
             icon: Icons.trending_down_rounded,
             name: _getTranslatedName(context, perdedor['nombre']),
@@ -362,9 +362,9 @@ class _PlayerStatus extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          IconScale(icon, size: useLandscapeLayout ? 7 : 12, color: color),
+          IconScale(icon, size: 12, color: color),
           SizedBox(width: useLandscapeLayout ? ResponsiveApp.scaleWidth(2) : ResponsiveApp.scaleWidth(4)),
-          Flexible(
+          Expanded(
             child: TextScale(
               name,
               size: useLandscapeLayout ? 16 : 11,
@@ -377,7 +377,7 @@ class _PlayerStatus extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(width: useLandscapeLayout ? ResponsiveApp.scaleWidth(3) : ResponsiveApp.scaleWidth(5)),
+          SizedBox(width: useLandscapeLayout ? ResponsiveApp.scaleWidth(4) : ResponsiveApp.scaleWidth(8)),
           TextScale(
             puntuacion.toString(),
             size: 11,
