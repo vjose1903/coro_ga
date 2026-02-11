@@ -93,9 +93,7 @@ class _Body extends StatelessWidget {
       return ResponsiveLayoutBuilder(
         builder: (context, constraints, info) {
           final bool useLandscapeLayout = info.useLandscapeLayout;
-          final double contentHeight = useLandscapeLayout
-              ? (ResponsiveApp.size.height - 80)
-              : ((ResponsiveApp.size.height - (ResponsiveApp.size.height * 0.125)) - 80);
+          final double contentHeight = useLandscapeLayout ? (ResponsiveApp.size.height - 80) : ((ResponsiveApp.size.height - (ResponsiveApp.size.height * 0.125)) - 80);
           final EdgeInsets contentPadding = ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 16 : 20);
 
           return Container(
@@ -110,40 +108,20 @@ class _Body extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
-                              child: _FormDetailsColumn(
-                                tipoPartida: tipoPartida,
-                                sinMaxPuntuacion: sinMaxPuntuacion,
-                                isDark: isDark,
-                                formPartidaProvider: formPartidaProvider,
-                                onOpenDefaults: () => openDefaultsPartidasDialog(context),
-                              ),
+                              child: _FormDetailsColumn(tipoPartida: tipoPartida, sinMaxPuntuacion: sinMaxPuntuacion, isDark: isDark, formPartidaProvider: formPartidaProvider, onOpenDefaults: () => openDefaultsPartidasDialog(context), useLandscapeLayout: useLandscapeLayout),
                             ),
                             const SizedBox(width: 20),
                             Expanded(
-                              child: _FormPlayersColumn(
-                                isDark: isDark,
-                                jugadoresController: jugadoresController,
-                                onCreate: () => _crearPartida(context, form, formPartidaProvider),
-                              ),
+                              child: _FormPlayersColumn(isDark: isDark, jugadoresController: jugadoresController, onCreate: () => _crearPartida(context, form, formPartidaProvider), useLandscapeLayout: useLandscapeLayout),
                             ),
                           ],
                         )
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _FormDetailsColumn(
-                              tipoPartida: tipoPartida,
-                              sinMaxPuntuacion: sinMaxPuntuacion,
-                              isDark: isDark,
-                              formPartidaProvider: formPartidaProvider,
-                              onOpenDefaults: () => openDefaultsPartidasDialog(context),
-                            ),
+                            _FormDetailsColumn(tipoPartida: tipoPartida, sinMaxPuntuacion: sinMaxPuntuacion, isDark: isDark, formPartidaProvider: formPartidaProvider, onOpenDefaults: () => openDefaultsPartidasDialog(context), useLandscapeLayout: useLandscapeLayout),
                             const SizedBox(height: 20),
-                            _FormPlayersColumn(
-                              isDark: isDark,
-                              jugadoresController: jugadoresController,
-                              onCreate: () => _crearPartida(context, form, formPartidaProvider),
-                            ),
+                            _FormPlayersColumn(isDark: isDark, jugadoresController: jugadoresController, onCreate: () => _crearPartida(context, form, formPartidaProvider), useLandscapeLayout: useLandscapeLayout),
                           ],
                         ),
                 ),
@@ -207,6 +185,7 @@ class _FormDetailsColumn extends StatelessWidget {
     required this.isDark,
     required this.formPartidaProvider,
     required this.onOpenDefaults,
+    required this.useLandscapeLayout,
   });
 
   final dynamic tipoPartida;
@@ -214,6 +193,7 @@ class _FormDetailsColumn extends StatelessWidget {
   final bool isDark;
   final FormPartidaProvider formPartidaProvider;
   final VoidCallback onOpenDefaults;
+  final bool useLandscapeLayout;
 
   @override
   Widget build(BuildContext context) {
@@ -223,7 +203,7 @@ class _FormDetailsColumn extends StatelessWidget {
         // Botón plantillas
         Align(
           alignment: Alignment.centerRight,
-          child: _PlantillasButton(onTap: onOpenDefaults),
+          child: _PlantillasButton(onTap: onOpenDefaults, useLandscapeLayout: useLandscapeLayout),
         ),
         const SizedBox(height: 14),
         // Nombre de la partida
@@ -246,8 +226,8 @@ class _FormDetailsColumn extends StatelessWidget {
                     formControlName: 'tipo',
                     labelText: AppLocalizations.of(context)!.type,
                     items: [
-                      DropdownMenuItem(value: 'Rondas', child: Text(AppLocalizations.of(context)!.rounds)),
-                      DropdownMenuItem(value: 'Puntuación', child: Text(AppLocalizations.of(context)!.score)),
+                      DropdownMenuItem(value: 'Rondas', child: TextScale(AppLocalizations.of(context)!.rounds)),
+                      DropdownMenuItem(value: 'Puntuación', child: TextScale(AppLocalizations.of(context)!.score)),
                     ],
                     onChanged: (value) => formPartidaProvider.changeTipo(value),
                   ),
@@ -264,9 +244,7 @@ class _FormDetailsColumn extends StatelessWidget {
                         width: scoreFieldWidth,
                         child: CustomReactiveInput(
                           formControlName: 'maxPuntuacion',
-                          labelText: tipoPartida == 'Rondas'
-                              ? AppLocalizations.of(context)!.roundCount
-                              : AppLocalizations.of(context)!.maxScore,
+                          labelText: tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScore,
                           inputType: TextInputType.number,
                         ),
                       ),
@@ -305,13 +283,11 @@ class _FormDetailsColumn extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(
-                      child: Text(
-                        tipoPartida == 'Rondas'
-                            ? AppLocalizations.of(context)!.noMaxRounds
-                            : AppLocalizations.of(context)!.noMaxScore,
+                      child: TextScale(
+                        tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.noMaxRounds : AppLocalizations.of(context)!.noMaxScore,
+                        size: 12,
                         style: TextStyle(
                           fontFamily: 'Poppins',
-                          fontSize: ResponsiveApp.scaleText(12),
                           color: isDark ? Colors.white70 : Colors.grey[700],
                         ),
                       ),
@@ -339,17 +315,19 @@ class _FormPlayersColumn extends StatelessWidget {
     required this.isDark,
     required this.jugadoresController,
     required this.onCreate,
+    required this.useLandscapeLayout,
   });
 
   final bool isDark;
   final ScrollController jugadoresController;
   final VoidCallback onCreate;
+  final bool useLandscapeLayout;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _JugadoresSection(jugadoresController: jugadoresController),
+        _JugadoresSection(jugadoresController: jugadoresController, useLandscapeLayout: useLandscapeLayout),
         const SizedBox(height: 12),
         Expanded(
           child: DecoratedBox(
@@ -381,8 +359,9 @@ class _FormPlayersColumn extends StatelessWidget {
 
 // Botón de plantillas
 class _PlantillasButton extends StatelessWidget {
-  const _PlantillasButton({required this.onTap});
+  const _PlantillasButton({required this.onTap, required this.useLandscapeLayout});
   final VoidCallback onTap;
+  final bool useLandscapeLayout;
 
   @override
   Widget build(BuildContext context) {
@@ -392,7 +371,7 @@ class _PlantillasButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(10),
         child: Container(
-          padding: ResponsiveApp.symmetric(horizontal: 12, vertical: 8),
+          padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 5 : 12, vertical: 8),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -414,17 +393,17 @@ class _PlantillasButton extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const FaIcon(
+              const IconScale(
                 FontAwesomeIcons.layerGroup,
                 size: 14,
                 color: Colors.white,
               ),
               const SizedBox(width: 8),
-              Text(
+              TextScale(
                 AppLocalizations.of(context)!.predefined,
-                style: TextStyle(
+                size: 12,
+                style: const TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: ResponsiveApp.scaleText(12),
                   fontWeight: FontWeight.w500,
                   color: Colors.white,
                 ),
@@ -439,13 +418,17 @@ class _PlantillasButton extends StatelessWidget {
 
 // Sección de jugadores con header
 class _JugadoresSection extends StatelessWidget {
-  const _JugadoresSection({required this.jugadoresController});
+  const _JugadoresSection({required this.jugadoresController, required this.useLandscapeLayout});
   final ScrollController jugadoresController;
+  final bool useLandscapeLayout;
 
   @override
   Widget build(BuildContext context) {
     final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
     final isDark = Preferences.isDarkMode;
+
+    final avatarSize = (useLandscapeLayout ? ResponsiveApp.scaleWidth(17) : ResponsiveApp.scaleWidth(42)).clamp(28.0, 52.0);
+    final iconSize = (useLandscapeLayout ? ResponsiveApp.scaleWidth(5) : ResponsiveApp.scaleWidth(10)).clamp(12.0, 22.0);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -453,8 +436,8 @@ class _JugadoresSection extends StatelessWidget {
         Row(
           children: [
             Container(
-              width: 32,
-              height: 32,
+              width: avatarSize,
+              height: avatarSize,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [AppThemes.colorPrimero, AppThemes.colorPrimero.withValues(alpha: 0.7)],
@@ -463,20 +446,20 @@ class _JugadoresSection extends StatelessWidget {
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Center(
-                child: FaIcon(
+              child: Center(
+                child: IconScale(
                   FontAwesomeIcons.users,
-                  size: 14,
+                  size: iconSize,
                   color: Colors.white,
                 ),
               ),
             ),
             const SizedBox(width: 10),
-            Text(
+            TextScale(
               AppLocalizations.of(context)!.players,
+              size: 16,
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: ResponsiveApp.scaleText(16),
                 fontWeight: FontWeight.w600,
                 color: isDark ? Colors.white : AppThemes.colorCuarto,
               ),
@@ -488,11 +471,11 @@ class _JugadoresSection extends StatelessWidget {
                 color: AppThemes.colorTercero.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(
+              child: TextScale(
                 formPartidaProvider.jugadores.length.toString(),
+                size: 13,
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: ResponsiveApp.scaleText(13),
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
@@ -564,7 +547,7 @@ class _AddPlayerButton extends StatelessWidget {
             ],
           ),
           child: const Center(
-            child: FaIcon(FontAwesomeIcons.plus, size: 14, color: Colors.white),
+            child: IconScale(FontAwesomeIcons.plus, size: 14, color: Colors.white),
           ),
         ),
       ),
@@ -605,13 +588,13 @@ class _CreateButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const FaIcon(FontAwesomeIcons.plus, size: 16, color: Colors.white),
+              const IconScale(FontAwesomeIcons.plus, size: 16, color: Colors.white),
               const SizedBox(width: 10),
-              Text(
+              TextScale(
                 AppLocalizations.of(context)!.createGame,
+                size: 16,
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: ResponsiveApp.scaleText(16),
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
@@ -751,11 +734,11 @@ class _JugadorInputState extends State<_JugadorInput> with AutomaticKeepAliveCli
             borderRadius: BorderRadius.circular(8),
           ),
           child: Center(
-            child: Text(
+            child: TextScale(
               '${widget.index + 1}',
+              size: 12,
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: ResponsiveApp.scaleText(12),
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
               ),
@@ -820,7 +803,7 @@ class _JugadorInputState extends State<_JugadorInput> with AutomaticKeepAliveCli
                   ],
                 ),
                 child: const Center(
-                  child: FaIcon(FontAwesomeIcons.minus, size: 12, color: Colors.white),
+                  child: IconScale(FontAwesomeIcons.minus, size: 12, color: Colors.white),
                 ),
               ),
             ),

@@ -163,7 +163,7 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
               visible: !panelController.isAttached || panelController.isPanelClosed,
               child: ScaleTransition(
                 scale: CurvedAnimation(parent: _fabAnimController, curve: Curves.elasticOut),
-                child: Container(
+                child: DecoratedBox(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
@@ -193,7 +193,7 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
                         Toast.show(type: ToastType.info, context: context, message: l10n.freeVersionLimitGames(PremiumProvider.freeMaxGames), actionLabel: l10n.getPro, onAction: () => Navigator.pushNamed(context, 'premium'));
                       }
                     },
-                    child: IconScale(Icons.add_rounded, size: 32, color: Colors.white),
+                    child: const IconScale(Icons.add_rounded, size: 25, color: Colors.white),
                   ),
                 ),
               ),

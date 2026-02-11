@@ -22,61 +22,68 @@ class PartidasDefaultAlert extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
-    final l10n = AppLocalizations.of(context)!;
     final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
     formPartidaPredefinidaProvider.getPartidasPredefinidas();
 
     return Consumer<ReorderableProvider>(
       builder: (BuildContext context, reorderableProvider, Widget? child) {
-        return PopScope(
-          canPop: !reorderableProvider.isReording,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                _PredefinidaHeader(
-                  onAdd: () => _addPartidaPredefinida(context),
-                  isReordering: reorderableProvider.isReording,
-                  onDone: () => reorderableProvider.isReording = false,
-                ),
-                const SizedBox(height: 16),
+        return ResponsiveLayoutBuilder(
+          useMediaQuery: true,
+          builder: (context, constraints, info) {
+            final useLandscapeLayout = info.useLandscapeLayout;
 
-                // Lista de partidas
-                Flexible(
-                  child: Container(
-                    height: double.infinity,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      color: AppThemes.themeColor_1,
-                      border: Border.all(
-                        color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
+            return PopScope(
+              canPop: !reorderableProvider.isReording,
+              child: Padding(
+                padding: EdgeInsets.all(useLandscapeLayout ? 12 : 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header
+                    _PredefinidaHeader(
+                      onAdd: () => _addPartidaPredefinida(context),
+                      isReordering: reorderableProvider.isReording,
+                      onDone: () => reorderableProvider.isReording = false,
+                      useLandscapeLayout: useLandscapeLayout,
+                    ),
+                    SizedBox(height: useLandscapeLayout ? 12 : 16),
+
+                    // Lista de partidas
+                    Flexible(
+                      child: Container(
+                        height: double.infinity,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          color: AppThemes.themeColor_1,
+                          border: Border.all(
+                            color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
+                          ),
+                        ),
+                        child: const PartidasScrollView(),
                       ),
                     ),
-                    child: const PartidasScrollView(),
-                  ),
-                ),
-                const SizedBox(height: 14),
+                    SizedBox(height: useLandscapeLayout ? 10 : 14),
 
-                // Botón cerrar
-                Consumer<ReorderableProvider>(
-                  builder: (context, reorderableProvider, child) {
-                    return Visibility(
-                      visible: !reorderableProvider.isReording,
-                      child: _CloseButton(
-                        onTap: () {
-                          Navigator.pop(context);
-                          reorderableProvider.isReording = false;
-                        },
-                      ),
-                    );
-                  },
+                    // Botón cerrar
+                    Consumer<ReorderableProvider>(
+                      builder: (context, reorderableProvider, child) {
+                        return Visibility(
+                          visible: !reorderableProvider.isReording,
+                          child: _CloseButton(
+                            onTap: () {
+                              Navigator.pop(context);
+                              reorderableProvider.isReording = false;
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
@@ -102,15 +109,20 @@ class _PredefinidaHeader extends StatelessWidget {
     required this.onAdd,
     required this.isReordering,
     required this.onDone,
+    required this.useLandscapeLayout,
   });
 
   final VoidCallback onAdd;
   final bool isReordering;
   final VoidCallback onDone;
+  final bool useLandscapeLayout;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
+
+    final avatarSize = (useLandscapeLayout ? ResponsiveApp.scaleWidth(17) : ResponsiveApp.scaleWidth(42)).clamp(28.0, 52.0);
+    final iconSize = (useLandscapeLayout ? ResponsiveApp.scaleWidth(5) : ResponsiveApp.scaleWidth(10)).clamp(12.0, 22.0);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -141,8 +153,8 @@ class _PredefinidaHeader extends StatelessWidget {
         children: [
           // Icono
           Container(
-            width: 42,
-            height: 42,
+            width: avatarSize,
+            height: avatarSize,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
@@ -158,8 +170,8 @@ class _PredefinidaHeader extends StatelessWidget {
                 ),
               ],
             ),
-            child: const Center(
-              child: FaIcon(FontAwesomeIcons.layerGroup, color: Colors.white, size: 18),
+            child: Center(
+              child: IconScale(FontAwesomeIcons.layerGroup, color: Colors.white, size: iconSize),
             ),
           ),
           const SizedBox(width: 12),
@@ -169,20 +181,20 @@ class _PredefinidaHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                TextScale(
                   AppLocalizations.of(context)!.predefinedGames,
+                  size: 16,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: ResponsiveApp.scaleText(16),
                     fontWeight: FontWeight.bold,
                     color: isDark ? Colors.white : AppThemes.colorQuinto,
                   ),
                 ),
-                Text(
+                TextScale(
                   isReordering ? AppLocalizations.of(context)!.dragToReorder : AppLocalizations.of(context)!.tapToSelect,
+                  size: 11,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: ResponsiveApp.scaleText(11),
                     color: isDark ? Colors.grey[400] : Colors.grey[600],
                     fontWeight: FontWeight.w500,
                   ),
@@ -225,7 +237,7 @@ class _AddButton extends StatelessWidget {
               ),
             ],
           ),
-          child: const FaIcon(FontAwesomeIcons.plus, color: Colors.white, size: 16),
+          child: const IconScale(FontAwesomeIcons.plus, color: Colors.white, size: 16),
         ),
       ),
     );
@@ -258,11 +270,11 @@ class _DoneButton extends StatelessWidget {
               ),
             ],
           ),
-          child: Text(
+          child: TextScale(
             AppLocalizations.of(context)!.done,
+            size: 13,
             style: TextStyle(
               fontFamily: 'Poppins',
-              fontSize: ResponsiveApp.scaleText(13),
               fontWeight: FontWeight.w600,
               color: Colors.white,
             ),
@@ -304,13 +316,13 @@ class _CloseButton extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const FaIcon(FontAwesomeIcons.xmark, color: Colors.white, size: 14),
+                const IconScale(FontAwesomeIcons.xmark, color: Colors.white, size: 14),
                 const SizedBox(width: 8),
-                Text(
+                TextScale(
                   AppLocalizations.of(context)!.close,
+                  size: 14,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: ResponsiveApp.scaleText(14),
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
@@ -357,28 +369,28 @@ class PartidasScrollView extends StatelessWidget {
                     color: AppThemes.colorPrimero.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: FaIcon(
+                  child: IconScale(
                     FontAwesomeIcons.layerGroup,
                     size: 32,
                     color: AppThemes.colorPrimero.withValues(alpha: 0.5),
                   ),
                 ),
                 const SizedBox(height: 12),
-                Text(
+                TextScale(
                   AppLocalizations.of(context)!.noPredefinedGames,
+                  size: 14,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: ResponsiveApp.scaleText(14),
                     fontWeight: FontWeight.w500,
                     color: Colors.grey[500],
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
+                TextScale(
                   AppLocalizations.of(context)!.tapPlusToCreate,
+                  size: 12,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: ResponsiveApp.scaleText(12),
                     color: Colors.grey[400],
                   ),
                 ),
@@ -393,7 +405,12 @@ class PartidasScrollView extends StatelessWidget {
               builder: (context, constraints) {
                 const double spacing = 8;
                 const double padding = 10;
-                final double itemWidth = (constraints.maxWidth - (padding * 2) - (spacing * 2)) / 3;
+                final useLandscapeLayout =
+                    ResponsiveLayoutBuilder.maybeOf(context)?.useLandscapeLayout ??
+                    (constraints.maxWidth > constraints.maxHeight);
+                final itemsPerRow = useLandscapeLayout ? 4 : 3;
+                final totalSpacing = spacing * (itemsPerRow - 1);
+                final double itemWidth = (constraints.maxWidth - (padding * 2) - totalSpacing) / itemsPerRow;
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -402,46 +419,49 @@ class PartidasScrollView extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const FaIcon(
+                        const IconScale(
                           FontAwesomeIcons.circleInfo,
                           size: 12,
                           color: Colors.grey,
                         ),
                         const SizedBox(width: 6),
                         Flexible(
-                          child: Text(
+                          child: TextScale(
                             l10n.predefinedEditHint,
+                            size: 12,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            style: const TextStyle(color: Colors.grey),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 3),
-                    SingleChildScrollView(
-                      physics: const ClampingScrollPhysics(),
-                      padding: const EdgeInsets.all(padding),
-                      child: ReorderableWrap(
-                          enableReorder: reorderableProvider.isReording,
-                          needsLongPressDraggable: false,
-                          runSpacing: 15,
-                          spacing: spacing,
-                          maxMainAxisCount: 3,
-                          scrollPhysics: const ClampingScrollPhysics(),
-                          onReorder: (oldIndex, newIndex) {
-                            reorderableProvider.onReorder(oldIndex: oldIndex, newIndex: newIndex, reordenableList: snapshot.data);
-                            reordenarDataBase();
-                          },
-                          onNoReorder: (index) => reordenarDataBase(),
-                          children: snapshot.data!.map<Widget>((widget) {
-                            if (widget is ReordenableItem) {
-                              return ReordenableItem(
-                                partidaPredefinida: widget.partidaPredefinida,
-                                itemWidth: itemWidth,
-                              );
-                            }
-                            return widget;
-                          }).toList()),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        physics: const ClampingScrollPhysics(),
+                        padding: const EdgeInsets.all(padding),
+                        child: ReorderableWrap(
+                            enableReorder: reorderableProvider.isReording,
+                            needsLongPressDraggable: false,
+                            runSpacing: 15,
+                            spacing: spacing,
+                            maxMainAxisCount: itemsPerRow,
+                            scrollPhysics: const ClampingScrollPhysics(),
+                            onReorder: (oldIndex, newIndex) {
+                              reorderableProvider.onReorder(oldIndex: oldIndex, newIndex: newIndex, reordenableList: snapshot.data);
+                              reordenarDataBase();
+                            },
+                            onNoReorder: (index) => reordenarDataBase(),
+                            children: snapshot.data!.map<Widget>((widget) {
+                              if (widget is ReordenableItem) {
+                                return ReordenableItem(
+                                  partidaPredefinida: widget.partidaPredefinida,
+                                  itemWidth: itemWidth,
+                                );
+                              }
+                              return widget;
+                            }).toList()),
+                      ),
                     ),
                   ],
                 );
@@ -531,17 +551,17 @@ class ReordenableItem extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            FaIcon(
+                            IconScale(
                               FontAwesomeIcons.user,
                               size: 8,
                               color: Colors.white.withValues(alpha: 0.6),
                             ),
                             const SizedBox(width: 3),
-                            Text(
+                            TextScale(
                               '${partidaPredefinida.cantidadJugadores ?? 0}',
+                              size: 9,
                               style: TextStyle(
                                 fontFamily: 'Poppins',
-                                fontSize: ResponsiveApp.scaleText(9),
                                 color: Colors.white.withValues(alpha: 0.6),
                                 fontWeight: FontWeight.w500,
                               ),
@@ -553,11 +573,11 @@ class ReordenableItem extends StatelessWidget {
                       Positioned(
                         bottom: 4,
                         right: 6,
-                        child: Text(
+                        child: TextScale(
                           L10n.getGameType(context, partidaPredefinida.tipo),
+                          size: 8,
                           style: TextStyle(
                             fontFamily: 'Poppins',
-                            fontSize: ResponsiveApp.scaleText(8),
                             color: Colors.white.withValues(alpha: 0.6),
                             fontWeight: FontWeight.w500,
                           ),
@@ -594,13 +614,13 @@ class ReordenableItem extends StatelessWidget {
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const FaIcon(FontAwesomeIcons.penToSquare, size: 12, color: Colors.white),
+                                  const IconScale(FontAwesomeIcons.penToSquare, size: 12, color: Colors.white),
                                   const SizedBox(width: 6),
-                                  Text(
+                                  TextScale(
                                     l10n.edit,
+                                    size: 12,
                                     style: TextStyle(
                                       fontFamily: 'Poppins',
-                                      fontSize: ResponsiveApp.scaleText(12),
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white,
                                     ),
@@ -642,7 +662,7 @@ class ReordenableItem extends StatelessWidget {
                         ],
                       ),
                       child: const Center(
-                        child: FaIcon(FontAwesomeIcons.minus, color: Colors.white, size: 12),
+                        child: IconScale(FontAwesomeIcons.minus, color: Colors.white, size: 12),
                       ),
                     ),
                   ),
