@@ -10,6 +10,7 @@ import '../providers/providers.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 import 'responsive_layout_builder.dart';
+import 'text_scale.dart';
 
 class Layout extends StatefulWidget {
   const Layout({
@@ -262,7 +263,7 @@ class _AppBar extends StatelessWidget {
 
     return SafeArea(
       child: Padding(
-        padding: ResponsiveApp.symmetric(horizontal: isLandscape ? 8 : 12, vertical: isLandscape ? 3 : 5),
+        padding: ResponsiveApp.symmetric(horizontal: isLandscape ? 10 : 12, vertical: isLandscape ? 1 : 5),
         child: Row(
           children: [
             if (leading != null)
@@ -272,17 +273,17 @@ class _AppBar extends StatelessWidget {
               ),
             if (title != null)
               Expanded(
-                child: Text(
+                child: TextScale(
                   title!,
+                  size: isLandscape ? 22 : 15,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.bold,
-                    fontSize: ResponsiveApp.scaleText(isLandscape ? 22 : 15),
                     letterSpacing: 1.2,
-                    shadows: const [
+                    shadows: [
                       Shadow(
                         color: Colors.black26,
                         blurRadius: 4,
