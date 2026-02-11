@@ -597,97 +597,142 @@ class _MenuState extends State<_Menu> {
   Widget build(BuildContext context) {
     ThemeProvider themeProvider = context.watch<ThemeProvider>();
     final controller = _controller;
+    final l10n = AppLocalizations.of(context)!;
+
+    final premiumSection = Consumer<PremiumProvider>(
+      builder: (context, premiumProvider, child) {
+        return _PremiumCard(
+          isPremium: premiumProvider.isPremium,
+          simulatePremium: premiumProvider.simulatePremium,
+          onTap: () {
+            final navigator = Navigator.of(context);
+            final slideUpProvider = context.read<SlideUpProvider>();
+            slideUpProvider.closeSlideUp(controller: widget.panelController);
+            Future.delayed(const Duration(milliseconds: 300), () {
+              navigator.pushNamed('premium');
+            });
+          },
+          onSimulateChanged: (value) => premiumProvider.setSimulatePremium(value),
+        );
+      },
+    );
+
+    final reviewSection = const _ReviewSection();
+    final aboutSection = _AboutButton(panelController: widget.panelController);
+
     return Container(
       width: double.infinity,
       height: double.infinity,
-      padding: ResponsiveApp.only(top: 5, bottom: 20),
-      child: SingleChildScrollView(
-        controller: controller,
-        physics: const ClampingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header con logo
-            Padding(
-              padding: ResponsiveApp.only(left: 4),
-              child: Consumer<PremiumProvider>(
-                builder: (context, premiumProvider, child) => _MenuHeader(isPremium: premiumProvider.isPremium),
-              ),
-            ),
-            const SizedBox(height: 24),
+      child: ResponsiveLayoutBuilder(
+        useMediaQuery: true,
+        builder: (context, constraints, info) {
+          final useLandscapeMenu = info.useLandscapeLayout;
+          final topPadding = useLandscapeMenu ? 4.0 : 5.0;
+          final bottomPadding = useLandscapeMenu ? 12.0 : 20.0;
+          final headerSpacing = useLandscapeMenu ? 14.0 : 24.0;
+          final sectionSpacing = useLandscapeMenu ? 14.0 : 16.0;
 
-            // Sección de Tema
-            _MenuSection(
-              icon: Icons.palette_outlined,
-              title: AppLocalizations.of(context)!.appearance,
-              child: Column(
-                children: [
-                  _ThemeToggleRow(
-                    title: AppLocalizations.of(context)!.systemTheme,
-                    subtitle: AppLocalizations.of(context)!.syncWithDevice,
-                    value: Preferences.isSystemMode,
-                    onChanged: (value) {
-                      Preferences.isSystemMode = value;
-                      Preferences.isDarkMode = PlatformDispatcher.instance.platformBrightness == Brightness.dark;
-                      themeProvider.changeCurrentTheme();
-                      setState(() {});
-                    },
-                  ),
-                  AnimatedCrossFade(
-                    duration: const Duration(milliseconds: 300),
-                    crossFadeState: Preferences.isSystemMode ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-                    firstChild: const SizedBox(height: 0),
-                    secondChild: Padding(
-                      padding: ResponsiveApp.only(top: 12),
-                      child: _ThemeSwitcher(
-                        isDark: Preferences.isDarkMode,
-                        onTap: () {
-                          Preferences.isDarkMode = !Preferences.isDarkMode;
-                          themeProvider.changeCurrentTheme();
-                          setState(() {});
-                        },
-                      ),
+          final appearanceSection = _MenuSection(
+            icon: Icons.palette_outlined,
+            title: l10n.appearance,
+            useLandscapeMenu: useLandscapeMenu,
+            child: Column(
+              children: [
+                _ThemeToggleRow(
+                  title: l10n.systemTheme,
+                  subtitle: l10n.syncWithDevice,
+                  value: Preferences.isSystemMode,
+                  onChanged: (value) {
+                    Preferences.isSystemMode = value;
+                    Preferences.isDarkMode = PlatformDispatcher.instance.platformBrightness == Brightness.dark;
+                    themeProvider.changeCurrentTheme();
+                    setState(() {});
+                  },
+                ),
+                AnimatedCrossFade(
+                  duration: const Duration(milliseconds: 300),
+                  crossFadeState: Preferences.isSystemMode ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+                  firstChild: const SizedBox(height: 0),
+                  secondChild: Padding(
+                    padding: ResponsiveApp.only(top: 10),
+                    child: _ThemeSwitcher(
+                      isDark: Preferences.isDarkMode,
+                      useLandscapeMenu: useLandscapeMenu,
+                      onTap: () {
+                        Preferences.isDarkMode = !Preferences.isDarkMode;
+                        themeProvider.changeCurrentTheme();
+                        setState(() {});
+                      },
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
+          );
+          final languageSection = _MenuSection(
+            icon: Icons.language_rounded,
+            title: l10n.language,
+            useLandscapeMenu: useLandscapeMenu,
+            child: _LanguageSwitcher(),
+          );
 
-            // Sección de Idioma
-            _MenuSection(
-              icon: Icons.language_rounded,
-              title: AppLocalizations.of(context)!.language,
-              child: _LanguageSwitcher(),
+          return SingleChildScrollView(
+            controller: controller,
+            physics: const ClampingScrollPhysics(),
+            padding: ResponsiveApp.only(top: topPadding, bottom: bottomPadding),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: ResponsiveApp.only(left: 4),
+                  child: Consumer<PremiumProvider>(
+                    builder: (context, premiumProvider, child) => _MenuHeader(isPremium: premiumProvider.isPremium),
+                  ),
+                ),
+                SizedBox(height: headerSpacing),
+                if (!useLandscapeMenu) ...[
+                  appearanceSection,
+                  SizedBox(height: sectionSpacing),
+                  languageSection,
+                  SizedBox(height: sectionSpacing),
+                  premiumSection,
+                  SizedBox(height: sectionSpacing),
+                  reviewSection,
+                  SizedBox(height: sectionSpacing),
+                  aboutSection,
+                ] else
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 6,
+                        child: Column(
+                          children: [
+                            appearanceSection,
+                            SizedBox(height: sectionSpacing),
+                            languageSection,
+                          ],
+                        ),
+                      ),
+                      SizedBox(width: sectionSpacing),
+                      Expanded(
+                        flex: 5,
+                        child: Column(
+                          children: [
+                            premiumSection,
+                            SizedBox(height: sectionSpacing),
+                            reviewSection,
+                            SizedBox(height: sectionSpacing),
+                            aboutSection,
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
             ),
-            const SizedBox(height: 16),
-
-            // Sección Premium
-            Consumer<PremiumProvider>(
-              builder: (context, premiumProvider, child) {
-                return _PremiumCard(
-                  isPremium: premiumProvider.isPremium,
-                  simulatePremium: premiumProvider.simulatePremium,
-                  onTap: () {
-                    final navigator = Navigator.of(context);
-                    final slideUpProvider = context.read<SlideUpProvider>();
-                    slideUpProvider.closeSlideUp(controller: widget.panelController);
-                    Future.delayed(const Duration(milliseconds: 300), () {
-                      navigator.pushNamed('premium');
-                    });
-                  },
-                  onSimulateChanged: (value) => premiumProvider.setSimulatePremium(value),
-                );
-              },
-            ),
-            const SizedBox(height: 16),
-            const _ReviewSection(),
-            const SizedBox(height: 16),
-
-            // Sección Acerca de
-            _AboutButton(panelController: widget.panelController),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -786,13 +831,14 @@ class _MenuSection extends StatelessWidget {
   final IconData icon;
   final String title;
   final Widget child;
+  final bool useLandscapeMenu;
 
-  const _MenuSection({required this.icon, required this.title, required this.child});
+  const _MenuSection({required this.icon, required this.title, required this.child, required this.useLandscapeMenu});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: ResponsiveApp.all(16),
+      padding: ResponsiveApp.all(useLandscapeMenu ? 5 : 16),
       decoration: BoxDecoration(
         color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.05) : Colors.grey.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(16),
@@ -807,12 +853,12 @@ class _MenuSection extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: ResponsiveApp.all(8),
+                padding: ResponsiveApp.all(useLandscapeMenu ? 4 : 8),
                 decoration: BoxDecoration(
                   color: AppThemes.colorPrimero.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: IconScale(icon, size: 18, color: AppThemes.colorPrimero),
+                child: IconScale(icon, size: useLandscapeMenu ? 15 : 18, color: AppThemes.colorPrimero),
               ),
               const SizedBox(width: 12),
               TextScale(
@@ -889,8 +935,9 @@ class _ThemeToggleRow extends StatelessWidget {
 class _ThemeSwitcher extends StatelessWidget {
   final bool isDark;
   final VoidCallback onTap;
+  final bool useLandscapeMenu;
 
-  const _ThemeSwitcher({required this.isDark, required this.onTap});
+  const _ThemeSwitcher({required this.isDark, required this.onTap, required this.useLandscapeMenu});
 
   @override
   Widget build(BuildContext context) {
@@ -905,16 +952,8 @@ class _ThemeSwitcher extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _ThemeOption(
-              icon: Icons.wb_sunny_rounded,
-              label: AppLocalizations.of(context)!.lightTheme,
-              isSelected: !isDark,
-            ),
-            _ThemeOption(
-              icon: Icons.nights_stay_rounded,
-              label: AppLocalizations.of(context)!.darkTheme,
-              isSelected: isDark,
-            ),
+            _ThemeOption(icon: Icons.wb_sunny_rounded, label: AppLocalizations.of(context)!.lightTheme, isSelected: !isDark),
+            _ThemeOption(icon: Icons.nights_stay_rounded, label: AppLocalizations.of(context)!.darkTheme, isSelected: isDark),
           ],
         ),
       ),
@@ -942,7 +981,7 @@ class _ThemeOption extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          IconScale(icon, size: 18, color: isSelected ? Colors.white : Colors.grey[500]),
+          IconScale(icon, size: 16, color: isSelected ? Colors.white : Colors.grey[500]),
           const SizedBox(width: 6),
           TextScale(
             label,
