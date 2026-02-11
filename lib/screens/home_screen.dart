@@ -599,43 +599,46 @@ class _MenuState extends State<_Menu> {
     final controller = _controller;
     final l10n = AppLocalizations.of(context)!;
 
-    final premiumSection = Consumer<PremiumProvider>(
-      builder: (context, premiumProvider, child) {
-        return _PremiumCard(
-          isPremium: premiumProvider.isPremium,
-          simulatePremium: premiumProvider.simulatePremium,
-          onTap: () {
-            final navigator = Navigator.of(context);
-            final slideUpProvider = context.read<SlideUpProvider>();
-            slideUpProvider.closeSlideUp(controller: widget.panelController);
-            Future.delayed(const Duration(milliseconds: 300), () {
-              navigator.pushNamed('premium');
-            });
-          },
-          onSimulateChanged: (value) => premiumProvider.setSimulatePremium(value),
-        );
-      },
-    );
-
-    final reviewSection = const _ReviewSection();
-    final aboutSection = _AboutButton(panelController: widget.panelController);
-
     return Container(
       width: double.infinity,
       height: double.infinity,
       child: ResponsiveLayoutBuilder(
         useMediaQuery: true,
         builder: (context, constraints, info) {
-          final useLandscapeMenu = info.useLandscapeLayout;
-          final topPadding = useLandscapeMenu ? 4.0 : 5.0;
-          final bottomPadding = useLandscapeMenu ? 12.0 : 20.0;
-          final headerSpacing = useLandscapeMenu ? 14.0 : 24.0;
-          final sectionSpacing = useLandscapeMenu ? 14.0 : 16.0;
+          final useLandscapeLayout = info.useLandscapeLayout;
+          final topPadding = useLandscapeLayout ? 4.0 : 5.0;
+          final bottomPadding = useLandscapeLayout ? 12.0 : 20.0;
+          final headerSpacing = useLandscapeLayout ? 14.0 : 24.0;
+          final sectionSpacing = useLandscapeLayout ? 14.0 : 16.0;
+          final reviewSection = _ReviewSection(useLandscapeLayout: useLandscapeLayout);
+          final aboutSection = _AboutButton(
+            panelController: widget.panelController,
+            useLandscapeLayout: useLandscapeLayout,
+          );
+
+          final premiumSection = Consumer<PremiumProvider>(
+            builder: (context, premiumProvider, child) {
+              return _PremiumCard(
+                isPremium: premiumProvider.isPremium,
+                simulatePremium: premiumProvider.simulatePremium,
+                useLandscapeLayout: useLandscapeLayout,
+                onTap: () {
+                  final navigator = Navigator.of(context);
+                  final slideUpProvider = context.read<SlideUpProvider>();
+                  slideUpProvider.closeSlideUp(controller: widget.panelController);
+                  Future.delayed(const Duration(milliseconds: 300), () {
+                    navigator.pushNamed('premium');
+                  });
+                },
+                onSimulateChanged: (value) => premiumProvider.setSimulatePremium(value),
+              );
+            },
+          );
 
           final appearanceSection = _MenuSection(
             icon: Icons.palette_outlined,
             title: l10n.appearance,
-            useLandscapeMenu: useLandscapeMenu,
+            useLandscapeLayout: useLandscapeLayout,
             child: Column(
               children: [
                 _ThemeToggleRow(
@@ -657,7 +660,7 @@ class _MenuState extends State<_Menu> {
                     padding: ResponsiveApp.only(top: 10),
                     child: _ThemeSwitcher(
                       isDark: Preferences.isDarkMode,
-                      useLandscapeMenu: useLandscapeMenu,
+                      useLandscapeLayout: useLandscapeLayout,
                       onTap: () {
                         Preferences.isDarkMode = !Preferences.isDarkMode;
                         themeProvider.changeCurrentTheme();
@@ -672,7 +675,7 @@ class _MenuState extends State<_Menu> {
           final languageSection = _MenuSection(
             icon: Icons.language_rounded,
             title: l10n.language,
-            useLandscapeMenu: useLandscapeMenu,
+            useLandscapeLayout: useLandscapeLayout,
             child: _LanguageSwitcher(),
           );
 
@@ -690,7 +693,7 @@ class _MenuState extends State<_Menu> {
                   ),
                 ),
                 SizedBox(height: headerSpacing),
-                if (!useLandscapeMenu) ...[
+                if (!useLandscapeLayout) ...[
                   appearanceSection,
                   SizedBox(height: sectionSpacing),
                   languageSection,
@@ -831,14 +834,14 @@ class _MenuSection extends StatelessWidget {
   final IconData icon;
   final String title;
   final Widget child;
-  final bool useLandscapeMenu;
+  final bool useLandscapeLayout;
 
-  const _MenuSection({required this.icon, required this.title, required this.child, required this.useLandscapeMenu});
+  const _MenuSection({required this.icon, required this.title, required this.child, required this.useLandscapeLayout});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: ResponsiveApp.all(useLandscapeMenu ? 5 : 16),
+      padding: ResponsiveApp.all(useLandscapeLayout ? 5 : 16),
       decoration: BoxDecoration(
         color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.05) : Colors.grey.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(16),
@@ -853,12 +856,12 @@ class _MenuSection extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: ResponsiveApp.all(useLandscapeMenu ? 4 : 8),
+                padding: ResponsiveApp.all(useLandscapeLayout ? 4 : 8),
                 decoration: BoxDecoration(
                   color: AppThemes.colorPrimero.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: IconScale(icon, size: useLandscapeMenu ? 15 : 18, color: AppThemes.colorPrimero),
+                child: IconScale(icon, size: 18, color: AppThemes.colorPrimero),
               ),
               const SizedBox(width: 12),
               TextScale(
@@ -935,9 +938,9 @@ class _ThemeToggleRow extends StatelessWidget {
 class _ThemeSwitcher extends StatelessWidget {
   final bool isDark;
   final VoidCallback onTap;
-  final bool useLandscapeMenu;
+  final bool useLandscapeLayout;
 
-  const _ThemeSwitcher({required this.isDark, required this.onTap, required this.useLandscapeMenu});
+  const _ThemeSwitcher({required this.isDark, required this.onTap, required this.useLandscapeLayout});
 
   @override
   Widget build(BuildContext context) {
@@ -1001,12 +1004,14 @@ class _ThemeOption extends StatelessWidget {
 class _PremiumCard extends StatelessWidget {
   final bool isPremium;
   final bool simulatePremium;
+  final bool useLandscapeLayout;
   final VoidCallback onTap;
   final ValueChanged<bool> onSimulateChanged;
 
   const _PremiumCard({
     required this.isPremium,
     required this.simulatePremium,
+    required this.useLandscapeLayout,
     required this.onTap,
     required this.onSimulateChanged,
   });
@@ -1016,7 +1021,7 @@ class _PremiumCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: ResponsiveApp.all(16),
+        padding: ResponsiveApp.all(useLandscapeLayout ? 5 : 16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -1037,7 +1042,7 @@ class _PremiumCard extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  padding: ResponsiveApp.all(12),
+                  padding: ResponsiveApp.all(useLandscapeLayout ? 4 : 8),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
@@ -1053,9 +1058,13 @@ class _PremiumCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: Image.asset('assets/img/corona-pro.png', width: 28, height: 28),
+                  child: Image.asset(
+                    'assets/img/corona-pro.png',
+                    width: useLandscapeLayout ? 24 : 28,
+                    height: useLandscapeLayout ? 24 : 28,
+                  ),
                 ),
-                const SizedBox(width: 14),
+                SizedBox(width: useLandscapeLayout ? 10 : 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1087,7 +1096,7 @@ class _PremiumCard extends StatelessWidget {
                                   TextScale(
                                     AppLocalizations.of(context)!.active,
                                     size: 10,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.green,
                                       fontFamily: 'Poppins',
                                       fontWeight: FontWeight.w600,
@@ -1113,7 +1122,7 @@ class _PremiumCard extends StatelessWidget {
                 ),
                 if (!isPremium)
                   Container(
-                    padding: ResponsiveApp.all(8),
+                    padding: ResponsiveApp.all(useLandscapeLayout ? 5 : 10),
                     decoration: BoxDecoration(
                       color: AppThemes.colorPrimero.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
@@ -1241,12 +1250,14 @@ class _MenuActionButton extends StatelessWidget {
   final IconData icon;
   final String title;
   final VoidCallback onTap;
+  final bool useLandscapeLayout;
   final Widget? trailing;
 
   const _MenuActionButton({
     required this.icon,
     required this.title,
     required this.onTap,
+    required this.useLandscapeLayout,
     this.trailing,
   });
 
@@ -1261,7 +1272,7 @@ class _MenuActionButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,
         child: Container(
-          padding: ResponsiveApp.all(16),
+          padding: ResponsiveApp.all(useLandscapeLayout ? 5 : 16),
           decoration: BoxDecoration(
             color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(16),
@@ -1270,18 +1281,18 @@ class _MenuActionButton extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                padding: ResponsiveApp.all(8),
+                padding: ResponsiveApp.all(useLandscapeLayout ? 4 : 8),
                 decoration: BoxDecoration(
                   color: AppThemes.colorPrimero.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: IconScale(icon, size: 18, color: AppThemes.colorPrimero),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: useLandscapeLayout ? 10 : 12),
               Expanded(
                 child: TextScale(
                   title,
-                  size: 16,
+                  size: useLandscapeLayout ? 15 : 16,
                   style: TextStyle(
                     color: isDark ? Colors.white : AppThemes.colorCuarto,
                     fontFamily: 'Poppins',
@@ -1289,7 +1300,12 @@ class _MenuActionButton extends StatelessWidget {
                   ),
                 ),
               ),
-              trailing ?? IconScale(Icons.arrow_forward_ios_rounded, size: 16, color: isDark ? Colors.white70 : Colors.grey[500]),
+              trailing ??
+                  IconScale(
+                    Icons.arrow_forward_ios_rounded,
+                    size: useLandscapeLayout ? 14 : 16,
+                    color: isDark ? Colors.white70 : Colors.grey[500],
+                  ),
             ],
           ),
         ),
@@ -1299,7 +1315,9 @@ class _MenuActionButton extends StatelessWidget {
 }
 
 class _ReviewSection extends StatefulWidget {
-  const _ReviewSection();
+  final bool useLandscapeLayout;
+
+  const _ReviewSection({required this.useLandscapeLayout});
 
   @override
   State<_ReviewSection> createState() => _ReviewSectionState();
@@ -1335,21 +1353,26 @@ class _ReviewSectionState extends State<_ReviewSection> {
       icon: FontAwesomeIcons.solidStar,
       title: l10n.reviewCardTitle,
       onTap: _handleReviewTap,
+      useLandscapeLayout: widget.useLandscapeLayout,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (_isLoading) ...[
             SizedBox(
-              width: 18,
-              height: 18,
+              width: widget.useLandscapeLayout ? 16 : 18,
+              height: widget.useLandscapeLayout ? 16 : 18,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
                 valueColor: AlwaysStoppedAnimation(AppThemes.colorPrimero),
               ),
             ),
-            const SizedBox(width: 6),
+            SizedBox(width: widget.useLandscapeLayout ? 4 : 6),
           ],
-          IconScale(Icons.arrow_forward_ios_rounded, size: 16, color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[500]),
+          IconScale(
+            Icons.arrow_forward_ios_rounded,
+            size: widget.useLandscapeLayout ? 14 : 16,
+            color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[500],
+          ),
         ],
       ),
     );
@@ -1358,8 +1381,12 @@ class _ReviewSectionState extends State<_ReviewSection> {
 
 class _AboutButton extends StatelessWidget {
   final PanelController panelController;
+  final bool useLandscapeLayout;
 
-  const _AboutButton({required this.panelController});
+  const _AboutButton({
+    required this.panelController,
+    required this.useLandscapeLayout,
+  });
 
   void _openAbout(BuildContext context) {
     final navigator = Navigator.of(context);
@@ -1375,6 +1402,7 @@ class _AboutButton extends StatelessWidget {
       icon: FontAwesomeIcons.infoCircle,
       title: l10n.aboutTitle,
       onTap: () => _openAbout(context),
+      useLandscapeLayout: useLandscapeLayout,
     );
   }
 }

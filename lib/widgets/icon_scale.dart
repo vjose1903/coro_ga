@@ -34,8 +34,10 @@ class IconScale extends StatelessWidget {
     final shortestSide = mediaSize.shortestSide;
     final isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
     final isLargeDevice = shortestSide >= 600;
-    final landscapePhoneBoost = isLandscape && !isLargeDevice ? 0.65 : 0.8;
-    final portraitBias = isLandscape ? 0.9 : 1.2;
+    final landscapePhoneBoost = isLandscape && !isLargeDevice ? 0.6 : 0.5;
+    final portraitBias = isLandscape ? 0.9 : 0.8;
+    
+    debugPrint('isLargeDevice ${isLargeDevice}' );
 
     final resolvedSize = size ?? 24.0;
     final scaledBase = ResponsiveApp.scaleWidth(resolvedSize) * portraitBias * landscapePhoneBoost;
