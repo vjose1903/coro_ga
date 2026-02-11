@@ -75,7 +75,7 @@ class _PartidaCardState extends State<PartidaCard> {
               index: widget.index,
               trailingActions: <SwipeAction>[
                 SwipeAction(
-                  icon: const IconScale(Icons.delete_outline_rounded, color: Colors.white, size: 22),
+                  icon: IconScale(Icons.delete_outline_rounded, color: Colors.white, size: isLandscape ? 20 : 22),
                   title: l10n.delete,
                   style: const TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white),
                   onTap: (CompletionHandler handler) async => widget.functionBorrar(handler),
@@ -83,7 +83,7 @@ class _PartidaCardState extends State<PartidaCard> {
                 ),
                 if (!widget.partida.isSinIniciar)
                   SwipeAction(
-                    icon: const IconScale(Icons.restart_alt_rounded, color: Colors.white, size: 22),
+                    icon: IconScale(Icons.restart_alt_rounded, color: Colors.white, size: isLandscape ? 20 : 22),
                     title: l10n.restart,
                     style: const TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white),
                     onTap: (CompletionHandler handler) async {
@@ -114,7 +114,7 @@ class _PartidaCardState extends State<PartidaCard> {
                     color: Colors.amber[700]!,
                   ),
                 SwipeAction(
-                    icon: const IconScale(Icons.edit_outlined, color: Colors.white, size: 22),
+                    icon: IconScale(Icons.edit_outlined, color: Colors.white, size: isLandscape ? 20 : 22),
                     title: l10n.edit,
                     style: const TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white),
                     onTap: (CompletionHandler handler) async {
