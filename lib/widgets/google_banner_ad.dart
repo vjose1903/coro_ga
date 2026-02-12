@@ -9,7 +9,7 @@ import '../helpers/helpers.dart';
 import '../providers/premium_provider.dart';
 
 class GoogleBannerAd extends StatefulWidget {
-  const GoogleBannerAd({super.key, required this.location, this.onCloseAd});
+  const GoogleBannerAd({required this.location, this.onCloseAd, super.key});
 
   final AdLocation location;
   final Function? onCloseAd;
@@ -22,6 +22,7 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
   BannerAd? _bannerAd;
   AdSize? _adSize;
   bool _isLoading = false;
+  bool _loadScheduled = false;
   Timer? _retryTimer;
   int _retryAttempt = 0;
   static const double _horizontalPadding = 16;
@@ -29,11 +30,7 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final width = (MediaQuery.of(context).size.width - (_horizontalPadding * 2)).truncate();
-      _loadBanner(width: width);
-    });
+    _scheduleBannerLoad();
   }
 
   @override
@@ -42,39 +39,44 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     if (oldWidget.location != widget.location) {
       _disposeBanner();
       _isLoading = false;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        final width = (MediaQuery.of(context).size.width - (_horizontalPadding * 2)).truncate();
-        _loadBanner(width: width);
-      });
+      _scheduleBannerLoad();
     }
   }
 
   Future<void> _loadBanner({int? width}) async {
     if (_isLoading || !mounted || _bannerAd != null) return;
+    _isLoading = true;
+    _loadScheduled = false;
 
     final adUnitId = AdHelper.getBannerAdUnitId(widget.location);
     debugPrint('BannerAd load start: location=${widget.location}, unitId=$adUnitId');
     if (adUnitId.isEmpty) {
       debugPrint('BannerAd load aborted: empty adUnitId for location=${widget.location}');
+      _isLoading = false;
       return;
     }
 
-    final int resolvedWidth = width ?? MediaQuery.of(context).size.width.truncate();
-    final size = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(resolvedWidth);
-    if (!mounted || size == null) {
+    final mediaSize = MediaQuery.of(context).size;
+    final shortestSide = mediaSize.shortestSide;
+    final isLargeDevice = shortestSide >= 600;
+    final int resolvedWidth = width ?? mediaSize.width.truncate();
+    final adaptiveSize = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(resolvedWidth);
+    if (!mounted || adaptiveSize == null) {
       debugPrint('BannerAd load aborted: adaptive size null for width=$resolvedWidth');
+      _isLoading = false;
       return;
     }
-    _adSize = size;
+
+    // In larger devices anchored adaptive can be too tall; cap to full banner height.
+    final AdSize chosenSize = isLargeDevice && adaptiveSize.height > 60 ? AdSize.fullBanner : adaptiveSize;
+    _adSize = chosenSize;
 
     _disposeBanner();
-    _isLoading = true;
 
     final ad = BannerAd(
       adUnitId: adUnitId,
       request: const AdRequest(),
-      size: size,
+      size: chosenSize,
       listener: BannerAdListener(
         onAdLoaded: (ad) {
           if (!mounted) {
@@ -87,7 +89,23 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
           });
           _retryTimer?.cancel();
           _isLoading = false;
+
+          debugPrint('   ');
+          debugPrint('   ');
+          debugPrint('   ');
+          debugPrint('   ');
+          debugPrint('Loaded');
+          debugPrint('   ');
+          debugPrint('   ');
           debugPrint('BannerAd loaded: location=${widget.location}, unitId=$adUnitId, size=${_bannerAd?.size}');
+
+          final info = (ad as BannerAd).responseInfo;
+          debugPrint('Winner adapter: ${info?.mediationAdapterClassName}');
+          debugPrint('ResponseInfo: $info');
+          debugPrint('   ');
+          debugPrint('   ');
+          debugPrint('   ');
+          debugPrint('   ');
         },
         onAdFailedToLoad: (ad, error) {
           ad.dispose();
@@ -110,13 +128,22 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
               'message=${error.message}',
               'domain=${error.domain}',
             ],
-            fatal: false,
           );
           _scheduleRetry();
         },
       ),
     );
-    ad.load();
+    unawaited(ad.load());
+  }
+
+  void _scheduleBannerLoad() {
+    if (_loadScheduled || !mounted) return;
+    _loadScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final width = (MediaQuery.of(context).size.width - (_horizontalPadding * 2)).truncate();
+      _loadBanner(width: width);
+    });
   }
 
   @override
@@ -139,11 +166,7 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     }
 
     if (_bannerAd == null && !_isLoading) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        final width = (MediaQuery.of(context).size.width - (_horizontalPadding * 2)).truncate();
-        _loadBanner(width: width);
-      });
+      _scheduleBannerLoad();
     }
 
     final double width = _bannerAd?.size.width.toDouble() ?? _adSize?.width.toDouble() ?? 320;
@@ -155,9 +178,7 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
         key: _bannerAd != null ? ObjectKey(_bannerAd) : null,
         width: width,
         alignment: Alignment.topCenter,
-        child: _bannerAd == null
-            ? SizedBox(width: width, height: height)
-            : SizedBox(width: width, height: height, child: AdWidget(ad: _bannerAd!)),
+        child: _bannerAd == null ? SizedBox(width: width, height: height) : SizedBox(width: width, height: height, child: AdWidget(ad: _bannerAd!)),
       ),
     );
   }
