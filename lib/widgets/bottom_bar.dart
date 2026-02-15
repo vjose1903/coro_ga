@@ -1,10 +1,10 @@
 // ignore_for_file: unused_local_variable
 
 import 'package:flutter/material.dart';
-import 'package:sliding_up_panel2/sliding_up_panel2.dart';
-import '../providers/providers.dart';
 import 'package:provider/provider.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
+import '../providers/providers.dart';
 import '../shared_preferences/preferences.dart';
 
 class BottomBar extends StatelessWidget {
@@ -18,10 +18,12 @@ class BottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color backgroundColor = Preferences.isDarkMode ? const Color(0xEB333333) : const Color(0xFFC4D0E5);
     final SlideUpProvider slideUpProvider = context.watch<SlideUpProvider>();
+    final double bottomInset = MediaQuery.of(context).viewPadding.bottom;
 
     // Usar la posición del panel para animar la altura suavemente
     // panelPosition va de 0 (cerrado) a 1 (abierto)
-    final double height = panelController != null ? _maxHeight * (1 - slideUpProvider.panelPosition) : _maxHeight;
+    final double animatedHeight = panelController != null ? _maxHeight * (1 - slideUpProvider.panelPosition) : _maxHeight;
+    final double height = animatedHeight > 0 ? animatedHeight + bottomInset : 0;
 
     return Container(
       height: height,
@@ -30,7 +32,7 @@ class BottomBar extends StatelessWidget {
       child: height > 0
           ? ClipRect(
               child: Padding(
-                padding: const EdgeInsets.all(1),
+                padding: EdgeInsets.fromLTRB(1, 1, 1, bottomInset + 1),
                 child: child ?? Container(),
               ),
             )

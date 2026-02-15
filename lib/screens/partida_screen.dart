@@ -167,10 +167,12 @@ class _Body extends StatelessWidget {
 
         final double topMargin = compactHeight ? (useLandscapeLayout ? 12 : 24) : (useLandscapeLayout ? 20 : 40);
         final mediaQuery = MediaQuery.of(context);
+        final double bottomInset = mediaQuery.viewPadding.bottom;
         final double baseBottomMargin = compactHeight ? (useLandscapeLayout ? 17 : 60) : (useLandscapeLayout ? 25 : 90);
         const double bottomBarHeight = 65;
-        final double landscapeBottomReserved = bottomBarHeight + mediaQuery.viewPadding.bottom + 8;
-        final double bottomMargin = useLandscapeLayout && baseBottomMargin < landscapeBottomReserved ? landscapeBottomReserved : baseBottomMargin;
+        final double landscapeBottomReserved = bottomBarHeight + bottomInset + 8;
+        final double bottomMarginBase = useLandscapeLayout && baseBottomMargin < landscapeBottomReserved ? landscapeBottomReserved : baseBottomMargin;
+        final double bottomMargin = bottomMarginBase + bottomInset;
         final double horizontalPadding = ResponsiveApp.scaleWidth(20);
         final double contentSpacing = ResponsiveApp.scaleHeight(20);
         final double betweenCardGap = compactHeight ? ResponsiveApp.scaleHeight(22) : ResponsiveApp.scaleHeight(25);

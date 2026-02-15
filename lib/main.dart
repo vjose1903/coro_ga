@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'helpers/helpers.dart';
 import 'package:provider/provider.dart';
+
+import 'helpers/helpers.dart';
 import 'l10n/app_localizations.dart';
 import 'providers/providers.dart';
 import 'routes/app_routes.dart';
@@ -61,6 +63,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _applyImmersiveMode();
   }
 
   @override
@@ -75,6 +78,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       final ThemeProvider themeProvider = context.read<ThemeProvider>();
       _lastLifecycleState = state;
 
+      if (_lastLifecycleState == AppLifecycleState.resumed) {
+        _applyImmersiveMode();
+      }
+
       if (Preferences.isSystemMode && _lastLifecycleState == AppLifecycleState.resumed) {
         final bool isActualSystemDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
 
@@ -84,6 +91,22 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         }
       }
     });
+  }
+
+  void _applyImmersiveMode() {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
+
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: [SystemUiOverlay.top],
+    );
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+      ),
+    );
   }
 
   @override
