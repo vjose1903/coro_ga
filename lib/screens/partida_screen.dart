@@ -94,51 +94,68 @@ class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProvider
             return const SizedBox.shrink();
           }
 
-          return Scaffold(
-            body: _Body(panelController: panelController, showBanner: _showBanner),
-            floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-            floatingActionButton: Visibility(
-              visible: !panelController.isAttached || panelController.isPanelClosed,
-              child: ScaleTransition(
-                scale: CurvedAnimation(parent: _fabAnimController, curve: Curves.elasticOut),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppThemes.colorTercero.withValues(alpha: 0.4),
-                        blurRadius: 12,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: FloatingActionButton(
-                    heroTag: null,
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    shape: const CircleBorder(),
-                    onPressed: () {
-                      final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-                      final PremiumProvider premiumProvider = context.read<PremiumProvider>();
-                      final l10n = AppLocalizations.of(context)!;
+          return ResponsiveLayoutBuilder(
+            useMediaQuery: true,
+            builder: (context, constraints, info) {
+              final useLandscapeLayout = info.useLandscapeLayout;
+              final isWide = info.isWide;
 
-                      if (premiumProvider.canCreateGame(partidaProvider.partidas.length)) {
-                        Navigator.pushNamed(context, 'formulario');
-                      } else {
-                        Toast.show(type: ToastType.info, context: context, message: l10n.freeVersionLimitGames(PremiumProvider.freeMaxGames), actionLabel: l10n.getPro, onAction: () => Navigator.pushNamed(context, 'premium'));
-                      }
-                    },
-                    child: const IconScale(Icons.add_rounded, size: 32, color: Colors.white),
+              return Scaffold(
+                body: _Body(
+                  panelController: panelController,
+                  showBanner: _showBanner,
+                  useLandscapeLayout: useLandscapeLayout,
+                  isWide: isWide,
+                ),
+                floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+                floatingActionButton: Visibility(
+                  visible: !panelController.isAttached || panelController.isPanelClosed,
+                  child: ScaleTransition(
+                    scale: CurvedAnimation(parent: _fabAnimController, curve: Curves.elasticOut),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppThemes.colorTercero.withValues(alpha: 0.4),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: FloatingActionButton(
+                        heroTag: null,
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+                        shape: const CircleBorder(),
+                        onPressed: () {
+                          final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+                          final PremiumProvider premiumProvider = context.read<PremiumProvider>();
+                          final l10n = AppLocalizations.of(context)!;
+
+                          if (premiumProvider.canCreateGame(partidaProvider.partidas.length)) {
+                            Navigator.pushNamed(context, 'formulario');
+                          } else {
+                            Toast.show(type: ToastType.info, context: context, message: l10n.freeVersionLimitGames(PremiumProvider.freeMaxGames), actionLabel: l10n.getPro, onAction: () => Navigator.pushNamed(context, 'premium'));
+                          }
+                        },
+                        child: const IconScale(Icons.add_rounded, size: 32, color: Colors.white),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            bottomNavigationBar: BottomBar(panelController: panelController, child: const NavigationBar()),
+                bottomNavigationBar: BottomBar(
+                  useLandscapeLayout: useLandscapeLayout,
+                  panelController: panelController,
+                  child: NavigationBar(useLandscapeLayout: useLandscapeLayout, isWide: isWide),
+                ),
+              );
+            },
           );
         },
       ),
@@ -147,10 +164,18 @@ class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProvider
 }
 
 class _Body extends StatelessWidget {
-  const _Body({super.key, required this.panelController, required this.showBanner});
+  const _Body({
+    super.key,
+    required this.panelController,
+    required this.showBanner,
+    required this.useLandscapeLayout,
+    required this.isWide,
+  });
 
   final PanelController panelController;
   final bool showBanner;
+  final bool useLandscapeLayout;
+  final bool isWide;
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
@@ -160,113 +185,106 @@ class _Body extends StatelessWidget {
     final bool compactHeight = ResponsiveApp.isSmallHeight;
     final l10n = AppLocalizations.of(context)!;
 
-    return ResponsiveLayoutBuilder(
-      builder: (context, constraints, info) {
-        final bool useLandscapeLayout = info.useLandscapeLayout;
-        final bool isWide = info.isWide;
+    final double topMargin = compactHeight ? (useLandscapeLayout ? 12 : 24) : (useLandscapeLayout ? 20 : 40);
+    final mediaQuery = MediaQuery.of(context);
+    final double bottomInset = mediaQuery.viewPadding.bottom;
+    final double baseBottomMargin = compactHeight ? (useLandscapeLayout ? 17 : 60) : (useLandscapeLayout ? 25 : 90);
+    const double bottomBarHeight = 65;
+    final double landscapeBottomReserved = bottomBarHeight + bottomInset + 8;
+    final double bottomMarginBase = useLandscapeLayout && baseBottomMargin < landscapeBottomReserved ? landscapeBottomReserved : baseBottomMargin;
+    final double bottomMargin = bottomMarginBase + bottomInset;
+    final double horizontalPadding = ResponsiveApp.scaleWidth(20);
+    final double contentSpacing = ResponsiveApp.scaleHeight(20);
+    final double betweenCardGap = compactHeight ? ResponsiveApp.scaleHeight(22) : ResponsiveApp.scaleHeight(25);
+    final double adSpacing = ResponsiveApp.scaleHeight(15);
 
-        final double topMargin = compactHeight ? (useLandscapeLayout ? 12 : 24) : (useLandscapeLayout ? 20 : 40);
-        final mediaQuery = MediaQuery.of(context);
-        final double bottomInset = mediaQuery.viewPadding.bottom;
-        final double baseBottomMargin = compactHeight ? (useLandscapeLayout ? 17 : 60) : (useLandscapeLayout ? 25 : 90);
-        const double bottomBarHeight = 65;
-        final double landscapeBottomReserved = bottomBarHeight + bottomInset + 8;
-        final double bottomMarginBase = useLandscapeLayout && baseBottomMargin < landscapeBottomReserved ? landscapeBottomReserved : baseBottomMargin;
-        final double bottomMargin = bottomMarginBase + bottomInset;
-        final double horizontalPadding = ResponsiveApp.scaleWidth(20);
-        final double contentSpacing = ResponsiveApp.scaleHeight(20);
-        final double betweenCardGap = compactHeight ? ResponsiveApp.scaleHeight(22) : ResponsiveApp.scaleHeight(25);
-        final double adSpacing = ResponsiveApp.scaleHeight(15);
-
-        return Layout(
-            panelController: panelController,
-            hasFooter: true,
-            appBarTitle: partida.nombre,
-            appBarLeading: CustomIconButtom(
-              iconSize: ResponsiveApp.isSmallHeight ? 19 : 20,
-              iconColor: Colors.white,
-              icon: Icons.arrow_back_ios_new,
-              onTap: () => Navigator.pop(context),
-            ),
-            appBarTrailing: CustomIconButtom(
-              iconSize: ResponsiveApp.isSmallHeight ? 19 : 20,
-              iconColor: Colors.white,
-              icon: Icons.edit_outlined,
-              onTap: () {
-                formPartidaProvider.form.patchValue(partida.toMap());
-                partidaProvider.partidaEditar = partida;
-                slideUpProvider.openSlideUp(
-                  controller: panelController,
-                  maxHeightFraction: useLandscapeLayout ? 0.9 : 0.5,
-                  bodyContent: EditarEntidad(panelController: panelController),
-                );
-              },
-            ),
-            bodyContent: Container(
-                margin: EdgeInsets.only(top: topMargin, bottom: bottomMargin),
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child: useLandscapeLayout
-                    ? Row(
-                        children: [
-                          Flexible(
-                            flex: isWide ? 40 : 45,
-                            child: Column(
-                              children: [
-                                CustomEstadoPartida(
-                                  useLandscapeLayout: useLandscapeLayout,
-                                  isWide: isWide,
-                                ),
-                                SizedBox(height: contentSpacing),
-                                const Spacer(),
-                                if (partida.esSinMaxPuntuacion) ...[
-                                  _EndGameButton(label: l10n.endGame, onTap: () => _confirmEndGame(context, partida), isWide: isWide, useLandscapeLayout: useLandscapeLayout),
-                                  SizedBox(height: adSpacing),
-                                ],
-                                if (showBanner) ...[
-                                  GoogleBannerAd(
-                                    key: ValueKey('partida_banner_${partida.id ?? 'none'}'),
-                                    location: AdLocation.partida,
-                                    usePadding: false,
-                                  ),
-                                ],
-                              ],
+    return Layout(
+        panelController: panelController,
+        hasFooter: true,
+        appBarTitle: partida.nombre,
+        appBarLeading: CustomIconButtom(
+          iconSize: ResponsiveApp.isSmallHeight ? 19 : 20,
+          iconColor: Colors.white,
+          icon: Icons.arrow_back_ios_new,
+          onTap: () => Navigator.pop(context),
+        ),
+        appBarTrailing: CustomIconButtom(
+          iconSize: ResponsiveApp.isSmallHeight ? 19 : 20,
+          iconColor: Colors.white,
+          icon: Icons.edit_outlined,
+          onTap: () {
+            formPartidaProvider.form.patchValue(partida.toMap());
+            partidaProvider.partidaEditar = partida;
+            slideUpProvider.openSlideUp(
+              controller: panelController,
+              maxHeightFraction: useLandscapeLayout ? 0.9 : 0.5,
+              bodyContent: EditarEntidad(panelController: panelController),
+            );
+          },
+        ),
+        bodyContent: Container(
+            margin: EdgeInsets.only(top: topMargin, bottom: bottomMargin),
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            child: useLandscapeLayout
+                ? Row(
+                    children: [
+                      Flexible(
+                        flex: isWide ? 40 : 45,
+                        child: Column(
+                          children: [
+                            CustomEstadoPartida(
+                              useLandscapeLayout: useLandscapeLayout,
+                              isWide: isWide,
                             ),
-                          ),
-                          SizedBox(width: ResponsiveApp.scaleWidth(5)),
-                          Flexible(
-                            flex: isWide ? 60 : 55,
-                            child: JugadoresCard(panelController: panelController, expand: false, useLandscapeLayout: useLandscapeLayout, isWide: isWide),
-                          ),
-                        ],
-                      )
-                    : Column(children: [
-                        CustomEstadoPartida(
-                          useLandscapeLayout: useLandscapeLayout,
-                          isWide: isWide,
+                            SizedBox(height: contentSpacing),
+                            const Spacer(),
+                            if (partida.esSinMaxPuntuacion) ...[
+                              _EndGameButton(label: l10n.endGame, onTap: () => _confirmEndGame(context, partida), isWide: isWide, useLandscapeLayout: useLandscapeLayout),
+                              SizedBox(height: adSpacing),
+                            ],
+                            if (showBanner) ...[
+                              GoogleBannerAd(
+                                key: ValueKey('partida_banner_${partida.id ?? 'none'}'),
+                                location: AdLocation.partida,
+                                usePadding: false,
+                              ),
+                            ],
+                          ],
                         ),
-                        SizedBox(height: contentSpacing),
-                        JugadoresCard(panelController: panelController, useLandscapeLayout: useLandscapeLayout, isWide: isWide),
-                        SizedBox(height: betweenCardGap),
-                        if (partida.esSinMaxPuntuacion) ...[
-                          _EndGameButton(
-                            label: l10n.endGame,
-                            onTap: () => _confirmEndGame(context, partida),
-                            isWide: isWide,
-                            useLandscapeLayout: useLandscapeLayout,
-                          ),
-                          SizedBox(height: adSpacing),
-                        ],
-                        if (showBanner) ...[
-                          // Anuncio separado de la lista de jugadores
-                          GoogleBannerAd(
-                            key: ValueKey('partida_banner_${partida.id ?? 'none'}'),
-                            location: AdLocation.partida,
-                          ),
-                          SizedBox(height: adSpacing),
-                        ],
-                      ])));
-      },
-    );
+                      ),
+                      SizedBox(width: ResponsiveApp.scaleWidth(5)),
+                      Flexible(
+                        flex: isWide ? 60 : 55,
+                        child: JugadoresCard(panelController: panelController, expand: false, useLandscapeLayout: useLandscapeLayout, isWide: isWide),
+                      ),
+                    ],
+                  )
+                : Column(children: [
+                    CustomEstadoPartida(
+                      useLandscapeLayout: useLandscapeLayout,
+                      isWide: isWide,
+                    ),
+                    SizedBox(height: contentSpacing),
+                    JugadoresCard(panelController: panelController, useLandscapeLayout: useLandscapeLayout, isWide: isWide),
+                    SizedBox(height: betweenCardGap),
+                    if (partida.esSinMaxPuntuacion) ...[
+                      _EndGameButton(
+                        label: l10n.endGame,
+                        onTap: () => _confirmEndGame(context, partida),
+                        isWide: isWide,
+                        useLandscapeLayout: useLandscapeLayout,
+                      ),
+                      SizedBox(height: adSpacing),
+                    ],
+                    if (showBanner) ...[
+                      // Anuncio separado de la lista de jugadores
+                      GoogleBannerAd(
+                        key: ValueKey('partida_banner_${partida.id ?? 'none'}'),
+                        location: AdLocation.partida,
+                      ),
+                      SizedBox(height: adSpacing),
+                    ],
+                  ])));
   }
 
   void _confirmEndGame(BuildContext context, Partida partida) {
@@ -416,7 +434,7 @@ class JugadoresCard extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             // Lista de jugadores
-            Expanded(child: JugadoresList(panelController: panelController, useLandscapeLayout: useLandscapeLayout)),
+            Expanded(child: JugadoresList(panelController: panelController, useLandscapeLayout: useLandscapeLayout, isWide: isWide)),
           ],
         ),
       ),
@@ -471,9 +489,10 @@ class _ActionButton extends StatelessWidget {
 }
 
 class JugadoresList extends StatelessWidget {
-  const JugadoresList({super.key, required this.panelController, required this.useLandscapeLayout});
+  const JugadoresList({super.key, required this.panelController, required this.useLandscapeLayout, required this.isWide});
   final PanelController panelController;
   final bool useLandscapeLayout;
+  final bool isWide;
 
   @override
   Widget build(BuildContext context) {
@@ -490,7 +509,6 @@ class JugadoresList extends StatelessWidget {
         final columns = useLandscapeLayout && availableWidth >= 700 ? 3 : 2;
         final columnWidth = (availableWidth - horizontalSpacing * (columns - 1)) / columns;
         final maxHeight = constraints.maxHeight.isFinite ? constraints.maxHeight : ResponsiveApp.size.height;
-        final cardHeight = useLandscapeLayout ? (maxHeight * 0.45).clamp(90.0, 120.0) : ResponsiveApp.scaleHeight(130);
 
         return SizedBox(
           width: double.infinity,
@@ -502,12 +520,12 @@ class JugadoresList extends StatelessWidget {
               children: jugadores.asMap().entries.map((entry) {
                 final index = entry.key;
                 final jugador = entry.value;
+
                 final jugadorCard = JugadorInfo(
                   jugador: jugador,
                   panelController: panelController,
-                  forcedWidth: columnWidth,
-                  forcedHeight: cardHeight,
                   useLandscapeLayout: useLandscapeLayout,
+                  isWide: isWide,
                 );
 
                 return SizedBox(
@@ -529,12 +547,11 @@ class JugadoresList extends StatelessWidget {
 }
 
 class JugadorInfo extends StatelessWidget {
-  const JugadorInfo({super.key, required this.jugador, required this.panelController, this.forcedWidth, this.forcedHeight, required this.useLandscapeLayout});
+  const JugadorInfo({super.key, required this.jugador, required this.panelController, required this.useLandscapeLayout, required this.isWide});
   final Jugador jugador;
   final PanelController panelController;
-  final double? forcedWidth;
-  final double? forcedHeight;
   final bool useLandscapeLayout;
+  final bool isWide;
 
   @override
   Widget build(BuildContext context) {
@@ -571,9 +588,8 @@ class JugadorInfo extends StatelessWidget {
       jugador: jugador,
       estado: estado,
       config: config,
-      width: forcedWidth,
-      height: forcedHeight,
       useLandscapeLayout: useLandscapeLayout,
+      isWide: isWide,
       onTap: () {
         final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
         final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
@@ -589,17 +605,15 @@ class _JugadorCard extends StatelessWidget {
     required this.jugador,
     required this.estado,
     required this.config,
-    this.width,
-    this.height,
     required this.useLandscapeLayout,
+    required this.isWide,
     required this.onTap,
   });
   final Jugador jugador;
   final String estado;
   final Map<String, dynamic> config;
-  final double? width;
-  final double? height;
   final bool useLandscapeLayout;
+  final bool isWide;
   final VoidCallback onTap;
 
   @override
@@ -607,13 +621,14 @@ class _JugadorCard extends StatelessWidget {
     final bool isWinner = estado == Estado.ganador;
     final bool isLoser = estado == Estado.perdedor;
     final bool compactWidth = ResponsiveApp.isSmallWidth;
-    final double cardHeight = height ?? (useLandscapeLayout ? ResponsiveApp.scaleWidth(120) : ResponsiveApp.scaleHeight(130));
+    final double cardHeight = (useLandscapeLayout ? ResponsiveApp.scaleWidth(isWide ? 65 : 45) : ResponsiveApp.scaleHeight(130));
     final double defaultCardWidth = ResponsiveApp.size.width * (compactWidth ? 0.48 : 0.4);
-    final double cardWidth = width ?? defaultCardWidth;
-    final double contentPadding = ResponsiveApp.scaleWidth(useLandscapeLayout ? 10 : 12);
-    final double nameFontSize = ResponsiveApp.scaleText(useLandscapeLayout ? 13 : 14);
-    final double scoreFontSize = ResponsiveApp.scaleText(useLandscapeLayout ? 30 : 42);
-    final double iconSize = ResponsiveApp.scaleWidth(useLandscapeLayout ? 12 : 14);
+    final double cardWidth = defaultCardWidth;
+    final double contentPadding = ResponsiveApp.scaleWidth(useLandscapeLayout ? 5 : 12);
+    final double nameFontSize = useLandscapeLayout ? 15 : 14;
+    final double scoreFontSize = useLandscapeLayout ? 32 : 42;
+
+    final double iconSize = useLandscapeLayout ? 11 : 14;
     final double iconPadding = ResponsiveApp.scaleWidth(useLandscapeLayout ? 3 : 4);
 
     return Container(
@@ -661,9 +676,9 @@ class _JugadorCard extends StatelessWidget {
                   jugador.nombre!,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  size: nameFontSize,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: nameFontSize,
                     fontWeight: FontWeight.w600,
                     color: Preferences.isDarkMode ? AppThemes.colorPrimero : AppThemes.colorTercero,
                   ),
@@ -717,7 +732,9 @@ class _JugadorCard extends StatelessWidget {
 }
 
 class NavigationBar extends StatefulWidget {
-  const NavigationBar({super.key});
+  const NavigationBar({super.key, required this.useLandscapeLayout, required this.isWide});
+  final bool useLandscapeLayout;
+  final bool isWide;
 
   @override
   State<NavigationBar> createState() => _NavigationBarState();
@@ -765,6 +782,8 @@ class _NavigationBarState extends State<NavigationBar> {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final List<Partida> partidas = partidaProvider.partidas;
 
+    final double paddingLeft = widget.useLandscapeLayout ? (widget.isWide ? 20 : 35) : 20;
+
     if (partidas.isNotEmpty) {
       return ScrollablePositionedList.separated(
           separatorBuilder: (_, __) => const SizedBox(width: 10),
@@ -773,8 +792,8 @@ class _NavigationBarState extends State<NavigationBar> {
           scrollDirection: Axis.horizontal,
           physics: const ClampingScrollPhysics(),
           itemCount: partidas.length,
-          padding: const EdgeInsets.only(left: 20, right: 150),
-          itemBuilder: (context, index) => _Chip(partida: partidas[index], scrollToGame: scrollToGame));
+          padding: EdgeInsets.only(left: paddingLeft, right: 200),
+          itemBuilder: (context, index) => _Chip(partida: partidas[index], scrollToGame: scrollToGame, isWide: widget.isWide, useLandscapeLayout: widget.useLandscapeLayout));
     } else {
       return Container();
     }
@@ -782,9 +801,11 @@ class _NavigationBarState extends State<NavigationBar> {
 }
 
 class _Chip extends StatelessWidget {
-  const _Chip({super.key, required this.partida, required this.scrollToGame});
+  const _Chip({super.key, required this.partida, required this.scrollToGame, required this.isWide, required this.useLandscapeLayout});
   final Partida? partida;
   final Function scrollToGame;
+  final bool isWide;
+  final bool useLandscapeLayout;
 
   @override
   Widget build(BuildContext context) {
@@ -830,13 +851,13 @@ class _Chip extends StatelessWidget {
               }
             },
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+              padding: EdgeInsets.symmetric(horizontal: 18, vertical: useLandscapeLayout ? 6 : 10),
               child: TextScale(
                 partida!.nombre!,
+                size: isWide ? 14 : 16,
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   color: isSelected ? Colors.white : (Preferences.isDarkMode ? Colors.white70 : Colors.grey[700]),
-                  fontSize: ResponsiveApp.scaleText(14),
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),
