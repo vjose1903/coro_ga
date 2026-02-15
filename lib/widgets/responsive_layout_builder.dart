@@ -20,7 +20,7 @@ class ResponsiveLayoutBuilder extends StatelessWidget {
   const ResponsiveLayoutBuilder({
     super.key,
     required this.builder,
-    this.wideThreshold = 700,
+    this.wideThreshold = 600,
     this.useMediaQuery = false,
   });
 
@@ -39,8 +39,9 @@ class ResponsiveLayoutBuilder extends StatelessWidget {
         final mediaSize = MediaQuery.of(context).size;
         final maxWidth = useMediaQuery ? mediaSize.width : constraints.maxWidth;
         final maxHeight = useMediaQuery ? mediaSize.height : constraints.maxHeight;
+        final shortestSide = maxWidth < maxHeight ? maxWidth : maxHeight;
         final isLandscape = maxWidth > maxHeight;
-        final isWide = maxWidth >= wideThreshold;
+        final isWide = shortestSide >= wideThreshold;
         final aspectRatio = maxHeight == 0 ? 0.0 : maxWidth / maxHeight;
         final useLandscapeLayout = isLandscape || isWide;
 

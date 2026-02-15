@@ -56,7 +56,7 @@ class _FormularioScreenState extends State<FormularioScreen> {
               Navigator.pop(context, 'home');
             },
           ),
-          bodyContent: SingleChildScrollView(physics: const ClampingScrollPhysics(), child: _Body()),
+          bodyContent: _Body(),
         ),
       ),
     );
@@ -93,39 +93,61 @@ class _Body extends StatelessWidget {
       return ResponsiveLayoutBuilder(
         builder: (context, constraints, info) {
           final bool useLandscapeLayout = info.useLandscapeLayout;
-          final double contentHeight = useLandscapeLayout ? (ResponsiveApp.size.height - 80) : ((ResponsiveApp.size.height - (ResponsiveApp.size.height * 0.125)) - 80);
           final EdgeInsets contentPadding = ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 16 : 20);
 
-          return Container(
-              height: contentHeight,
-              margin: ResponsiveApp.only(top: useLandscapeLayout ? 10 : 15, bottom: useLandscapeLayout ? 20 : 40),
-              padding: contentPadding,
+          return SafeArea(
+            top: false,
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: contentPadding.left,
+                right: contentPadding.right,
+                top: useLandscapeLayout ? 10 : 15,
+                bottom: useLandscapeLayout ? 20 : 40,
+              ),
               child: ReactiveForm(
                 formGroup: form,
-                child: IntrinsicHeight(
-                  child: useLandscapeLayout
-                      ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: _FormDetailsColumn(tipoPartida: tipoPartida, sinMaxPuntuacion: sinMaxPuntuacion, isDark: isDark, formPartidaProvider: formPartidaProvider, onOpenDefaults: () => openDefaultsPartidasDialog(context), useLandscapeLayout: useLandscapeLayout),
+                child: useLandscapeLayout
+                    ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: _FormDetailsColumn(
+                              tipoPartida: tipoPartida,
+                              sinMaxPuntuacion: sinMaxPuntuacion,
+                              isDark: isDark,
+                              formPartidaProvider: formPartidaProvider,
+                              onOpenDefaults: () => openDefaultsPartidasDialog(context),
+                              onCreate: () => _crearPartida(context, form, formPartidaProvider),
+                              useLandscapeLayout: useLandscapeLayout,
                             ),
-                            const SizedBox(width: 20),
-                            Expanded(
-                              child: _FormPlayersColumn(isDark: isDark, jugadoresController: jugadoresController, onCreate: () => _crearPartida(context, form, formPartidaProvider), useLandscapeLayout: useLandscapeLayout),
-                            ),
-                          ],
-                        )
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _FormDetailsColumn(tipoPartida: tipoPartida, sinMaxPuntuacion: sinMaxPuntuacion, isDark: isDark, formPartidaProvider: formPartidaProvider, onOpenDefaults: () => openDefaultsPartidasDialog(context), useLandscapeLayout: useLandscapeLayout),
-                            const SizedBox(height: 20),
-                            _FormPlayersColumn(isDark: isDark, jugadoresController: jugadoresController, onCreate: () => _crearPartida(context, form, formPartidaProvider), useLandscapeLayout: useLandscapeLayout),
-                          ],
-                        ),
-                ),
-              ));
+                          ),
+                          const SizedBox(width: 20),
+                          Expanded(
+                            child: _FormPlayersColumn(isDark: isDark, jugadoresController: jugadoresController, onCreate: () => _crearPartida(context, form, formPartidaProvider), useLandscapeLayout: useLandscapeLayout),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _FormDetailsColumn(
+                            tipoPartida: tipoPartida,
+                            sinMaxPuntuacion: sinMaxPuntuacion,
+                            isDark: isDark,
+                            formPartidaProvider: formPartidaProvider,
+                            onOpenDefaults: () => openDefaultsPartidasDialog(context),
+                            onCreate: () => _crearPartida(context, form, formPartidaProvider),
+                            useLandscapeLayout: useLandscapeLayout,
+                          ),
+                          const SizedBox(height: 20),
+                          Expanded(
+                            child: _FormPlayersColumn(isDark: isDark, jugadoresController: jugadoresController, onCreate: () => _crearPartida(context, form, formPartidaProvider), useLandscapeLayout: useLandscapeLayout),
+                          ),
+                        ],
+                      ),
+              ),
+            ),
+          );
         },
       );
     });
@@ -185,6 +207,7 @@ class _FormDetailsColumn extends StatelessWidget {
     required this.isDark,
     required this.formPartidaProvider,
     required this.onOpenDefaults,
+    required this.onCreate,
     required this.useLandscapeLayout,
   });
 
@@ -193,6 +216,7 @@ class _FormDetailsColumn extends StatelessWidget {
   final bool isDark;
   final FormPartidaProvider formPartidaProvider;
   final VoidCallback onOpenDefaults;
+  final VoidCallback onCreate;
   final bool useLandscapeLayout;
 
   @override
@@ -305,6 +329,10 @@ class _FormDetailsColumn extends StatelessWidget {
               ),
             ),
           ),
+        if (useLandscapeLayout) ...[
+          const Spacer(),
+          _CreateButton(onTap: onCreate),
+        ],
       ],
     );
   }
@@ -350,8 +378,10 @@ class _FormPlayersColumn extends StatelessWidget {
             child: _Inputs(jugadoresController: jugadoresController),
           ),
         ),
-        const SizedBox(height: 16),
-        _CreateButton(onTap: onCreate),
+        if (!useLandscapeLayout) ...[
+          const SizedBox(height: 16),
+          _CreateButton(onTap: onCreate),
+        ],
       ],
     );
   }
@@ -427,8 +457,8 @@ class _JugadoresSection extends StatelessWidget {
     final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
     final isDark = Preferences.isDarkMode;
 
-    final avatarSize = (useLandscapeLayout ? ResponsiveApp.scaleWidth(17) : ResponsiveApp.scaleWidth(42)).clamp(28.0, 52.0);
-    final iconSize = (useLandscapeLayout ? ResponsiveApp.scaleWidth(5) : ResponsiveApp.scaleWidth(10)).clamp(12.0, 22.0);
+    final avatarSize = (useLandscapeLayout ? ResponsiveApp.scaleWidth(15) : ResponsiveApp.scaleWidth(42)).clamp(28.0, 52.0);
+    final iconSize = (useLandscapeLayout ? ResponsiveApp.scaleWidth(4) : ResponsiveApp.scaleWidth(10)).clamp(5.0, 22.0);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -466,15 +496,15 @@ class _JugadoresSection extends StatelessWidget {
             ),
             Container(
               margin: ResponsiveApp.only(left: 10),
-              padding: ResponsiveApp.symmetric(horizontal: 10, vertical: 4),
+              padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 4 : 10, vertical: useLandscapeLayout ? 6 : 4),
               decoration: BoxDecoration(
                 color: AppThemes.colorTercero.withValues(alpha: 0.9),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(useLandscapeLayout ? 8 : 12),
               ),
               child: TextScale(
                 formPartidaProvider.jugadores.length.toString(),
                 size: 13,
-                style: TextStyle(
+                style: const TextStyle(
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -615,17 +645,17 @@ class _Inputs extends StatelessWidget {
   Widget build(BuildContext context) {
     final jugadoresLength = context.select<FormPartidaProvider, int>((provider) => provider.jugadores.length);
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final listBottomPadding = ResponsiveApp.isSmallHeight ? 10.0 : 20.0;
 
     return ListView.separated(
       controller: jugadoresController,
       physics: const ClampingScrollPhysics(),
-      padding: EdgeInsets.only(top: 12, left: 12, right: 12, bottom: (ResponsiveApp.isSmallHeight ? 0 : 12) + keyboardHeight),
+      padding: EdgeInsets.only(top: 12, left: 12, right: 12, bottom: listBottomPadding + keyboardHeight),
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemCount: jugadoresLength,
       itemBuilder: (_, index) => _JugadorInput(
         index: index,
         scrollController: jugadoresController,
-        isLast: index == jugadoresLength - 1,
       ),
     );
   }
@@ -635,36 +665,22 @@ class _JugadorInput extends StatefulWidget {
   const _JugadorInput({
     required this.index,
     required this.scrollController,
-    required this.isLast,
   });
 
   final int index;
   final ScrollController scrollController;
-  final bool isLast;
 
   @override
   State<_JugadorInput> createState() => _JugadorInputState();
 }
 
 class _JugadorInputState extends State<_JugadorInput> with AutomaticKeepAliveClientMixin {
-  late final TextEditingController _controller;
   late final FormPartidaProvider _provider;
   late final FocusNode _focusNode;
   final GlobalKey _inputKey = GlobalKey();
 
   @override
   bool get wantKeepAlive => true;
-
-  FormControl<String> get _formControl {
-    final array = _provider.form.control('jugadores') as FormArray;
-    return (array.controls[widget.index] as FormGroup).control('nombre') as FormControl<String>;
-  }
-
-  void _syncToForm() {
-    if (mounted && _formControl.value != _controller.text) {
-      _formControl.value = _controller.text;
-    }
-  }
 
   void _onFocusChange() {
     if (_focusNode.hasFocus && _inputKey.currentContext != null) {
@@ -696,16 +712,12 @@ class _JugadorInputState extends State<_JugadorInput> with AutomaticKeepAliveCli
   void initState() {
     super.initState();
     _provider = context.read<FormPartidaProvider>();
-    _controller = TextEditingController(text: _formControl.value ?? '');
-    _controller.addListener(_syncToForm);
     _focusNode = FocusNode();
     _focusNode.addListener(_onFocusChange);
   }
 
   @override
   void dispose() {
-    _controller.removeListener(_syncToForm);
-    _controller.dispose();
     _focusNode.removeListener(_onFocusChange);
     _focusNode.dispose();
     super.dispose();
@@ -714,7 +726,6 @@ class _JugadorInputState extends State<_JugadorInput> with AutomaticKeepAliveCli
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final isDark = Preferences.isDarkMode;
 
     return Row(
       children: [
@@ -737,7 +748,7 @@ class _JugadorInputState extends State<_JugadorInput> with AutomaticKeepAliveCli
             child: TextScale(
               '${widget.index + 1}',
               size: 12,
-              style: TextStyle(
+              style: const TextStyle(
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
@@ -749,31 +760,11 @@ class _JugadorInputState extends State<_JugadorInput> with AutomaticKeepAliveCli
         // Input
         Expanded(
           key: _inputKey,
-          child: TextField(
-            controller: _controller,
+          child: CustomReactiveInput(
+            formControlName: 'jugadores.${widget.index}.nombre',
+            labelText: AppLocalizations.of(context)!.name,
             focusNode: _focusNode,
             textCapitalization: TextCapitalization.words,
-            textInputAction: widget.isLast ? TextInputAction.done : TextInputAction.next,
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: ResponsiveApp.scaleText(14),
-              color: isDark ? Colors.white : AppThemes.colorCuarto,
-            ),
-            decoration: InputDecoration(
-              labelText: AppLocalizations.of(context)!.name,
-              fillColor: AppThemes.inputColor,
-              filled: true,
-              labelStyle: TextStyle(
-                color: AppThemes.labelInputColor,
-                fontFamily: 'Poppins',
-              ),
-              floatingLabelStyle: TextStyle(
-                color: AppThemes.colorQuinto,
-                fontSize: ResponsiveApp.scaleText(15),
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Poppins',
-              ),
-            ),
           ),
         ),
         // Botón eliminar

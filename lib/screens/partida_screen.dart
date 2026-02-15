@@ -6,15 +6,15 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
 import '../helpers/helpers.dart';
+import '../l10n/app_localizations.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
-import 'ganador.dart';
+import '../routes/route_observer.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
-import '../widgets/widgets.dart';
-import '../l10n/app_localizations.dart';
 import '../utils/utils.dart';
-import '../routes/route_observer.dart';
+import '../widgets/widgets.dart';
+import 'ganador.dart';
 
 class PartidaScreen extends StatefulWidget {
   const PartidaScreen({super.key});
@@ -40,7 +40,6 @@ class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProvider
       // Resetear estado del panel al entrar a la pantalla
       if (mounted) {
         context.read<SlideUpProvider>().closeSlideUp(controller: panelController, skipClean: true);
-
       }
       Future.delayed(const Duration(milliseconds: 300), () => _fabAnimController.forward());
     });
@@ -134,7 +133,7 @@ class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProvider
                         Toast.show(type: ToastType.info, context: context, message: l10n.freeVersionLimitGames(PremiumProvider.freeMaxGames), actionLabel: l10n.getPro, onAction: () => Navigator.pushNamed(context, 'premium'));
                       }
                     },
-                    child: const Icon(Icons.add_rounded, size: 32, color: Colors.white),
+                    child: const IconScale(Icons.add_rounded, size: 32, color: Colors.white),
                   ),
                 ),
               ),
@@ -164,8 +163,14 @@ class _Body extends StatelessWidget {
     return ResponsiveLayoutBuilder(
       builder: (context, constraints, info) {
         final bool useLandscapeLayout = info.useLandscapeLayout;
+        final bool isWide = info.isWide;
+
         final double topMargin = compactHeight ? (useLandscapeLayout ? 12 : 24) : (useLandscapeLayout ? 20 : 40);
-        final double bottomMargin = compactHeight ? (useLandscapeLayout ? 16 : 60) : (useLandscapeLayout ? 24 : 90);
+        final mediaQuery = MediaQuery.of(context);
+        final double baseBottomMargin = compactHeight ? (useLandscapeLayout ? 17 : 60) : (useLandscapeLayout ? 25 : 90);
+        const double bottomBarHeight = 65;
+        final double landscapeBottomReserved = bottomBarHeight + mediaQuery.viewPadding.bottom + 8;
+        final double bottomMargin = useLandscapeLayout && baseBottomMargin < landscapeBottomReserved ? landscapeBottomReserved : baseBottomMargin;
         final double horizontalPadding = ResponsiveApp.scaleWidth(20);
         final double contentSpacing = ResponsiveApp.scaleHeight(20);
         final double betweenCardGap = compactHeight ? ResponsiveApp.scaleHeight(22) : ResponsiveApp.scaleHeight(25);
@@ -176,13 +181,13 @@ class _Body extends StatelessWidget {
             hasFooter: true,
             appBarTitle: partida.nombre,
             appBarLeading: CustomIconButtom(
-              iconSize: ResponsiveApp.isSmallHeight ? 18 : 22,
+              iconSize: ResponsiveApp.isSmallHeight ? 19 : 20,
               iconColor: Colors.white,
               icon: Icons.arrow_back_ios_new,
               onTap: () => Navigator.pop(context),
             ),
             appBarTrailing: CustomIconButtom(
-              iconSize: ResponsiveApp.isSmallHeight ? 18 : 22,
+              iconSize: ResponsiveApp.isSmallHeight ? 19 : 20,
               iconColor: Colors.white,
               icon: Icons.edit_outlined,
               onTap: () {
@@ -190,7 +195,7 @@ class _Body extends StatelessWidget {
                 partidaProvider.partidaEditar = partida;
                 slideUpProvider.openSlideUp(
                   controller: panelController,
-                  maxHeightFraction: 0.5,
+                  maxHeightFraction: useLandscapeLayout ? 0.9 : 0.5,
                   bodyContent: EditarEntidad(panelController: panelController),
                 );
               },
@@ -201,47 +206,51 @@ class _Body extends StatelessWidget {
                 child: useLandscapeLayout
                     ? Row(
                         children: [
-                          Expanded(
+                          Flexible(
+                            flex: isWide ? 40 : 45,
                             child: Column(
                               children: [
-                                const CustomEstadoPartida(),
+                                CustomEstadoPartida(
+                                  useLandscapeLayout: useLandscapeLayout,
+                                  isWide: isWide,
+                                ),
                                 SizedBox(height: contentSpacing),
+                                const Spacer(),
                                 if (partida.esSinMaxPuntuacion) ...[
-                                  _EndGameButton(
-                                    label: l10n.endGame,
-                                    onTap: () => _confirmEndGame(context, partida),
-                                  ),
+                                  _EndGameButton(label: l10n.endGame, onTap: () => _confirmEndGame(context, partida), isWide: isWide, useLandscapeLayout: useLandscapeLayout),
                                   SizedBox(height: adSpacing),
                                 ],
                                 if (showBanner) ...[
                                   GoogleBannerAd(
                                     key: ValueKey('partida_banner_${partida.id ?? 'none'}'),
                                     location: AdLocation.partida,
+                                    usePadding: false,
                                   ),
                                 ],
                               ],
                             ),
                           ),
-                          SizedBox(width: ResponsiveApp.scaleWidth(16)),
-                          Expanded(
-                            flex: 2,
-                            child: JugadoresCard(
-                              panelController: panelController,
-                              expand: false,
-                              useLandscapeLayout: useLandscapeLayout,
-                            ),
+                          SizedBox(width: ResponsiveApp.scaleWidth(5)),
+                          Flexible(
+                            flex: isWide ? 60 : 55,
+                            child: JugadoresCard(panelController: panelController, expand: false, useLandscapeLayout: useLandscapeLayout, isWide: isWide),
                           ),
                         ],
                       )
                     : Column(children: [
-                        const CustomEstadoPartida(),
+                        CustomEstadoPartida(
+                          useLandscapeLayout: useLandscapeLayout,
+                          isWide: isWide,
+                        ),
                         SizedBox(height: contentSpacing),
-                        JugadoresCard(panelController: panelController, useLandscapeLayout: useLandscapeLayout),
+                        JugadoresCard(panelController: panelController, useLandscapeLayout: useLandscapeLayout, isWide: isWide),
                         SizedBox(height: betweenCardGap),
                         if (partida.esSinMaxPuntuacion) ...[
                           _EndGameButton(
                             label: l10n.endGame,
                             onTap: () => _confirmEndGame(context, partida),
+                            isWide: isWide,
+                            useLandscapeLayout: useLandscapeLayout,
                           ),
                           SizedBox(height: adSpacing),
                         ],
@@ -296,9 +305,11 @@ class _Body extends StatelessWidget {
 }
 
 class _EndGameButton extends StatelessWidget {
-  const _EndGameButton({required this.label, required this.onTap});
+  const _EndGameButton({required this.label, required this.onTap, required this.isWide, required this.useLandscapeLayout});
   final String label;
   final VoidCallback onTap;
+  final bool isWide;
+  final bool useLandscapeLayout;
 
   @override
   Widget build(BuildContext context) {
@@ -308,7 +319,7 @@ class _EndGameButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(14),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          padding: EdgeInsets.symmetric(vertical: useLandscapeLayout ? 10 : 12, horizontal: 16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [Colors.orange[600]!, Colors.red[400]!],
@@ -325,13 +336,13 @@ class _EndGameButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.flag_rounded, color: Colors.white, size: 18),
+              const IconScale(Icons.flag_rounded, color: Colors.white, size: 18),
               const SizedBox(width: 8),
-              Text(
+              TextScale(
                 label,
-                style: TextStyle(
+                size: isWide ? 14 : 15,
+                style: const TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: ResponsiveApp.scaleText(13),
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
                 ),
@@ -345,10 +356,11 @@ class _EndGameButton extends StatelessWidget {
 }
 
 class JugadoresCard extends StatelessWidget {
-  const JugadoresCard({super.key, required this.panelController, this.expand = true, required this.useLandscapeLayout});
+  const JugadoresCard({super.key, required this.panelController, this.expand = true, required this.useLandscapeLayout, required this.isWide});
   final PanelController panelController;
   final bool expand;
   final bool useLandscapeLayout;
+  final bool isWide;
 
   @override
   Widget build(BuildContext context) {
@@ -384,6 +396,8 @@ class JugadoresCard extends StatelessWidget {
               children: [
                 _ActionButton(
                   icon: Icons.history_rounded,
+                  useLandscapeLayout: useLandscapeLayout,
+                  isWide: isWide,
                   onTap: () {
                     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
                     slideUpProvider.openSlideUp(controller: panelController, bodyContent: HistorialGeneral(panelController: panelController));
@@ -391,6 +405,8 @@ class JugadoresCard extends StatelessWidget {
                 ),
                 _ActionButton(
                   icon: Icons.manage_accounts_rounded,
+                  useLandscapeLayout: useLandscapeLayout,
+                  isWide: isWide,
                   isPrimary: true,
                   onTap: openSlideUp,
                 ),
@@ -412,10 +428,14 @@ class JugadoresCard extends StatelessWidget {
 class _ActionButton extends StatelessWidget {
   const _ActionButton({
     required this.icon,
+    required this.useLandscapeLayout,
+    required this.isWide,
     required this.onTap,
     this.isPrimary = false,
   });
   final IconData icon;
+  final bool useLandscapeLayout;
+  final bool isWide;
   final VoidCallback onTap;
   final bool isPrimary;
 
@@ -437,9 +457,9 @@ class _ActionButton extends StatelessWidget {
             color: isPrimary ? null : (Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.1)),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(
+          child: IconScale(
             icon,
-            size: 18,
+            size: isWide ? 16 : 13,
             color: isPrimary ? Colors.white : (Preferences.isDarkMode ? Colors.white70 : Colors.grey[700]),
           ),
         ),
@@ -468,9 +488,7 @@ class JugadoresList extends StatelessWidget {
         final columns = useLandscapeLayout && availableWidth >= 700 ? 3 : 2;
         final columnWidth = (availableWidth - horizontalSpacing * (columns - 1)) / columns;
         final maxHeight = constraints.maxHeight.isFinite ? constraints.maxHeight : ResponsiveApp.size.height;
-        final cardHeight = useLandscapeLayout
-            ? (maxHeight * 0.45).clamp(90.0, 120.0)
-            : ResponsiveApp.scaleHeight(130);
+        final cardHeight = useLandscapeLayout ? (maxHeight * 0.45).clamp(90.0, 120.0) : ResponsiveApp.scaleHeight(130);
 
         return SizedBox(
           width: double.infinity,
@@ -637,7 +655,7 @@ class _JugadorCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Nombre
-                Text(
+                TextScale(
                   jugador.nombre!,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -659,7 +677,7 @@ class _JugadorCard extends StatelessWidget {
                                 ? [Colors.red[300]!, Colors.red[500]!]
                                 : [AppThemes.colorPrimero, AppThemes.colorTercero],
                       ).createShader(bounds),
-                      child: Text(
+                      child: TextScale(
                         jugador.puntuacion.toString(),
                         style: TextStyle(
                           fontFamily: 'Poppins',
@@ -680,7 +698,7 @@ class _JugadorCard extends StatelessWidget {
                       color: config['bgColor'],
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(
+                    child: IconScale(
                       config['icon'],
                       size: iconSize,
                       color: config['color'],
@@ -811,7 +829,7 @@ class _Chip extends StatelessWidget {
             },
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-              child: Text(
+              child: TextScale(
                 partida!.nombre!,
                 style: TextStyle(
                   fontFamily: 'Poppins',

@@ -9,10 +9,16 @@ import '../helpers/helpers.dart';
 import '../providers/premium_provider.dart';
 
 class GoogleBannerAd extends StatefulWidget {
-  const GoogleBannerAd({required this.location, this.onCloseAd, super.key});
+  const GoogleBannerAd({
+    required this.location,
+    this.onCloseAd,
+    this.usePadding = true,
+    super.key,
+  });
 
   final AdLocation location;
   final Function? onCloseAd;
+  final bool usePadding;
 
   @override
   State<GoogleBannerAd> createState() => _GoogleBannerAdState();
@@ -141,7 +147,8 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     _loadScheduled = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      final width = (MediaQuery.of(context).size.width - (_horizontalPadding * 2)).truncate();
+      final horizontalPadding = widget.usePadding ? _horizontalPadding * 2 : 0.0;
+      final width = (MediaQuery.of(context).size.width - horizontalPadding).truncate();
       _loadBanner(width: width);
     });
   }
@@ -172,14 +179,18 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     final double width = _bannerAd?.size.width.toDouble() ?? _adSize?.width.toDouble() ?? 320;
     final double height = _bannerAd?.size.height.toDouble() ?? _adSize?.height.toDouble() ?? 50;
 
+    final banner = Container(
+      key: _bannerAd != null ? ObjectKey(_bannerAd) : null,
+      width: width,
+      alignment: Alignment.topCenter,
+      child: _bannerAd == null ? SizedBox(width: width, height: height) : SizedBox(width: width, height: height, child: AdWidget(ad: _bannerAd!)),
+    );
+
+    if (!widget.usePadding) return banner;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: _horizontalPadding),
-      child: Container(
-        key: _bannerAd != null ? ObjectKey(_bannerAd) : null,
-        width: width,
-        alignment: Alignment.topCenter,
-        child: _bannerAd == null ? SizedBox(width: width, height: height) : SizedBox(width: width, height: height, child: AdWidget(ad: _bannerAd!)),
-      ),
+      child: banner,
     );
   }
 
@@ -199,7 +210,8 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     _retryTimer = Timer(delay, () {
       _retryTimer = null;
       if (!mounted) return;
-      final width = (MediaQuery.of(context).size.width - (_horizontalPadding * 2)).truncate();
+      final horizontalPadding = widget.usePadding ? _horizontalPadding * 2 : 0.0;
+      final width = (MediaQuery.of(context).size.width - horizontalPadding).truncate();
       _loadBanner(width: width);
     });
   }
