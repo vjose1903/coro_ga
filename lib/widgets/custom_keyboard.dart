@@ -5,17 +5,24 @@ import '../themes/app_themes.dart';
 enum KeyboardType { number }
 
 class CustomKeyboard extends StatelessWidget {
-  const CustomKeyboard({super.key, required this.onChanged, required this.tipo, this.buttonHeight});
+  const CustomKeyboard({
+    super.key,
+    required this.onChanged,
+    required this.tipo,
+    required this.useLandscapeLayout,
+    required this.isWide,
+  });
   final Function onChanged;
   final KeyboardType tipo;
-  final double? buttonHeight;
+  final bool useLandscapeLayout;
+  final bool isWide;
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     // Altura responsive: en pantallas pequeñas (<700px) reduce proporcionalmente
     final defaultHeight = screenHeight < 700 ? (screenHeight * 0.045).clamp(28.0, 38.0) : 38.0;
-    final height = buttonHeight ?? defaultHeight;
+    final height = useLandscapeLayout ? (isWide ? defaultHeight : defaultHeight + 6) : defaultHeight;
 
     return Table(
       children: [

@@ -77,137 +77,200 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
     final bool hasTeclado = partida.tipo == 'Puntuación';
     final isDark = Preferences.isDarkMode;
 
-    // Usar ClipRect para evitar overflow visual cuando el panel se reduce
-    return ClipRect(
-      child: Column(
-        children: [
-          // Header del jugador - FIJO arriba
-          _JugadorHeader(
-            nombre: jugadorProvider.nombreJugador,
-            puntuacion: jugador.puntuacion ?? 0,
-            canDelete: partida.jugadores!.length > 2,
-            panelController: widget.panelController,
-            onEdit: () {
-              jugadorProvider.jugadorEditar = jugador;
-              jugadorProvider.formJugador.patchValue(jugador.toMap());
-              _showEditarJugadorModal(context);
-            },
-            onDelete: () {
-              jugadorProvider.deleteJugador(context, jugador: jugador, panelController: widget.panelController, callBack: (value) {});
-            },
+    final historialSection = Expanded(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppThemes.themeColor_1,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
           ),
-          const SizedBox(height: 12),
-
-          // Historial - Expanded para ocupar espacio restante
-          Expanded(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: AppThemes.themeColor_1,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppThemes.colorCuarto.withValues(alpha: isDark ? 0.15 : 0.08),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: _ListHistorial(historialController: historialController),
-              ),
+          boxShadow: [
+            BoxShadow(
+              color: AppThemes.colorCuarto.withValues(alpha: isDark ? 0.15 : 0.08),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-          ),
-          const SizedBox(height: 12),
-          // TECLADO CON INPUT - FIJO
-          if (hasTeclado)
-            _KeyboardSection(
-              puntuacionController: puntuacionController,
-              errorText: _errorText,
-              onType: () {
-                if (_errorText != null) {
-                  setState(() => _errorText = null);
-                }
-              },
-            ),
-          if (hasTeclado) const SizedBox(height: 15),
-          // BOTONES - FIJOS abajo
-          Row(
-            children: [
-              // REDUCIR
-              Expanded(
-                child: _ActionScoreButton(
-                  icon: Icons.remove_rounded,
-                  label: AppLocalizations.of(context)!.decrease,
-                  color: Colors.red[400]!,
-                  onTap: () {
-                    final slideUpProvider = context.read<SlideUpProvider>();
-                    final previousScore = jugador.puntuacion ?? 0;
-                    final String puntuacion = hasTeclado ? puntuacionController.text : '1';
-
-                    changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: 'reducir', context: context)
-                        .then((newPuntuacion) {
-                      if (newPuntuacion != 0) {
-                        puntuacionController.text = '';
-                        slideUpProvider.closeSlideUp(controller: widget.panelController);
-                        _maybeShowScoreInterstitial(
-                          context: context,
-                          previousScore: previousScore,
-                          newScore: newPuntuacion,
-                          maxScore: maxScore,
-                        );
-                      }
-                    });
-                  },
-                ),
-              ),
-              const SizedBox(width: 12),
-              // AUMENTAR
-              Expanded(
-                child: _ActionScoreButton(
-                  icon: Icons.add_rounded,
-                  label: AppLocalizations.of(context)!.increase,
-                  color: Colors.green,
-                  onTap: () {
-                    final slideUpProvider = context.read<SlideUpProvider>();
-                    final previousScore = jugador.puntuacion ?? 0;
-                    final String puntuacion = hasTeclado ? puntuacionController.text : '1';
-                    changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: 'aumentar', context: context)
-                        .then((newPuntuacion) {
-                      if (newPuntuacion != 0) {
-                        puntuacionController.text = '';
-                        slideUpProvider.closeSlideUp(controller: widget.panelController);
-                        _maybeShowScoreInterstitial(
-                          context: context,
-                          previousScore: previousScore,
-                          newScore: newPuntuacion,
-                          maxScore: maxScore,
-                        );
-                        if (maxScore > 0 && newPuntuacion >= maxScore) {
-                          Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                  settings: RouteSettings(arguments: {
-                                    'partida': partida.nombre,
-                                    'jugador': jugador.nombre,
-                                  }),
-                                  pageBuilder: (context, animation, secondaryAnimation) => const GanadorScreen(),
-                                  transitionsBuilder: (context, animation, secondaryAnimation, child) =>
-                                      FadeTransition(opacity: animation, child: child),
-                                  transitionDuration: const Duration(milliseconds: 400)));
-                        }
-                      }
-                    });
-                  },
-                ),
-              ),
-            ],
-          )
-        ],
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: _ListHistorial(historialController: historialController),
+        ),
       ),
+    );
+
+    final actionButtons = Row(
+      children: [
+        Expanded(
+          child: _ActionScoreButton(
+            icon: Icons.remove_rounded,
+            label: AppLocalizations.of(context)!.decrease,
+            color: Colors.red[400]!,
+            onTap: () {
+              final slideUpProvider = context.read<SlideUpProvider>();
+              final previousScore = jugador.puntuacion ?? 0;
+              final String puntuacion = hasTeclado ? puntuacionController.text : '1';
+
+              changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: 'reducir', context: context).then((newPuntuacion) {
+                if (newPuntuacion != 0) {
+                  puntuacionController.text = '';
+                  slideUpProvider.closeSlideUp(controller: widget.panelController);
+                  _maybeShowScoreInterstitial(
+                    context: context,
+                    previousScore: previousScore,
+                    newScore: newPuntuacion,
+                    maxScore: maxScore,
+                  );
+                }
+              });
+            },
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _ActionScoreButton(
+            icon: Icons.add_rounded,
+            label: AppLocalizations.of(context)!.increase,
+            color: Colors.green,
+            onTap: () {
+              final slideUpProvider = context.read<SlideUpProvider>();
+              final previousScore = jugador.puntuacion ?? 0;
+              final String puntuacion = hasTeclado ? puntuacionController.text : '1';
+              changePuntuacion(jugadorProvider: jugadorProvider, puntuacion: puntuacion, tipo: 'aumentar', context: context).then((newPuntuacion) {
+                if (newPuntuacion != 0) {
+                  puntuacionController.text = '';
+                  slideUpProvider.closeSlideUp(controller: widget.panelController);
+                  _maybeShowScoreInterstitial(
+                    context: context,
+                    previousScore: previousScore,
+                    newScore: newPuntuacion,
+                    maxScore: maxScore,
+                  );
+                  if (maxScore > 0 && newPuntuacion >= maxScore) {
+                    Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                            settings: RouteSettings(arguments: {
+                              'partida': partida.nombre,
+                              'jugador': jugador.nombre,
+                            }),
+                            pageBuilder: (context, animation, secondaryAnimation) => const GanadorScreen(),
+                            transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
+                            transitionDuration: const Duration(milliseconds: 400)));
+                  }
+                }
+              });
+            },
+          ),
+        ),
+      ],
+    );
+
+    // Usar ClipRect para evitar overflow visual cuando el panel se reduce
+    return ResponsiveLayoutBuilder(
+      useMediaQuery: true,
+      builder: (context, constraints, info) {
+        final useLandscapeLayout = info.useLandscapeLayout;
+        final isWide = info.isWide;
+
+        final useTwoColumns = useLandscapeLayout && hasTeclado;
+
+        return SafeArea(
+          top: !useLandscapeLayout,
+          bottom: false,
+          left: useLandscapeLayout,
+          right: useLandscapeLayout,
+          child: ClipRect(
+            child: useTwoColumns
+                ? Row(
+                    children: [
+                      Expanded(
+                        flex: 55,
+                        child: Column(
+                          children: [
+                            _JugadorHeader(
+                              nombre: jugadorProvider.nombreJugador,
+                              puntuacion: jugador.puntuacion ?? 0,
+                              canDelete: partida.jugadores!.length > 2,
+                              panelController: widget.panelController,
+                              onEdit: () {
+                                jugadorProvider.jugadorEditar = jugador;
+                                jugadorProvider.formJugador.patchValue(jugador.toMap());
+                                _showEditarJugadorModal(context);
+                              },
+                              onDelete: () {
+                                jugadorProvider.deleteJugador(context, jugador: jugador, panelController: widget.panelController, callBack: (value) {});
+                              },
+                            ),
+                            const SizedBox(height: 12),
+                            historialSection,
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        flex: 45,
+                        child: Column(
+                          children: [
+                            const Spacer(),
+                            if (hasTeclado)
+                              _KeyboardSection(
+                                puntuacionController: puntuacionController,
+                                errorText: _errorText,
+                                useLandscapeLayout: useLandscapeLayout,
+                                isWide: isWide,
+                                onType: () {
+                                  if (_errorText != null) {
+                                    setState(() => _errorText = null);
+                                  }
+                                },
+                              ),
+                            if (hasTeclado) const SizedBox(height: 15),
+                            actionButtons,
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      _JugadorHeader(
+                        nombre: jugadorProvider.nombreJugador,
+                        puntuacion: jugador.puntuacion ?? 0,
+                        canDelete: partida.jugadores!.length > 2,
+                        panelController: widget.panelController,
+                        onEdit: () {
+                          jugadorProvider.jugadorEditar = jugador;
+                          jugadorProvider.formJugador.patchValue(jugador.toMap());
+                          _showEditarJugadorModal(context);
+                        },
+                        onDelete: () {
+                          jugadorProvider.deleteJugador(context, jugador: jugador, panelController: widget.panelController, callBack: (value) {});
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      historialSection,
+                      const SizedBox(height: 12),
+                      if (hasTeclado)
+                        _KeyboardSection(
+                          puntuacionController: puntuacionController,
+                          errorText: _errorText,
+                          useLandscapeLayout: useLandscapeLayout,
+                          isWide: isWide,
+                          onType: () {
+                            if (_errorText != null) {
+                              setState(() => _errorText = null);
+                            }
+                          },
+                        ),
+                      if (hasTeclado) const SizedBox(height: 15),
+                      actionButtons,
+                    ],
+                  ),
+          ),
+        );
+      },
     );
   }
 
@@ -245,8 +308,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
     });
   }
 
-  Future<int> changePuntuacion(
-      {required String puntuacion, required String tipo, required JugadorProvider jugadorProvider, required BuildContext context}) async {
+  Future<int> changePuntuacion({required String puntuacion, required String tipo, required JugadorProvider jugadorProvider, required BuildContext context}) async {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     final partida = partidaProvider.partidaEnTurno;
     final jugador = jugadorProvider.jugadorEnTurno;
@@ -348,14 +410,14 @@ class _ListHistorialState extends State<_ListHistorial> with SlideUpAutoScrollMi
                 color: AppThemes.colorPrimero.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.history_rounded, size: 32, color: AppThemes.colorPrimero.withValues(alpha: 0.5)),
+              child: IconScale(Icons.history_rounded, size: 32, color: AppThemes.colorPrimero.withValues(alpha: 0.5)),
             ),
             const SizedBox(height: 12),
-            Text(
+            TextScale(
               msgNoRgistros,
+              size: 13,
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: ResponsiveApp.scaleText(13),
                 color: Colors.grey[500],
               ),
             )
@@ -431,7 +493,7 @@ class _HistorialItemState extends State<_HistorialItem> {
         index: widget.index,
         trailingActions: [
           SwipeAction(
-            icon: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 20),
+            icon: const IconScale(Icons.delete_outline_rounded, color: Colors.white, size: 20),
             title: AppLocalizations.of(context)!.delete,
             style: TextStyle(fontFamily: 'Poppins', fontSize: ResponsiveApp.scaleText(11), color: Colors.white),
             onTap: (CompletionHandler handler) async {
@@ -486,29 +548,29 @@ class _HistorialItemState extends State<_HistorialItem> {
                           color: (isAumentar ? Colors.green : Colors.red).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Icon(
+                        child: IconScale(
                           isAumentar ? Icons.trending_up_rounded : Icons.trending_down_rounded,
                           color: isAumentar ? Colors.green : Colors.red[400],
                           size: isSmallScreen ? 14 : 16,
                         ),
                       ),
                       SizedBox(width: isSmallScreen ? 8 : 12),
-                      Text(
+                      TextScale(
                         "${isAumentar ? '+' : '-'}${widget.historial.puntuacion}",
+                        size: 15,
                         style: TextStyle(
                           fontFamily: 'Poppins',
-                          fontSize: ResponsiveApp.scaleText(15),
                           fontWeight: FontWeight.w600,
                           color: isAumentar ? Colors.green : Colors.red[400],
                         ),
                       ),
                     ],
                   ),
-                  Text(
+                  TextScale(
                     L10n.getActionType(context, widget.historial.tipo),
+                    size: 11,
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: ResponsiveApp.scaleText(11),
                       color: Colors.grey[500],
                     ),
                   ),
@@ -523,16 +585,13 @@ class _HistorialItemState extends State<_HistorialItem> {
 }
 
 class _KeyboardSection extends StatelessWidget {
-  const _KeyboardSection({
-    super.key,
-    required this.puntuacionController,
-    this.errorText,
-    required this.onType,
-  });
+  const _KeyboardSection({super.key, required this.puntuacionController, this.errorText, required this.onType, required this.useLandscapeLayout, required this.isWide});
 
   final TextEditingController puntuacionController;
   final String? errorText;
   final VoidCallback onType;
+  final bool useLandscapeLayout;
+  final bool isWide;
 
   void changePuntuacionValue(String value) {
     onType();
@@ -596,7 +655,13 @@ class _KeyboardSection extends StatelessWidget {
               fillColor: AppThemes.inputDisabledColor,
               filled: true,
               isDense: true,
-              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: isSmallScreen ? 2 : 4),
+              contentPadding: EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: useLandscapeLayout
+                      ? 7
+                      : isSmallScreen
+                          ? 2
+                          : 4),
               labelStyle: TextStyle(
                 color: errorText != null ? Colors.red[400] : AppThemes.labelInputDisabledColor,
                 fontFamily: 'Poppins',
@@ -631,12 +696,12 @@ class _KeyboardSection extends StatelessWidget {
                 if (errorText != null)
                   Positioned(
                     top: 2,
-                    child: Text(
+                    child: TextScale(
                       errorText!,
+                      size: 11,
                       style: TextStyle(
                         color: Colors.red[400],
                         fontFamily: 'Poppins',
-                        fontSize: ResponsiveApp.scaleText(11),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -645,7 +710,12 @@ class _KeyboardSection extends StatelessWidget {
             ),
           ),
           // Teclado
-          CustomKeyboard(onChanged: (value) => changePuntuacionValue(value), tipo: KeyboardType.number),
+          CustomKeyboard(
+            onChanged: (value) => changePuntuacionValue(value),
+            tipo: KeyboardType.number,
+            useLandscapeLayout: useLandscapeLayout,
+            isWide: isWide,
+          ),
         ],
       ),
     );
@@ -700,11 +770,11 @@ class _JugadorHeader extends StatelessWidget {
               ],
             ),
             child: Center(
-              child: Text(
+              child: TextScale(
                 nombre.isNotEmpty ? nombre[0].toUpperCase() : '?',
+                size: 18,
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: ResponsiveApp.scaleText(18),
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -718,11 +788,11 @@ class _JugadorHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                TextScale(
                   nombre,
+                  size: 14,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: ResponsiveApp.scaleText(14),
                     fontWeight: FontWeight.bold,
                     color: isDark ? Colors.white : AppThemes.colorQuinto,
                   ),
@@ -730,11 +800,11 @@ class _JugadorHeader extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
-                Text(
+                TextScale(
                   AppLocalizations.of(context)!.playerScore(puntuacion),
+                  size: 11,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: ResponsiveApp.scaleText(11),
                     color: isDark ? Colors.grey[400] : Colors.grey[600],
                     fontWeight: FontWeight.w500,
                   ),
@@ -782,12 +852,10 @@ class _MiniIconButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: isDestructive
-                ? Colors.red.withValues(alpha: 0.1)
-                : (Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.15)),
+            color: isDestructive ? Colors.red.withValues(alpha: 0.1) : (Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.15)),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(
+          child: IconScale(
             icon,
             size: 18,
             color: isDestructive ? Colors.red[400] : (Preferences.isDarkMode ? Colors.white70 : Colors.grey[700]),
@@ -838,13 +906,13 @@ class _ActionScoreButton extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, size: 22, color: Colors.white),
+                IconScale(icon, size: 22, color: Colors.white),
                 const SizedBox(width: 8),
-                Text(
+                TextScale(
                   label,
+                  size: 15,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: ResponsiveApp.scaleText(15),
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),

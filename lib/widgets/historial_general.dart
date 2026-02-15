@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
@@ -44,6 +43,7 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
     final Partida partida = partidaProvider.partidaEnTurno!;
     final List<Jugador> jugadores = partida.jugadores ?? [];
     final isDark = Preferences.isDarkMode;
+    final bool hasTeclado = partida.tipo == 'Puntuación';
 
     jugadorSeleccionado ??= jugadores.isNotEmpty ? jugadores.first : null;
 
@@ -58,31 +58,50 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
     }
     todosHistoriales.sort((a, b) => a.historial.id!.compareTo(b.historial.id!));
 
-    final screenHeight = MediaQuery.of(context).size.height;
-    final isSmallScreen = screenHeight < 700;
-    final spacingLg = isSmallScreen ? 8.0 : 16.0;
-    final spacingMd = isSmallScreen ? 6.0 : 12.0;
-
-    return Column(
+    final scoreControls = Row(
       children: [
-        // Header - arrastrable para cerrar el panel
-        _HistorialHeader(
-          cantRegistros: todosHistoriales.length,
-          panelController: widget.panelController,
+        Expanded(
+          child: _ActionScoreButton(
+            icon: Icons.remove_rounded,
+            label: AppLocalizations.of(context)!.decrease,
+            color: Colors.red[400]!,
+            onTap: () => _changePuntuacion(
+              context: context,
+              jugadorProvider: jugadorProvider,
+              partidaProvider: partidaProvider,
+              tipo: 'reducir',
+            ),
+          ),
         ),
-        SizedBox(height: spacingLg),
-
-        // Selector de jugador
-        _JugadorSelector(
-          jugadores: jugadores,
-          jugadorSeleccionado: jugadorSeleccionado,
-          onChanged: (jugador) => setState(() => jugadorSeleccionado = jugador),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _ActionScoreButton(
+            icon: Icons.add_rounded,
+            label: AppLocalizations.of(context)!.increase,
+            color: const Color(0xFF4CAF50),
+            onTap: () => _changePuntuacion(
+              context: context,
+              jugadorProvider: jugadorProvider,
+              partidaProvider: partidaProvider,
+              tipo: 'aumentar',
+            ),
+          ),
         ),
-        SizedBox(height: spacingMd),
+      ],
+    );
 
-        // Lista de historial
-        Flexible(
-          flex: 2,
+    return ResponsiveLayoutBuilder(
+      useMediaQuery: true,
+      builder: (context, constraints, info) {
+        final useLandscapeLayout = info.useLandscapeLayout;
+        final isWide = info.isWide;
+        final screenHeight = MediaQuery.of(context).size.height;
+        final isSmallScreen = screenHeight < 700;
+        final spacingLg = isSmallScreen ? 8.0 : 16.0;
+        final spacingMd = isSmallScreen ? 6.0 : 12.0;
+        final useTwoColumns = useLandscapeLayout && hasTeclado;
+
+        final historialSection = Expanded(
           child: ConstrainedBox(
             constraints: BoxConstraints(
               minHeight: screenHeight * (isSmallScreen ? 0.12 : 0.18),
@@ -104,56 +123,93 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
               ),
             ),
           ),
-        ),
-        SizedBox(height: spacingMd),
+        );
 
-        // Teclado y campo de puntuación
-        if (partida.tipo == 'Puntuación') ...[
-          _KeyboardSection(
-            puntuacionController: puntuacionController,
-            errorText: _errorText,
-            onType: () {
-              if (_errorText != null) {
-                setState(() => _errorText = null);
-              }
-            },
-          ),
-          const SizedBox(height: 15),
-        ],
-
-        // Botones de acción
-        Row(
-          children: [
-            Expanded(
-              child: _ActionScoreButton(
-                icon: Icons.remove_rounded,
-                label: AppLocalizations.of(context)!.decrease,
-                color: Colors.red[400]!,
-                onTap: () => _changePuntuacion(
-                  context: context,
-                  jugadorProvider: jugadorProvider,
-                  partidaProvider: partidaProvider,
-                  tipo: 'reducir',
+        return SafeArea(
+          top: !useLandscapeLayout,
+          bottom: false,
+          left: useLandscapeLayout,
+          right: useLandscapeLayout,
+          child: useTwoColumns
+              ? Row(
+                  children: [
+                    Expanded(
+                      flex: 55,
+                      child: Column(
+                        children: [
+                          _HistorialHeader(
+                            cantRegistros: todosHistoriales.length,
+                            panelController: widget.panelController,
+                          ),
+                          SizedBox(height: spacingLg),
+                          _JugadorSelector(
+                            jugadores: jugadores,
+                            jugadorSeleccionado: jugadorSeleccionado,
+                            onChanged: (jugador) => setState(() => jugadorSeleccionado = jugador),
+                          ),
+                          SizedBox(height: spacingMd),
+                          historialSection,
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 45,
+                      child: Column(
+                        children: [
+                          const Spacer(),
+                          _KeyboardSection(
+                            puntuacionController: puntuacionController,
+                            errorText: _errorText,
+                            useLandscapeLayout: useLandscapeLayout,
+                            isWide: isWide,
+                            onType: () {
+                              if (_errorText != null) {
+                                setState(() => _errorText = null);
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 15),
+                          scoreControls,
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              : Column(
+                  children: [
+                    _HistorialHeader(
+                      cantRegistros: todosHistoriales.length,
+                      panelController: widget.panelController,
+                    ),
+                    SizedBox(height: spacingLg),
+                    _JugadorSelector(
+                      jugadores: jugadores,
+                      jugadorSeleccionado: jugadorSeleccionado,
+                      onChanged: (jugador) => setState(() => jugadorSeleccionado = jugador),
+                    ),
+                    SizedBox(height: spacingMd),
+                    historialSection,
+                    SizedBox(height: spacingMd),
+                    if (hasTeclado) ...[
+                      _KeyboardSection(
+                        puntuacionController: puntuacionController,
+                        errorText: _errorText,
+                        useLandscapeLayout: useLandscapeLayout,
+                        isWide: isWide,
+                        onType: () {
+                          if (_errorText != null) {
+                            setState(() => _errorText = null);
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 15),
+                    ],
+                    scoreControls,
+                  ],
                 ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _ActionScoreButton(
-                icon: Icons.add_rounded,
-                label: AppLocalizations.of(context)!.increase,
-                color: const Color(0xFF4CAF50),
-                onTap: () => _changePuntuacion(
-                  context: context,
-                  jugadorProvider: jugadorProvider,
-                  partidaProvider: partidaProvider,
-                  tipo: 'aumentar',
-                ),
-              ),
-            ),
-          ],
-        )
-      ],
+        );
+      },
     );
   }
 
@@ -296,7 +352,7 @@ class _HistorialHeader extends StatelessWidget {
               ],
             ),
             child: const Center(
-              child: FaIcon(FontAwesomeIcons.clockRotateLeft, color: Colors.white, size: 18),
+              child: IconScale(Icons.history_rounded, color: Colors.white, size: 18),
             ),
           ),
           const SizedBox(width: 12),
@@ -304,21 +360,21 @@ class _HistorialHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                TextScale(
                   AppLocalizations.of(context)!.generalHistory,
+                  size: 14,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: ResponsiveApp.scaleText(14),
                     fontWeight: FontWeight.bold,
                     color: isDark ? Colors.white : AppThemes.colorQuinto,
                   ),
                 ),
                 const SizedBox(height: 1),
-                Text(
+                TextScale(
                   AppLocalizations.of(context)!.records(cantRegistros),
+                  size: 11,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: ResponsiveApp.scaleText(11),
                     color: isDark ? Colors.grey[400] : Colors.grey[600],
                     fontWeight: FontWeight.w500,
                   ),
@@ -362,7 +418,7 @@ class _JugadorSelector extends StatelessWidget {
         isDense: isSmallScreen,
         underline: const SizedBox(),
         dropdownColor: isDark ? AppThemes.themeColor_1 : Colors.white,
-        icon: Icon(
+        icon: IconScale(
           Icons.arrow_drop_down,
           color: isDark ? Colors.grey[400] : Colors.grey[600],
           size: isSmallScreen ? 20 : 24,
@@ -383,11 +439,11 @@ class _JugadorSelector extends StatelessWidget {
                     borderRadius: BorderRadius.circular(isSmallScreen ? 6 : 8),
                   ),
                   child: Center(
-                    child: Text(
+                    child: TextScale(
                       jugador.nombre != null && jugador.nombre!.isNotEmpty ? jugador.nombre![0].toUpperCase() : '?',
+                      size: 12,
                       style: TextStyle(
                         fontFamily: 'Poppins',
-                        fontSize: ResponsiveApp.scaleText(12),
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -397,11 +453,11 @@ class _JugadorSelector extends StatelessWidget {
                 SizedBox(width: isSmallScreen ? 8 : 10),
                 // Nombre
                 Expanded(
-                  child: Text(
+                  child: TextScale(
                     jugador.nombre!,
+                    size: 14,
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: ResponsiveApp.scaleText(14),
                       color: isDark ? Colors.white : AppThemes.colorQuinto,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -415,11 +471,11 @@ class _JugadorSelector extends StatelessWidget {
                     color: isDark ? AppThemes.colorPrimero.withValues(alpha: 0.3) : AppThemes.colorPrimero.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: Text(
+                  child: TextScale(
                     '${jugador.puntuacion}',
+                    size: 11,
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: ResponsiveApp.scaleText(11),
                       fontWeight: FontWeight.bold,
                       color: isDark ? Colors.white : AppThemes.colorPrimero,
                     ),
@@ -481,18 +537,18 @@ class _ListHistorialGeneralState extends State<_ListHistorialGeneral> with Slide
                 color: AppThemes.colorPrimero.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: FaIcon(
-                FontAwesomeIcons.clockRotateLeft,
+              child: IconScale(
+                Icons.history_rounded,
                 size: 24,
                 color: AppThemes.colorPrimero.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: 10),
-            Text(
+            TextScale(
               AppLocalizations.of(context)!.noRecords,
+              size: 12,
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: ResponsiveApp.scaleText(12),
                 color: Colors.grey[500],
               ),
             ),
@@ -566,7 +622,7 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
         backgroundColor: Colors.transparent,
         trailingActions: [
           SwipeAction(
-            icon: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 20),
+            icon: const IconScale(Icons.delete_outline_rounded, color: Colors.white, size: 20),
             title: AppLocalizations.of(context)!.delete,
             style: TextStyle(fontFamily: 'Poppins', fontSize: ResponsiveApp.scaleText(11), color: Colors.white),
             onTap: (handler) => _deleteHistorial(context, handler),
@@ -592,11 +648,11 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Center(
-                      child: Text(
+                      child: TextScale(
                         widget.jugador.nombre != null && widget.jugador.nombre!.isNotEmpty ? widget.jugador.nombre![0].toUpperCase() : '?',
+                        size: 12,
                         style: TextStyle(
                           fontFamily: 'Poppins',
-                          fontSize: ResponsiveApp.scaleText(12),
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -606,11 +662,11 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
                   SizedBox(width: isSmallScreen ? 8 : 10),
                   // Nombre
                   Expanded(
-                    child: Text(
+                    child: TextScale(
                       widget.jugador.nombre!,
+                      size: 13,
                       style: TextStyle(
                         fontFamily: 'Poppins',
-                        fontSize: ResponsiveApp.scaleText(13),
                         fontWeight: FontWeight.w500,
                         color: isDark ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorQuinto,
                       ),
@@ -628,17 +684,17 @@ class _HistorialGeneralItemState extends State<_HistorialGeneralItem> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
+                        IconScale(
                           isAumentar ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
                           size: 14,
                           color: color,
                         ),
                         const SizedBox(width: 4),
-                        Text(
+                        TextScale(
                           "${isAumentar ? '+' : '-'}${widget.historial.puntuacion}",
+                          size: 13,
                           style: TextStyle(
                             fontFamily: 'Poppins',
-                            fontSize: ResponsiveApp.scaleText(13),
                             fontWeight: FontWeight.bold,
                             color: color,
                           ),
@@ -735,13 +791,13 @@ class _ActionScoreButton extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, color: Colors.white, size: 20),
+                IconScale(icon, color: Colors.white, size: 20),
                 const SizedBox(width: 8),
-                Text(
+                TextScale(
                   label,
+                  size: 14,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: ResponsiveApp.scaleText(14),
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
@@ -761,11 +817,15 @@ class _KeyboardSection extends StatelessWidget {
     required this.puntuacionController,
     this.errorText,
     required this.onType,
+    required this.useLandscapeLayout,
+    required this.isWide,
   });
 
   final TextEditingController puntuacionController;
   final String? errorText;
   final VoidCallback onType;
+  final bool useLandscapeLayout;
+  final bool isWide;
 
   void changePuntuacionValue(String value) {
     onType();
@@ -829,7 +889,13 @@ class _KeyboardSection extends StatelessWidget {
               fillColor: AppThemes.inputDisabledColor,
               filled: true,
               isDense: true,
-              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: isSmallScreen ? 2 : 4),
+              contentPadding: EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: useLandscapeLayout
+                      ? 7
+                      : isSmallScreen
+                          ? 2
+                          : 4),
               labelStyle: TextStyle(
                 color: errorText != null ? Colors.red[400] : AppThemes.labelInputDisabledColor,
                 fontFamily: 'Poppins',
@@ -864,12 +930,12 @@ class _KeyboardSection extends StatelessWidget {
                 if (errorText != null)
                   Positioned(
                     top: 2,
-                    child: Text(
+                    child: TextScale(
                       errorText!,
+                      size: 11,
                       style: TextStyle(
                         color: Colors.red[400],
                         fontFamily: 'Poppins',
-                        fontSize: ResponsiveApp.scaleText(11),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -878,7 +944,12 @@ class _KeyboardSection extends StatelessWidget {
             ),
           ),
           // Teclado
-          CustomKeyboard(onChanged: (value) => changePuntuacionValue(value), tipo: KeyboardType.number),
+          CustomKeyboard(
+            onChanged: (value) => changePuntuacionValue(value),
+            tipo: KeyboardType.number,
+            useLandscapeLayout: useLandscapeLayout,
+            isWide: isWide,
+          ),
         ],
       ),
     );
