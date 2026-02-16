@@ -31,10 +31,8 @@ class IconScale extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediaSize = MediaQuery.sizeOf(context);
-    final shortestSide = mediaSize.shortestSide;
-    final isLandscapeLayout = ResponsiveLayoutBuilder.maybeOf(context)?.useLandscapeLayout ?? ResponsiveApp.useLandscapeLayout;
-    final isLargeDevice = shortestSide >= 600;
+    final isLandscapeLayout = ResponsiveLayoutBuilder.maybeOf(context)?.useLandscapeLayout ?? ResponsiveLayoutBuilder.resolveUseLandscapeLayout(context);
+    final isLargeDevice = ResponsiveLayoutBuilder.resolveIsWide(context);
     final landscapePhoneBoost = isLandscapeLayout && !isLargeDevice ? 0.65 : 0.6;
     final portraitBias = isLandscapeLayout ? 0.9 : 1.9;
 

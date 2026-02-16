@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../helpers/helpers.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:toastification/toastification.dart';
+import '../widgets/icon_scale.dart';
+import '../widgets/text_scale.dart';
 
 enum ToastType { error, success, warning, info }
 
@@ -79,11 +81,11 @@ class Toast {
           borderRadius: BorderRadius.circular(10),
         ),
         child: Center(
-          child: FaIcon(iconData, size: 18, color: iconColor),
+          child: IconScale(iconData, size: 18, color: iconColor),
         ),
       ),
       title: title != null
-          ? Text(
+          ? TextScale(
               title,
               style: TextStyle(
                 fontFamily: 'Poppins',
@@ -98,7 +100,7 @@ class Toast {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
+                TextScale(
                   message,
                   style: TextStyle(
                     fontFamily: 'Poppins',
@@ -134,7 +136,7 @@ class Toast {
                               ),
                             ],
                           ),
-                          child: Text(
+                          child: TextScale(
                             actionLabel,
                             style: TextStyle(
                               fontFamily: 'Poppins',

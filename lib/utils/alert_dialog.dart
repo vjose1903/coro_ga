@@ -1,27 +1,32 @@
 import 'dart:io';
-import '../helpers/helpers.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
+import '../widgets/icon_scale.dart';
+import '../widgets/responsive_layout_builder.dart';
+import '../widgets/text_scale.dart';
 
 enum DialogType { error, success, warning, info, custom }
 
 class CustomActionsButtons {
   factory CustomActionsButtons.cancelButton(Map<String, dynamic> json) => CustomActionsButtons(
-        label: json["label"] ?? "Cancelar",
-        onTap: json["onTap"] ?? () {},
-        textColor: json["textColor"],
+        label: json['label'] ?? 'Cancelar',
+        onTap: json['onTap'] ?? () {},
+        textColor: json['textColor'],
         isDestructive: true,
       );
 
   factory CustomActionsButtons.aceptarButton(Map<String, dynamic> json) => CustomActionsButtons(
-        label: json["label"] ?? "Aceptar",
-        onTap: json["onTap"] ?? () {},
-        textColor: json["textColor"],
+        label: json['label'] ?? 'Aceptar',
+        onTap: json['onTap'] ?? () {},
+        textColor: json['textColor'],
         isPrimary: true,
       );
+
   CustomActionsButtons({
     required this.label,
     this.textColor,
@@ -68,40 +73,57 @@ class CustomAlertDialog {
       barrierDismissible: buttonsList == null || buttonsList.isEmpty,
       context: context,
       builder: (buildContext) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 340),
-            decoration: BoxDecoration(
-              color: isDark ? AppThemes.themeColor_2 : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
+        return ResponsiveLayoutBuilder(
+          useMediaQuery: true,
+          builder: (context, constraints, info) {
+            final useLandscapeLayout = info.useLandscapeLayout;
+            final isWide = info.isWide;
+
+            return Dialog(
+              backgroundColor: Colors.transparent,
+              insetPadding: EdgeInsets.symmetric(
+                horizontal: useLandscapeLayout ? 28 : 24,
+                vertical: useLandscapeLayout ? 16 : 24,
+              ),
+              child: Container(
+                constraints: BoxConstraints(maxWidth: useLandscapeLayout ? 520 : 340),
+                decoration: BoxDecoration(
+                  color: isDark ? AppThemes.themeColor_2 : Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.2),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Header con icono
-                _DialogHeader(title: title, dialogType: dialogType),
-                // Contenido
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-                  child: DialogBody(
-                    dialogType: dialogType,
-                    menssage: menssage,
-                    body: body,
-                  ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Header con icono
+                    _DialogHeader(title: title, dialogType: dialogType, isWide: isWide, useLandscapeLayout: useLandscapeLayout),
+                    // Contenido
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        useLandscapeLayout ? 24 : 20,
+                        20,
+                        useLandscapeLayout ? 24 : 20,
+                        20,
+                      ),
+                      child: DialogBody(
+                        dialogType: dialogType,
+                        menssage: menssage,
+                        body: body,
+                      ),
+                    ),
+                    // Botones
+                    if (buttonsList != null && buttonsList.isNotEmpty) _DialogActions(buttons: buttonsList),
+                  ],
                 ),
-                // Botones
-                if (buttonsList != null && buttonsList.isNotEmpty) _DialogActions(buttons: buttonsList),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
@@ -130,7 +152,7 @@ class CustomAlertDialog {
                   const SizedBox(width: 8),
                 ],
                 Flexible(
-                  child: Text(
+                  child: TextScale(
                     title,
                     style: const TextStyle(
                       fontFamily: 'Poppins',
@@ -188,7 +210,7 @@ class CustomAlertDialog {
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ).createShader(bounds),
-      child: FaIcon(
+      child: IconScale(
         iconData,
         size: size,
         color: Colors.white,
@@ -211,7 +233,7 @@ class CustomAlertDialog {
         isDestructiveAction: button.isDestructive,
         isDefaultAction: button.isPrimary,
         onPressed: () => button.onTap != null ? button.onTap!() : () {},
-        child: Text(
+        child: TextScale(
           button.label,
           style: TextStyle(
             fontFamily: 'Poppins',
@@ -226,8 +248,11 @@ class CustomAlertDialog {
 
 // Header del diálogo
 class _DialogHeader extends StatelessWidget {
-  const _DialogHeader({required this.title, this.dialogType});
+  const _DialogHeader({required this.title, required this.useLandscapeLayout, required this.isWide, this.dialogType});
+
   final String title;
+  final bool useLandscapeLayout;
+  final bool isWide;
   final DialogType? dialogType;
 
   @override
@@ -248,24 +273,24 @@ class _DialogHeader extends StatelessWidget {
         children: [
           if (dialogType != null && dialogType != DialogType.custom) ...[
             Container(
-              width: 32,
-              height: 32,
+              width: useLandscapeLayout ? (isWide ? 32 : 34) : 32,
+              height: useLandscapeLayout ? (isWide ? 32 : 34) : 32,
               decoration: BoxDecoration(
                 color: _getBackgroundColor(dialogType!).withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Center(
-                child: CustomAlertDialog._getIconWidget(dialogType, size: 16),
+                child: CustomAlertDialog._getIconWidget(dialogType, size: useLandscapeLayout ? (isWide ? 16 : 14) : 16),
               ),
             ),
             const SizedBox(width: 10),
           ],
           Expanded(
-            child: Text(
+            child: TextScale(
               title,
+              size: 15,
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: ResponsiveApp.scaleText(15),
                 fontWeight: FontWeight.w600,
                 color: isDark ? Colors.white : AppThemes.colorCuarto,
               ),
@@ -376,11 +401,11 @@ class _ActionButton extends StatelessWidget {
                 : null,
           ),
           child: Center(
-            child: Text(
+            child: TextScale(
               label,
+              size: 14,
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: ResponsiveApp.scaleText(14),
                 fontWeight: FontWeight.w500,
                 color: textColor,
               ),
@@ -418,11 +443,11 @@ class DialogBody extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        TextScale(
           menssage,
+          size: 14,
           style: TextStyle(
             fontFamily: 'Poppins',
-            fontSize: ResponsiveApp.scaleText(14),
             height: 1.5,
             color: isDark ? Colors.white70 : Colors.black87,
           ),

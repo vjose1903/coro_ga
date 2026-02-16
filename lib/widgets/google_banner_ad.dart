@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../helpers/helpers.dart';
 import '../providers/premium_provider.dart';
+import 'responsive_layout_builder.dart';
 
 class GoogleBannerAd extends StatefulWidget {
   const GoogleBannerAd({
@@ -63,8 +64,7 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     }
 
     final mediaSize = MediaQuery.of(context).size;
-    final shortestSide = mediaSize.shortestSide;
-    final isLargeDevice = shortestSide >= 600;
+    final isLargeDevice = ResponsiveLayoutBuilder.resolveIsWide(context);
     final int resolvedWidth = width ?? mediaSize.width.truncate();
     final adaptiveSize = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(resolvedWidth);
     if (!mounted || adaptiveSize == null) {

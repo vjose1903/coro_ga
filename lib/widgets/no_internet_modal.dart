@@ -4,6 +4,7 @@ import '../l10n/app_localizations.dart';
 import '../themes/app_themes.dart';
 import '../shared_preferences/preferences.dart';
 import '../helpers/helpers.dart';
+import 'text_scale.dart';
 
 class NoInternetModal extends StatelessWidget {
   const NoInternetModal({super.key});
@@ -54,7 +55,7 @@ class NoInternetModal extends StatelessWidget {
                 const SizedBox(height: 20),
                 FadeInDown(
                   delay: const Duration(milliseconds: 300),
-                  child: Text(
+                  child: TextScale(
                     AppLocalizations.of(context)!.noInternetTitle,
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -69,7 +70,7 @@ class NoInternetModal extends StatelessWidget {
                 const SizedBox(height: 10),
                 FadeIn(
                   delay: const Duration(milliseconds: 400),
-                  child: Text(
+                  child: TextScale(
                     AppLocalizations.of(context)!.noInternetMessage,
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -95,7 +96,7 @@ class NoInternetModal extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 10),
-                      Text(
+                      TextScale(
                         AppLocalizations.of(context)!.noInternetWaiting,
                         style: TextStyle(
                           fontSize: ResponsiveApp.scaleText(13),

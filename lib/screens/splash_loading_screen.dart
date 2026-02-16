@@ -175,7 +175,7 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
+                                      TextScale(
                                         'Coro Games',
                                         style: theme.textTheme.headlineSmall?.copyWith(
                                           fontWeight: FontWeight.w700,
@@ -189,7 +189,7 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
                                         backgroundColor: AppThemes.themeColor_3,
                                       ),
                                       const SizedBox(height: 12),
-                                      Text(
+                                      TextScale(
                                         _hasError ? l10n.loadingDataError : l10n.loadingData,
                                         textAlign: TextAlign.left,
                                         style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
@@ -198,7 +198,7 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
                                         const SizedBox(height: 16),
                                         ElevatedButton(
                                           onPressed: _startInitialization,
-                                          child: Text(l10n.loading),
+                                          child: TextScale(l10n.loading),
                                         ),
                                       ],
                                     ],
@@ -232,7 +232,7 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 20),
-                                Text(
+                                TextScale(
                                   'Coro Games',
                                   style: theme.textTheme.headlineSmall?.copyWith(
                                     fontWeight: FontWeight.w700,
@@ -246,7 +246,7 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
                                   backgroundColor: AppThemes.themeColor_3,
                                 ),
                                 const SizedBox(height: 12),
-                                Text(
+                                TextScale(
                                   _hasError ? l10n.loadingDataError : l10n.loadingData,
                                   textAlign: TextAlign.center,
                                   style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
@@ -255,7 +255,7 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
                                   const SizedBox(height: 16),
                                   ElevatedButton(
                                     onPressed: _startInitialization,
-                                    child: Text(l10n.loading),
+                                    child: TextScale(l10n.loading),
                                   ),
                                 ],
                               ],

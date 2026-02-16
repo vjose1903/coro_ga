@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../shared_preferences/preferences.dart';
+import 'icon_scale.dart';
 
 class IconSize {
   static const double xMin = 20;
@@ -33,7 +34,7 @@ class CustomIconButtom extends StatelessWidget {
           child: SizedBox(
             width: size,
             height: size,
-            child: Icon(icon, color: myIconColor, size: iconSize),
+            child: IconScale(icon, color: myIconColor, size: iconSize),
           ),
         ),
       ),

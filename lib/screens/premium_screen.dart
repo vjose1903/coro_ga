@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
-import '../helpers/helpers.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/premium_provider.dart';
 import '../services/purchase_service.dart';
@@ -65,161 +64,173 @@ class _PremiumScreenState extends State<PremiumScreen> {
             ),
           ),
           child: SafeArea(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: ResponsiveLayoutBuilder(
-                  builder: (context, constraints, info) {
-                    final useLandscapeLayout = info.useLandscapeLayout;
-                    final headerRow = Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _BackButton(),
-                        Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: _isProcessing ? null : () => _restorePremium(context),
-                            borderRadius: BorderRadius.circular(12),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (_activeAction == _ProcessingAction.restore) ...[
-                                    SizedBox(
-                                      width: 16,
-                                      height: 16,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.25,
-                                        valueColor: AlwaysStoppedAnimation(
-                                          isDark ? Colors.white : AppThemes.colorPrimero,
-                                        ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: ResponsiveLayoutBuilder(
+                builder: (context, constraints, info) {
+                  final useLandscapeLayout = info.useLandscapeLayout;
+                  final isWide = info.isWide;
+
+                  final headerRow = Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _BackButton(isWide: isWide, useLandscapeLayout: useLandscapeLayout),
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: _isProcessing ? null : () => _restorePremium(context),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (_activeAction == _ProcessingAction.restore) ...[
+                                  SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.25,
+                                      valueColor: AlwaysStoppedAnimation(
+                                        isDark ? Colors.white : AppThemes.colorPrimero,
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
-                                  ],
-                                  Text(
-                                    AppLocalizations.of(context)!.restorePurchases,
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                      fontSize: ResponsiveApp.scaleText(14),
-                                      fontWeight: FontWeight.w600,
-                                      color: isDark
-                                          ? (_isProcessing ? Colors.white38 : Colors.white70)
-                                          : (_isProcessing ? AppThemes.colorPrimero : AppThemes.colorTercero),
-                                    ),
                                   ),
+                                  const SizedBox(width: 8),
                                 ],
-                              ),
+                                TextScale(
+                                  AppLocalizations.of(context)!.restorePurchases,
+                                  size: 14,
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w600,
+                                    color: isDark ? (_isProcessing ? Colors.white38 : Colors.white70) : (_isProcessing ? AppThemes.colorPrimero : AppThemes.colorTercero),
+                                  ),
+                                ),
+                              ],
                             ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+
+                  final title = FadeInUp(
+                    delay: const Duration(milliseconds: 200),
+                    child: ShaderMask(
+                      shaderCallback: (bounds) => const LinearGradient(
+                        colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ).createShader(bounds),
+                      child: TextScale(
+                        AppLocalizations.of(context)!.coroGamesPro,
+                        size: 26,
+                        style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  );
+
+                  final subtitle = FadeInUp(
+                    delay: const Duration(milliseconds: 300),
+                    child: TextScale(
+                      AppLocalizations.of(context)!.unlockFullPotential,
+                      size: 15,
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        color: isDark ? Colors.white54 : Colors.grey[600],
+                      ),
+                    ),
+                  );
+
+                  final features = [
+                    _FeatureItem(
+                      icon: FontAwesomeIcons.userGroup,
+                      title: AppLocalizations.of(context)!.unlimitedPlayers,
+                      description: AppLocalizations.of(context)!.unlimitedPlayersDesc,
+                      delay: 400,
+                      useLandscapeLayout: useLandscapeLayout,
+                      isWide: isWide,
+                    ),
+                    _FeatureItem(
+                      icon: FontAwesomeIcons.gamepad,
+                      title: AppLocalizations.of(context)!.unlimitedGames,
+                      description: AppLocalizations.of(context)!.unlimitedGamesDesc,
+                      delay: 500,
+                      useLandscapeLayout: useLandscapeLayout,
+                      isWide: isWide,
+                    ),
+                    _FeatureItem(
+                      icon: FontAwesomeIcons.gamepad,
+                      title: AppLocalizations.of(context)!.predefinedGamesFeature,
+                      description: AppLocalizations.of(context)!.predefinedGamesDesc,
+                      delay: 600,
+                      useLandscapeLayout: useLandscapeLayout,
+                      isWide: isWide,
+                    ),
+                    _FeatureItem(
+                      icon: FontAwesomeIcons.clockRotateLeft,
+                      title: AppLocalizations.of(context)!.fullHistory,
+                      description: AppLocalizations.of(context)!.fullHistoryDesc,
+                      delay: 700,
+                      useLandscapeLayout: useLandscapeLayout,
+                      isWide: isWide,
+                    ),
+                    _FeatureItem(
+                      icon: FontAwesomeIcons.ban,
+                      title: AppLocalizations.of(context)!.noAds,
+                      description: AppLocalizations.of(context)!.noAdsDesc,
+                      delay: 800,
+                      useLandscapeLayout: useLandscapeLayout,
+                      isWide: isWide,
+                    ),
+                  ];
+
+                  final buySection = Consumer<PremiumProvider>(
+                    builder: (context, premiumProvider, child) {
+                      if (premiumProvider.isPremium) {
+                        return _AlreadyPremiumCard();
+                      }
+                      return _BuyButton(
+                        enabled: !_isProcessing,
+                        showSpinner: _activeAction == _ProcessingAction.buy,
+                        useLandscapeLayout: useLandscapeLayout,
+                        isWide: isWide,
+                        onTap: () => _buyPremium(context),
+                      );
+                    },
+                  );
+
+                  final footnote = FadeInUp(
+                    delay: const Duration(milliseconds: 1000),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconScale(
+                          FontAwesomeIcons.lock,
+                          size: 12,
+                          color: isDark ? Colors.white38 : Colors.grey[400],
+                        ),
+                        const SizedBox(width: 8),
+                        TextScale(
+                          AppLocalizations.of(context)!.oneTimePayment,
+                          size: 12,
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            color: isDark ? Colors.white38 : Colors.grey[500],
                           ),
                         ),
                       ],
-                    );
+                    ),
+                  );
 
-                    final title = FadeInUp(
-                      delay: const Duration(milliseconds: 200),
-                      child: ShaderMask(
-                        shaderCallback: (bounds) => const LinearGradient(
-                          colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ).createShader(bounds),
-                        child: Text(
-                          AppLocalizations.of(context)!.coroGamesPro,
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: ResponsiveApp.scaleText(28),
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    );
-
-                    final subtitle = FadeInUp(
-                      delay: const Duration(milliseconds: 300),
-                      child: Text(
-                        AppLocalizations.of(context)!.unlockFullPotential,
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: ResponsiveApp.scaleText(15),
-                          color: isDark ? Colors.white54 : Colors.grey[600],
-                        ),
-                      ),
-                    );
-
-                    final features = [
-                      _FeatureItem(
-                        icon: FontAwesomeIcons.userGroup,
-                        title: AppLocalizations.of(context)!.unlimitedPlayers,
-                        description: AppLocalizations.of(context)!.unlimitedPlayersDesc,
-                        delay: 400,
-                      ),
-                      _FeatureItem(
-                        icon: FontAwesomeIcons.gamepad,
-                        title: AppLocalizations.of(context)!.unlimitedGames,
-                        description: AppLocalizations.of(context)!.unlimitedGamesDesc,
-                        delay: 500,
-                      ),
-                      _FeatureItem(
-                        icon: FontAwesomeIcons.gamepad,
-                        title: AppLocalizations.of(context)!.predefinedGamesFeature,
-                        description: AppLocalizations.of(context)!.predefinedGamesDesc,
-                        delay: 600,
-                      ),
-                      _FeatureItem(
-                        icon: FontAwesomeIcons.clockRotateLeft,
-                        title: AppLocalizations.of(context)!.fullHistory,
-                        description: AppLocalizations.of(context)!.fullHistoryDesc,
-                        delay: 700,
-                      ),
-                      _FeatureItem(
-                        icon: FontAwesomeIcons.ban,
-                        title: AppLocalizations.of(context)!.noAds,
-                        description: AppLocalizations.of(context)!.noAdsDesc,
-                        delay: 800,
-                      ),
-                    ];
-
-                    final buySection = Consumer<PremiumProvider>(
-                      builder: (context, premiumProvider, child) {
-                        if (premiumProvider.isPremium) {
-                          return _AlreadyPremiumCard();
-                        }
-                        return _BuyButton(
-                          enabled: !_isProcessing,
-                          showSpinner: _activeAction == _ProcessingAction.buy,
-                          onTap: () => _buyPremium(context),
-                        );
-                      },
-                    );
-
-                    final footnote = FadeInUp(
-                      delay: const Duration(milliseconds: 1000),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          FaIcon(
-                            FontAwesomeIcons.lock,
-                            size: 12,
-                            color: isDark ? Colors.white38 : Colors.grey[400],
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            AppLocalizations.of(context)!.oneTimePayment,
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: ResponsiveApp.scaleText(12),
-                              color: isDark ? Colors.white38 : Colors.grey[500],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-
-                    if (!useLandscapeLayout) {
-                      return Column(
+                  if (!useLandscapeLayout) {
+                    return SingleChildScrollView(
+                      child: Column(
                         children: [
                           headerRow,
                           const SizedBox(height: 20),
@@ -236,41 +247,95 @@ class _PremiumScreenState extends State<PremiumScreen> {
                           footnote,
                           const SizedBox(height: 30),
                         ],
-                      );
-                    }
+                      ),
+                    );
+                  }
 
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  return SizedBox(
+                    height: constraints.maxHeight,
+                    child: Row(
                       children: [
                         Expanded(
                           child: Column(
                             children: [
                               headerRow,
-                              const SizedBox(height: 20),
-                              _PremiumLogo(),
-                              const SizedBox(height: 24),
-                              title,
-                              const SizedBox(height: 8),
-                              subtitle,
-                              const SizedBox(height: 24),
+                              const SizedBox(height: 12),
+                              Expanded(
+                                child: LayoutBuilder(
+                                  builder: (context, leftConstraints) {
+                                    final availableHeight = leftConstraints.maxHeight;
+                                    final logoSize = (availableHeight * 0.46).clamp(72.0, 130.0);
+                                    final titleSize = (availableHeight * 0.11).clamp(20.0, 28.0);
+                                    final subtitleSize = (availableHeight * 0.06).clamp(12.0, 15.0);
+                                    final logoGap = (availableHeight * 0.08).clamp(10.0, 24.0);
+                                    final subtitleGap = (availableHeight * 0.03).clamp(4.0, 8.0);
+
+                                    return Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          _PremiumLogo(size: logoSize),
+                                          SizedBox(height: logoGap),
+                                          FadeInUp(
+                                            delay: const Duration(milliseconds: 200),
+                                            child: ShaderMask(
+                                              shaderCallback: (bounds) => const LinearGradient(
+                                                colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomRight,
+                                              ).createShader(bounds),
+                                              child: TextScale(
+                                                AppLocalizations.of(context)!.coroGamesPro,
+                                                size: titleSize,
+                                                style: TextStyle(
+                                                  fontFamily: 'Poppins',
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(height: subtitleGap),
+                                          FadeInUp(
+                                            delay: const Duration(milliseconds: 300),
+                                            child: TextScale(
+                                              AppLocalizations.of(context)!.unlockFullPotential,
+                                              size: subtitleSize,
+                                              style: TextStyle(
+                                                fontFamily: 'Poppins',
+                                                color: isDark ? Colors.white54 : Colors.grey[600],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
                               buySection,
                               const SizedBox(height: 14),
                               footnote,
+                              const SizedBox(height: 8),
                             ],
                           ),
                         ),
                         const SizedBox(width: 24),
                         Expanded(
-                          child: Column(
-                            children: [
-                              ...features,
-                            ],
+                          flex: 2,
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                ...features,
+                                const SizedBox(height: 20),
+                              ],
+                            ),
                           ),
                         ),
                       ],
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -309,9 +374,15 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
 // Botón de volver
 class _BackButton extends StatelessWidget {
+  const _BackButton({required this.useLandscapeLayout, required this.isWide});
+
+  final bool useLandscapeLayout;
+  final bool isWide;
+
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
+    final iconSize = useLandscapeLayout ? (isWide ? 16.0 : 13.0) : 18.0;
 
     return Row(
       children: [
@@ -340,9 +411,9 @@ class _BackButton extends StatelessWidget {
                 ],
               ),
               child: Center(
-                child: FaIcon(
+                child: IconScale(
                   FontAwesomeIcons.arrowLeft,
-                  size: 18,
+                  size: iconSize,
                   color: isDark ? Colors.white70 : AppThemes.colorCuarto,
                 ),
               ),
@@ -356,15 +427,22 @@ class _BackButton extends StatelessWidget {
 
 // Logo Premium con efecto shine
 class _PremiumLogo extends StatelessWidget {
+  const _PremiumLogo({this.size = 130});
+
+  final double size;
+
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
+    final framePadding = (size * 0.046).clamp(4.0, 6.0);
+    final outerRadius = (size * 0.246).clamp(20.0, 32.0);
+    final innerRadius = (size * 0.2).clamp(16.0, 26.0);
 
     return FadeInDown(
       child: Container(
-        padding: const EdgeInsets.all(6),
+        padding: EdgeInsets.all(framePadding),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(32),
+          borderRadius: BorderRadius.circular(outerRadius),
           gradient: const LinearGradient(
             colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
             begin: Alignment.topLeft,
@@ -384,11 +462,11 @@ class _PremiumLogo extends StatelessWidget {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(26),
+          borderRadius: BorderRadius.circular(innerRadius),
           child: Image.asset(
             'assets/icon/icon-pro.png',
-            width: 130,
-            height: 130,
+            width: size,
+            height: size,
           ),
         ),
       ),
@@ -402,12 +480,16 @@ class _FeatureItem extends StatelessWidget {
   final String title;
   final String description;
   final int delay;
+  final bool useLandscapeLayout;
+  final bool isWide;
 
   const _FeatureItem({
     required this.icon,
     required this.title,
     required this.description,
     required this.delay,
+    required this.useLandscapeLayout,
+    required this.isWide,
   });
 
   @override
@@ -453,13 +535,10 @@ class _FeatureItem extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
-                child: ShaderMask(
-                  shaderCallback: (bounds) => LinearGradient(
-                    colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ).createShader(bounds),
-                  child: FaIcon(icon, size: 20, color: Colors.white),
+                child: IconScale(
+                  icon,
+                  size: useLandscapeLayout ? (isWide ? 15 : 13) : 20,
+                  color: AppThemes.colorPrimero,
                 ),
               ),
             ),
@@ -469,21 +548,21 @@ class _FeatureItem extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  TextScale(
                     title,
+                    size: 15,
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: ResponsiveApp.scaleText(15),
                       fontWeight: FontWeight.w600,
                       color: isDark ? Colors.white : AppThemes.colorCuarto,
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text(
+                  TextScale(
                     description,
+                    size: 12,
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: ResponsiveApp.scaleText(12),
                       color: isDark ? Colors.white54 : Colors.grey[600],
                     ),
                   ),
@@ -503,7 +582,7 @@ class _FeatureItem extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Center(
-                child: FaIcon(FontAwesomeIcons.check, size: 12, color: Colors.white),
+                child: IconScale(FontAwesomeIcons.check, size: 12, color: Colors.white),
               ),
             ),
           ],
@@ -559,15 +638,15 @@ class _AlreadyPremiumCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Center(
-                child: FaIcon(FontAwesomeIcons.crown, size: 16, color: Colors.white),
+                child: IconScale(FontAwesomeIcons.crown, size: 16, color: Colors.white),
               ),
             ),
             const SizedBox(width: 14),
-            Text(
+            TextScale(
               AppLocalizations.of(context)!.alreadyPremium,
+              size: 18,
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: ResponsiveApp.scaleText(18),
                 fontWeight: FontWeight.bold,
                 color: isDark ? const Color(0xFF81C784) : const Color(0xFF43A047),
               ),
@@ -584,11 +663,15 @@ class _BuyButton extends StatelessWidget {
   final VoidCallback onTap;
   final bool enabled;
   final bool showSpinner;
+  final bool useLandscapeLayout;
+  final bool isWide;
 
   const _BuyButton({
     required this.onTap,
     this.enabled = true,
     this.showSpinner = false,
+    this.useLandscapeLayout = false,
+    this.isWide = false,
   });
 
   @override
@@ -604,7 +687,7 @@ class _BuyButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             child: Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 18),
+              padding: EdgeInsets.symmetric(vertical: useLandscapeLayout ? 8 : 12),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
@@ -626,23 +709,23 @@ class _BuyButton extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (showSpinner) ...[
-                        SizedBox(
+                        const SizedBox(
                           width: 18,
                           height: 18,
                           child: CircularProgressIndicator(
                             strokeWidth: 2.25,
-                            valueColor: const AlwaysStoppedAnimation(Colors.white),
+                            valueColor: AlwaysStoppedAnimation(Colors.white),
                           ),
                         ),
                         const SizedBox(width: 10),
                       ],
-                      FaIcon(FontAwesomeIcons.crown, size: 18, color: Colors.white),
+                      IconScale(FontAwesomeIcons.crown, size: useLandscapeLayout ? (isWide ? 17 : 13) : 18, color: Colors.white),
                       const SizedBox(width: 10),
-                      Text(
+                      TextScale(
                         AppLocalizations.of(context)!.getPro,
-                        style: TextStyle(
+                        size: 20,
+                        style: const TextStyle(
                           fontFamily: 'Poppins',
-                          fontSize: ResponsiveApp.scaleText(20),
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -650,11 +733,11 @@ class _BuyButton extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text(
+                  TextScale(
                     PurchaseService.instance.premiumPrice,
+                    size: 14,
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: ResponsiveApp.scaleText(14),
                       color: Colors.white.withValues(alpha: 0.85),
                     ),
                   ),

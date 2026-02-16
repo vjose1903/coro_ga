@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'icon_scale.dart';
 
 class IconRounded extends StatelessWidget {
   const IconRounded(
@@ -22,6 +23,6 @@ class IconRounded extends StatelessWidget {
     return Container(
         margin: EdgeInsets.only(left: marginLeft!, right: marginRight!),
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: backgroundColor),
-        child: Padding(padding: const EdgeInsets.all(3), child: Center(child: Icon(icon, size: iconSize, color: iconColor))));
+        child: Padding(padding: const EdgeInsets.all(3), child: Center(child: IconScale(icon, size: iconSize, color: iconColor))));
   }
 }

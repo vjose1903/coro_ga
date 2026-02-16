@@ -3,6 +3,7 @@ import '../themes/app_themes.dart';
 import '../utils/l10n_helper.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import '../helpers/helpers.dart';
+import 'icon_scale.dart';
 import 'text_scale.dart';
 
 class CustomReactiveInput extends StatelessWidget {
@@ -94,8 +95,8 @@ class CustomReactiveInput extends StatelessWidget {
                         fontFamily: 'Poppins',
                       ),
                     ),
-              suffixIcon: innerRight == null ? null : Icon(innerRight),
-              icon: innerLeft == null ? null : Icon(innerLeft),
+              suffixIcon: innerRight == null ? null : IconScale(innerRight!),
+              icon: innerLeft == null ? null : IconScale(innerLeft!),
 
               // FillColor --------
               fillColor: enabled ? AppThemes.inputColor : AppThemes.inputDisabledColor,

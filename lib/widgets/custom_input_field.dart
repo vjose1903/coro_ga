@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../themes/app_themes.dart';
 import '../helpers/helpers.dart';
+import 'icon_scale.dart';
 
 class CustomInputField<T> extends StatelessWidget {
 
@@ -51,8 +52,8 @@ class CustomInputField<T> extends StatelessWidget {
         hintText: hintText,
         labelText: labelText,
         helperText: helperText,
-        suffixIcon: innerRight == null ? null : Icon(innerRight),
-        icon: innerLeft == null ? null : Icon(innerLeft),
+        suffixIcon: innerRight == null ? null : IconScale(innerRight!),
+        icon: innerLeft == null ? null : IconScale(innerLeft!),
 
         // FillColor --------
         fillColor: enabled ? AppThemes.inputColor : AppThemes.inputDisabledColor,

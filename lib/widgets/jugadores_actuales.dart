@@ -1,31 +1,41 @@
 import 'package:flutter/material.dart';
-import '../helpers/helpers.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../l10n/app_localizations.dart';
-import '../models/models.dart';
-import '../shared_preferences/preferences.dart';
-import '../themes/app_themes.dart';
-import '../providers/providers.dart';
-import 'layout.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/app_localizations.dart';
+import '../models/models.dart';
+import '../providers/providers.dart';
+import '../shared_preferences/preferences.dart';
+import '../themes/app_themes.dart';
+import 'widgets.dart';
+
 class JugadoresActuales extends StatelessWidget {
-  const JugadoresActuales({super.key, required this.jugadoresController, required this.rebuildWidget, required this.onEditJugador});
+  const JugadoresActuales({super.key, required this.jugadoresController, required this.rebuildWidget, required this.onEditJugador, required this.useLandscapeLayout, required this.isWide});
   final Function rebuildWidget;
   final ScrollController jugadoresController;
+  final bool useLandscapeLayout;
+  final bool isWide;
   final Function(Jugador) onEditJugador;
 
   @override
   Widget build(BuildContext context) {
-    return ListJugadores(jugadoresController: jugadoresController, rebuildWidget: rebuildWidget, onEditJugador: onEditJugador);
+    return ListJugadores(
+      jugadoresController: jugadoresController,
+      rebuildWidget: rebuildWidget,
+      onEditJugador: onEditJugador,
+      useLandscapeLayout: useLandscapeLayout,
+      isWide: isWide,
+    );
   }
 }
 
 class ListJugadores extends StatelessWidget {
-  const ListJugadores({super.key, required this.jugadoresController, required this.rebuildWidget, required this.onEditJugador});
+  const ListJugadores({super.key, required this.jugadoresController, required this.rebuildWidget, required this.onEditJugador, required this.useLandscapeLayout, required this.isWide});
   final ScrollController jugadoresController;
   final Function rebuildWidget;
   final Function(Jugador) onEditJugador;
+  final bool useLandscapeLayout;
+  final bool isWide;
 
   @override
   Widget build(BuildContext context) {
@@ -45,18 +55,18 @@ class ListJugadores extends StatelessWidget {
                 color: AppThemes.colorPrimero.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: FaIcon(
+              child: IconScale(
                 FontAwesomeIcons.userSlash,
                 size: 24,
                 color: AppThemes.colorPrimero.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: 10),
-            Text(
+            TextScale(
               AppLocalizations.of(context)!.noPlayers,
+              size: 12,
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: ResponsiveApp.scaleText(12),
                 color: Colors.grey[500],
               ),
             ),
@@ -69,6 +79,43 @@ class ListJugadores extends StatelessWidget {
     final slideUpController = SlideUpScrollController.of(context);
     final effectiveController = slideUpController ?? jugadoresController;
 
+    if (useLandscapeLayout) {
+      return GridView.builder(
+        controller: effectiveController,
+        physics: const ClampingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 6,
+          mainAxisExtent: isWide ? 70 : 66,
+        ),
+        itemCount: jugadores.length,
+        itemBuilder: (context, index) {
+          final Jugador jugador = jugadores[index];
+
+          return _JugadorItem(
+            jugador: jugador,
+            index: index,
+            useLandscapeLayout: useLandscapeLayout,
+            isWide: isWide,
+            canDelete: partidaProvider.partidaEnTurno!.jugadores!.length > 2,
+            onEdit: () => onEditJugador(jugador),
+            onDelete: () {
+              jugadorProvider.deleteJugador(context, jugador: jugador, callBack: (value) async {
+                if (value['tipo'] == 'aceptar') {
+                  final double actualPosition = jugadoresController.position.pixels;
+                  rebuildWidget();
+                  await Future.delayed(const Duration(milliseconds: 50));
+                  jugadoresController.jumpTo(actualPosition);
+                }
+              });
+            },
+          );
+        },
+      );
+    }
+
     return ListView.builder(
       controller: effectiveController,
       physics: const ClampingScrollPhysics(),
@@ -80,6 +127,8 @@ class ListJugadores extends StatelessWidget {
         return _JugadorItem(
           jugador: jugador,
           index: index,
+          useLandscapeLayout: useLandscapeLayout,
+          isWide: isWide,
           canDelete: partidaProvider.partidaEnTurno!.jugadores!.length > 2,
           onEdit: () => onEditJugador(jugador),
           onDelete: () {
@@ -105,6 +154,8 @@ class _JugadorItem extends StatelessWidget {
     required this.canDelete,
     required this.onEdit,
     required this.onDelete,
+    required this.useLandscapeLayout,
+    required this.isWide,
   });
 
   final Jugador jugador;
@@ -112,6 +163,8 @@ class _JugadorItem extends StatelessWidget {
   final bool canDelete;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final bool useLandscapeLayout;
+  final bool isWide;
 
   @override
   Widget build(BuildContext context) {
@@ -123,9 +176,7 @@ class _JugadorItem extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: isDark
-              ? [Colors.white.withValues(alpha: 0.06), Colors.white.withValues(alpha: 0.02)]
-              : [Colors.white, Colors.grey.withValues(alpha: 0.05)],
+          colors: isDark ? [Colors.white.withValues(alpha: 0.06), Colors.white.withValues(alpha: 0.02)] : [Colors.white, Colors.grey.withValues(alpha: 0.05)],
         ),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
@@ -164,11 +215,11 @@ class _JugadorItem extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Center(
-                    child: Text(
+                    child: TextScale(
                       jugador.nombre != null && jugador.nombre!.isNotEmpty ? jugador.nombre![0].toUpperCase() : '?',
-                      style: TextStyle(
+                      size: 14,
+                      style: const TextStyle(
                         fontFamily: 'Poppins',
-                        fontSize: ResponsiveApp.scaleText(14),
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -179,11 +230,11 @@ class _JugadorItem extends StatelessWidget {
 
                 // Nombre
                 Expanded(
-                  child: Text(
+                  child: TextScale(
                     jugador.nombre ?? '',
+                    size: 13,
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: ResponsiveApp.scaleText(13),
                       fontWeight: FontWeight.w500,
                       color: isDark ? Colors.white.withValues(alpha: 0.9) : AppThemes.colorQuinto,
                     ),
@@ -199,32 +250,26 @@ class _JugadorItem extends StatelessWidget {
                     color: AppThemes.colorPrimero.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: Text(
+                  child: TextScale(
                     jugador.puntuacion.toString(),
+                    size: isWide ? 12 : 14,
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: ResponsiveApp.scaleText(12),
                       fontWeight: FontWeight.bold,
                       color: AppThemes.colorPrimero,
                     ),
                   ),
                 ),
 
-                // Botón editar
                 const SizedBox(width: 8),
-                _MiniButton(
-                  icon: FontAwesomeIcons.penToSquare,
-                  onTap: onEdit,
-                ),
+
+                // Botón editar
+                _MiniButton(icon: FontAwesomeIcons.penToSquare, onTap: onEdit, isWide: isWide, useLandscapeLayout: useLandscapeLayout),
 
                 // Botón eliminar
                 if (canDelete) ...[
                   const SizedBox(width: 6),
-                  _MiniButton(
-                    icon: FontAwesomeIcons.trash,
-                    onTap: onDelete,
-                    isDestructive: true,
-                  ),
+                  _MiniButton(icon: FontAwesomeIcons.trash, onTap: onDelete, isDestructive: true, isWide: isWide, useLandscapeLayout: useLandscapeLayout),
                 ],
               ],
             ),
@@ -239,12 +284,16 @@ class _MiniButton extends StatelessWidget {
   const _MiniButton({
     required this.icon,
     required this.onTap,
+    required this.isWide,
+    required this.useLandscapeLayout,
     this.isDestructive = false,
   });
 
   final IconData icon;
   final VoidCallback onTap;
   final bool isDestructive;
+  final bool useLandscapeLayout;
+  final bool isWide;
 
   @override
   Widget build(BuildContext context) {
@@ -259,14 +308,12 @@ class _MiniButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(9),
           decoration: BoxDecoration(
-            color: isDestructive
-                ? Colors.red.withValues(alpha: 0.1)
-                : (isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey.withValues(alpha: 0.1)),
+            color: isDestructive ? Colors.red.withValues(alpha: 0.1) : (isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey.withValues(alpha: 0.1)),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: FaIcon(
+          child: IconScale(
             icon,
-            size: 16,
+            size: useLandscapeLayout ? (isWide ? 14 : 12) : 16,
             color: color,
           ),
         ),

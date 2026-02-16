@@ -6,14 +6,13 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-
   factory DatabaseHelper() {
     return db;
   }
 
   DatabaseHelper._();
   static const dbFileName = 'GameScore.db';
-  static const dbCurrentVersion = 2;
+  static const dbCurrentVersion = 3;
 
   static final DatabaseHelper db = DatabaseHelper._();
 
@@ -26,7 +25,8 @@ class DatabaseHelper {
   }
 
   static Future<Database> initializeDatabase() async {
-    final Directory applicationDocumentDirectory = await getApplicationDocumentsDirectory();
+    final Directory applicationDocumentDirectory =
+        await getApplicationDocumentsDirectory();
 
     final String path = join(applicationDocumentDirectory.path, dbFileName);
 
@@ -48,10 +48,12 @@ class DatabaseHelper {
   static void _onCreate(Database db, int version) async {
     await _databaseV1(db);
     if (version >= 2) await _databaseV2(db);
+    if (version >= 3) await _databaseV3(db);
   }
 
   static void _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (newVersion >= 2) await _databaseV2(db);
+    if (newVersion >= 3) await _databaseV3(db);
   }
 
   static Future _onConfigure(Database db) async {
@@ -61,8 +63,10 @@ class DatabaseHelper {
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   static _databaseV1(Database db) async {
-    Fun.logColor(color: Colores.yellow, body: '=========== BASE DE DATOS V1 ===========');
-    await db.execute(''' 
+    Fun.logColor(
+        color: Colores.yellow,
+        body: '=========== BASE DE DATOS V1 ===========');
+    await db.execute('''
         CREATE TABLE ${Partida.tableName}(
           id INTEGER PRIMARY KEY,
           nombre TEXT,
@@ -95,7 +99,9 @@ class DatabaseHelper {
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   static _databaseV2(Database db) async {
-    Fun.logColor(color: Colores.yellow, body: '=========== BASE DE DATOS V2 ===========');
+    Fun.logColor(
+        color: Colores.yellow,
+        body: '=========== BASE DE DATOS V2 ===========');
     await db.execute('''
       CREATE TABLE IF NOT EXISTS ${PartidaPredefinida.tableName}(
         id INTEGER PRIMARY KEY,
@@ -104,6 +110,24 @@ class DatabaseHelper {
         maxPuntuacion INTEGER,
         cantidadJugadores INTEGER,
         orden INTEGER
+      );
+    ''');
+  }
+
+  static _databaseV3(Database db) async {
+    Fun.logColor(
+        color: Colores.yellow,
+        body: '=========== BASE DE DATOS V3 ===========');
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS ${PartidaFinalizada.tableName}(
+        id INTEGER PRIMARY KEY,
+        nombre TEXT NOT NULL,
+        tipo TEXT,
+        maxPuntuacion INTEGER,
+        jugadoresFinales TEXT NOT NULL,
+        ganador TEXT,
+        motivo TEXT,
+        finalizadaAt TEXT DEFAULT CURRENT_TIMESTAMP
       );
     ''');
   }

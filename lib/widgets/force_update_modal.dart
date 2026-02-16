@@ -7,6 +7,8 @@ import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../helpers/helpers.dart';
+import 'icon_scale.dart';
+import 'text_scale.dart';
 
 class ForceUpdateModal extends StatelessWidget {
   const ForceUpdateModal({super.key});
@@ -87,7 +89,7 @@ class ForceUpdateModal extends StatelessWidget {
                   child: Builder(
                     builder: (context) {
                       final l10n = AppLocalizations.of(context)!;
-                      return Text(
+                      return TextScale(
                         l10n.newVersionTitle,
                         textAlign: TextAlign.center,
                         style: TextStyle(
@@ -109,7 +111,7 @@ class ForceUpdateModal extends StatelessWidget {
                   child: Builder(
                     builder: (context) {
                       final l10n = AppLocalizations.of(context)!;
-                      return Text(
+                      return TextScale(
                         l10n.newVersionAvailable,
                         textAlign: TextAlign.center,
                         style: TextStyle(
@@ -143,7 +145,7 @@ class ForceUpdateModal extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
+                          IconScale(
                             Icons.download_rounded,
                             size: 22,
                             color: AppThemes.colorCuarto,
@@ -152,7 +154,7 @@ class ForceUpdateModal extends StatelessWidget {
                           Builder(
                             builder: (context) {
                               final l10n = AppLocalizations.of(context)!;
-                              return Text(
+                              return TextScale(
                                 l10n.updateNow,
                                 style: TextStyle(
                                   fontSize: ResponsiveApp.scaleText(16),

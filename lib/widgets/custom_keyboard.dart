@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
+import 'icon_scale.dart';
+import 'text_scale.dart';
 
 enum KeyboardType { number }
 
@@ -110,10 +112,11 @@ class _Simbolo extends StatelessWidget {
     // Escalar tamaño basado en altura de tecla
     final iconSize = (height * 0.52).clamp(16.0, 20.0);
     final fontSize = (height * 0.45).clamp(14.0, 17.0);
-    if (icon != null) return Icon(icon, size: iconSize, color: color);
-    return Text(
+    if (icon != null) return IconScale(icon!, size: iconSize, color: color);
+    return TextScale(
       label!,
-      style: TextStyle(fontFamily: 'Poppins', fontSize: fontSize, color: color),
+      size: fontSize,
+      style: TextStyle(fontFamily: 'Poppins', color: color),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import '../helpers/helpers.dart';
+import 'text_scale.dart';
 
 class CustomSplashScreen extends StatefulWidget {
 
@@ -115,7 +116,6 @@ class _AnimatedTextState extends State<_AnimatedText> {
 
   @override
   Widget build(BuildContext context) {
-    return Text(_displayedText, style: widget.style);
+    return TextScale(_displayedText, style: widget.style);
   }
 }
-

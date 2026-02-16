@@ -14,14 +14,32 @@ class FormPartidaProvider extends ChangeNotifier {
 
   bool sinMaxPuntuacion = false;
 
-  void rellenarFormulario(PartidaPredefinida partidaPredefinida, {BuildContext? context}) async {
-    await resetForm(restoreJugadores: false);
-    form.patchValue(partidaPredefinida.toMap());
+  void rellenarFormulario(PartidaPredefinida partidaPredefinida, {BuildContext? context}) {
+    // Mismo flujo que al inicializar el formulario para asegurar nombres por defecto.
+    resetForm(context: context);
+
+    form.control('nombre').value = partidaPredefinida.nombre ?? '';
+    form.control('tipo').value = partidaPredefinida.tipo ?? '';
+    form.control('activo').value = 'true';
+    form.control('maxPuntuacion').value = partidaPredefinida.maxPuntuacion ?? 1;
     _syncSinMaxWithValue();
 
-    for (var index = 0; index < partidaPredefinida.cantidadJugadores!; index++) {
-      addJugadorToList(name: _defaultPlayerName(context, index + 1));
+    final jugadoresArray = form.control('jugadores') as FormArray<dynamic>;
+    final targetJugadores =
+        (partidaPredefinida.cantidadJugadores ?? 2).clamp(2, 20);
+
+    while (jugadoresArray.controls.length < targetJugadores) {
+      addJugadorToList(context: context);
     }
+    while (jugadoresArray.controls.length > targetJugadores) {
+      jugadoresArray.removeAt(jugadoresArray.controls.length - 1);
+    }
+
+    // Forzar nombres por índice para evitar estados residuales de controles.
+    for (var i = 0; i < jugadoresArray.controls.length; i++) {
+      form.control('jugadores.$i.nombre').value = _defaultPlayerName(context, i + 1);
+    }
+    form.updateValueAndValidity();
 
     notifyListeners();
   }
@@ -51,17 +69,14 @@ class FormPartidaProvider extends ChangeNotifier {
   }
 
   resetForm({bool restoreJugadores = true, BuildContext? context}) {
-    form.reset();
-
-    final jugadoresArray = form.control('jugadores') as FormArray<dynamic>;
-
-    if (jugadoresArray.value != null && jugadoresArray.value!.isNotEmpty) {
-      final longitud = jugadoresArray.value!.length;
-      for (var index = 0; index < longitud; index++) {
-        jugadoresArray.removeAt(0);
-      }
-    }
-
+    // Crear un FormGroup nuevo evita estado residual en controles reactivos.
+    form = fb.group({
+      'nombre': ['', Validators.required],
+      'activo': ['true'],
+      'tipo': ['', Validators.required],
+      'maxPuntuacion': [1, Validators.min(1)],
+      'jugadores': fb.array([])
+    });
     if (restoreJugadores) {
       for (var i = 0; i < List.from([1, 2]).length; i++) {
         addJugadorToList(name: _defaultPlayerName(context, i + 1));
@@ -81,9 +96,13 @@ class FormPartidaProvider extends ChangeNotifier {
     return jugadoresArray ?? [];
   }
 
-  void addJugadorToList({String? name}) {
+  void addJugadorToList({String? name, BuildContext? context}) {
     final jugadoresArray = form.control('jugadores') as FormArray<dynamic>;
-    final newFormGroup = createItem(cant: 1, name: name).first;
+    final playerNumber = jugadoresArray.controls.length + 1;
+    final resolvedName = (name != null && name.trim().isNotEmpty)
+        ? name
+        : _defaultPlayerName(context, playerNumber);
+    final newFormGroup = createItem(cant: 1, name: resolvedName).first;
 
     jugadoresArray.add(newFormGroup);
 

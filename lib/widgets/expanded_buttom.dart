@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'text_scale.dart';
 
 class ExpandedButtom extends StatelessWidget {
   const ExpandedButtom({
@@ -27,7 +28,7 @@ class ExpandedButtom extends StatelessWidget {
           onTap: () => onTap != null ? onTap!() : null,
           child: Padding(
             padding: const EdgeInsets.all(7),
-            child: Text(label, style: TextStyle(fontFamily: 'Poppins', fontSize: fontSize, color: textColor), textAlign: TextAlign.center),
+            child: TextScale(label, style: TextStyle(fontFamily: 'Poppins', fontSize: fontSize, color: textColor), textAlign: TextAlign.center),
           ),
         ),
       ),

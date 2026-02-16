@@ -3,5 +3,6 @@ export 'package:game_score/models/historial_jugada.dart';
 export 'package:game_score/models/jugador.dart';
 export 'package:game_score/models/menu_option.dart';
 export 'package:game_score/models/partida.dart';
+export 'package:game_score/models/partida_finalizada.dart';
 export 'package:game_score/models/partida_predefinida.dart';
 export 'package:game_score/models/sql_response.dart';

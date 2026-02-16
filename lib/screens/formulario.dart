@@ -48,7 +48,7 @@ class _FormularioScreenState extends State<FormularioScreen> {
           panelController: PanelController(),
           appBarTitle: l10n.createNewGame,
           appBarLeading: CustomIconButtom(
-            iconSize: ResponsiveApp.isSmallHeight ? 20 : 25,
+            iconSize: ResponsiveApp.isSmallHeight ? 16 : 20,
             iconColor: Colors.white,
             icon: Icons.arrow_back_ios_new,
             onTap: () {
@@ -457,7 +457,7 @@ class _JugadoresSection extends StatelessWidget {
     final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
     final isDark = Preferences.isDarkMode;
 
-    final avatarSize = (useLandscapeLayout ? ResponsiveApp.scaleWidth(15) : ResponsiveApp.scaleWidth(42)).clamp(28.0, 52.0);
+    final avatarSize = (useLandscapeLayout ? ResponsiveApp.scaleWidth(15) : ResponsiveApp.scaleWidth(30)).clamp(28.0, 52.0);
     final iconSize = (useLandscapeLayout ? ResponsiveApp.scaleWidth(4) : ResponsiveApp.scaleWidth(10)).clamp(5.0, 22.0);
 
     return Row(
@@ -531,7 +531,7 @@ class _JugadoresSection extends StatelessWidget {
     }
 
     FocusManager.instance.primaryFocus?.unfocus();
-    formPartidaProvider.addJugadorToList();
+    formPartidaProvider.addJugadorToList(context: context);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (jugadoresController.hasClients) {
@@ -643,7 +643,9 @@ class _Inputs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final jugadoresLength = context.select<FormPartidaProvider, int>((provider) => provider.jugadores.length);
+    final formPartidaProvider = context.watch<FormPartidaProvider>();
+    final jugadoresValues = List<dynamic>.from(formPartidaProvider.jugadores);
+    final jugadoresLength = jugadoresValues.length;
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     final listBottomPadding = ResponsiveApp.isSmallHeight ? 10.0 : 20.0;
 
@@ -654,6 +656,7 @@ class _Inputs extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemCount: jugadoresLength,
       itemBuilder: (_, index) => _JugadorInput(
+        key: ValueKey('jugador-input-$index-${jugadoresValues[index]['nombre'] ?? ''}-$jugadoresLength'),
         index: index,
         scrollController: jugadoresController,
       ),
@@ -663,6 +666,7 @@ class _Inputs extends StatelessWidget {
 
 class _JugadorInput extends StatefulWidget {
   const _JugadorInput({
+    super.key,
     required this.index,
     required this.scrollController,
   });
@@ -674,13 +678,10 @@ class _JugadorInput extends StatefulWidget {
   State<_JugadorInput> createState() => _JugadorInputState();
 }
 
-class _JugadorInputState extends State<_JugadorInput> with AutomaticKeepAliveClientMixin {
+class _JugadorInputState extends State<_JugadorInput> {
   late final FormPartidaProvider _provider;
   late final FocusNode _focusNode;
   final GlobalKey _inputKey = GlobalKey();
-
-  @override
-  bool get wantKeepAlive => true;
 
   void _onFocusChange() {
     if (_focusNode.hasFocus && _inputKey.currentContext != null) {
@@ -725,8 +726,6 @@ class _JugadorInputState extends State<_JugadorInput> with AutomaticKeepAliveCli
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-
     return Row(
       children: [
         // Número del jugador

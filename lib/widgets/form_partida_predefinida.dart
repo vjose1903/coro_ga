@@ -1,16 +1,18 @@
 import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:reactive_forms/reactive_forms.dart';
+
+import '../helpers/helpers.dart';
 import '../l10n/app_localizations.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 import '../utils/utils.dart';
+import 'header_section.dart';
 import 'widgets.dart';
-import 'package:provider/provider.dart';
-import 'package:reactive_forms/reactive_forms.dart';
-import '../helpers/helpers.dart';
 
 class FormPartidaPredefinida extends StatelessWidget {
   const FormPartidaPredefinida({super.key});
@@ -51,30 +53,30 @@ class FormPartidaPredefinida extends StatelessWidget {
                     // Tipo y puntuación máxima
                     Row(
                       children: [
-                      Expanded(
-                        child: CustomReactiveDropDown(
-                          formControlName: 'tipo',
-                          labelText: AppLocalizations.of(context)!.type,
-                          items: [DropdownMenuItem(value: 'Rondas', child: Text(AppLocalizations.of(context)!.rounds)), DropdownMenuItem(value: 'Puntuación', child: Text(AppLocalizations.of(context)!.score))],
-                          onChanged: (value) => formPartidaPredefinidaProvider.changeTipo(value),
+                        Expanded(
+                          child: CustomReactiveDropDown(
+                            formControlName: 'tipo',
+                            labelText: AppLocalizations.of(context)!.type,
+                            items: [DropdownMenuItem(value: 'Rondas', child: TextScale(AppLocalizations.of(context)!.rounds)), DropdownMenuItem(value: 'Puntuación', child: TextScale(AppLocalizations.of(context)!.score))],
+                            onChanged: (value) => formPartidaPredefinidaProvider.changeTipo(value),
+                          ),
                         ),
-                      ),
-                      if (tipoPartida != null && tipoPartida != '' && !sinMaxPuntuacion) const SizedBox(width: 12),
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeOut,
-                        width: tipoPartida == '' || tipoPartida == null || sinMaxPuntuacion ? 0 : ResponsiveApp.size.width * 0.43,
-                        child: ClipRect(
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: SizedBox(
-                              width: ResponsiveApp.size.width * 0.43,
-                              child: CustomReactiveInput(formControlName: 'maxPuntuacion', labelText: tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScore, inputType: TextInputType.number),
+                        if (tipoPartida != null && tipoPartida != '' && !sinMaxPuntuacion) const SizedBox(width: 12),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.easeOut,
+                          width: tipoPartida == '' || tipoPartida == null || sinMaxPuntuacion ? 0 : ResponsiveApp.size.width * 0.43,
+                          child: ClipRect(
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: SizedBox(
+                                width: ResponsiveApp.size.width * 0.43,
+                                child: CustomReactiveInput(formControlName: 'maxPuntuacion', labelText: tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScore, inputType: TextInputType.number),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
                     ),
                     const SizedBox(height: 14),
 
@@ -105,7 +107,7 @@ class FormPartidaPredefinida extends StatelessWidget {
                             child: Row(
                               children: [
                                 Expanded(
-                                  child: Text(
+                                  child: TextScale(
                                     tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.noMaxRounds : AppLocalizations.of(context)!.noMaxScore,
                                     style: TextStyle(
                                       fontFamily: 'Poppins',
@@ -228,83 +230,14 @@ class _FormHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Preferences.isDarkMode;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.02),
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.white.withValues(alpha: 0.7),
-            offset: const Offset(-2, -2),
-            blurRadius: 4,
-          ),
-          BoxShadow(
-            color: isDark ? Colors.black.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.08),
-            offset: const Offset(2, 2),
-            blurRadius: 4,
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Icono
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: isEditing ? [const Color(0xFF4FC3F7), const Color(0xFF29B6F6)] : [const Color(0xFF81C784), const Color(0xFF66BB6A)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: (isEditing ? const Color(0xFF29B6F6) : const Color(0xFF66BB6A)).withValues(alpha: 0.3),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Center(
-              child: FaIcon(
-                isEditing ? FontAwesomeIcons.penToSquare : FontAwesomeIcons.gamepad,
-                size: 18,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          // Texto
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isEditing ? AppLocalizations.of(context)!.editPredefinedGame : AppLocalizations.of(context)!.newPredefinedGame,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w600,
-                    fontSize: ResponsiveApp.scaleText(16),
-                    color: isDark ? Colors.white : AppThemes.colorCuarto,
-                  ),
-                ),
-                Text(
-                  isEditing ? AppLocalizations.of(context)!.modifyGameData : AppLocalizations.of(context)!.configureYourPredefined,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: ResponsiveApp.scaleText(11),
-                    color: isDark ? Colors.white54 : Colors.black54,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+    return HeaderSection(
+      panelController: null,
+      icon: isEditing ? FontAwesomeIcons.penToSquare : FontAwesomeIcons.gamepad,
+      iconBackgroundColor: isEditing ? const Color(0xFF29B6F6) : const Color(0xFF66BB6A),
+      title: isEditing ? AppLocalizations.of(context)!.editPredefinedGame : AppLocalizations.of(context)!.newPredefinedGame,
+      subtitle: isEditing ? AppLocalizations.of(context)!.modifyGameData : AppLocalizations.of(context)!.configureYourPredefined,
+      useLandscapeLayout: ResponsiveLayoutBuilder.maybeOf(context)?.useLandscapeLayout ?? ResponsiveLayoutBuilder.resolveUseLandscapeLayout(context),
+      isWide: ResponsiveLayoutBuilder.maybeOf(context)?.isWide ?? ResponsiveLayoutBuilder.resolveIsWide(context),
     );
   }
 }
@@ -347,13 +280,13 @@ class _JugadoresCounter extends StatelessWidget {
         children: [
           Row(
             children: [
-              FaIcon(
+              IconScale(
                 FontAwesomeIcons.userGroup,
                 size: 14,
                 color: isDark ? Colors.white54 : Colors.black54,
               ),
               const SizedBox(width: 8),
-              Text(
+              TextScale(
                 AppLocalizations.of(context)!.playerCount,
                 style: TextStyle(
                   fontFamily: 'Poppins',
@@ -390,7 +323,7 @@ class _JugadoresCounter extends StatelessWidget {
                     ],
                   ),
                   child: Center(
-                    child: Text(
+                    child: TextScale(
                       cantidad.toString(),
                       style: TextStyle(
                         fontFamily: 'Poppins',
@@ -454,7 +387,7 @@ class _CounterButton extends StatelessWidget {
             ],
           ),
           child: Center(
-            child: FaIcon(icon, size: 16, color: Colors.white),
+            child: IconScale(icon, size: 16, color: Colors.white),
           ),
         ),
       ),
@@ -510,9 +443,9 @@ class _ActionButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              FaIcon(icon, size: 14, color: Colors.white),
+              IconScale(icon, size: 14, color: Colors.white),
               const SizedBox(width: 8),
-              Text(
+              TextScale(
                 label,
                 style: TextStyle(
                   fontFamily: 'Poppins',

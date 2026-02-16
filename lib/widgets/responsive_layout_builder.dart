@@ -32,6 +32,16 @@ class ResponsiveLayoutBuilder extends StatelessWidget {
     return context.dependOnInheritedWidgetOfExactType<_ResponsiveLayoutScope>()?.info;
   }
 
+  static bool resolveIsWide(BuildContext context, {double wideThreshold = 600}) {
+    return MediaQuery.sizeOf(context).shortestSide >= wideThreshold;
+  }
+
+  static bool resolveUseLandscapeLayout(BuildContext context, {double wideThreshold = 600}) {
+    final size = MediaQuery.sizeOf(context);
+    final isLandscape = size.width > size.height;
+    return isLandscape || resolveIsWide(context, wideThreshold: wideThreshold);
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -39,7 +49,9 @@ class ResponsiveLayoutBuilder extends StatelessWidget {
         final mediaSize = MediaQuery.of(context).size;
         final maxWidth = useMediaQuery ? mediaSize.width : constraints.maxWidth;
         final maxHeight = useMediaQuery ? mediaSize.height : constraints.maxHeight;
-        final shortestSide = maxWidth < maxHeight ? maxWidth : maxHeight;
+        // `isWide` debe seguir la misma lógica global que TextScale/IconScale:
+        // se determina por el tamaño real del dispositivo, no por constraints locales.
+        final shortestSide = mediaSize.shortestSide;
         final isLandscape = maxWidth > maxHeight;
         final isWide = shortestSide >= wideThreshold;
         final aspectRatio = maxHeight == 0 ? 0.0 : maxWidth / maxHeight;

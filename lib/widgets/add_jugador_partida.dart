@@ -11,7 +11,7 @@ import '../providers/providers.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 import '../utils/utils.dart';
-import 'slide_up_header.dart';
+import 'header_section.dart';
 import 'widgets.dart';
 
 class AddJugadorPartida extends StatelessWidget {
@@ -51,72 +51,92 @@ class _AddJugadorState extends State<AddJugador> {
 
     final int cantJugadores = partidaProvider.partidaEnTurno?.jugadores?.length ?? 0;
 
-    return SingleChildScrollView(
-      physics: const ClampingScrollPhysics(),
-      child: SizedBox(
-        height: (ResponsiveApp.size.height - (ResponsiveApp.size.height * 0.22)),
-        child: Column(
-          children: [
-            // Header
-            _AddJugadorHeader(cantJugadores: cantJugadores, panelController: widget.panelController),
-            const SizedBox(height: 16),
+    return ResponsiveLayoutBuilder(
+      useMediaQuery: true,
+      builder: (context, constraints, info) {
+        final useLandscapeLayout = info.useLandscapeLayout;
+        final isWide = info.isWide;
 
-            // Input Nombre + Botón agregar
-            ReactiveForm(
-              formGroup: form,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        return SafeArea(
+          top: false,
+          bottom: false,
+          left: useLandscapeLayout,
+          right: useLandscapeLayout,
+          child: SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
+            child: SizedBox(
+              height: (ResponsiveApp.size.height - (ResponsiveApp.size.height * 0.22)),
+              child: Column(
                 children: [
-                  Expanded(
-                    child: CustomReactiveInput(
-                      formControlName: 'nombre',
-                      labelText: AppLocalizations.of(context)!.playerName,
-                      textCapitalization: TextCapitalization.words,
+                  // Header
+                  _AddJugadorHeader(cantJugadores: cantJugadores, panelController: widget.panelController),
+                  const SizedBox(height: 16),
+
+                  // Sección jugadores actuales
+                  _SectionTitle(title: AppLocalizations.of(context)!.addPlayer, icon: FontAwesomeIcons.plus),
+                  const SizedBox(height: 10),
+
+                  // Input Nombre + Botón agregar
+                  ReactiveForm(
+                    formGroup: form,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: CustomReactiveInput(
+                            formControlName: 'nombre',
+                            labelText: AppLocalizations.of(context)!.playerName,
+                            textCapitalization: TextCapitalization.words,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        _AddIconButton(useLandscapeLayout: useLandscapeLayout, isWide: isWide, onTap: () => _agregarJugador(context, form)),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  _AddIconButton(onTap: () => _agregarJugador(context, form)),
+                  const SizedBox(height: 16),
+
+                  // Sección jugadores actuales
+                  _SectionTitle(
+                    title: AppLocalizations.of(context)!.currentPlayers,
+                    icon: FontAwesomeIcons.users,
+                    count: cantJugadores,
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Lista de jugadores
+                  Expanded(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: AppThemes.themeColor_1,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
+                        ),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: JugadoresActuales(
+                          jugadoresController: jugadoresController,
+                          rebuildWidget: rebuildWidget,
+                          useLandscapeLayout: useLandscapeLayout,
+                          isWide: isWide,
+                          onEditJugador: (jugador) => _showEditarJugadorModal(context, jugador, useLandscapeLayout),
+                        ),
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-
-            // Sección jugadores actuales
-            _SectionTitle(
-              title: AppLocalizations.of(context)!.currentPlayers,
-              icon: FontAwesomeIcons.users,
-              count: cantJugadores,
-            ),
-            const SizedBox(height: 8),
-
-            // Lista de jugadores
-            Expanded(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: AppThemes.themeColor_1,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
-                  ),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: JugadoresActuales(
-                    jugadoresController: jugadoresController,
-                    rebuildWidget: rebuildWidget,
-                    onEditJugador: (jugador) => _showEditarJugadorModal(context, jugador),
-                  ),
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
-  void _showEditarJugadorModal(BuildContext context, Jugador jugador) {
+  void _showEditarJugadorModal(BuildContext context, Jugador jugador, bool useLandscapeLayout) {
     final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
     final jugadorProvider = context.read<JugadorProvider>();
     final slideUpProvider = context.read<SlideUpProvider>();
 
@@ -133,10 +153,11 @@ class _AddJugadorState extends State<AddJugador> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         child: Container(
-          width: double.infinity,
+          width: useLandscapeLayout ? screenWidth * 0.6 : double.infinity,
           height: screenHeight * 0.5,
           padding: const EdgeInsets.all(16),
           child: EditarEntidad(
+            panelController: widget.panelController,
             onClose: () => Navigator.pop(dialogContext),
           ),
         ),
@@ -160,12 +181,7 @@ class _AddJugadorState extends State<AddJugador> {
     if (partida == null || partida.jugadores == null) return;
 
     if (!premiumProvider.canAddPlayer(partida.jugadores!.length)) {
-      Toast.show(
-          type: ToastType.info,
-          context: context,
-          message: AppLocalizations.of(context)!.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
-          actionLabel: AppLocalizations.of(context)!.getPro,
-          onAction: () => Navigator.pushNamed(context, 'premium'));
+      Toast.show(type: ToastType.info, context: context, message: AppLocalizations.of(context)!.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers), actionLabel: AppLocalizations.of(context)!.getPro, onAction: () => Navigator.pushNamed(context, 'premium'));
       return;
     }
 
@@ -198,70 +214,14 @@ class _AddJugadorHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Preferences.isDarkMode;
-
-    return SlideUpHeader(
+    return HeaderSection(
       panelController: panelController,
-      child: Row(
-        children: [
-          // Icono
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF4CAF50), Color(0xFF43A047)],
-              ),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: const Center(
-              child: FaIcon(
-                FontAwesomeIcons.userPlus,
-                color: Colors.white,
-                size: 18,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-
-          // Información
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.players,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: ResponsiveApp.scaleText(14),
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppThemes.colorQuinto,
-                  ),
-                ),
-                const SizedBox(height: 1),
-                Text(
-                  AppLocalizations.of(context)!.playersInGame(cantJugadores),
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: ResponsiveApp.scaleText(11),
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      icon: FontAwesomeIcons.userPlus,
+      iconBackgroundColor: const Color(0xFF4CAF50),
+      title: AppLocalizations.of(context)!.players,
+      subtitle: AppLocalizations.of(context)!.playersInGame(cantJugadores),
+      useLandscapeLayout: ResponsiveLayoutBuilder.maybeOf(context)?.useLandscapeLayout ?? ResponsiveLayoutBuilder.resolveUseLandscapeLayout(context),
+      isWide: ResponsiveLayoutBuilder.maybeOf(context)?.isWide ?? ResponsiveLayoutBuilder.resolveIsWide(context),
     );
   }
 }
@@ -270,12 +230,12 @@ class _SectionTitle extends StatelessWidget {
   const _SectionTitle({
     required this.title,
     required this.icon,
-    required this.count,
+    this.count,
   });
 
   final String title;
   final IconData icon;
-  final int count;
+  final int? count;
 
   @override
   Widget build(BuildContext context) {
@@ -283,47 +243,50 @@ class _SectionTitle extends StatelessWidget {
 
     return Row(
       children: [
-        FaIcon(
+        IconScale(
           icon,
           size: 12,
           color: isDark ? Colors.grey[500] : Colors.grey[600],
         ),
         const SizedBox(width: 8),
-        Text(
+        TextScale(
           title,
+          size: 12,
           style: TextStyle(
             fontFamily: 'Poppins',
-            fontSize: ResponsiveApp.scaleText(12),
             fontWeight: FontWeight.w600,
             color: isDark ? Colors.grey[400] : Colors.grey[700],
           ),
         ),
         const SizedBox(width: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-          decoration: BoxDecoration(
-            color: AppThemes.colorPrimero.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Text(
-            '$count',
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: ResponsiveApp.scaleText(10),
-              fontWeight: FontWeight.bold,
-              color: AppThemes.colorPrimero,
+        if (count != null)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: AppThemes.colorPrimero.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: TextScale(
+              '$count',
+              size: 10,
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.bold,
+                color: AppThemes.colorPrimero,
+              ),
             ),
           ),
-        ),
       ],
     );
   }
 }
 
 class _AddIconButton extends StatelessWidget {
-  const _AddIconButton({required this.onTap});
+  const _AddIconButton({required this.onTap, required this.useLandscapeLayout, required this.isWide});
 
   final VoidCallback onTap;
+  final bool useLandscapeLayout;
+  final bool isWide;
 
   @override
   Widget build(BuildContext context) {
@@ -333,8 +296,8 @@ class _AddIconButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Container(
-          width: 52,
-          height: 52,
+          width: useLandscapeLayout ? (isWide ? 40 : 42) : 52,
+          height: useLandscapeLayout ? (isWide ? 40 : 42) : 52,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
@@ -350,11 +313,11 @@ class _AddIconButton extends StatelessWidget {
               ),
             ],
           ),
-          child: const Center(
-            child: FaIcon(
+          child: Center(
+            child: IconScale(
               FontAwesomeIcons.plus,
               color: Colors.white,
-              size: 20,
+              size: isWide ? 20 : 17,
             ),
           ),
         ),

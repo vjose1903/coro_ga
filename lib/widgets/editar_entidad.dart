@@ -11,7 +11,7 @@ import '../providers/providers.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 import '../utils/utils.dart';
-import 'slide_up_header.dart';
+import 'header_section.dart';
 import 'widgets.dart';
 
 class EditarEntidad extends StatelessWidget {
@@ -50,12 +50,18 @@ class EditarEntidad extends StatelessWidget {
 
     return ResponsiveLayoutBuilder(builder: (context, constraints, info) {
       final useLandscapeLayout = info.useLandscapeLayout;
+      final isWide = info.isWide;
 
-      return Container(
-        height: double.infinity,
-        padding: ResponsiveApp.only(bottom: 10),
-        child: Column(
-          children: [
+      return SafeArea(
+        top: false,
+        bottom: false,
+        left: useLandscapeLayout,
+        right: useLandscapeLayout,
+        child: Container(
+          height: double.infinity,
+          padding: ResponsiveApp.only(bottom: 10),
+          child: Column(
+            children: [
             // Header con avatar e información
             _EditHeader(
               tipo: tipo,
@@ -63,6 +69,7 @@ class EditarEntidad extends StatelessWidget {
               icon: icon,
               noNameLabel: AppLocalizations.of(context)!.noName,
               useLandscapeLayout: useLandscapeLayout,
+              isWide: isWide,
               panelController: panelController,
               partida: partida,
               onRestart: partida != null && !partida.isSinIniciar
@@ -80,8 +87,8 @@ class EditarEntidad extends StatelessWidget {
             SizedBox(height: ResponsiveApp.scaleHeight(16)),
 
             // Botones de acción
-            Row(
-              children: [
+              Row(
+                children: [
                 // CANCELAR
                 Expanded(
                   child: _ActionButton(
@@ -116,9 +123,10 @@ class EditarEntidad extends StatelessWidget {
                       },
                       useLandscapeLayout: useLandscapeLayout),
                 ),
-              ],
-            )
-          ],
+                ],
+              )
+            ],
+          ),
         ),
       );
     });
@@ -230,28 +238,36 @@ class _EditPartidaState extends State<EditPartida> {
           child: Column(children: <Widget>[
             CustomReactiveInput(key: const ValueKey('edit_partida_nombre'), formControlName: 'nombre', labelText: AppLocalizations.of(context)!.name, textCapitalization: TextCapitalization.words, focusNode: _focusNode),
             SizedBox(height: ResponsiveApp.scaleHeight(10)),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.easeOut,
-                  // height: 45,
-                  width: tipoPartida == '' ? ResponsiveApp.size.width - 21 : ResponsiveApp.size.width * 0.46,
-                  child: CustomReactiveDropDown(
-                    formControlName: 'tipo',
-                    labelText: AppLocalizations.of(context)!.type,
-                    items: [DropdownMenuItem(value: 'Rondas', child: TextScale(AppLocalizations.of(context)!.rounds)), DropdownMenuItem(value: 'Puntuación', child: TextScale(AppLocalizations.of(context)!.score))],
-                    onChanged: (value) => formPartidaProvider.changeTipo(value),
-                  ),
-                ),
-                AnimatedContainer(
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeOut,
-                    width: tipoPartida == '' ? 0.01 : ResponsiveApp.size.width * 0.46,
-                    child: CustomReactiveInput(formControlName: 'maxPuntuacion', labelText: tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScoreFull, inputType: TextInputType.number)),
-              ],
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 350),
+              switchInCurve: Curves.easeOut,
+              switchOutCurve: Curves.easeOut,
+              child: (tipoPartida == null || tipoPartida == '')
+                  ? CustomReactiveDropDown(
+                      key: const ValueKey('tipo_solo'),
+                      formControlName: 'tipo',
+                      labelText: AppLocalizations.of(context)!.type,
+                      items: [DropdownMenuItem(value: 'Rondas', child: TextScale(AppLocalizations.of(context)!.rounds)), DropdownMenuItem(value: 'Puntuación', child: TextScale(AppLocalizations.of(context)!.score))],
+                      onChanged: (value) => formPartidaProvider.changeTipo(value),
+                    )
+                  : Row(
+                      key: const ValueKey('tipo_y_max'),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: CustomReactiveDropDown(
+                            formControlName: 'tipo',
+                            labelText: AppLocalizations.of(context)!.type,
+                            items: [DropdownMenuItem(value: 'Rondas', child: TextScale(AppLocalizations.of(context)!.rounds)), DropdownMenuItem(value: 'Puntuación', child: TextScale(AppLocalizations.of(context)!.score))],
+                            onChanged: (value) => formPartidaProvider.changeTipo(value),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: CustomReactiveInput(formControlName: 'maxPuntuacion', labelText: tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScoreFull, inputType: TextInputType.number),
+                        ),
+                      ],
+                    ),
             ),
           ]),
         ));
@@ -309,6 +325,7 @@ class _EditHeader extends StatelessWidget {
     required this.icon,
     required this.noNameLabel,
     required this.useLandscapeLayout,
+    required this.isWide,
     this.panelController,
     this.partida,
     this.onRestart,
@@ -319,223 +336,85 @@ class _EditHeader extends StatelessWidget {
   final IconData icon;
   final String noNameLabel;
   final bool useLandscapeLayout;
+  final bool isWide;
   final PanelController? panelController;
   final Partida? partida;
   final Future<void> Function()? onRestart;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Preferences.isDarkMode;
     final l10n = AppLocalizations.of(context)!;
-    final avatarSize = (useLandscapeLayout ? ResponsiveApp.scaleWidth(17) : ResponsiveApp.scaleWidth(42)).clamp(28.0, 52.0);
-    final iconSize = (useLandscapeLayout ? ResponsiveApp.scaleWidth(10) : ResponsiveApp.scaleWidth(18)).clamp(12.0, 22.0);
-
-    final content = Row(
-      children: [
-        // Avatar con icono
-        Container(
-          width: avatarSize,
-          height: avatarSize,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppThemes.colorPrimero,
-                AppThemes.colorPrimero.withValues(alpha: 0.7),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: AppThemes.colorPrimero.withValues(alpha: 0.3),
-                blurRadius: 6,
-                offset: Offset(0, ResponsiveApp.scaleHeight(3)),
-              ),
-            ],
-          ),
-          child: Center(
-            child: FaIcon(
-              icon,
-              color: Colors.white,
-              size: iconSize,
-            ),
-          ),
-        ),
-        SizedBox(width: useLandscapeLayout ? ResponsiveApp.scaleWidth(8) : ResponsiveApp.scaleWidth(12)),
-
-        // Información
-        Expanded(
-          child: useLandscapeLayout
-              ? Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Flexible(
-                      fit: FlexFit.loose,
-                      child: TextScale(
-                        '${l10n.edit} $tipo',
-                        size: 12,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          color: isDark ? Colors.grey[400] : Colors.grey[600],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
+    return HeaderSection(
+      panelController: panelController,
+      icon: icon,
+      iconBackgroundColor: AppThemes.colorPrimero,
+      title: '${l10n.edit} $tipo',
+      subtitle: nombre.isNotEmpty ? nombre : noNameLabel,
+      useLandscapeLayout: useLandscapeLayout,
+      isWide: isWide,
+      rightWidget: onRestart == null
+          ? null
+          : Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  CustomAlertDialog.show(
+                    context,
+                    title: l10n.confirm,
+                    menssage: l10n.confirmRestartGame(partida!.nombre!),
+                    dialogType: DialogType.warning,
+                    buttonsList: [
+                      CustomActionsButtons.cancelButton({
+                        'label': l10n.cancel,
+                        'onTap': () => Navigator.pop(context),
+                      }),
+                      CustomActionsButtons.aceptarButton({
+                        'label': l10n.accept,
+                        'onTap': () async {
+                          Navigator.pop(context);
+                          await onRestart!();
+                        },
+                      }),
+                    ],
+                  );
+                },
+                borderRadius: useLandscapeLayout ? ResponsiveApp.borderRadius(6) : ResponsiveApp.borderRadius(10),
+                child: Container(
+                  padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 6 : 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFFFFB300), Color(0xFFFF8F00)],
                     ),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      fit: FlexFit.loose,
-                      child: TextScale(
-                        nombre.isNotEmpty ? nombre : l10n.noName,
-                        size: 16,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : AppThemes.colorQuinto,
-                        ),
+                    borderRadius: useLandscapeLayout ? ResponsiveApp.borderRadius(6) : ResponsiveApp.borderRadius(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFFFA000).withValues(alpha: 0.3),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
                       ),
-                    ),
-                  ],
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextScale(
-                      '${l10n.edit} $tipo',
-                      size: 12,
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        color: isDark ? Colors.grey[400] : Colors.grey[600],
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    SizedBox(height: ResponsiveApp.scaleHeight(1)),
-                    TextScale(
-                      nombre.isNotEmpty ? nombre : l10n.noName,
-                      size: 16,
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : AppThemes.colorQuinto,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-        ),
-
-        // Botón reiniciar (solo si es partida y ya inició)
-        if (onRestart != null)
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () {
-                CustomAlertDialog.show(
-                  context,
-                  title: l10n.confirm,
-                  menssage: l10n.confirmRestartGame(partida!.nombre!),
-                  dialogType: DialogType.warning,
-                  buttonsList: [
-                    CustomActionsButtons.cancelButton({
-                      'label': l10n.cancel,
-                      'onTap': () => Navigator.pop(context),
-                    }),
-                    CustomActionsButtons.aceptarButton({
-                      'label': l10n.accept,
-                      'onTap': () async {
-                        Navigator.pop(context);
-                        await onRestart!();
-                      },
-                    }),
-                  ],
-                );
-              },
-              borderRadius: useLandscapeLayout ? ResponsiveApp.borderRadius(6) : ResponsiveApp.borderRadius(10),
-              child: Container(
-                padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 6 : 10, vertical: 6),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFFFFB300), Color(0xFFFF8F00)],
+                    ],
                   ),
-                  borderRadius: useLandscapeLayout ? ResponsiveApp.borderRadius(6) : ResponsiveApp.borderRadius(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFFFA000).withValues(alpha: 0.3),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const IconScale(Icons.restart_alt_rounded, color: Colors.white, size: 16),
-                    SizedBox(width: ResponsiveApp.scaleWidth(4)),
-                    TextScale(
-                      l10n.restart,
-                      size: 12,
-                      style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const IconScale(Icons.restart_alt_rounded, color: Colors.white, size: 16),
+                      SizedBox(width: ResponsiveApp.scaleWidth(4)),
+                      TextScale(
+                        l10n.restart,
+                        size: 12,
+                        style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-      ],
-    );
-
-    if (panelController != null) return SlideUpHeader(panelController: panelController!, child: content);
-    return _HeaderContainer(child: content);
-  }
-}
-
-/// Container base para headers sin panelController (mantiene el mismo estilo)
-class _HeaderContainer extends StatelessWidget {
-  const _HeaderContainer({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Preferences.isDarkMode;
-
-    return Container(
-      padding: ResponsiveApp.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark ? [Colors.white.withValues(alpha: 0.08), Colors.white.withValues(alpha: 0.03)] : [AppThemes.colorPrimero.withValues(alpha: 0.08), AppThemes.colorPrimero.withValues(alpha: 0.03)],
-        ),
-        borderRadius: ResponsiveApp.borderRadius(14),
-        border: Border.all(
-          color: isDark ? Colors.white.withValues(alpha: 0.1) : AppThemes.colorPrimero.withValues(alpha: 0.15),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.white.withValues(alpha: isDark ? 0.05 : 0.8),
-            blurRadius: 4,
-            offset: const Offset(-2, -2),
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
-            blurRadius: 4,
-            offset: const Offset(2, 2),
-          ),
-        ],
-      ),
-      child: child,
     );
   }
 }

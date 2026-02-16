@@ -12,6 +12,7 @@ import '../providers/providers.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 import '../utils/utils.dart';
+import 'header_section.dart';
 import 'widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:reorderables/reorderables.dart';
@@ -31,6 +32,7 @@ class PartidasDefaultAlert extends StatelessWidget {
           useMediaQuery: true,
           builder: (context, constraints, info) {
             final useLandscapeLayout = info.useLandscapeLayout;
+            final isWide = info.isWide;
 
             return PopScope(
               canPop: !reorderableProvider.isReording,
@@ -45,6 +47,7 @@ class PartidasDefaultAlert extends StatelessWidget {
                       isReordering: reorderableProvider.isReording,
                       onDone: () => reorderableProvider.isReording = false,
                       useLandscapeLayout: useLandscapeLayout,
+                      isWide: isWide,
                     ),
                     SizedBox(height: useLandscapeLayout ? 12 : 16),
 
@@ -110,103 +113,26 @@ class _PredefinidaHeader extends StatelessWidget {
     required this.isReordering,
     required this.onDone,
     required this.useLandscapeLayout,
+    required this.isWide,
   });
 
   final VoidCallback onAdd;
   final bool isReordering;
   final VoidCallback onDone;
   final bool useLandscapeLayout;
+  final bool isWide;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Preferences.isDarkMode;
-
-    final avatarSize = (useLandscapeLayout ? ResponsiveApp.scaleWidth(17) : ResponsiveApp.scaleWidth(42)).clamp(28.0, 52.0);
-    final iconSize = (useLandscapeLayout ? ResponsiveApp.scaleWidth(5) : ResponsiveApp.scaleWidth(10)).clamp(12.0, 22.0);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark ? [Colors.white.withValues(alpha: 0.08), Colors.white.withValues(alpha: 0.03)] : [AppThemes.colorPrimero.withValues(alpha: 0.08), AppThemes.colorPrimero.withValues(alpha: 0.03)],
-        ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: isDark ? Colors.white.withValues(alpha: 0.1) : AppThemes.colorPrimero.withValues(alpha: 0.15),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.white.withValues(alpha: isDark ? 0.05 : 0.8),
-            blurRadius: 4,
-            offset: const Offset(-2, -2),
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
-            blurRadius: 4,
-            offset: const Offset(2, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Icono
-          Container(
-            width: avatarSize,
-            height: avatarSize,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
-              ),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: AppThemes.colorPrimero.withValues(alpha: 0.3),
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Center(
-              child: IconScale(FontAwesomeIcons.layerGroup, color: Colors.white, size: iconSize),
-            ),
-          ),
-          const SizedBox(width: 12),
-
-          // Título
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextScale(
-                  AppLocalizations.of(context)!.predefinedGames,
-                  size: 16,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppThemes.colorQuinto,
-                  ),
-                ),
-                TextScale(
-                  isReordering ? AppLocalizations.of(context)!.dragToReorder : AppLocalizations.of(context)!.tapToSelect,
-                  size: 11,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Botones
-          if (isReordering) _DoneButton(onTap: onDone) else _AddButton(onTap: onAdd),
-        ],
-      ),
+    return HeaderSection(
+      panelController: null,
+      icon: FontAwesomeIcons.layerGroup,
+      iconBackgroundColor: AppThemes.colorPrimero,
+      title: AppLocalizations.of(context)!.predefinedGames,
+      subtitle: isReordering ? AppLocalizations.of(context)!.dragToReorder : AppLocalizations.of(context)!.tapToSelect,
+      useLandscapeLayout: useLandscapeLayout,
+      isWide: isWide,
+      rightWidget: isReordering ? _DoneButton(onTap: onDone) : _AddButton(onTap: onAdd),
     );
   }
 }
@@ -407,7 +333,7 @@ class PartidasScrollView extends StatelessWidget {
                 const double padding = 10;
                 final useLandscapeLayout =
                     ResponsiveLayoutBuilder.maybeOf(context)?.useLandscapeLayout ??
-                    (constraints.maxWidth > constraints.maxHeight);
+                    ResponsiveLayoutBuilder.resolveUseLandscapeLayout(context);
                 final itemsPerRow = useLandscapeLayout ? 4 : 3;
                 final totalSpacing = spacing * (itemsPerRow - 1);
                 final double itemWidth = (constraints.maxWidth - (padding * 2) - totalSpacing) / itemsPerRow;
@@ -693,7 +619,9 @@ class ReordenableItem extends StatelessWidget {
   selectPartidaPredefinida({required BuildContext context}) {
     final FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
     formPartidaProvider.rellenarFormulario(partidaPredefinida, context: context);
-    Navigator.pop(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (context.mounted) Navigator.pop(context);
+    });
   }
 
   patchFormPartida({required BuildContext context, required PartidaPredefinida partida}) {
