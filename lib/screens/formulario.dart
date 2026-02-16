@@ -644,8 +644,7 @@ class _Inputs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final formPartidaProvider = context.watch<FormPartidaProvider>();
-    final jugadoresValues = List<dynamic>.from(formPartidaProvider.jugadores);
-    final jugadoresLength = jugadoresValues.length;
+    final jugadoresLength = formPartidaProvider.jugadores.length;
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     final listBottomPadding = ResponsiveApp.isSmallHeight ? 10.0 : 20.0;
 
@@ -656,7 +655,6 @@ class _Inputs extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemCount: jugadoresLength,
       itemBuilder: (_, index) => _JugadorInput(
-        key: ValueKey('jugador-input-$index-${jugadoresValues[index]['nombre'] ?? ''}-$jugadoresLength'),
         index: index,
         scrollController: jugadoresController,
       ),

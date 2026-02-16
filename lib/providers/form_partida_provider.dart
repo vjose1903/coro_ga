@@ -4,47 +4,38 @@ import '../models/partida_predefinida.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 class FormPartidaProvider extends ChangeNotifier {
-  FormGroup form = fb.group({
-    'nombre': ['', Validators.required],
-    'activo': ['true'],
-    'tipo': ['', Validators.required],
-    'maxPuntuacion': [1, Validators.min(1)],
-    'jugadores': fb.array([])
-  });
+  static const int _minJugadores = 2;
+  static const int _maxJugadores = 20;
+  static const int _defaultMaxPuntuacion = 1;
+
+  FormGroup form = _buildBaseForm();
 
   bool sinMaxPuntuacion = false;
 
-  void rellenarFormulario(PartidaPredefinida partidaPredefinida, {BuildContext? context}) {
+  void rellenarFormulario(
+    PartidaPredefinida partidaPredefinida, {
+    BuildContext? context,
+  }) {
     // Mismo flujo que al inicializar el formulario para asegurar nombres por defecto.
-    resetForm(context: context);
+    resetForm(restoreJugadores: false);
 
     form.control('nombre').value = partidaPredefinida.nombre ?? '';
     form.control('tipo').value = partidaPredefinida.tipo ?? '';
     form.control('activo').value = 'true';
-    form.control('maxPuntuacion').value = partidaPredefinida.maxPuntuacion ?? 1;
+    form.control('maxPuntuacion').value =
+        partidaPredefinida.maxPuntuacion ?? _defaultMaxPuntuacion;
     _syncSinMaxWithValue();
 
-    final jugadoresArray = form.control('jugadores') as FormArray<dynamic>;
     final targetJugadores =
-        (partidaPredefinida.cantidadJugadores ?? 2).clamp(2, 20);
-
-    while (jugadoresArray.controls.length < targetJugadores) {
-      addJugadorToList(context: context);
-    }
-    while (jugadoresArray.controls.length > targetJugadores) {
-      jugadoresArray.removeAt(jugadoresArray.controls.length - 1);
-    }
-
-    // Forzar nombres por índice para evitar estados residuales de controles.
-    for (var i = 0; i < jugadoresArray.controls.length; i++) {
-      form.control('jugadores.$i.nombre').value = _defaultPlayerName(context, i + 1);
-    }
+        (partidaPredefinida.cantidadJugadores ?? _minJugadores)
+            .clamp(_minJugadores, _maxJugadores);
+    _setPlayersCount(targetJugadores, context: context);
     form.updateValueAndValidity();
 
     notifyListeners();
   }
 
-  void changeTipo(value) {
+  void changeTipo(dynamic value) {
     notifyListeners();
   }
 
@@ -70,28 +61,19 @@ class FormPartidaProvider extends ChangeNotifier {
 
   resetForm({bool restoreJugadores = true, BuildContext? context}) {
     // Crear un FormGroup nuevo evita estado residual en controles reactivos.
-    form = fb.group({
-      'nombre': ['', Validators.required],
-      'activo': ['true'],
-      'tipo': ['', Validators.required],
-      'maxPuntuacion': [1, Validators.min(1)],
-      'jugadores': fb.array([])
-    });
+    form = _buildBaseForm();
     if (restoreJugadores) {
-      for (var i = 0; i < List.from([1, 2]).length; i++) {
-        addJugadorToList(name: _defaultPlayerName(context, i + 1));
-      }
+      _setPlayersCount(_minJugadores, context: context);
     }
 
     form.control('activo').value = 'true';
     form.control('maxPuntuacion').setValidators([Validators.min(1)]);
-    form.control('maxPuntuacion').value = 1;
+    form.control('maxPuntuacion').value = _defaultMaxPuntuacion;
     sinMaxPuntuacion = false;
     notifyListeners();
-    // return Future.delayed(const Duration(milliseconds: 10));
   }
 
-  get jugadores {
+  List<dynamic> get jugadores {
     final jugadoresArray = form.control('jugadores').value;
     return jugadoresArray ?? [];
   }
@@ -143,5 +125,28 @@ class FormPartidaProvider extends ChangeNotifier {
       control.setValidators([Validators.min(1)]);
     }
     control.updateValueAndValidity();
+  }
+
+  static FormGroup _buildBaseForm() => fb.group({
+        'nombre': ['', Validators.required],
+        'activo': ['true'],
+        'tipo': ['', Validators.required],
+        'maxPuntuacion': [_defaultMaxPuntuacion, Validators.min(1)],
+        'jugadores': fb.array([]),
+      });
+
+  void _setPlayersCount(int targetCount, {BuildContext? context}) {
+    final jugadoresArray = form.control('jugadores') as FormArray<dynamic>;
+    while (jugadoresArray.controls.length < targetCount) {
+      final nextNumber = jugadoresArray.controls.length + 1;
+      jugadoresArray.add(
+        fb.group({
+          'nombre': [_defaultPlayerName(context, nextNumber), Validators.required],
+        }),
+      );
+    }
+    while (jugadoresArray.controls.length > targetCount) {
+      jugadoresArray.removeAt(jugadoresArray.controls.length - 1);
+    }
   }
 }
