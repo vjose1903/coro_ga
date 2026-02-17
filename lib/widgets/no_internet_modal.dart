@@ -46,9 +46,7 @@ class NoInternetModal extends StatelessWidget {
                 ZoomIn(
                   delay: const Duration(milliseconds: 200),
                   child: Image.asset(
-                    Preferences.isPremium
-                        ? 'assets/icon/iconCircular-pro.png'
-                        : 'assets/icon/iconCircular.png',
+                    Preferences.isPremium ? 'assets/icon/iconCircular-pro.png' : 'assets/icon/iconCircular.png',
                     width: 96,
                     height: 96,
                   ),
@@ -93,8 +91,7 @@ class NoInternetModal extends StatelessWidget {
                         height: 18,
                         child: CircularProgressIndicator(
                           strokeWidth: 2.2,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       ),
                       const SizedBox(width: 10),

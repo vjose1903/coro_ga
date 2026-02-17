@@ -66,11 +66,9 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     _loadScheduled = false;
 
     final adUnitId = AdHelper.getBannerAdUnitId(widget.location);
-    debugPrint(
-        'BannerAd load start: location=${widget.location}, unitId=$adUnitId');
+    debugPrint('BannerAd load start: location=${widget.location}, unitId=$adUnitId');
     if (adUnitId.isEmpty) {
-      debugPrint(
-          'BannerAd load aborted: empty adUnitId for location=${widget.location}');
+      debugPrint('BannerAd load aborted: empty adUnitId for location=${widget.location}');
       _isLoading = false;
       return;
     }
@@ -105,8 +103,7 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
           debugPrint('Loaded');
           debugPrint('   ');
           debugPrint('   ');
-          debugPrint(
-              'BannerAd loaded: location=${widget.location}, unitId=$adUnitId, size=${_bannerAd?.size}');
+          debugPrint('BannerAd loaded: location=${widget.location}, unitId=$adUnitId, size=${_bannerAd?.size}');
 
           final info = (ad as BannerAd).responseInfo;
           debugPrint('Winner adapter: ${info?.mediationAdapterClassName}');
@@ -191,21 +188,14 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
       return const SizedBox.shrink();
     }
 
-    final double width = _bannerAd?.size.width.toDouble() ??
-        _adSize?.width.toDouble() ??
-        _bannerMinWidth;
-    final double height = _bannerAd?.size.height.toDouble() ??
-        _adSize?.height.toDouble() ??
-        _bannerHeight;
+    final double width = _bannerAd?.size.width.toDouble() ?? _adSize?.width.toDouble() ?? _bannerMinWidth;
+    final double height = _bannerAd?.size.height.toDouble() ?? _adSize?.height.toDouble() ?? _bannerHeight;
 
     final banner = Container(
       key: _bannerAd != null ? ObjectKey(_bannerAd) : null,
       width: width,
       alignment: Alignment.topCenter,
-      child: _bannerAd == null
-          ? SizedBox(width: width, height: height)
-          : SizedBox(
-              width: width, height: height, child: AdWidget(ad: _bannerAd!)),
+      child: _bannerAd == null ? SizedBox(width: width, height: height) : SizedBox(width: width, height: height, child: AdWidget(ad: _bannerAd!)),
     );
 
     if (!widget.usePadding) return banner;
@@ -233,11 +223,9 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
   void _scheduleRetry() {
     if (!mounted) return;
     _retryTimer?.cancel();
-    final delay =
-        Duration(seconds: (_retryAttempt >= 3) ? 30 : 10 * (_retryAttempt + 1));
+    final delay = Duration(seconds: (_retryAttempt >= 3) ? 30 : 10 * (_retryAttempt + 1));
     _retryAttempt += 1;
-    debugPrint(
-        'BannerAd retry scheduled: location=${widget.location}, attempt=$_retryAttempt, in=${delay.inSeconds}s');
+    debugPrint('BannerAd retry scheduled: location=${widget.location}, attempt=$_retryAttempt, in=${delay.inSeconds}s');
     _retryTimer = Timer(delay, () {
       _retryTimer = null;
       if (!mounted) return;

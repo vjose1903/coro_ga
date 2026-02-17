@@ -39,8 +39,7 @@ class _FormularioScreenState extends State<FormularioScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final GoogleAdsProvider googleAdsProvider =
-        context.read<GoogleAdsProvider>();
+    final GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
 
     googleAdsProvider.loadInterstitialAd();
 
@@ -69,8 +68,7 @@ class _FormularioScreenState extends State<FormularioScreen> {
 }
 
 void openDefaultsPartidasDialog(BuildContext context) {
-  final PartidaPredefinidaProvider formPartidaPredefinidaProvider =
-      context.read<PartidaPredefinidaProvider>();
+  final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
   formPartidaPredefinidaProvider.resetForm();
 
   FluidAlerts.show(
@@ -78,8 +76,7 @@ void openDefaultsPartidasDialog(BuildContext context) {
     rootPage: OrientationBuilder(
       builder: (context, _) {
         final size = MediaQuery.sizeOf(context);
-        final isLandscape =
-            MediaQuery.orientationOf(context) == Orientation.landscape;
+        final isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
         return SizedBox(
           width: size.width - 40,
           height: size.height - (isLandscape ? 50 : 150),
@@ -98,8 +95,7 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (BuildContext context, value, Widget? child) {
-      final FormPartidaProvider formPartidaProvider =
-          context.watch<FormPartidaProvider>();
+      final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
       final form = formPartidaProvider.form;
       final isDark = Preferences.isDarkMode;
       final bool sinMaxPuntuacion = formPartidaProvider.sinMaxPuntuacion;
@@ -110,8 +106,7 @@ class _Body extends StatelessWidget {
         builder: (context, constraints, info) {
           final bool useLandscapeLayout = info.useLandscapeLayout;
           final bool isWide = info.isWide;
-          final EdgeInsets contentPadding =
-              ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 16 : 20);
+          final EdgeInsets contentPadding = ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 16 : 20);
 
           return SafeArea(
             top: false,
@@ -135,22 +130,14 @@ class _Body extends StatelessWidget {
                               sinMaxPuntuacion: sinMaxPuntuacion,
                               isDark: isDark,
                               formPartidaProvider: formPartidaProvider,
-                              onOpenDefaults: () =>
-                                  openDefaultsPartidasDialog(context),
-                              onCreate: () => _crearPartida(
-                                  context, form, formPartidaProvider),
+                              onOpenDefaults: () => openDefaultsPartidasDialog(context),
+                              onCreate: () => _crearPartida(context, form, formPartidaProvider),
                               useLandscapeLayout: useLandscapeLayout,
                             ),
                           ),
                           const SizedBox(width: 20),
                           Expanded(
-                            child: _FormPlayersColumn(
-                                isDark: isDark,
-                                jugadoresController: jugadoresController,
-                                onCreate: () => _crearPartida(
-                                    context, form, formPartidaProvider),
-                                useLandscapeLayout: useLandscapeLayout,
-                                isWide: isWide),
+                            child: _FormPlayersColumn(isDark: isDark, jugadoresController: jugadoresController, onCreate: () => _crearPartida(context, form, formPartidaProvider), useLandscapeLayout: useLandscapeLayout, isWide: isWide),
                           ),
                         ],
                       )
@@ -162,21 +149,13 @@ class _Body extends StatelessWidget {
                             sinMaxPuntuacion: sinMaxPuntuacion,
                             isDark: isDark,
                             formPartidaProvider: formPartidaProvider,
-                            onOpenDefaults: () =>
-                                openDefaultsPartidasDialog(context),
-                            onCreate: () => _crearPartida(
-                                context, form, formPartidaProvider),
+                            onOpenDefaults: () => openDefaultsPartidasDialog(context),
+                            onCreate: () => _crearPartida(context, form, formPartidaProvider),
                             useLandscapeLayout: useLandscapeLayout,
                           ),
                           const SizedBox(height: 20),
                           Expanded(
-                            child: _FormPlayersColumn(
-                                isDark: isDark,
-                                jugadoresController: jugadoresController,
-                                onCreate: () => _crearPartida(
-                                    context, form, formPartidaProvider),
-                                useLandscapeLayout: useLandscapeLayout,
-                                isWide: isWide),
+                            child: _FormPlayersColumn(isDark: isDark, jugadoresController: jugadoresController, onCreate: () => _crearPartida(context, form, formPartidaProvider), useLandscapeLayout: useLandscapeLayout, isWide: isWide),
                           ),
                         ],
                       ),
@@ -188,14 +167,12 @@ class _Body extends StatelessWidget {
     });
   }
 
-  void _crearPartida(BuildContext context, FormGroup form,
-      FormPartidaProvider formPartidaProvider) async {
+  void _crearPartida(BuildContext context, FormGroup form, FormPartidaProvider formPartidaProvider) async {
     form.markAllAsTouched();
 
     if (form.valid) {
       final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-      final GoogleAdsProvider googleAdsProvider =
-          context.read<GoogleAdsProvider>();
+      final GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
 
       await MyLoading.show();
       final Partida partida = Partida.fromMap(form.value);
@@ -231,16 +208,10 @@ class _Body extends StatelessWidget {
           });
         }
       } else {
-        Toast.show(
-            type: ToastType.error,
-            context: context,
-            message: AppLocalizations.of(context)!.errorRegisteringGame);
+        Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.errorRegisteringGame);
       }
     } else {
-      Toast.show(
-          type: ToastType.warning,
-          context: context,
-          message: AppLocalizations.of(context)!.checkAllFields);
+      Toast.show(type: ToastType.warning, context: context, message: AppLocalizations.of(context)!.checkAllFields);
     }
   }
 }
@@ -272,8 +243,7 @@ class _FormDetailsColumn extends StatelessWidget {
         // Botón plantillas
         Align(
           alignment: Alignment.centerRight,
-          child: _PlantillasButton(
-              onTap: onOpenDefaults, useLandscapeLayout: useLandscapeLayout),
+          child: _PlantillasButton(onTap: onOpenDefaults, useLandscapeLayout: useLandscapeLayout),
         ),
         const SizedBox(height: 14),
         // Nombre de la partida
@@ -286,11 +256,8 @@ class _FormDetailsColumn extends StatelessWidget {
         // Tipo y puntuación
         LayoutBuilder(
           builder: (context, constraints) {
-            final useLandscapeLayout =
-                ResponsiveApp.isLandscapeFor(constraints) ||
-                    constraints.maxWidth >= 700;
-            final scoreFieldWidth =
-                constraints.maxWidth * (useLandscapeLayout ? 0.45 : 0.43);
+            final useLandscapeLayout = ResponsiveApp.isLandscapeFor(constraints) || constraints.maxWidth >= 700;
+            final scoreFieldWidth = constraints.maxWidth * (useLandscapeLayout ? 0.45 : 0.43);
             return Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -299,30 +266,17 @@ class _FormDetailsColumn extends StatelessWidget {
                     formControlName: 'tipo',
                     labelText: AppLocalizations.of(context)!.type,
                     items: [
-                      DropdownMenuItem(
-                          value: 'Rondas',
-                          child:
-                              TextScale(AppLocalizations.of(context)!.rounds)),
-                      DropdownMenuItem(
-                          value: 'Puntuación',
-                          child:
-                              TextScale(AppLocalizations.of(context)!.score)),
+                      DropdownMenuItem(value: 'Rondas', child: TextScale(AppLocalizations.of(context)!.rounds)),
+                      DropdownMenuItem(value: 'Puntuación', child: TextScale(AppLocalizations.of(context)!.score)),
                     ],
                     onChanged: (value) => formPartidaProvider.changeTipo(value),
                   ),
                 ),
-                if (tipoPartida != null &&
-                    tipoPartida != '' &&
-                    !sinMaxPuntuacion)
-                  const SizedBox(width: 12),
+                if (tipoPartida != null && tipoPartida != '' && !sinMaxPuntuacion) const SizedBox(width: 12),
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 500),
                   curve: Curves.easeOut,
-                  width: tipoPartida == '' ||
-                          tipoPartida == null ||
-                          sinMaxPuntuacion
-                      ? 0
-                      : scoreFieldWidth,
+                  width: tipoPartida == '' || tipoPartida == null || sinMaxPuntuacion ? 0 : scoreFieldWidth,
                   child: ClipRect(
                     child: Align(
                       alignment: Alignment.centerRight,
@@ -330,9 +284,7 @@ class _FormDetailsColumn extends StatelessWidget {
                         width: scoreFieldWidth,
                         child: CustomReactiveInput(
                           formControlName: 'maxPuntuacion',
-                          labelText: tipoPartida == 'Rondas'
-                              ? AppLocalizations.of(context)!.roundCount
-                              : AppLocalizations.of(context)!.maxScore,
+                          labelText: tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScore,
                           inputType: TextInputType.number,
                         ),
                       ),
@@ -351,24 +303,18 @@ class _FormDetailsColumn extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               splashColor: AppThemes.colorPrimero.withValues(alpha: 0.12),
               highlightColor: AppThemes.colorPrimero.withValues(alpha: 0.06),
-              onTap: () =>
-                  formPartidaProvider.setSinMaxPuntuacion(!sinMaxPuntuacion),
+              onTap: () => formPartidaProvider.setSinMaxPuntuacion(!sinMaxPuntuacion),
               child: Ink(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
                 decoration: BoxDecoration(
                   color: AppThemes.inputColor.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: Preferences.isDarkMode
-                        ? Colors.white.withValues(alpha: 0.08)
-                        : Colors.grey.withValues(alpha: 0.2),
+                    color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.2),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: isDark
-                          ? Colors.black.withValues(alpha: 0.2)
-                          : Colors.black.withValues(alpha: 0.05),
+                      color: isDark ? Colors.black.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.05),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
@@ -378,9 +324,7 @@ class _FormDetailsColumn extends StatelessWidget {
                   children: [
                     Expanded(
                       child: TextScale(
-                        tipoPartida == 'Rondas'
-                            ? AppLocalizations.of(context)!.noMaxRounds
-                            : AppLocalizations.of(context)!.noMaxScore,
+                        tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.noMaxRounds : AppLocalizations.of(context)!.noMaxScore,
                         size: 12,
                         style: TextStyle(
                           fontFamily: 'Poppins',
@@ -394,19 +338,13 @@ class _FormDetailsColumn extends StatelessWidget {
                       child: FittedBox(
                         child: Switch(
                           value: sinMaxPuntuacion,
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           padding: EdgeInsets.zero,
                           activeThumbColor: AppThemes.colorPrimero,
-                          activeTrackColor:
-                              AppThemes.colorPrimero.withValues(alpha: 0.35),
-                          inactiveThumbColor:
-                              isDark ? Colors.white70 : Colors.grey[600],
-                          inactiveTrackColor: isDark
-                              ? Colors.white.withValues(alpha: 0.2)
-                              : Colors.grey.withValues(alpha: 0.3),
-                          onChanged: (value) =>
-                              formPartidaProvider.setSinMaxPuntuacion(value),
+                          activeTrackColor: AppThemes.colorPrimero.withValues(alpha: 0.35),
+                          inactiveThumbColor: isDark ? Colors.white70 : Colors.grey[600],
+                          inactiveTrackColor: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.3),
+                          onChanged: (value) => formPartidaProvider.setSinMaxPuntuacion(value),
                         ),
                       ),
                     ),
@@ -443,10 +381,7 @@ class _FormPlayersColumn extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _JugadoresSection(
-            jugadoresController: jugadoresController,
-            useLandscapeLayout: useLandscapeLayout,
-            isWide: isWide),
+        _JugadoresSection(jugadoresController: jugadoresController, useLandscapeLayout: useLandscapeLayout, isWide: isWide),
         SizedBox(height: useLandscapeLayout ? 8 : 12),
         Expanded(
           child: DecoratedBox(
@@ -455,16 +390,12 @@ class _FormPlayersColumn extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.04)
-                      : Colors.white.withValues(alpha: 0.7),
+                  color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.white.withValues(alpha: 0.7),
                   offset: const Offset(-2, -2),
                   blurRadius: 4,
                 ),
                 BoxShadow(
-                  color: isDark
-                      ? Colors.black.withValues(alpha: 0.3)
-                      : Colors.black.withValues(alpha: 0.08),
+                  color: isDark ? Colors.black.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.08),
                   offset: const Offset(2, 2),
                   blurRadius: 4,
                 ),
@@ -484,8 +415,7 @@ class _FormPlayersColumn extends StatelessWidget {
 
 // Botón de plantillas
 class _PlantillasButton extends StatelessWidget {
-  const _PlantillasButton(
-      {required this.onTap, required this.useLandscapeLayout});
+  const _PlantillasButton({required this.onTap, required this.useLandscapeLayout});
   final VoidCallback onTap;
   final bool useLandscapeLayout;
 
@@ -497,8 +427,7 @@ class _PlantillasButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(10),
         child: Container(
-          padding: ResponsiveApp.symmetric(
-              horizontal: useLandscapeLayout ? 5 : 12, vertical: 8),
+          padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 5 : 12, vertical: 8),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -545,28 +474,18 @@ class _PlantillasButton extends StatelessWidget {
 
 // Sección de jugadores con header
 class _JugadoresSection extends StatelessWidget {
-  const _JugadoresSection(
-      {required this.jugadoresController,
-      required this.useLandscapeLayout,
-      required this.isWide});
+  const _JugadoresSection({required this.jugadoresController, required this.useLandscapeLayout, required this.isWide});
   final ScrollController jugadoresController;
   final bool useLandscapeLayout;
   final bool isWide;
 
   @override
   Widget build(BuildContext context) {
-    final FormPartidaProvider formPartidaProvider =
-        context.watch<FormPartidaProvider>();
+    final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
     final isDark = Preferences.isDarkMode;
 
-    final avatarSize = (useLandscapeLayout
-            ? ResponsiveApp.scaleWidth(15)
-            : ResponsiveApp.scaleWidth(30))
-        .clamp(28.0, 52.0);
-    final iconSize = (useLandscapeLayout
-            ? ResponsiveApp.scaleWidth(4)
-            : ResponsiveApp.scaleWidth(10))
-        .clamp(5.0, 22.0);
+    final avatarSize = (useLandscapeLayout ? ResponsiveApp.scaleWidth(15) : ResponsiveApp.scaleWidth(30)).clamp(28.0, 52.0);
+    final iconSize = (useLandscapeLayout ? ResponsiveApp.scaleWidth(4) : ResponsiveApp.scaleWidth(10)).clamp(5.0, 22.0);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -578,20 +497,13 @@ class _JugadoresSection extends StatelessWidget {
               height: avatarSize,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    AppThemes.colorPrimero,
-                    AppThemes.colorPrimero.withValues(alpha: 0.7)
-                  ],
+                  colors: [AppThemes.colorPrimero, AppThemes.colorPrimero.withValues(alpha: 0.7)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Center(
-                  child: Transform.translate(
-                      offset: const Offset(-1.0, 0.0),
-                      child: IconScale(FontAwesomeIcons.users,
-                          color: Colors.white, size: iconSize))),
+              child: Center(child: Transform.translate(offset: const Offset(-1.0, 0.0), child: IconScale(FontAwesomeIcons.users, color: Colors.white, size: iconSize))),
             ),
             const SizedBox(width: 10),
             TextScale(
@@ -605,13 +517,10 @@ class _JugadoresSection extends StatelessWidget {
             ),
             Container(
               margin: ResponsiveApp.only(left: useLandscapeLayout ? 5 : 10),
-              padding: ResponsiveApp.symmetric(
-                  horizontal: useLandscapeLayout ? 4 : 10,
-                  vertical: useLandscapeLayout ? 6 : 4),
+              padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 4 : 10, vertical: useLandscapeLayout ? 6 : 4),
               decoration: BoxDecoration(
                 color: AppThemes.colorTercero.withValues(alpha: 0.9),
-                borderRadius:
-                    BorderRadius.circular(useLandscapeLayout ? 8 : 12),
+                borderRadius: BorderRadius.circular(useLandscapeLayout ? 8 : 12),
               ),
               child: TextScale(
                 formPartidaProvider.jugadores.length.toString(),
@@ -625,27 +534,17 @@ class _JugadoresSection extends StatelessWidget {
             ),
           ],
         ),
-        if (formPartidaProvider.jugadores.length < 20)
-          _AddPlayerButton(
-              useLandscapeLayout: useLandscapeLayout,
-              isWide: isWide,
-              onTap: () => _addJugador(context, formPartidaProvider)),
+        if (formPartidaProvider.jugadores.length < 20) _AddPlayerButton(useLandscapeLayout: useLandscapeLayout, isWide: isWide, onTap: () => _addJugador(context, formPartidaProvider)),
       ],
     );
   }
 
-  void _addJugador(
-      BuildContext context, FormPartidaProvider formPartidaProvider) {
+  void _addJugador(BuildContext context, FormPartidaProvider formPartidaProvider) {
     final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
     if (!premiumProvider.canAddPlayer(formPartidaProvider.jugadores.length)) {
       final l10n = AppLocalizations.of(context)!;
-      Toast.show(
-          type: ToastType.info,
-          context: context,
-          message: l10n.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
-          actionLabel: l10n.getPro,
-          onAction: () => Navigator.pushNamed(context, 'premium'));
+      Toast.show(type: ToastType.info, context: context, message: l10n.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers), actionLabel: l10n.getPro, onAction: () => Navigator.pushNamed(context, 'premium'));
       return;
     }
 
@@ -654,29 +553,20 @@ class _JugadoresSection extends StatelessWidget {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (jugadoresController.hasClients) {
-        jugadoresController.animateTo(
-            jugadoresController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 800),
-            curve: Curves.easeOutCubic);
+        jugadoresController.animateTo(jugadoresController.position.maxScrollExtent, duration: const Duration(milliseconds: 800), curve: Curves.easeOutCubic);
       }
     });
 
     if (formPartidaProvider.jugadores.length == 20) {
       final l10n = AppLocalizations.of(context)!;
-      Toast.show(
-          type: ToastType.info,
-          context: context,
-          message: l10n.maxPlayersReached);
+      Toast.show(type: ToastType.info, context: context, message: l10n.maxPlayersReached);
     }
   }
 }
 
 // Botón agregar jugador
 class _AddPlayerButton extends StatelessWidget {
-  const _AddPlayerButton(
-      {required this.onTap,
-      required this.useLandscapeLayout,
-      required this.isWide});
+  const _AddPlayerButton({required this.onTap, required this.useLandscapeLayout, required this.isWide});
 
   final VoidCallback onTap;
   final bool useLandscapeLayout;
@@ -708,8 +598,7 @@ class _AddPlayerButton extends StatelessWidget {
             ],
           ),
           child: const Center(
-            child:
-                IconScale(FontAwesomeIcons.plus, size: 14, color: Colors.white),
+            child: IconScale(FontAwesomeIcons.plus, size: 14, color: Colors.white),
           ),
         ),
       ),
@@ -750,8 +639,7 @@ class _CreateButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const IconScale(FontAwesomeIcons.plus,
-                  size: 16, color: Colors.white),
+              const IconScale(FontAwesomeIcons.plus, size: 16, color: Colors.white),
               const SizedBox(width: 10),
               TextScale(
                 AppLocalizations.of(context)!.createGame,
@@ -784,11 +672,7 @@ class _Inputs extends StatelessWidget {
     return ListView.separated(
       controller: jugadoresController,
       physics: const ClampingScrollPhysics(),
-      padding: EdgeInsets.only(
-          top: 12,
-          left: 12,
-          right: 12,
-          bottom: listBottomPadding + keyboardHeight),
+      padding: EdgeInsets.only(top: 12, left: 12, right: 12, bottom: listBottomPadding + keyboardHeight),
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemCount: jugadoresLength,
       itemBuilder: (_, index) => _JugadorInput(
@@ -820,11 +704,8 @@ class _JugadorInputState extends State<_JugadorInput> {
   void _onFocusChange() {
     if (_focusNode.hasFocus && _inputKey.currentContext != null) {
       Future.delayed(const Duration(milliseconds: 400), () {
-        if (mounted &&
-            _inputKey.currentContext != null &&
-            widget.scrollController.hasClients) {
-          final RenderBox? renderBox =
-              _inputKey.currentContext?.findRenderObject() as RenderBox?;
+        if (mounted && _inputKey.currentContext != null && widget.scrollController.hasClients) {
+          final RenderBox? renderBox = _inputKey.currentContext?.findRenderObject() as RenderBox?;
           if (renderBox != null) {
             final position = renderBox.localToGlobal(Offset.zero);
             final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
@@ -833,12 +714,9 @@ class _JugadorInputState extends State<_JugadorInput> {
             final visibleBottom = screenHeight - keyboardHeight;
 
             if (itemBottom > visibleBottom - 50) {
-              final scrollOffset = widget.scrollController.offset +
-                  (itemBottom - visibleBottom) +
-                  80;
+              final scrollOffset = widget.scrollController.offset + (itemBottom - visibleBottom) + 80;
               widget.scrollController.animateTo(
-                scrollOffset.clamp(
-                    0, widget.scrollController.position.maxScrollExtent),
+                scrollOffset.clamp(0, widget.scrollController.position.maxScrollExtent),
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeOut,
               );
@@ -933,8 +811,7 @@ class _JugadorInputState extends State<_JugadorInput> {
                   ],
                 ),
                 child: const Center(
-                  child: IconScale(FontAwesomeIcons.minus,
-                      size: 12, color: Colors.white),
+                  child: IconScale(FontAwesomeIcons.minus, size: 12, color: Colors.white),
                 ),
               ),
             ),

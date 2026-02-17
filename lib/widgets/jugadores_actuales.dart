@@ -10,13 +10,7 @@ import '../themes/app_themes.dart';
 import 'widgets.dart';
 
 class JugadoresActuales extends StatelessWidget {
-  const JugadoresActuales(
-      {required this.jugadoresController,
-      required this.rebuildWidget,
-      required this.onEditJugador,
-      required this.useLandscapeLayout,
-      required this.isWide,
-      super.key});
+  const JugadoresActuales({required this.jugadoresController, required this.rebuildWidget, required this.onEditJugador, required this.useLandscapeLayout, required this.isWide, super.key});
   final Function rebuildWidget;
   final ScrollController jugadoresController;
   final bool useLandscapeLayout;
@@ -36,13 +30,7 @@ class JugadoresActuales extends StatelessWidget {
 }
 
 class ListJugadores extends StatelessWidget {
-  const ListJugadores(
-      {required this.jugadoresController,
-      required this.rebuildWidget,
-      required this.onEditJugador,
-      required this.useLandscapeLayout,
-      required this.isWide,
-      super.key});
+  const ListJugadores({required this.jugadoresController, required this.rebuildWidget, required this.onEditJugador, required this.useLandscapeLayout, required this.isWide, super.key});
   final ScrollController jugadoresController;
   final Function rebuildWidget;
   final Function(Jugador) onEditJugador;
@@ -54,8 +42,7 @@ class ListJugadores extends StatelessWidget {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
 
-    final List<Jugador> jugadores =
-        partidaProvider.partidaEnTurno!.jugadoresSort;
+    final List<Jugador> jugadores = partidaProvider.partidaEnTurno!.jugadoresSort;
 
     if (jugadores.isEmpty) {
       return Center(
@@ -115,11 +102,9 @@ class ListJugadores extends StatelessWidget {
             canDelete: partidaProvider.partidaEnTurno!.jugadores!.length > 2,
             onEdit: () => onEditJugador(jugador),
             onDelete: () {
-              jugadorProvider.deleteJugador(context, jugador: jugador,
-                  callBack: (value) async {
+              jugadorProvider.deleteJugador(context, jugador: jugador, callBack: (value) async {
                 if (value['tipo'] == 'aceptar') {
-                  final double actualPosition =
-                      jugadoresController.position.pixels;
+                  final double actualPosition = jugadoresController.position.pixels;
                   rebuildWidget();
                   await Future.delayed(const Duration(milliseconds: 50));
                   jugadoresController.jumpTo(actualPosition);
@@ -147,11 +132,9 @@ class ListJugadores extends StatelessWidget {
           canDelete: partidaProvider.partidaEnTurno!.jugadores!.length > 2,
           onEdit: () => onEditJugador(jugador),
           onDelete: () {
-            jugadorProvider.deleteJugador(context, jugador: jugador,
-                callBack: (value) async {
+            jugadorProvider.deleteJugador(context, jugador: jugador, callBack: (value) async {
               if (value['tipo'] == 'aceptar') {
-                final double actualPosition =
-                    jugadoresController.position.pixels;
+                final double actualPosition = jugadoresController.position.pixels;
                 rebuildWidget();
                 await Future.delayed(const Duration(milliseconds: 50));
                 jugadoresController.jumpTo(actualPosition);
@@ -193,18 +176,11 @@ class _JugadorItem extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: isDark
-              ? [
-                  Colors.white.withValues(alpha: 0.06),
-                  Colors.white.withValues(alpha: 0.02)
-                ]
-              : [Colors.white, Colors.grey.withValues(alpha: 0.05)],
+          colors: isDark ? [Colors.white.withValues(alpha: 0.06), Colors.white.withValues(alpha: 0.02)] : [Colors.white, Colors.grey.withValues(alpha: 0.05)],
         ),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.08)
-              : Colors.grey.withValues(alpha: 0.15),
+          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
         ),
         boxShadow: [
           BoxShadow(
@@ -240,9 +216,7 @@ class _JugadorItem extends StatelessWidget {
                   ),
                   child: Center(
                     child: TextScale(
-                      jugador.nombre != null && jugador.nombre!.isNotEmpty
-                          ? jugador.nombre![0].toUpperCase()
-                          : '?',
+                      jugador.nombre != null && jugador.nombre!.isNotEmpty ? jugador.nombre![0].toUpperCase() : '?',
                       size: 14,
                       style: const TextStyle(
                         fontFamily: 'Poppins',
@@ -262,9 +236,7 @@ class _JugadorItem extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w500,
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.9)
-                          : AppThemes.colorQuinto,
+                      color: isDark ? Colors.white.withValues(alpha: 0.9) : AppThemes.colorQuinto,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -273,8 +245,7 @@ class _JugadorItem extends StatelessWidget {
 
                 // Puntuación
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
                     color: AppThemes.colorPrimero.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(6),
@@ -293,21 +264,12 @@ class _JugadorItem extends StatelessWidget {
                 const SizedBox(width: 8),
 
                 // Botón editar
-                _MiniButton(
-                    icon: FontAwesomeIcons.penToSquare,
-                    onTap: onEdit,
-                    isWide: isWide,
-                    useLandscapeLayout: useLandscapeLayout),
+                _MiniButton(icon: FontAwesomeIcons.penToSquare, onTap: onEdit, isWide: isWide, useLandscapeLayout: useLandscapeLayout),
 
                 // Botón eliminar
                 if (canDelete) ...[
                   const SizedBox(width: 6),
-                  _MiniButton(
-                      icon: FontAwesomeIcons.trash,
-                      onTap: onDelete,
-                      isDestructive: true,
-                      isWide: isWide,
-                      useLandscapeLayout: useLandscapeLayout),
+                  _MiniButton(icon: FontAwesomeIcons.trash, onTap: onDelete, isDestructive: true, isWide: isWide, useLandscapeLayout: useLandscapeLayout),
                 ],
               ],
             ),
@@ -336,9 +298,7 @@ class _MiniButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
-    final color = isDestructive
-        ? Colors.red[400]!
-        : (isDark ? Colors.grey[400]! : Colors.grey[600]!);
+    final color = isDestructive ? Colors.red[400]! : (isDark ? Colors.grey[400]! : Colors.grey[600]!);
 
     return Material(
       color: Colors.transparent,
@@ -348,11 +308,7 @@ class _MiniButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(9),
           decoration: BoxDecoration(
-            color: isDestructive
-                ? Colors.red.withValues(alpha: 0.1)
-                : (isDark
-                    ? Colors.white.withValues(alpha: 0.05)
-                    : Colors.grey.withValues(alpha: 0.1)),
+            color: isDestructive ? Colors.red.withValues(alpha: 0.1) : (isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey.withValues(alpha: 0.1)),
             borderRadius: BorderRadius.circular(8),
           ),
           child: IconScale(

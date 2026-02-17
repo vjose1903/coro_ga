@@ -13,8 +13,7 @@ import 'text_scale.dart';
 class ForceUpdateModal extends StatelessWidget {
   const ForceUpdateModal({super.key});
 
-  static Future<void> showIfNeeded(BuildContext context,
-      {bool forceShow = false}) async {
+  static Future<void> showIfNeeded(BuildContext context, {bool forceShow = false}) async {
     // En desarrollo solo mostrar si se pasa forceShow
     if (kDebugMode && !forceShow) return;
 
@@ -77,9 +76,7 @@ class ForceUpdateModal extends StatelessWidget {
                 ZoomIn(
                   delay: const Duration(milliseconds: 200),
                   child: Image.asset(
-                    Preferences.isPremium
-                        ? 'assets/icon/iconCircular-pro.png'
-                        : 'assets/icon/iconCircular.png',
+                    Preferences.isPremium ? 'assets/icon/iconCircular-pro.png' : 'assets/icon/iconCircular.png',
                     width: 100,
                     height: 100,
                   ),

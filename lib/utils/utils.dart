@@ -4,5 +4,4 @@ export 'package:game_score/utils/fluid_alerts.dart';
 export 'package:game_score/utils/functions.dart';
 export 'package:game_score/utils/l10n_helper.dart';
 export 'package:game_score/utils/loading.dart';
-export 'package:game_score/utils/string_extension.dart';
 export 'package:game_score/utils/toast.dart';

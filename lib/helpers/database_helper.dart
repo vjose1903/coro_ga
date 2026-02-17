@@ -27,8 +27,7 @@ class DatabaseHelper {
   }
 
   static Future<Database> initializeDatabase() async {
-    final Directory applicationDocumentDirectory =
-        await getApplicationDocumentsDirectory();
+    final Directory applicationDocumentDirectory = await getApplicationDocumentsDirectory();
 
     final String path = join(applicationDocumentDirectory.path, dbFileName);
 
@@ -65,9 +64,7 @@ class DatabaseHelper {
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   static Future<void> _databaseV1(Database db) async {
-    Fun.logColor(
-        color: Colores.yellow,
-        body: '=========== BASE DE DATOS V1 ===========');
+    Fun.logColor(color: Colores.yellow, body: '=========== BASE DE DATOS V1 ===========');
     await db.execute('''
         CREATE TABLE ${Partida.tableName}(
           id INTEGER PRIMARY KEY,
@@ -101,9 +98,7 @@ class DatabaseHelper {
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   static Future<void> _databaseV2(Database db) async {
-    Fun.logColor(
-        color: Colores.yellow,
-        body: '=========== BASE DE DATOS V2 ===========');
+    Fun.logColor(color: Colores.yellow, body: '=========== BASE DE DATOS V2 ===========');
     await db.execute('''
       CREATE TABLE IF NOT EXISTS ${PartidaPredefinida.tableName}(
         id INTEGER PRIMARY KEY,
@@ -117,9 +112,7 @@ class DatabaseHelper {
   }
 
   static Future<void> _databaseV3(Database db) async {
-    Fun.logColor(
-        color: Colores.yellow,
-        body: '=========== BASE DE DATOS V3 ===========');
+    Fun.logColor(color: Colores.yellow, body: '=========== BASE DE DATOS V3 ===========');
     await db.execute('''
       CREATE TABLE IF NOT EXISTS ${PartidaFinalizada.tableName}(
         id INTEGER PRIMARY KEY,

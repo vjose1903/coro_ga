@@ -133,8 +133,7 @@ class AppIntegrityService {
     // Fallback: verificar si existe el archivo de Play Store
     // Esto es menos confiable pero funciona sin código nativo
     try {
-      final result =
-          await Process.run('pm', ['list', 'packages', 'com.android.vending']);
+      final result = await Process.run('pm', ['list', 'packages', 'com.android.vending']);
       return result.stdout.toString().contains('com.android.vending');
     } catch (e) {
       return true; // En caso de error, no bloquear

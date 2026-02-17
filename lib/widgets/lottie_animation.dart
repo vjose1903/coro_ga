@@ -9,8 +9,7 @@ class LottieAnimation extends StatefulWidget {
   State<LottieAnimation> createState() => _MyWidgetState();
 }
 
-class _MyWidgetState extends State<LottieAnimation>
-    with SingleTickerProviderStateMixin {
+class _MyWidgetState extends State<LottieAnimation> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override

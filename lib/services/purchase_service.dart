@@ -26,8 +26,7 @@ class PurchaseService {
   List<ProductDetails> get products => _products;
 
   /// Inicializar IAP
-  Future<void> initialize(
-      {void Function(bool success)? onPurchaseComplete}) async {
+  Future<void> initialize({void Function(bool success)? onPurchaseComplete}) async {
     _onPurchaseComplete = onPurchaseComplete;
     _isAvailable = await _iap.isAvailable();
     if (!_isAvailable) {
@@ -96,8 +95,7 @@ class PurchaseService {
   /// Listener de compras
   void _onPurchaseUpdated(List<PurchaseDetails> purchases) async {
     for (final purchase in purchases) {
-      if (purchase.status == PurchaseStatus.purchased ||
-          purchase.status == PurchaseStatus.restored) {
+      if (purchase.status == PurchaseStatus.purchased || purchase.status == PurchaseStatus.restored) {
         if (purchase.productID == premiumProductId) {
           _restoredPurchaseFound = true;
           _onPurchaseComplete?.call(true);

@@ -28,12 +28,7 @@ class ExpandedButtom extends StatelessWidget {
           onTap: () => onTap != null ? onTap!() : null,
           child: Padding(
             padding: const EdgeInsets.all(7),
-            child: TextScale(label,
-                style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: fontSize,
-                    color: textColor),
-                textAlign: TextAlign.center),
+            child: TextScale(label, style: TextStyle(fontFamily: 'Poppins', fontSize: fontSize, color: textColor), textAlign: TextAlign.center),
           ),
         ),
       ),

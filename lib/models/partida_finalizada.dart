@@ -21,16 +21,13 @@ class PartidaFinalizada {
     if (jugadoresRaw is String && jugadoresRaw.isNotEmpty) {
       final decoded = jsonDecode(jugadoresRaw);
       if (decoded is List) {
-        jugadoresParsed =
-            decoded.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+        jugadoresParsed = decoded.map((e) => Map<String, dynamic>.from(e as Map)).toList();
       }
     } else if (jugadoresRaw is List) {
-      jugadoresParsed =
-          jugadoresRaw.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+      jugadoresParsed = jugadoresRaw.map((e) => Map<String, dynamic>.from(e as Map)).toList();
     }
 
-    final finalizadaAtRaw =
-        json['finalizadaAt'] ?? json['finalizada_at'] ?? json['finalizadaAt'];
+    final finalizadaAtRaw = json['finalizadaAt'] ?? json['finalizada_at'] ?? json['finalizadaAt'];
     return PartidaFinalizada(
       id: json['id'],
       nombre: json['nombre'],
@@ -39,9 +36,7 @@ class PartidaFinalizada {
       jugadoresFinales: jugadoresParsed,
       ganador: json['ganador'],
       motivo: json['motivo'],
-      finalizadaAt: finalizadaAtRaw != null
-          ? DateTime.tryParse(finalizadaAtRaw.toString())
-          : null,
+      finalizadaAt: finalizadaAtRaw != null ? DateTime.tryParse(finalizadaAtRaw.toString()) : null,
     );
   }
 
@@ -78,9 +73,7 @@ class PartidaFinalizada {
 
   String? getGanadorFromJugadores() {
     if (jugadoresFinales == null || jugadoresFinales!.isEmpty) return null;
-    final sorted = List<Map<String, dynamic>>.from(jugadoresFinales!)
-      ..sort((a, b) => ((a['puntuacion'] ?? 0) as num)
-          .compareTo((b['puntuacion'] ?? 0) as num));
+    final sorted = List<Map<String, dynamic>>.from(jugadoresFinales!)..sort((a, b) => ((a['puntuacion'] ?? 0) as num).compareTo((b['puntuacion'] ?? 0) as num));
     return sorted.last['nombre']?.toString();
   }
 
@@ -154,8 +147,7 @@ class PartidaFinalizada {
   }
 
   static Future<PartidaFinalizada?> findById(int id) async {
-    final response =
-        await CrudHelper.getOne(tableName: PartidaFinalizada.tableName, id: id);
+    final response = await CrudHelper.getOne(tableName: PartidaFinalizada.tableName, id: id);
     if (response.hasError!) return null;
     return PartidaFinalizada.fromMap(response.data);
   }

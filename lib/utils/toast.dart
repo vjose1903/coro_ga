@@ -43,29 +43,25 @@ class Toast {
 
     switch (type) {
       case ToastType.info:
-        backgroundColor =
-            isDark ? const Color(0xFF1A3A5C) : const Color(0xFFE8F4FD);
+        backgroundColor = isDark ? const Color(0xFF1A3A5C) : const Color(0xFFE8F4FD);
         borderColor = const Color(0xFF42A5F5);
         iconColor = const Color(0xFF1E88E5);
         iconData = FontAwesomeIcons.circleInfo;
         break;
       case ToastType.error:
-        backgroundColor =
-            isDark ? const Color(0xFF4A1F1F) : const Color(0xFFFDECEC);
+        backgroundColor = isDark ? const Color(0xFF4A1F1F) : const Color(0xFFFDECEC);
         borderColor = const Color(0xFFEF5350);
         iconColor = const Color(0xFFE53935);
         iconData = FontAwesomeIcons.circleXmark;
         break;
       case ToastType.success:
-        backgroundColor =
-            isDark ? const Color(0xFF1F3D1F) : const Color(0xFFEDF7ED);
+        backgroundColor = isDark ? const Color(0xFF1F3D1F) : const Color(0xFFEDF7ED);
         borderColor = const Color(0xFF66BB6A);
         iconColor = const Color(0xFF43A047);
         iconData = FontAwesomeIcons.circleCheck;
         break;
       case ToastType.warning:
-        backgroundColor =
-            isDark ? const Color(0xFF4A3A1F) : const Color(0xFFFFF8E6);
+        backgroundColor = isDark ? const Color(0xFF4A3A1F) : const Color(0xFFFFF8E6);
         borderColor = const Color(0xFFFFB74D);
         iconColor = const Color(0xFFFFA726);
         iconData = FontAwesomeIcons.triangleExclamation;
@@ -124,14 +120,10 @@ class Toast {
                         },
                         borderRadius: BorderRadius.circular(8),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
-                              colors: [
-                                iconColor,
-                                iconColor.withValues(alpha: 0.8)
-                              ],
+                              colors: [iconColor, iconColor.withValues(alpha: 0.8)],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
@@ -164,14 +156,11 @@ class Toast {
       showProgressBar: false,
       dragToClose: true,
       backgroundColor: backgroundColor,
-      borderSide:
-          BorderSide(color: borderColor.withValues(alpha: 0.5), width: 1.5),
+      borderSide: BorderSide(color: borderColor.withValues(alpha: 0.5), width: 1.5),
       borderRadius: BorderRadius.circular(14),
       boxShadow: [
         BoxShadow(
-          color: isDark
-              ? Colors.black.withValues(alpha: 0.3)
-              : Colors.black.withValues(alpha: 0.1),
+          color: isDark ? Colors.black.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.1),
           blurRadius: 12,
           offset: const Offset(0, 4),
         ),
@@ -183,31 +172,18 @@ class Toast {
   }
 
   static void success(BuildContext context, {String? title, String? message}) {
-    show(
-        type: ToastType.success,
-        context: context,
-        title: title,
-        message: message);
+    show(type: ToastType.success, context: context, title: title, message: message);
   }
 
   static void error(BuildContext context, {String? title, String? message}) {
-    show(
-        type: ToastType.error,
-        context: context,
-        title: title,
-        message: message);
+    show(type: ToastType.error, context: context, title: title, message: message);
   }
 
   static void info(BuildContext context, {String? title, String? message}) {
-    show(
-        type: ToastType.info, context: context, title: title, message: message);
+    show(type: ToastType.info, context: context, title: title, message: message);
   }
 
   static void warning(BuildContext context, {String? title, String? message}) {
-    show(
-        type: ToastType.warning,
-        context: context,
-        title: title,
-        message: message);
+    show(type: ToastType.warning, context: context, title: title, message: message);
   }
 }

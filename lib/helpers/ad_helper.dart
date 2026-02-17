@@ -9,26 +9,17 @@ enum RewardedAdLocation {
 class AdHelper {
   // IDs de prueba de Google (solo para desarrollo)
   // Android
-  static const String _testAndroidBannerId =
-      'ca-app-pub-3940256099942544/6300978111';
-  static const String _testAndroidInterstitialId =
-      'ca-app-pub-3940256099942544/1033173712';
-  static const String _testAndroidRewardedId =
-      'ca-app-pub-3940256099942544/5224354917';
+  static const String _testAndroidBannerId = 'ca-app-pub-3940256099942544/6300978111';
+  static const String _testAndroidInterstitialId = 'ca-app-pub-3940256099942544/1033173712';
+  static const String _testAndroidRewardedId = 'ca-app-pub-3940256099942544/5224354917';
   // iOS
-  static const String _testIosBannerId =
-      'ca-app-pub-3940256099942544/2934735716';
-  static const String _testIosInterstitialId =
-      'ca-app-pub-3940256099942544/4411468910';
-  static const String _testIosRewardedId =
-      'ca-app-pub-3940256099942544/1712485313';
+  static const String _testIosBannerId = 'ca-app-pub-3940256099942544/2934735716';
+  static const String _testIosInterstitialId = 'ca-app-pub-3940256099942544/4411468910';
+  static const String _testIosRewardedId = 'ca-app-pub-3940256099942544/1712485313';
 
-  static String _testBannerId() =>
-      Platform.isIOS ? _testIosBannerId : _testAndroidBannerId;
-  static String _testInterstitialId() =>
-      Platform.isIOS ? _testIosInterstitialId : _testAndroidInterstitialId;
-  static String _testRewardedId() =>
-      Platform.isIOS ? _testIosRewardedId : _testAndroidRewardedId;
+  static String _testBannerId() => Platform.isIOS ? _testIosBannerId : _testAndroidBannerId;
+  static String _testInterstitialId() => Platform.isIOS ? _testIosInterstitialId : _testAndroidInterstitialId;
+  static String _testRewardedId() => Platform.isIOS ? _testIosRewardedId : _testAndroidRewardedId;
 
   static const Map<String, String> _androidIds = {
     'AD_BANNER_HOME': 'ca-app-pub-7138392349989063/3603900094',
@@ -56,8 +47,7 @@ class AdHelper {
   /// Retorna el Interstitial Ad Unit ID correcto según el entorno
   static String getInterstitialAdUnitId() {
     if (kDebugMode) return _testInterstitialId();
-    final productionId = _getRemoteValue(
-        Platform.isIOS ? 'AD_IOS_INTERSTITIAL' : 'AD_INTERSTITIAL');
+    final productionId = _getRemoteValue(Platform.isIOS ? 'AD_IOS_INTERSTITIAL' : 'AD_INTERSTITIAL');
     return productionId;
   }
 
@@ -71,21 +61,18 @@ class AdHelper {
 
   static String _getProductionRewardedId(RewardedAdLocation location) {
     if (location == RewardedAdLocation.revancha) {
-      return _getRemoteValue(
-          Platform.isIOS ? 'AD_IOS_REWARDED_REVANCHA' : 'AD_REWARDED_REVANCHA');
+      return _getRemoteValue(Platform.isIOS ? 'AD_IOS_REWARDED_REVANCHA' : 'AD_REWARDED_REVANCHA');
     }
     throw UnimplementedError('RewardedAdLocation $location is not mapped');
   }
 
   static String _getProductionBannerId(AdLocation location) {
     if (location == AdLocation.home) {
-      return _getRemoteValue(
-          Platform.isIOS ? 'AD_IOS_BANNER_HOME' : 'AD_BANNER_HOME');
+      return _getRemoteValue(Platform.isIOS ? 'AD_IOS_BANNER_HOME' : 'AD_BANNER_HOME');
     }
 
     if (location == AdLocation.partida) {
-      return _getRemoteValue(
-          Platform.isIOS ? 'AD_IOS_BANNER_PARTIDA' : 'AD_BANNER_PARTIDA');
+      return _getRemoteValue(Platform.isIOS ? 'AD_IOS_BANNER_PARTIDA' : 'AD_BANNER_PARTIDA');
     }
     throw UnimplementedError('AdLocation $location is not mapped');
   }

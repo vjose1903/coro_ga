@@ -24,8 +24,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
   bool _isProcessing = false;
   _ProcessingAction _activeAction = _ProcessingAction.none;
 
-  Future<void> _runWithSpinner(
-      _ProcessingAction action, Future<void> Function() work) async {
+  Future<void> _runWithSpinner(_ProcessingAction action, Future<void> Function() work) async {
     if (_isProcessing) return;
     setState(() {
       _isProcessing = true;
@@ -76,52 +75,37 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   final headerRow = Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _BackButton(
-                          isWide: isWide,
-                          useLandscapeLayout: useLandscapeLayout),
+                      _BackButton(isWide: isWide, useLandscapeLayout: useLandscapeLayout),
                       Material(
                         color: Colors.transparent,
                         child: InkWell(
-                          onTap: _isProcessing
-                              ? null
-                              : () => _restorePremium(context),
+                          onTap: _isProcessing ? null : () => _restorePremium(context),
                           borderRadius: BorderRadius.circular(12),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                if (_activeAction ==
-                                    _ProcessingAction.restore) ...[
+                                if (_activeAction == _ProcessingAction.restore) ...[
                                   SizedBox(
                                     width: 16,
                                     height: 16,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2.25,
                                       valueColor: AlwaysStoppedAnimation(
-                                        isDark
-                                            ? Colors.white
-                                            : AppThemes.colorPrimero,
+                                        isDark ? Colors.white : AppThemes.colorPrimero,
                                       ),
                                     ),
                                   ),
                                   const SizedBox(width: 8),
                                 ],
                                 TextScale(
-                                  AppLocalizations.of(context)!
-                                      .restorePurchases,
+                                  AppLocalizations.of(context)!.restorePurchases,
                                   size: 14,
                                   style: TextStyle(
                                     fontFamily: 'Poppins',
                                     fontWeight: FontWeight.w600,
-                                    color: isDark
-                                        ? (_isProcessing
-                                            ? Colors.white38
-                                            : Colors.white70)
-                                        : (_isProcessing
-                                            ? AppThemes.colorPrimero
-                                            : AppThemes.colorTercero),
+                                    color: isDark ? (_isProcessing ? Colors.white38 : Colors.white70) : (_isProcessing ? AppThemes.colorPrimero : AppThemes.colorTercero),
                                   ),
                                 ),
                               ],
@@ -168,8 +152,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     _FeatureItem(
                       icon: FontAwesomeIcons.userGroup,
                       title: AppLocalizations.of(context)!.unlimitedPlayers,
-                      description:
-                          AppLocalizations.of(context)!.unlimitedPlayersDesc,
+                      description: AppLocalizations.of(context)!.unlimitedPlayersDesc,
                       delay: 400,
                       useLandscapeLayout: useLandscapeLayout,
                       isWide: isWide,
@@ -177,18 +160,15 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     _FeatureItem(
                       icon: FontAwesomeIcons.gamepad,
                       title: AppLocalizations.of(context)!.unlimitedGames,
-                      description:
-                          AppLocalizations.of(context)!.unlimitedGamesDesc,
+                      description: AppLocalizations.of(context)!.unlimitedGamesDesc,
                       delay: 500,
                       useLandscapeLayout: useLandscapeLayout,
                       isWide: isWide,
                     ),
                     _FeatureItem(
                       icon: FontAwesomeIcons.gamepad,
-                      title:
-                          AppLocalizations.of(context)!.predefinedGamesFeature,
-                      description:
-                          AppLocalizations.of(context)!.predefinedGamesDesc,
+                      title: AppLocalizations.of(context)!.predefinedGamesFeature,
+                      description: AppLocalizations.of(context)!.predefinedGamesDesc,
                       delay: 600,
                       useLandscapeLayout: useLandscapeLayout,
                       isWide: isWide,
@@ -196,8 +176,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     _FeatureItem(
                       icon: FontAwesomeIcons.clockRotateLeft,
                       title: AppLocalizations.of(context)!.fullHistory,
-                      description:
-                          AppLocalizations.of(context)!.fullHistoryDesc,
+                      description: AppLocalizations.of(context)!.fullHistoryDesc,
                       delay: 700,
                       useLandscapeLayout: useLandscapeLayout,
                       isWide: isWide,
@@ -285,19 +264,12 @@ class _PremiumScreenState extends State<PremiumScreen> {
                               Expanded(
                                 child: LayoutBuilder(
                                   builder: (context, leftConstraints) {
-                                    final availableHeight =
-                                        leftConstraints.maxHeight;
-                                    final logoSize = (availableHeight * 0.46)
-                                        .clamp(72.0, 130.0);
-                                    final titleSize = (availableHeight * 0.11)
-                                        .clamp(20.0, 28.0);
-                                    final subtitleSize =
-                                        (availableHeight * 0.06)
-                                            .clamp(12.0, 15.0);
-                                    final logoGap = (availableHeight * 0.08)
-                                        .clamp(10.0, 24.0);
-                                    final subtitleGap = (availableHeight * 0.03)
-                                        .clamp(4.0, 8.0);
+                                    final availableHeight = leftConstraints.maxHeight;
+                                    final logoSize = (availableHeight * 0.46).clamp(72.0, 130.0);
+                                    final titleSize = (availableHeight * 0.11).clamp(20.0, 28.0);
+                                    final subtitleSize = (availableHeight * 0.06).clamp(12.0, 15.0);
+                                    final logoGap = (availableHeight * 0.08).clamp(10.0, 24.0);
+                                    final subtitleGap = (availableHeight * 0.03).clamp(4.0, 8.0);
 
                                     return Center(
                                       child: Column(
@@ -306,21 +278,15 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                           _PremiumLogo(size: logoSize),
                                           SizedBox(height: logoGap),
                                           FadeInUp(
-                                            delay: const Duration(
-                                                milliseconds: 200),
+                                            delay: const Duration(milliseconds: 200),
                                             child: ShaderMask(
-                                              shaderCallback: (bounds) =>
-                                                  const LinearGradient(
-                                                colors: [
-                                                  Color(0xFFFFD700),
-                                                  Color(0xFFFFA500)
-                                                ],
+                                              shaderCallback: (bounds) => const LinearGradient(
+                                                colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
                                                 begin: Alignment.topLeft,
                                                 end: Alignment.bottomRight,
                                               ).createShader(bounds),
                                               child: TextScale(
-                                                AppLocalizations.of(context)!
-                                                    .coroGamesPro,
+                                                AppLocalizations.of(context)!.coroGamesPro,
                                                 size: titleSize,
                                                 style: const TextStyle(
                                                   fontFamily: 'Poppins',
@@ -332,17 +298,13 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                           ),
                                           SizedBox(height: subtitleGap),
                                           FadeInUp(
-                                            delay: const Duration(
-                                                milliseconds: 300),
+                                            delay: const Duration(milliseconds: 300),
                                             child: TextScale(
-                                              AppLocalizations.of(context)!
-                                                  .unlockFullPotential,
+                                              AppLocalizations.of(context)!.unlockFullPotential,
                                               size: subtitleSize,
                                               style: TextStyle(
                                                 fontFamily: 'Poppins',
-                                                color: isDark
-                                                    ? Colors.white54
-                                                    : Colors.grey[600],
+                                                color: isDark ? Colors.white54 : Colors.grey[600],
                                               ),
                                             ),
                                           ),
@@ -407,9 +369,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
       Toast.show(
         type: isPremium ? ToastType.success : ToastType.error,
         context: context,
-        message: isPremium
-            ? AppLocalizations.of(context)!.purchaseRestored
-            : AppLocalizations.of(context)!.restoreFailed,
+        message: isPremium ? AppLocalizations.of(context)!.purchaseRestored : AppLocalizations.of(context)!.restoreFailed,
       );
     });
   }
@@ -438,22 +398,16 @@ class _BackButton extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.08)
-                    : Colors.black.withValues(alpha: 0.05),
+                color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.04)
-                        : Colors.white.withValues(alpha: 0.8),
+                    color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.white.withValues(alpha: 0.8),
                     offset: const Offset(-2, -2),
                     blurRadius: 4,
                   ),
                   BoxShadow(
-                    color: isDark
-                        ? Colors.black.withValues(alpha: 0.3)
-                        : Colors.black.withValues(alpha: 0.08),
+                    color: isDark ? Colors.black.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.08),
                     offset: const Offset(2, 2),
                     blurRadius: 4,
                   ),
@@ -504,9 +458,7 @@ class _PremiumLogo extends StatelessWidget {
               offset: const Offset(0, 8),
             ),
             BoxShadow(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.1)
-                  : Colors.white.withValues(alpha: 0.8),
+              color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.white.withValues(alpha: 0.8),
               offset: const Offset(-3, -3),
               blurRadius: 6,
             ),
@@ -556,16 +508,12 @@ class _FeatureItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.03)
-                  : Colors.white.withValues(alpha: 0.8),
+              color: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.white.withValues(alpha: 0.8),
               offset: const Offset(-2, -2),
               blurRadius: 4,
             ),
             BoxShadow(
-              color: isDark
-                  ? Colors.black.withValues(alpha: 0.25)
-                  : Colors.black.withValues(alpha: 0.06),
+              color: isDark ? Colors.black.withValues(alpha: 0.25) : Colors.black.withValues(alpha: 0.06),
               offset: const Offset(2, 2),
               blurRadius: 4,
             ),
@@ -636,8 +584,7 @@ class _FeatureItem extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Center(
-                child: IconScale(FontAwesomeIcons.check,
-                    size: 12, color: Colors.white),
+                child: IconScale(FontAwesomeIcons.check, size: 12, color: Colors.white),
               ),
             ),
           ],
@@ -693,8 +640,7 @@ class _AlreadyPremiumCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Center(
-                child: IconScale(FontAwesomeIcons.crown,
-                    size: 16, color: Colors.white),
+                child: IconScale(FontAwesomeIcons.crown, size: 16, color: Colors.white),
               ),
             ),
             const SizedBox(width: 14),
@@ -704,8 +650,7 @@ class _AlreadyPremiumCard extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.bold,
-                color:
-                    isDark ? const Color(0xFF81C784) : const Color(0xFF43A047),
+                color: isDark ? const Color(0xFF81C784) : const Color(0xFF43A047),
               ),
             ),
           ],
@@ -743,8 +688,7 @@ class _BuyButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             child: Container(
               width: double.infinity,
-              padding:
-                  EdgeInsets.symmetric(vertical: useLandscapeLayout ? 8 : 12),
+              padding: EdgeInsets.symmetric(vertical: useLandscapeLayout ? 8 : 12),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
@@ -776,9 +720,7 @@ class _BuyButton extends StatelessWidget {
                         ),
                         const SizedBox(width: 10),
                       ],
-                      IconScale(FontAwesomeIcons.crown,
-                          size: useLandscapeLayout ? (isWide ? 17 : 13) : 18,
-                          color: Colors.white),
+                      IconScale(FontAwesomeIcons.crown, size: useLandscapeLayout ? (isWide ? 17 : 13) : 18, color: Colors.white),
                       const SizedBox(width: 10),
                       TextScale(
                         AppLocalizations.of(context)!.getPro,

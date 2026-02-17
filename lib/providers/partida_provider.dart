@@ -39,13 +39,11 @@ class PartidaProvider extends ChangeNotifier {
   }
 
   void removeJugador(Jugador jugador) {
-    final int index =
-        partidaEnTurno!.jugadores!.indexWhere((item) => item.id == jugador.id);
+    final int index = partidaEnTurno!.jugadores!.indexWhere((item) => item.id == jugador.id);
     partidaEnTurno!.jugadores!.removeAt(index);
 
     if (partidaEnTurno != null) {
-      final int indexPartida =
-          partidas.indexWhere((item) => item.id == partidaEnTurno!.id);
+      final int indexPartida = partidas.indexWhere((item) => item.id == partidaEnTurno!.id);
       partidas[indexPartida] = partidaEnTurno!;
     }
     notifyListeners();
@@ -61,10 +59,8 @@ class PartidaProvider extends ChangeNotifier {
     return response;
   }
 
-  Future<Partida> addJugadorToPartida(BuildContext context,
-      {required Partida partida, required Jugador jugador}) async {
-    final response =
-        await Partida.addNewJugador(partida: partida, jugador: jugador);
+  Future<Partida> addJugadorToPartida(BuildContext context, {required Partida partida, required Jugador jugador}) async {
+    final response = await Partida.addNewJugador(partida: partida, jugador: jugador);
 
     final int index = partidas.indexWhere((item) => item.id == partida.id);
     partidas[index] = response.data;
@@ -84,8 +80,7 @@ class PartidaProvider extends ChangeNotifier {
     return partidas;
   }
 
-  Future<SqlResponse> deletePartida(BuildContext context,
-      {required Partida partida, CompletionHandler? handler}) async {
+  Future<SqlResponse> deletePartida(BuildContext context, {required Partida partida, CompletionHandler? handler}) async {
     final response = await Partida.delete(partida: partida);
 
     if (!response.hasError!) {
@@ -97,29 +92,21 @@ class PartidaProvider extends ChangeNotifier {
       notifyListeners();
       return response;
     } else {
-      Toast.show(
-          type: ToastType.error,
-          context: context,
-          message: response.messages!.first);
+      Toast.show(type: ToastType.error, context: context, message: response.messages!.first);
       if (handler != null) await handler(false);
       return response;
     }
   }
 
-  Future<SqlResponse> editPartida(BuildContext context,
-      {required Partida partida, required String newNombrePartida}) async {
-    final responseFuture =
-        Partida.edit(partida: partida, newNombrePartida: newNombrePartida);
+  Future<SqlResponse> editPartida(BuildContext context, {required Partida partida, required String newNombrePartida}) async {
+    final responseFuture = Partida.edit(partida: partida, newNombrePartida: newNombrePartida);
     final response = await responseFuture;
 
     if (!response.hasError!) {
       notifyListeners();
       return responseFuture;
     } else {
-      Toast.show(
-          type: ToastType.error,
-          context: context,
-          message: response.messages!.first);
+      Toast.show(type: ToastType.error, context: context, message: response.messages!.first);
       return responseFuture;
     }
   }
@@ -149,8 +136,7 @@ class PartidaProvider extends ChangeNotifier {
         Toast.show(
           type: ToastType.error,
           context: context,
-          message:
-              snapshotRes.messages?.first ?? 'No se pudo finalizar la partida.',
+          message: snapshotRes.messages?.first ?? 'No se pudo finalizar la partida.',
         );
         response.hasError = true;
         response.addMsgs(snapshotRes.messages);

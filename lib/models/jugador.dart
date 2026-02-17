@@ -5,12 +5,7 @@ import '../utils/utils.dart';
 import 'models.dart';
 
 class Jugador extends DynamicClass {
-  Jugador(
-      {this.id,
-      this.nombre,
-      this.puntuacion = 0,
-      this.partidaId,
-      this.historialJugadas});
+  Jugador({this.id, this.nombre, this.puntuacion = 0, this.partidaId, this.historialJugadas});
   factory Jugador.fromJson(String str) => Jugador.fromMap(json.decode(str));
 
   factory Jugador.fromMap(Map<String, dynamic> json) => Jugador(
@@ -18,10 +13,7 @@ class Jugador extends DynamicClass {
         partidaId: json['partida_id'],
         nombre: json['nombre'],
         puntuacion: json['puntuacion'] ?? 0,
-        historialJugadas: json['historial_jugadas'] != null
-            ? List<HistorialJugada>.from(json['historial_jugadas']
-                .map((x) => HistorialJugada.fromMap(x)))
-            : [],
+        historialJugadas: json['historial_jugadas'] != null ? List<HistorialJugada>.from(json['historial_jugadas'].map((x) => HistorialJugada.fromMap(x))) : [],
       );
 
   static String tableName = 'Jugador';
@@ -42,12 +34,7 @@ class Jugador extends DynamicClass {
   }
 
   @override
-  Map<String, dynamic> toMap() => {
-        'id': id,
-        'nombre': nombre,
-        'puntuacion': puntuacion,
-        'partida_id': partidaId
-      };
+  Map<String, dynamic> toMap() => {'id': id, 'nombre': nombre, 'puntuacion': puntuacion, 'partida_id': partidaId};
 
   Map<String, dynamic> toUpdateMap() => {'nombre': nombre};
 
@@ -67,38 +54,27 @@ class Jugador extends DynamicClass {
     }
   }
 
-  static Future<SqlResponse> edit(
-      {required Jugador jugador, required String newNombreJugador}) async {
+  static Future<SqlResponse> edit({required Jugador jugador, required String newNombreJugador}) async {
     final Map<String, dynamic> tempJugadorMap = jugador.toUpdateMap();
     tempJugadorMap['nombre'] = newNombreJugador;
 
-    final response = await CrudHelper.updateOne(
-        tableName: Jugador.tableName, id: jugador.id, newData: tempJugadorMap);
+    final response = await CrudHelper.updateOne(tableName: Jugador.tableName, id: jugador.id, newData: tempJugadorMap);
 
     if (response.hasError!) response.addMsg(L10n.errorEditingPlayer);
 
     return response;
   }
 
-  static Future<SqlResponse> changePuntuacion(
-      {required Jugador jugador,
-      required int newPuntuacion,
-      required String tipo,
-      required Map newData}) async {
+  static Future<SqlResponse> changePuntuacion({required Jugador jugador, required int newPuntuacion, required String tipo, required Map newData}) async {
     //
     final SqlResponse response = SqlResponse();
 
-    final res = await CrudHelper.updateOne(
-        tableName: Jugador.tableName, id: jugador.id!, newData: newData);
+    final res = await CrudHelper.updateOne(tableName: Jugador.tableName, id: jugador.id!, newData: newData);
 
     if (!res.hasError!) {
-      final resHistorial = await HistorialJugada.newHistorial(
-          jugadorId: jugador.id!, puntuacion: newPuntuacion, tipo: tipo);
+      final resHistorial = await HistorialJugada.newHistorial(jugadorId: jugador.id!, puntuacion: newPuntuacion, tipo: tipo);
 
-      response.data = {
-        'historial': resHistorial.data,
-        'newPuntuacion': newData['puntuacion']
-      };
+      response.data = {'historial': resHistorial.data, 'newPuntuacion': newData['puntuacion']};
     } else {
       response.addMsgs(res.messages);
     }
@@ -106,23 +82,16 @@ class Jugador extends DynamicClass {
     return response;
   }
 
-  static Future<SqlResponse> deleteHistorial(
-      {required Jugador jugador, required HistorialJugada historial}) async {
+  static Future<SqlResponse> deleteHistorial({required Jugador jugador, required HistorialJugada historial}) async {
     final SqlResponse response = SqlResponse();
 
-    final res = await CrudHelper.deleteOne(
-        tableName: HistorialJugada.tableName, id: historial.id!);
+    final res = await CrudHelper.deleteOne(tableName: HistorialJugada.tableName, id: historial.id!);
 
     if (!res.hasError!) {
       jugador.historialJugadas!.remove(historial);
-      final int newPuntuacion = historial.tipo == 'aumentar'
-          ? jugador.puntuacion! - historial.puntuacion!
-          : jugador.puntuacion! + historial.puntuacion!;
+      final int newPuntuacion = historial.tipo == 'aumentar' ? jugador.puntuacion! - historial.puntuacion! : jugador.puntuacion! + historial.puntuacion!;
 
-      await CrudHelper.updateOne(
-          tableName: Jugador.tableName,
-          id: jugador.id!,
-          newData: {'puntuacion': newPuntuacion});
+      await CrudHelper.updateOne(tableName: Jugador.tableName, id: jugador.id!, newData: {'puntuacion': newPuntuacion});
 
       response.data = {'newPuntuacion': newPuntuacion};
     } else {
@@ -141,8 +110,7 @@ class Jugador extends DynamicClass {
     );
 
     if (!response.hasError!) {
-      final historialesParsed = List<HistorialJugada>.from(
-          response.data.map((x) => HistorialJugada.fromMap(x)));
+      final historialesParsed = List<HistorialJugada>.from(response.data.map((x) => HistorialJugada.fromMap(x)));
       jugador.addHistoriales(historialesParsed);
     } else {
       response.addMsg(L10n.noHistoryForGame);
@@ -152,13 +120,11 @@ class Jugador extends DynamicClass {
   Future<SqlResponse> delete() async {
     SqlResponse response = SqlResponse();
 
-    response =
-        await CrudHelper.deleteOne(tableName: Jugador.tableName, id: id!);
+    response = await CrudHelper.deleteOne(tableName: Jugador.tableName, id: id!);
     if (!response.hasError!) {
       if (historialJugadas != null && historialJugadas!.isNotEmpty) {
         for (final historial in historialJugadas!) {
-          final responseHistorial = await CrudHelper.deleteOne(
-              tableName: HistorialJugada.tableName, id: historial.id!);
+          final responseHistorial = await CrudHelper.deleteOne(tableName: HistorialJugada.tableName, id: historial.id!);
 
           if (responseHistorial.hasError! && response.messages == null) {
             response.addMsg(L10n.someHistoryNotDeleted);

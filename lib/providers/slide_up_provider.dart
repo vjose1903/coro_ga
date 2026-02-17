@@ -44,8 +44,7 @@ class SlideUpProvider extends ChangeNotifier {
     required PanelController controller,
     Widget? bodyContent,
     double? topMargin,
-    double?
-        maxHeightFraction, // Altura máxima como fracción de la pantalla (0.5 = 50%)
+    double? maxHeightFraction, // Altura máxima como fracción de la pantalla (0.5 = 50%)
     bool closeOnOutsideClick = true,
     bool isDraggable = false,
   }) {
@@ -68,10 +67,7 @@ class SlideUpProvider extends ChangeNotifier {
     });
   }
 
-  void closeSlideUp(
-      {required PanelController controller,
-      bool isListener = false,
-      bool skipClean = false}) {
+  void closeSlideUp({required PanelController controller, bool isListener = false, bool skipClean = false}) {
     _skipCleanOnClose = skipClean;
     if (!isListener && controller.isAttached) controller.close();
     _topMargin = null;

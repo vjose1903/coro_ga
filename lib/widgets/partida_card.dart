@@ -54,27 +54,20 @@ class _PartidaCardState extends State<PartidaCard> {
         return DecoratedBox(
           decoration: BoxDecoration(
             color: AppThemes.themeColor_2,
-            borderRadius: useLandscapeLayout
-                ? ResponsiveApp.borderRadius(10)
-                : ResponsiveApp.borderRadius(16),
+            borderRadius: useLandscapeLayout ? ResponsiveApp.borderRadius(10) : ResponsiveApp.borderRadius(16),
             border: Border.all(
-              color: Preferences.isDarkMode
-                  ? Colors.white.withValues(alpha: 0.08)
-                  : Colors.grey.withValues(alpha: 0.15),
+              color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
             ),
             boxShadow: [
               BoxShadow(
-                color: AppThemes.colorCuarto
-                    .withValues(alpha: Preferences.isDarkMode ? 0.2 : 0.1),
+                color: AppThemes.colorCuarto.withValues(alpha: Preferences.isDarkMode ? 0.2 : 0.1),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
             ],
           ),
           child: ClipRRect(
-            borderRadius: useLandscapeLayout
-                ? ResponsiveApp.borderRadius(10)
-                : ResponsiveApp.borderRadius(16),
+            borderRadius: useLandscapeLayout ? ResponsiveApp.borderRadius(10) : ResponsiveApp.borderRadius(16),
             child: SwipeActionCell(
               backgroundColor: Colors.transparent,
               key: ValueKey(widget.partida.id),
@@ -82,31 +75,22 @@ class _PartidaCardState extends State<PartidaCard> {
               index: widget.index,
               trailingActions: <SwipeAction>[
                 SwipeAction(
-                  icon: IconScale(Icons.delete_outline_rounded,
-                      color: Colors.white, size: useLandscapeLayout ? 20 : 22),
+                  icon: IconScale(Icons.delete_outline_rounded, color: Colors.white, size: useLandscapeLayout ? 20 : 22),
                   title: l10n.delete,
-                  style: const TextStyle(
-                      fontFamily: 'Poppins', fontSize: 12, color: Colors.white),
-                  onTap: (CompletionHandler handler) async =>
-                      widget.functionBorrar(handler),
+                  style: const TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white),
+                  onTap: (CompletionHandler handler) async => widget.functionBorrar(handler),
                   color: Colors.red[400]!,
                 ),
                 if (!widget.partida.isSinIniciar)
                   SwipeAction(
-                    icon: IconScale(Icons.restart_alt_rounded,
-                        color: Colors.white,
-                        size: useLandscapeLayout ? 20 : 22),
+                    icon: IconScale(Icons.restart_alt_rounded, color: Colors.white, size: useLandscapeLayout ? 20 : 22),
                     title: l10n.restart,
-                    style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 12,
-                        color: Colors.white),
+                    style: const TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white),
                     onTap: (CompletionHandler handler) async {
                       CustomAlertDialog.show(
                         context,
                         title: l10n.confirm,
-                        menssage:
-                            l10n.confirmRestartGame(widget.partida.nombre!),
+                        menssage: l10n.confirmRestartGame(widget.partida.nombre!),
                         dialogType: DialogType.warning,
                         buttonsList: [
                           CustomActionsButtons.cancelButton({
@@ -130,14 +114,9 @@ class _PartidaCardState extends State<PartidaCard> {
                     color: Colors.amber[700]!,
                   ),
                 SwipeAction(
-                    icon: IconScale(Icons.edit_outlined,
-                        color: Colors.white,
-                        size: useLandscapeLayout ? 20 : 22),
+                    icon: IconScale(Icons.edit_outlined, color: Colors.white, size: useLandscapeLayout ? 20 : 22),
                     title: l10n.edit,
-                    style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 12,
-                        color: Colors.white),
+                    style: const TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white),
                     onTap: (CompletionHandler handler) async {
                       widget.functionEditar();
                       await handler(false);
@@ -148,15 +127,10 @@ class _PartidaCardState extends State<PartidaCard> {
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: () => widget.onTap(),
-                  onLongPress: () => _swipeController.openCellAt(
-                      index: widget.index, trailing: true),
-                  borderRadius: useLandscapeLayout
-                      ? ResponsiveApp.borderRadius(10)
-                      : ResponsiveApp.borderRadius(16),
+                  onLongPress: () => _swipeController.openCellAt(index: widget.index, trailing: true),
+                  borderRadius: useLandscapeLayout ? ResponsiveApp.borderRadius(10) : ResponsiveApp.borderRadius(16),
                   child: Padding(
-                    padding: useLandscapeLayout
-                        ? ResponsiveApp.all(8)
-                        : ResponsiveApp.all(16),
+                    padding: useLandscapeLayout ? ResponsiveApp.all(8) : ResponsiveApp.all(16),
                     child: Row(
                       children: [
                         Expanded(
@@ -174,26 +148,18 @@ class _PartidaCardState extends State<PartidaCard> {
                                       style: TextStyle(
                                         fontFamily: 'Poppins',
                                         fontWeight: FontWeight.w600,
-                                        color: Preferences.isDarkMode
-                                            ? Colors.white
-                                            : AppThemes.colorCuarto,
+                                        color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
                                       ),
                                     ),
                                   ),
                                   Container(
-                                    padding: ResponsiveApp.symmetric(
-                                        horizontal: useLandscapeLayout ? 5 : 10,
-                                        vertical: 4),
+                                    padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 5 : 10, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: AppThemes.colorPrimero
-                                          .withValues(alpha: 0.12),
-                                      borderRadius:
-                                          ResponsiveApp.borderRadius(20),
+                                      color: AppThemes.colorPrimero.withValues(alpha: 0.12),
+                                      borderRadius: ResponsiveApp.borderRadius(20),
                                     ),
                                     child: TextScale(
-                                      widget.partida.tipo == 'Rondas'
-                                          ? l10n.gameType_rounds
-                                          : l10n.gameType_score,
+                                      widget.partida.tipo == 'Rondas' ? l10n.gameType_rounds : l10n.gameType_score,
                                       size: useLandscapeLayout ? 12 : 10,
                                       style: TextStyle(
                                         fontFamily: 'Poppins',
@@ -210,19 +176,11 @@ class _PartidaCardState extends State<PartidaCard> {
                                 children: [
                                   _InfoChip(
                                     icon: FontAwesomeIcons.users,
-                                    label:
-                                        widget.partida.cantJugadores.toString(),
+                                    label: widget.partida.cantJugadores.toString(),
                                     useLandscapeLayout: useLandscapeLayout,
                                   ),
-                                  SizedBox(
-                                      width: useLandscapeLayout
-                                          ? ResponsiveApp.scaleWidth(10)
-                                          : ResponsiveApp.scaleWidth(12)),
-                                  Expanded(
-                                      child: EstadoPartida(
-                                          partida: widget.partida,
-                                          useLandscapeLayout:
-                                              useLandscapeLayout)),
+                                  SizedBox(width: useLandscapeLayout ? ResponsiveApp.scaleWidth(10) : ResponsiveApp.scaleWidth(12)),
+                                  Expanded(child: EstadoPartida(partida: widget.partida, useLandscapeLayout: useLandscapeLayout)),
                                 ],
                               ),
                             ],
@@ -231,13 +189,9 @@ class _PartidaCardState extends State<PartidaCard> {
                         SizedBox(width: ResponsiveApp.scaleWidth(8)),
                         // Flecha
                         Container(
-                          padding: useLandscapeLayout
-                              ? ResponsiveApp.all(3)
-                              : ResponsiveApp.all(8),
+                          padding: useLandscapeLayout ? ResponsiveApp.all(3) : ResponsiveApp.all(8),
                           decoration: BoxDecoration(
-                            color: Preferences.isDarkMode
-                                ? Colors.white.withValues(alpha: 0.05)
-                                : Colors.grey.withValues(alpha: 0.08),
+                            color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.05) : Colors.grey.withValues(alpha: 0.08),
                             shape: BoxShape.circle,
                           ),
                           child: IconScale(
@@ -260,10 +214,7 @@ class _PartidaCardState extends State<PartidaCard> {
 }
 
 class _InfoChip extends StatelessWidget {
-  const _InfoChip(
-      {required this.icon,
-      required this.label,
-      required this.useLandscapeLayout});
+  const _InfoChip({required this.icon, required this.label, required this.useLandscapeLayout});
   final IconData icon;
   final String label;
   final bool useLandscapeLayout;
@@ -271,12 +222,9 @@ class _InfoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: ResponsiveApp.symmetric(
-          horizontal: useLandscapeLayout ? 3 : 10, vertical: 6),
+      padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 3 : 10, vertical: 6),
       decoration: BoxDecoration(
-        color: Preferences.isDarkMode
-            ? Colors.white.withValues(alpha: 0.08)
-            : Colors.grey.withValues(alpha: 0.1),
+        color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.1),
         borderRadius: ResponsiveApp.borderRadius(20),
       ),
       child: Row(
@@ -299,8 +247,7 @@ class _InfoChip extends StatelessWidget {
 }
 
 class EstadoPartida extends StatelessWidget {
-  const EstadoPartida(
-      {required this.partida, required this.useLandscapeLayout, super.key});
+  const EstadoPartida({required this.partida, required this.useLandscapeLayout, super.key});
 
   final Partida partida;
   final bool useLandscapeLayout;
@@ -310,30 +257,17 @@ class EstadoPartida extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     if (partida.isSinIniciar) {
-      return _EstadoChip(
-          icon: Icons.play_arrow_rounded,
-          label: l10n.starting,
-          color: Colors.blue,
-          useLandscapeLayout: useLandscapeLayout);
+      return _EstadoChip(icon: Icons.play_arrow_rounded, label: l10n.starting, color: Colors.blue, useLandscapeLayout: useLandscapeLayout);
     } else if (partida.isEmpate) {
-      return _EstadoChip(
-          icon: Icons.swap_horiz_rounded,
-          label: l10n.tie,
-          color: Colors.amber[700]!,
-          useLandscapeLayout: useLandscapeLayout);
+      return _EstadoChip(icon: Icons.swap_horiz_rounded, label: l10n.tie, color: Colors.amber[700]!, useLandscapeLayout: useLandscapeLayout);
     } else {
-      return _GanadorPerdedor(
-          partida: partida, useLandscapeLayout: useLandscapeLayout);
+      return _GanadorPerdedor(partida: partida, useLandscapeLayout: useLandscapeLayout);
     }
   }
 }
 
 class _EstadoChip extends StatelessWidget {
-  const _EstadoChip(
-      {required this.icon,
-      required this.label,
-      required this.color,
-      required this.useLandscapeLayout});
+  const _EstadoChip({required this.icon, required this.label, required this.color, required this.useLandscapeLayout});
   final IconData icon;
   final String label;
   final Color color;
@@ -342,8 +276,7 @@ class _EstadoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: ResponsiveApp.symmetric(
-          horizontal: useLandscapeLayout ? 4 : 10, vertical: 6),
+      padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 4 : 10, vertical: 6),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         borderRadius: ResponsiveApp.borderRadius(20),
@@ -352,10 +285,7 @@ class _EstadoChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           IconScale(icon, size: 14, color: color),
-          SizedBox(
-              width: useLandscapeLayout
-                  ? ResponsiveApp.scaleWidth(3)
-                  : ResponsiveApp.scaleWidth(5)),
+          SizedBox(width: useLandscapeLayout ? ResponsiveApp.scaleWidth(3) : ResponsiveApp.scaleWidth(5)),
           TextScale(
             label,
             size: useLandscapeLayout ? 16 : 12,
@@ -372,8 +302,7 @@ class _EstadoChip extends StatelessWidget {
 }
 
 class _GanadorPerdedor extends StatelessWidget {
-  const _GanadorPerdedor(
-      {required this.partida, required this.useLandscapeLayout});
+  const _GanadorPerdedor({required this.partida, required this.useLandscapeLayout});
   final Partida partida;
   final bool useLandscapeLayout;
 
@@ -414,12 +343,7 @@ class _GanadorPerdedor extends StatelessWidget {
 }
 
 class _PlayerStatus extends StatelessWidget {
-  const _PlayerStatus(
-      {required this.icon,
-      required this.name,
-      required this.puntuacion,
-      required this.color,
-      required this.useLandscapeLayout});
+  const _PlayerStatus({required this.icon, required this.name, required this.puntuacion, required this.color, required this.useLandscapeLayout});
   final IconData icon;
   final String name;
   final num puntuacion;
@@ -429,9 +353,7 @@ class _PlayerStatus extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: ResponsiveApp.symmetric(
-          horizontal: useLandscapeLayout ? 4 : 8,
-          vertical: useLandscapeLayout ? 3 : 5),
+      padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 4 : 8, vertical: useLandscapeLayout ? 3 : 5),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: ResponsiveApp.borderRadius(16),
@@ -440,10 +362,7 @@ class _PlayerStatus extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           IconScale(icon, size: 12, color: color),
-          SizedBox(
-              width: useLandscapeLayout
-                  ? ResponsiveApp.scaleWidth(2)
-                  : ResponsiveApp.scaleWidth(4)),
+          SizedBox(width: useLandscapeLayout ? ResponsiveApp.scaleWidth(2) : ResponsiveApp.scaleWidth(4)),
           Expanded(
             child: TextScale(
               name,
@@ -457,17 +376,11 @@ class _PlayerStatus extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
-              width: useLandscapeLayout
-                  ? ResponsiveApp.scaleWidth(4)
-                  : ResponsiveApp.scaleWidth(8)),
+          SizedBox(width: useLandscapeLayout ? ResponsiveApp.scaleWidth(4) : ResponsiveApp.scaleWidth(8)),
           TextScale(
             puntuacion.toString(),
             size: 11,
-            style: TextStyle(
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w900,
-                color: color),
+            style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w900, color: color),
           )
         ],
       ),

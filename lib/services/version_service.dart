@@ -35,8 +35,7 @@ class VersionService {
         await _checkAppStore();
       }
 
-      debugPrint(
-          'VersionService: current=$_currentVersion, store=$_storeVersion, url=$_storeUrl');
+      debugPrint('VersionService: current=$_currentVersion, store=$_storeVersion, url=$_storeUrl');
 
       if (_storeVersion != null && _currentVersion != null) {
         _updateAvailable = _isNewerVersion(_storeVersion!, _currentVersion!);
@@ -53,8 +52,7 @@ class VersionService {
 
   Future<void> _checkAppStore() async {
     try {
-      final url =
-          Uri.parse('https://itunes.apple.com/lookup?id=$_iosAppId&country=us');
+      final url = Uri.parse('https://itunes.apple.com/lookup?id=$_iosAppId&country=us');
       final client = HttpClient();
       client.connectionTimeout = const Duration(seconds: 10);
 
@@ -80,14 +78,12 @@ class VersionService {
   Future<void> _checkPlayStore() async {
     try {
       // Para Android, consultamos la página de Play Store y extraemos la versión
-      final url = Uri.parse(
-          'https://play.google.com/store/apps/details?id=$_androidPackageId&hl=en&gl=US');
+      final url = Uri.parse('https://play.google.com/store/apps/details?id=$_androidPackageId&hl=en&gl=US');
       final client = HttpClient();
       client.connectionTimeout = const Duration(seconds: 10);
 
       final request = await client.getUrl(url);
-      request.headers.set('User-Agent',
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
+      request.headers.set('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
       final response = await request.close();
 
       if (response.statusCode == 200) {
@@ -105,14 +101,12 @@ class VersionService {
           final match = pattern.firstMatch(body);
           if (match != null) {
             _storeVersion = match.group(1);
-            debugPrint(
-                'VersionService: Play Store version found with pattern: ${pattern.pattern}');
+            debugPrint('VersionService: Play Store version found with pattern: ${pattern.pattern}');
             break;
           }
         }
 
-        _storeUrl =
-            'https://play.google.com/store/apps/details?id=$_androidPackageId';
+        _storeUrl = 'https://play.google.com/store/apps/details?id=$_androidPackageId';
       }
       client.close();
     } catch (e) {
@@ -121,10 +115,8 @@ class VersionService {
   }
 
   bool _isNewerVersion(String storeVersion, String currentVersion) {
-    final storeParts =
-        storeVersion.split('.').map((e) => int.tryParse(e) ?? 0).toList();
-    final currentParts =
-        currentVersion.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+    final storeParts = storeVersion.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+    final currentParts = currentVersion.split('.').map((e) => int.tryParse(e) ?? 0).toList();
 
     // Asegurar que ambas listas tengan la misma longitud
     while (storeParts.length < 3) {

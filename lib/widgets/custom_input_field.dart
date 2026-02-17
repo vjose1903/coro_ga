@@ -56,17 +56,11 @@ class CustomInputField<T> extends StatelessWidget {
         icon: innerLeft == null ? null : IconScale(innerLeft!),
 
         // FillColor --------
-        fillColor:
-            enabled ? AppThemes.inputColor : AppThemes.inputDisabledColor,
+        fillColor: enabled ? AppThemes.inputColor : AppThemes.inputDisabledColor,
 
         // Labels -----------
-        labelStyle: TextStyle(
-            color: enabled
-                ? AppThemes.labelInputColor
-                : AppThemes.labelInputDisabledColor,
-            fontFamily: 'Poppins'),
-        floatingLabelStyle:
-            WidgetStateTextStyle.resolveWith((Set<WidgetState> states) {
+        labelStyle: TextStyle(color: enabled ? AppThemes.labelInputColor : AppThemes.labelInputDisabledColor, fontFamily: 'Poppins'),
+        floatingLabelStyle: WidgetStateTextStyle.resolveWith((Set<WidgetState> states) {
           final Color? color = states.contains(WidgetState.error)
               ? enabled
                   ? Colors.red[900]

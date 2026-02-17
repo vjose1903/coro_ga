@@ -39,10 +39,8 @@ class _CustomSplashScreenState extends State<CustomSplashScreen> {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                widget.navigateRoute,
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
+            pageBuilder: (context, animation, secondaryAnimation) => widget.navigateRoute,
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(opacity: animation, child: child);
             },
             transitionDuration: const Duration(milliseconds: 500),
@@ -73,10 +71,7 @@ class _CustomSplashScreenState extends State<CustomSplashScreen> {
                 delay: const Duration(milliseconds: 500),
                 child: _AnimatedText(
                   text: widget.text,
-                  style: widget.textStyle ??
-                      TextStyle(
-                          fontSize: ResponsiveApp.scaleText(30),
-                          fontFamily: 'Poppins'),
+                  style: widget.textStyle ?? TextStyle(fontSize: ResponsiveApp.scaleText(30), fontFamily: 'Poppins'),
                 ),
               ),
           ],

@@ -108,8 +108,7 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
       return true;
     };
-    await FirebaseCrashlytics.instance
-        .setCrashlyticsCollectionEnabled(!kDebugMode);
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(!kDebugMode);
   }
 
   Future<void> _initializeMobileAds() async {
@@ -127,8 +126,7 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final textColor = theme.colorScheme.onSurface.withValues(alpha: 0.85);
-    final backgroundColor =
-        Preferences.isDarkMode ? AppThemes.themeColor_1 : Colors.white;
+    final backgroundColor = Preferences.isDarkMode ? AppThemes.themeColor_1 : Colors.white;
     return Scaffold(
       backgroundColor: backgroundColor,
       body: SafeArea(
@@ -154,8 +152,7 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
                                     borderRadius: BorderRadius.circular(24),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black
-                                            .withValues(alpha: 0.25),
+                                        color: Colors.black.withValues(alpha: 0.25),
                                         blurRadius: 20,
                                         offset: const Offset(0, 8),
                                       ),
@@ -175,13 +172,11 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
                                 Expanded(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       TextScale(
                                         'Coro Games',
-                                        style: theme.textTheme.headlineSmall
-                                            ?.copyWith(
+                                        style: theme.textTheme.headlineSmall?.copyWith(
                                           fontWeight: FontWeight.w700,
                                           letterSpacing: 0.2,
                                         ),
@@ -194,12 +189,9 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
                                       ),
                                       const SizedBox(height: 12),
                                       TextScale(
-                                        _hasError
-                                            ? l10n.loadingDataError
-                                            : l10n.loadingData,
+                                        _hasError ? l10n.loadingDataError : l10n.loadingData,
                                         textAlign: TextAlign.left,
-                                        style: theme.textTheme.bodyMedium
-                                            ?.copyWith(color: textColor),
+                                        style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
                                       ),
                                       if (_hasError) ...[
                                         const SizedBox(height: 16),
@@ -222,8 +214,7 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
                                     borderRadius: BorderRadius.circular(24),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black
-                                            .withValues(alpha: 0.25),
+                                        color: Colors.black.withValues(alpha: 0.25),
                                         blurRadius: 20,
                                         offset: const Offset(0, 8),
                                       ),
@@ -242,8 +233,7 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
                                 const SizedBox(height: 20),
                                 TextScale(
                                   'Coro Games',
-                                  style:
-                                      theme.textTheme.headlineSmall?.copyWith(
+                                  style: theme.textTheme.headlineSmall?.copyWith(
                                     fontWeight: FontWeight.w700,
                                     letterSpacing: 0.2,
                                   ),
@@ -256,12 +246,9 @@ class _SplashLoadingScreenState extends State<SplashLoadingScreen> {
                                 ),
                                 const SizedBox(height: 12),
                                 TextScale(
-                                  _hasError
-                                      ? l10n.loadingDataError
-                                      : l10n.loadingData,
+                                  _hasError ? l10n.loadingDataError : l10n.loadingData,
                                   textAlign: TextAlign.center,
-                                  style: theme.textTheme.bodyMedium
-                                      ?.copyWith(color: textColor),
+                                  style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
                                 ),
                                 if (_hasError) ...[
                                   const SizedBox(height: 16),

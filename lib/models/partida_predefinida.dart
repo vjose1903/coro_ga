@@ -5,18 +5,10 @@ import '../utils/utils.dart';
 import 'models.dart';
 
 class PartidaPredefinida extends DynamicClass {
-  PartidaPredefinida(
-      {this.id,
-      this.nombre,
-      this.tipo,
-      this.maxPuntuacion,
-      this.cantidadJugadores,
-      this.orden});
-  factory PartidaPredefinida.fromJson(String str) =>
-      PartidaPredefinida.fromMap(json.decode(str));
+  PartidaPredefinida({this.id, this.nombre, this.tipo, this.maxPuntuacion, this.cantidadJugadores, this.orden});
+  factory PartidaPredefinida.fromJson(String str) => PartidaPredefinida.fromMap(json.decode(str));
 
-  factory PartidaPredefinida.fromMap(Map<String, dynamic> json) =>
-      PartidaPredefinida(
+  factory PartidaPredefinida.fromMap(Map<String, dynamic> json) => PartidaPredefinida(
         id: json['id'],
         nombre: json['nombre'],
         tipo: json['tipo'],
@@ -63,16 +55,14 @@ class PartidaPredefinida extends DynamicClass {
   // ==================================================================================================================================
   // ==================================================================================================================================
 
-  static Future<SqlResponse> createPartidaPredefinida(
-      {required PartidaPredefinida partida}) async {
+  static Future<SqlResponse> createPartidaPredefinida({required PartidaPredefinida partida}) async {
     final SqlResponse response = SqlResponse();
 
     final Map<String, dynamic> tempPartidaMap = partida.toMap();
 
     Fun.removeKeys(tempPartidaMap, ['id']);
 
-    final SqlResponse partidaRes = await CrudHelper.insert(
-        tableName: PartidaPredefinida.tableName, body: tempPartidaMap);
+    final SqlResponse partidaRes = await CrudHelper.insert(tableName: PartidaPredefinida.tableName, body: tempPartidaMap);
 
     partida.id = partidaRes.data;
 
@@ -82,12 +72,10 @@ class PartidaPredefinida extends DynamicClass {
   }
 
   static Future<List<PartidaPredefinida>> getPartidasPredefinidas() async {
-    final response =
-        await CrudHelper.getAll(tableName: PartidaPredefinida.tableName);
+    final response = await CrudHelper.getAll(tableName: PartidaPredefinida.tableName);
 
     if (!response.hasError!) {
-      final partidasParsed = List<PartidaPredefinida>.from(
-          response.data.map((x) => PartidaPredefinida.fromMap(x)));
+      final partidasParsed = List<PartidaPredefinida>.from(response.data.map((x) => PartidaPredefinida.fromMap(x)));
 
       return partidasParsed;
     } else {
@@ -96,20 +84,16 @@ class PartidaPredefinida extends DynamicClass {
     }
   }
 
-  static Future<SqlResponse> delete(
-      {required PartidaPredefinida partida}) async {
-    final response = await CrudHelper.deleteOne(
-        tableName: PartidaPredefinida.tableName, id: partida.id!);
+  static Future<SqlResponse> delete({required PartidaPredefinida partida}) async {
+    final response = await CrudHelper.deleteOne(tableName: PartidaPredefinida.tableName, id: partida.id!);
 
     if (response.hasError!) response.addMsg(L10n.errorDeletingPredefined);
 
     return response;
   }
 
-  static Future<SqlResponse> edit(
-      {required int id, required Map<String, dynamic> partidaEdit}) async {
-    final response = await CrudHelper.updateOne(
-        tableName: PartidaPredefinida.tableName, id: id, newData: partidaEdit);
+  static Future<SqlResponse> edit({required int id, required Map<String, dynamic> partidaEdit}) async {
+    final response = await CrudHelper.updateOne(tableName: PartidaPredefinida.tableName, id: id, newData: partidaEdit);
 
     if (response.hasError!) response.addMsg(L10n.errorEditingPredefined);
 

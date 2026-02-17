@@ -25,8 +25,7 @@ class PartidaScreen extends StatefulWidget {
   State<PartidaScreen> createState() => _PartidaScreenState();
 }
 
-class _PartidaScreenState extends State<PartidaScreen>
-    with SingleTickerProviderStateMixin, RouteAware {
+class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProviderStateMixin, RouteAware {
   late final PanelController panelController;
   late final AnimationController _fabAnimController;
   bool _showBanner = true;
@@ -42,12 +41,9 @@ class _PartidaScreenState extends State<PartidaScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Resetear estado del panel al entrar a la pantalla
       if (mounted) {
-        context
-            .read<SlideUpProvider>()
-            .closeSlideUp(controller: panelController, skipClean: true);
+        context.read<SlideUpProvider>().closeSlideUp(controller: panelController, skipClean: true);
       }
-      Future.delayed(const Duration(milliseconds: 300),
-          () => _fabAnimController.forward());
+      Future.delayed(const Duration(milliseconds: 300), () => _fabAnimController.forward());
     });
   }
 
@@ -115,29 +111,22 @@ class _PartidaScreenState extends State<PartidaScreen>
                   useLandscapeLayout: useLandscapeLayout,
                   isWide: isWide,
                 ),
-                floatingActionButtonLocation:
-                    FloatingActionButtonLocation.endDocked,
+                floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
                 floatingActionButton: Visibility(
-                  visible: !panelController.isAttached ||
-                      panelController.isPanelClosed,
+                  visible: !panelController.isAttached || panelController.isPanelClosed,
                   child: ScaleTransition(
-                    scale: CurvedAnimation(
-                        parent: _fabAnimController, curve: Curves.elasticOut),
+                    scale: CurvedAnimation(parent: _fabAnimController, curve: Curves.elasticOut),
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [
-                            AppThemes.colorPrimero,
-                            AppThemes.colorTercero
-                          ],
+                          colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color:
-                                AppThemes.colorTercero.withValues(alpha: 0.4),
+                            color: AppThemes.colorTercero.withValues(alpha: 0.4),
                             blurRadius: 12,
                             offset: const Offset(0, 6),
                           ),
@@ -149,28 +138,17 @@ class _PartidaScreenState extends State<PartidaScreen>
                         elevation: 0,
                         shape: const CircleBorder(),
                         onPressed: () {
-                          final PartidaProvider partidaProvider =
-                              context.read<PartidaProvider>();
-                          final PremiumProvider premiumProvider =
-                              context.read<PremiumProvider>();
+                          final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+                          final PremiumProvider premiumProvider = context.read<PremiumProvider>();
                           final l10n = AppLocalizations.of(context)!;
 
-                          if (premiumProvider
-                              .canCreateGame(partidaProvider.partidas.length)) {
+                          if (premiumProvider.canCreateGame(partidaProvider.partidas.length)) {
                             Navigator.pushNamed(context, 'formulario');
                           } else {
-                            Toast.show(
-                                type: ToastType.info,
-                                context: context,
-                                message: l10n.freeVersionLimitGames(
-                                    PremiumProvider.freeMaxGames),
-                                actionLabel: l10n.getPro,
-                                onAction: () =>
-                                    Navigator.pushNamed(context, 'premium'));
+                            Toast.show(type: ToastType.info, context: context, message: l10n.freeVersionLimitGames(PremiumProvider.freeMaxGames), actionLabel: l10n.getPro, onAction: () => Navigator.pushNamed(context, 'premium'));
                           }
                         },
-                        child: const IconScale(Icons.add_rounded,
-                            size: 32, color: Colors.white),
+                        child: const IconScale(Icons.add_rounded, size: 32, color: Colors.white),
                       ),
                     ),
                   ),
@@ -178,8 +156,7 @@ class _PartidaScreenState extends State<PartidaScreen>
                 bottomNavigationBar: BottomBar(
                   useLandscapeLayout: useLandscapeLayout,
                   panelController: panelController,
-                  child: NavigationBar(
-                      useLandscapeLayout: useLandscapeLayout, isWide: isWide),
+                  child: NavigationBar(useLandscapeLayout: useLandscapeLayout, isWide: isWide),
                 ),
               );
             },
@@ -205,33 +182,23 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
-    final FormPartidaProvider formPartidaProvider =
-        context.read<FormPartidaProvider>();
+    final FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
     final Partida partida = partidaProvider.partidaEnTurno!;
     final bool compactHeight = ResponsiveApp.isSmallHeight;
     final l10n = AppLocalizations.of(context)!;
 
-    final double topMargin = compactHeight
-        ? (useLandscapeLayout ? 12 : 24)
-        : (useLandscapeLayout ? 20 : 40);
+    final double topMargin = compactHeight ? (useLandscapeLayout ? 12 : 24) : (useLandscapeLayout ? 20 : 40);
     final mediaQuery = MediaQuery.of(context);
     final double bottomInset = mediaQuery.viewPadding.bottom;
-    final double baseBottomMargin = compactHeight
-        ? (useLandscapeLayout ? 17 : 60)
-        : (useLandscapeLayout ? 25 : 90);
+    final double baseBottomMargin = compactHeight ? (useLandscapeLayout ? 17 : 60) : (useLandscapeLayout ? 25 : 90);
     const double bottomBarHeight = 65;
     final double landscapeBottomReserved = bottomBarHeight + bottomInset + 8;
-    final double bottomMarginBase =
-        useLandscapeLayout && baseBottomMargin < landscapeBottomReserved
-            ? landscapeBottomReserved
-            : baseBottomMargin;
+    final double bottomMarginBase = useLandscapeLayout && baseBottomMargin < landscapeBottomReserved ? landscapeBottomReserved : baseBottomMargin;
     final double bottomMargin = bottomMarginBase + bottomInset;
     final double horizontalPadding = ResponsiveApp.scaleWidth(20);
     final double contentSpacing = ResponsiveApp.scaleHeight(20);
-    final double betweenCardGap = compactHeight
-        ? ResponsiveApp.scaleHeight(22)
-        : ResponsiveApp.scaleHeight(25);
+    final double betweenCardGap = compactHeight ? ResponsiveApp.scaleHeight(22) : ResponsiveApp.scaleHeight(25);
     final double adSpacing = ResponsiveApp.scaleHeight(15);
 
     return Layout(
@@ -282,18 +249,12 @@ class _Body extends StatelessWidget {
                             SizedBox(height: contentSpacing),
                             const Spacer(),
                             if (partida.esSinMaxPuntuacion) ...[
-                              _EndGameButton(
-                                  label: l10n.endGame,
-                                  onTap: () =>
-                                      _confirmEndGame(context, partida),
-                                  isWide: isWide,
-                                  useLandscapeLayout: useLandscapeLayout),
+                              _EndGameButton(label: l10n.endGame, onTap: () => _confirmEndGame(context, partida), isWide: isWide, useLandscapeLayout: useLandscapeLayout),
                               SizedBox(height: adSpacing),
                             ],
                             if (showBanner) ...[
                               GoogleBannerAd(
-                                key: ValueKey(
-                                    'partida_banner_${partida.id ?? 'none'}'),
+                                key: ValueKey('partida_banner_${partida.id ?? 'none'}'),
                                 location: AdLocation.partida,
                                 usePadding: false,
                               ),
@@ -304,11 +265,7 @@ class _Body extends StatelessWidget {
                       SizedBox(width: ResponsiveApp.scaleWidth(5)),
                       Flexible(
                         flex: isWide ? 60 : 55,
-                        child: JugadoresCard(
-                            panelController: panelController,
-                            expand: false,
-                            useLandscapeLayout: useLandscapeLayout,
-                            isWide: isWide),
+                        child: JugadoresCard(panelController: panelController, expand: false, useLandscapeLayout: useLandscapeLayout, isWide: isWide),
                       ),
                     ],
                   )
@@ -318,10 +275,7 @@ class _Body extends StatelessWidget {
                       isWide: isWide,
                     ),
                     SizedBox(height: contentSpacing),
-                    JugadoresCard(
-                        panelController: panelController,
-                        useLandscapeLayout: useLandscapeLayout,
-                        isWide: isWide),
+                    JugadoresCard(panelController: panelController, useLandscapeLayout: useLandscapeLayout, isWide: isWide),
                     SizedBox(height: betweenCardGap),
                     if (partida.esSinMaxPuntuacion) ...[
                       _EndGameButton(
@@ -361,16 +315,14 @@ class _Body extends StatelessWidget {
           'label': l10n.endGame,
           'onTap': () async {
             Navigator.pop(context);
-            final finalizadaRes =
-                await context.read<PartidaProvider>().finalizarPartida(
-                      context,
-                      partida: partida,
-                      ganadorNombre: ganador['nombre']?.toString(),
-                      motivo: 'manual',
-                    );
+            final finalizadaRes = await context.read<PartidaProvider>().finalizarPartida(
+                  context,
+                  partida: partida,
+                  ganadorNombre: ganador['nombre']?.toString(),
+                  motivo: 'manual',
+                );
             if (finalizadaRes.hasError!) return;
-            final PartidaFinalizada finalizada =
-                finalizadaRes.data as PartidaFinalizada;
+            final PartidaFinalizada finalizada = finalizadaRes.data as PartidaFinalizada;
             if (!context.mounted) return;
             unawaited(Navigator.push(
               context,
@@ -378,11 +330,8 @@ class _Body extends StatelessWidget {
                 settings: RouteSettings(arguments: {
                   'partidaFinalizadaId': finalizada.id,
                 }),
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    const GanadorScreen(),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) =>
-                        FadeTransition(opacity: animation, child: child),
+                pageBuilder: (context, animation, secondaryAnimation) => const GanadorScreen(),
+                transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
                 transitionDuration: const Duration(milliseconds: 400),
               ),
             ));
@@ -394,11 +343,7 @@ class _Body extends StatelessWidget {
 }
 
 class _EndGameButton extends StatelessWidget {
-  const _EndGameButton(
-      {required this.label,
-      required this.onTap,
-      required this.isWide,
-      required this.useLandscapeLayout});
+  const _EndGameButton({required this.label, required this.onTap, required this.isWide, required this.useLandscapeLayout});
   final String label;
   final VoidCallback onTap;
   final bool isWide;
@@ -412,8 +357,7 @@ class _EndGameButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(14),
         child: Container(
-          padding: EdgeInsets.symmetric(
-              vertical: useLandscapeLayout ? 10 : 12, horizontal: 16),
+          padding: EdgeInsets.symmetric(vertical: useLandscapeLayout ? 10 : 12, horizontal: 16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [Colors.orange[600]!, Colors.red[400]!],
@@ -430,8 +374,7 @@ class _EndGameButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const IconScale(Icons.flag_rounded,
-                  color: Colors.white, size: 18),
+              const IconScale(Icons.flag_rounded, color: Colors.white, size: 18),
               const SizedBox(width: 8),
               TextScale(
                 label,
@@ -451,12 +394,7 @@ class _EndGameButton extends StatelessWidget {
 }
 
 class JugadoresCard extends StatelessWidget {
-  const JugadoresCard(
-      {required this.panelController,
-      required this.useLandscapeLayout,
-      required this.isWide,
-      super.key,
-      this.expand = true});
+  const JugadoresCard({required this.panelController, required this.useLandscapeLayout, required this.isWide, super.key, this.expand = true});
   final PanelController panelController;
   final bool expand;
   final bool useLandscapeLayout;
@@ -468,9 +406,7 @@ class JugadoresCard extends StatelessWidget {
       final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
       final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
       jugadorProvider.formJugador.reset();
-      slideUpProvider.openSlideUp(
-          controller: panelController,
-          bodyContent: AddJugadorPartida(panelController: panelController));
+      slideUpProvider.openSlideUp(controller: panelController, bodyContent: AddJugadorPartida(panelController: panelController));
     }
 
     final card = DecoratedBox(
@@ -478,14 +414,11 @@ class JugadoresCard extends StatelessWidget {
         color: AppThemes.themeColor_2,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Preferences.isDarkMode
-              ? Colors.white.withValues(alpha: 0.08)
-              : Colors.grey.withValues(alpha: 0.15),
+          color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
         ),
         boxShadow: [
           BoxShadow(
-            color: AppThemes.colorCuarto
-                .withValues(alpha: Preferences.isDarkMode ? 0.2 : 0.1),
+            color: AppThemes.colorCuarto.withValues(alpha: Preferences.isDarkMode ? 0.2 : 0.1),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -504,12 +437,8 @@ class JugadoresCard extends StatelessWidget {
                   useLandscapeLayout: useLandscapeLayout,
                   isWide: isWide,
                   onTap: () {
-                    final SlideUpProvider slideUpProvider =
-                        context.read<SlideUpProvider>();
-                    slideUpProvider.openSlideUp(
-                        controller: panelController,
-                        bodyContent:
-                            HistorialGeneral(panelController: panelController));
+                    final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
+                    slideUpProvider.openSlideUp(controller: panelController, bodyContent: HistorialGeneral(panelController: panelController));
                   },
                 ),
                 _ActionButton(
@@ -523,11 +452,7 @@ class JugadoresCard extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             // Lista de jugadores
-            Expanded(
-                child: JugadoresList(
-                    panelController: panelController,
-                    useLandscapeLayout: useLandscapeLayout,
-                    isWide: isWide)),
+            Expanded(child: JugadoresList(panelController: panelController, useLandscapeLayout: useLandscapeLayout, isWide: isWide)),
           ],
         ),
       ),
@@ -567,19 +492,13 @@ class _ActionButton extends StatelessWidget {
                     colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
                   )
                 : null,
-            color: isPrimary
-                ? null
-                : (Preferences.isDarkMode
-                    ? Colors.white.withValues(alpha: 0.08)
-                    : Colors.grey.withValues(alpha: 0.1)),
+            color: isPrimary ? null : (Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.1)),
             borderRadius: BorderRadius.circular(10),
           ),
           child: IconScale(
             icon,
             size: isWide ? 16 : 13,
-            color: isPrimary
-                ? Colors.white
-                : (Preferences.isDarkMode ? Colors.white70 : Colors.grey[700]),
+            color: isPrimary ? Colors.white : (Preferences.isDarkMode ? Colors.white70 : Colors.grey[700]),
           ),
         ),
       ),
@@ -588,11 +507,7 @@ class _ActionButton extends StatelessWidget {
 }
 
 class JugadoresList extends StatelessWidget {
-  const JugadoresList(
-      {required this.panelController,
-      required this.useLandscapeLayout,
-      required this.isWide,
-      super.key});
+  const JugadoresList({required this.panelController, required this.useLandscapeLayout, required this.isWide, super.key});
   final PanelController panelController;
   final bool useLandscapeLayout;
   final bool isWide;
@@ -608,12 +523,9 @@ class JugadoresList extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         const horizontalSpacing = 10.0;
-        final availableWidth = constraints.maxWidth.isFinite
-            ? constraints.maxWidth
-            : MediaQuery.of(context).size.width;
+        final availableWidth = constraints.maxWidth.isFinite ? constraints.maxWidth : MediaQuery.of(context).size.width;
         final columns = useLandscapeLayout && availableWidth >= 700 ? 3 : 2;
-        final columnWidth =
-            (availableWidth - horizontalSpacing * (columns - 1)) / columns;
+        final columnWidth = (availableWidth - horizontalSpacing * (columns - 1)) / columns;
         return SizedBox(
           width: double.infinity,
           child: SingleChildScrollView(
@@ -637,9 +549,7 @@ class JugadoresList extends StatelessWidget {
                   child: partidaProvider.isChangePartida
                       ? ElasticIn(
                           key: ValueKey('${partida.id}_${jugador.id}'),
-                          delay: Duration(
-                              milliseconds:
-                                  100 * index), // Reducido de 100ms a 50ms
+                          delay: Duration(milliseconds: 100 * index), // Reducido de 100ms a 50ms
                           child: jugadorCard)
                       : jugadorCard,
                 );
@@ -653,12 +563,7 @@ class JugadoresList extends StatelessWidget {
 }
 
 class JugadorInfo extends StatelessWidget {
-  const JugadorInfo(
-      {required this.jugador,
-      required this.panelController,
-      required this.useLandscapeLayout,
-      required this.isWide,
-      super.key});
+  const JugadorInfo({required this.jugador, required this.panelController, required this.useLandscapeLayout, required this.isWide, super.key});
   final Jugador jugador;
   final PanelController panelController;
   final bool useLandscapeLayout;
@@ -705,9 +610,7 @@ class JugadorInfo extends StatelessWidget {
         final JugadorProvider jugadorProvider = context.read<JugadorProvider>();
         final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
         jugadorProvider.changeJugadorEnTurno(jugador);
-        slideUpProvider.openSlideUp(
-            controller: panelController,
-            bodyContent: PuntuacionForm(panelController: panelController));
+        slideUpProvider.openSlideUp(controller: panelController, bodyContent: PuntuacionForm(panelController: panelController));
       },
     );
   }
@@ -734,20 +637,15 @@ class _JugadorCard extends StatelessWidget {
     final bool isWinner = estado == Estado.ganador;
     final bool isLoser = estado == Estado.perdedor;
     final bool compactWidth = ResponsiveApp.isSmallWidth;
-    final double cardHeight = (useLandscapeLayout
-        ? ResponsiveApp.scaleWidth(isWide ? 65 : 45)
-        : ResponsiveApp.scaleHeight(130));
-    final double defaultCardWidth =
-        ResponsiveApp.size.width * (compactWidth ? 0.48 : 0.4);
+    final double cardHeight = (useLandscapeLayout ? ResponsiveApp.scaleWidth(isWide ? 65 : 45) : ResponsiveApp.scaleHeight(130));
+    final double defaultCardWidth = ResponsiveApp.size.width * (compactWidth ? 0.48 : 0.4);
     final double cardWidth = defaultCardWidth;
-    final double contentPadding =
-        ResponsiveApp.scaleWidth(useLandscapeLayout ? 5 : 12);
+    final double contentPadding = ResponsiveApp.scaleWidth(useLandscapeLayout ? 5 : 12);
     final double nameFontSize = useLandscapeLayout ? 15 : 14;
     final double scoreFontSize = useLandscapeLayout ? 32 : 42;
 
     final double iconSize = useLandscapeLayout ? 11 : 14;
-    final double iconPadding =
-        ResponsiveApp.scaleWidth(useLandscapeLayout ? 3 : 4);
+    final double iconPadding = ResponsiveApp.scaleWidth(useLandscapeLayout ? 3 : 4);
 
     return Container(
       height: cardHeight,
@@ -756,9 +654,7 @@ class _JugadorCard extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: Preferences.isDarkMode
-              ? [const Color(0xFF2A2D3E), const Color(0xFF1F2130)]
-              : [const Color(0xFFE8ECFF), const Color(0xFFD4DBFF)],
+          colors: Preferences.isDarkMode ? [const Color(0xFF2A2D3E), const Color(0xFF1F2130)] : [const Color(0xFFE8ECFF), const Color(0xFFD4DBFF)],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
@@ -766,9 +662,7 @@ class _JugadorCard extends StatelessWidget {
               ? Colors.green.withValues(alpha: 0.4)
               : isLoser
                   ? Colors.red.withValues(alpha: 0.3)
-                  : (Preferences.isDarkMode
-                      ? Colors.white.withValues(alpha: 0.1)
-                      : AppThemes.colorPrimero.withValues(alpha: 0.2)),
+                  : (Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.1) : AppThemes.colorPrimero.withValues(alpha: 0.2)),
           width: isWinner || isLoser ? 2 : 1,
         ),
         boxShadow: [
@@ -804,9 +698,7 @@ class _JugadorCard extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w600,
-                      color: Preferences.isDarkMode
-                          ? AppThemes.colorPrimero
-                          : AppThemes.colorTercero,
+                      color: Preferences.isDarkMode ? AppThemes.colorPrimero : AppThemes.colorTercero,
                     ),
                   ),
                 ),
@@ -834,10 +726,7 @@ class _JugadorCard extends StatelessWidget {
                           ? [Colors.green[400]!, Colors.green[600]!]
                           : isLoser
                               ? [Colors.red[300]!, Colors.red[500]!]
-                              : [
-                                  AppThemes.colorPrimero,
-                                  AppThemes.colorTercero
-                                ],
+                              : [AppThemes.colorPrimero, AppThemes.colorTercero],
                     ).createShader(bounds),
                     child: TextScale(
                       jugador.puntuacion.toString(),
@@ -860,8 +749,7 @@ class _JugadorCard extends StatelessWidget {
 }
 
 class NavigationBar extends StatefulWidget {
-  const NavigationBar(
-      {required this.useLandscapeLayout, required this.isWide, super.key});
+  const NavigationBar({required this.useLandscapeLayout, required this.isWide, super.key});
   final bool useLandscapeLayout;
   final bool isWide;
 
@@ -881,13 +769,10 @@ class _NavigationBarState extends State<NavigationBar> {
     itemScrollController = ItemScrollController();
     itemPositionsListener = ItemPositionsListener.create();
 
-    SchedulerBinding.instance
-        .addPostFrameCallback((_) => scrollToGame(context));
+    SchedulerBinding.instance.addPostFrameCallback((_) => scrollToGame(context));
 
     itemPositionsListener.itemPositions.addListener(() {
-      visibleIndeces = itemPositionsListener.itemPositions.value
-          .map((item) => item.index)
-          .toList();
+      visibleIndeces = itemPositionsListener.itemPositions.value.map((item) => item.index).toList();
     });
   }
 
@@ -899,20 +784,12 @@ class _NavigationBarState extends State<NavigationBar> {
   void scrollToGame(BuildContext context) {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
 
-    final int selectedIndex = partidaProvider.partidas.indexWhere(
-        (partida) => partida.id == partidaProvider.partidaEnTurno!.id);
+    final int selectedIndex = partidaProvider.partidas.indexWhere((partida) => partida.id == partidaProvider.partidaEnTurno!.id);
 
     // Usar post frame callback en lugar de delay
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (partidaProvider.partidas.length > 3 &&
-          visibleIndeces.isNotEmpty &&
-          ((selectedIndex <= visibleIndeces.first) ||
-              (selectedIndex >= visibleIndeces.last))) {
-        itemScrollController.scrollTo(
-            index: selectedIndex,
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOutCubic,
-            alignment: 0.4);
+      if (partidaProvider.partidas.length > 3 && visibleIndeces.isNotEmpty && ((selectedIndex <= visibleIndeces.first) || (selectedIndex >= visibleIndeces.last))) {
+        itemScrollController.scrollTo(index: selectedIndex, duration: const Duration(milliseconds: 500), curve: Curves.easeInOutCubic, alignment: 0.4);
       }
     });
   }
@@ -922,8 +799,7 @@ class _NavigationBarState extends State<NavigationBar> {
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final List<Partida> partidas = partidaProvider.partidas;
 
-    final double paddingLeft =
-        widget.useLandscapeLayout ? (widget.isWide ? 20 : 35) : 20;
+    final double paddingLeft = widget.useLandscapeLayout ? (widget.isWide ? 20 : 35) : 20;
 
     if (partidas.isNotEmpty) {
       return ScrollablePositionedList.separated(
@@ -934,11 +810,7 @@ class _NavigationBarState extends State<NavigationBar> {
           physics: const ClampingScrollPhysics(),
           itemCount: partidas.length,
           padding: EdgeInsets.only(left: paddingLeft, right: 200),
-          itemBuilder: (context, index) => _Chip(
-              partida: partidas[index],
-              scrollToGame: scrollToGame,
-              isWide: widget.isWide,
-              useLandscapeLayout: widget.useLandscapeLayout));
+          itemBuilder: (context, index) => _Chip(partida: partidas[index], scrollToGame: scrollToGame, isWide: widget.isWide, useLandscapeLayout: widget.useLandscapeLayout));
     } else {
       return Container();
     }
@@ -946,11 +818,7 @@ class _NavigationBarState extends State<NavigationBar> {
 }
 
 class _Chip extends StatelessWidget {
-  const _Chip(
-      {required this.partida,
-      required this.scrollToGame,
-      required this.isWide,
-      required this.useLandscapeLayout});
+  const _Chip({required this.partida, required this.scrollToGame, required this.isWide, required this.useLandscapeLayout});
   final Partida? partida;
   final Function scrollToGame;
   final bool isWide;
@@ -972,18 +840,12 @@ class _Chip extends StatelessWidget {
                   colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
                 )
               : null,
-          color: isSelected
-              ? null
-              : (Preferences.isDarkMode
-                  ? Colors.white.withValues(alpha: 0.1)
-                  : Colors.grey.withValues(alpha: 0.15)),
+          color: isSelected ? null : (Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.15)),
           borderRadius: BorderRadius.circular(25),
           border: isSelected
               ? null
               : Border.all(
-                  color: Preferences.isDarkMode
-                      ? Colors.white.withValues(alpha: 0.1)
-                      : Colors.grey.withValues(alpha: 0.2),
+                  color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.2),
                 ),
           boxShadow: isSelected
               ? [
@@ -1006,18 +868,13 @@ class _Chip extends StatelessWidget {
               }
             },
             child: Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: 18, vertical: useLandscapeLayout ? 6 : 10),
+              padding: EdgeInsets.symmetric(horizontal: 18, vertical: useLandscapeLayout ? 6 : 10),
               child: TextScale(
                 partida!.nombre!,
                 size: isWide ? 14 : 16,
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  color: isSelected
-                      ? Colors.white
-                      : (Preferences.isDarkMode
-                          ? Colors.white70
-                          : Colors.grey[700]),
+                  color: isSelected ? Colors.white : (Preferences.isDarkMode ? Colors.white70 : Colors.grey[700]),
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),

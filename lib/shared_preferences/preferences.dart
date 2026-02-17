@@ -79,8 +79,7 @@ class Preferences {
   static const bool _kTestPremium = false;
 
   static bool get isPremium {
-    return (kDebugMode && _kTestPremium) ||
-        (_prefs.getBool('isPremium') ?? false);
+    return (kDebugMode && _kTestPremium) || (_prefs.getBool('isPremium') ?? false);
   }
 
   static set isPremium(bool value) {

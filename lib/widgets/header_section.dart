@@ -45,14 +45,12 @@ class _HeaderSectionState extends State<HeaderSection> {
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
-    final avatarSize =
-        widget.useLandscapeLayout ? (widget.isWide ? 36.0 : 25.0) : 36.0;
+    final avatarSize = widget.useLandscapeLayout ? (widget.isWide ? 36.0 : 25.0) : 36.0;
     final iconSize = widget.useLandscapeLayout ? (12.0) : 18.0;
 
     return GestureDetector(
       onVerticalDragStart: (details) {
-        if (widget.panelController == null ||
-            !widget.panelController!.isAttached) {
+        if (widget.panelController == null || !widget.panelController!.isAttached) {
           return;
         }
         _dragStartPosition = widget.panelController!.panelPosition;
@@ -61,9 +59,7 @@ class _HeaderSectionState extends State<HeaderSection> {
         _panelMaxHeight ??= MediaQuery.of(context).size.height * 0.95;
       },
       onVerticalDragUpdate: (details) {
-        if (widget.panelController == null ||
-            !widget.panelController!.isAttached ||
-            _panelMaxHeight == null) {
+        if (widget.panelController == null || !widget.panelController!.isAttached || _panelMaxHeight == null) {
           return;
         }
 
@@ -78,8 +74,7 @@ class _HeaderSectionState extends State<HeaderSection> {
         widget.panelController!.panelPosition = newPosition;
       },
       onVerticalDragEnd: (details) {
-        if (widget.panelController == null ||
-            !widget.panelController!.isAttached) {
+        if (widget.panelController == null || !widget.panelController!.isAttached) {
           return;
         }
 
@@ -100,21 +95,11 @@ class _HeaderSectionState extends State<HeaderSection> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: isDark
-                ? [
-                    Colors.white.withValues(alpha: 0.08),
-                    Colors.white.withValues(alpha: 0.03)
-                  ]
-                : [
-                    AppThemes.colorPrimero.withValues(alpha: 0.08),
-                    AppThemes.colorPrimero.withValues(alpha: 0.03)
-                  ],
+            colors: isDark ? [Colors.white.withValues(alpha: 0.08), Colors.white.withValues(alpha: 0.03)] : [AppThemes.colorPrimero.withValues(alpha: 0.08), AppThemes.colorPrimero.withValues(alpha: 0.03)],
           ),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.1)
-                : AppThemes.colorPrimero.withValues(alpha: 0.15),
+            color: isDark ? Colors.white.withValues(alpha: 0.1) : AppThemes.colorPrimero.withValues(alpha: 0.15),
           ),
           boxShadow: [
             BoxShadow(
@@ -154,8 +139,7 @@ class _HeaderSectionState extends State<HeaderSection> {
               child: Center(
                 child: Transform.translate(
                   offset: widget.iconOffset,
-                  child: IconScale(widget.icon,
-                      color: Colors.white, size: iconSize),
+                  child: IconScale(widget.icon, color: Colors.white, size: iconSize),
                 ),
               ),
             ),
@@ -173,8 +157,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.bold,
-                              color:
-                                  isDark ? Colors.white : AppThemes.colorQuinto,
+                              color: isDark ? Colors.white : AppThemes.colorQuinto,
                             ),
                           ),
                         ),
@@ -188,9 +171,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontFamily: 'Poppins',
-                                color: isDark
-                                    ? Colors.grey[400]
-                                    : Colors.grey[600],
+                                color: isDark ? Colors.grey[400] : Colors.grey[600],
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -209,8 +190,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                           style: TextStyle(
                             fontFamily: 'Poppins',
                             fontWeight: FontWeight.bold,
-                            color:
-                                isDark ? Colors.white : AppThemes.colorQuinto,
+                            color: isDark ? Colors.white : AppThemes.colorQuinto,
                           ),
                         ),
                         if ((widget.subtitle ?? '').isNotEmpty) ...[
@@ -222,8 +202,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontFamily: 'Poppins',
-                              color:
-                                  isDark ? Colors.grey[400] : Colors.grey[600],
+                              color: isDark ? Colors.grey[400] : Colors.grey[600],
                               fontWeight: FontWeight.w500,
                             ),
                           ),

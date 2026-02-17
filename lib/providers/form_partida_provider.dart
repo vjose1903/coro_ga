@@ -23,13 +23,10 @@ class FormPartidaProvider extends ChangeNotifier {
     form.control('nombre').value = partidaPredefinida.nombre ?? '';
     form.control('tipo').value = partidaPredefinida.tipo ?? '';
     form.control('activo').value = 'true';
-    form.control('maxPuntuacion').value =
-        partidaPredefinida.maxPuntuacion ?? _defaultMaxPuntuacion;
+    form.control('maxPuntuacion').value = partidaPredefinida.maxPuntuacion ?? _defaultMaxPuntuacion;
     _syncSinMaxWithValue();
 
-    final targetJugadores =
-        (partidaPredefinida.cantidadJugadores ?? _minJugadores)
-            .clamp(_minJugadores, _maxJugadores);
+    final targetJugadores = (partidaPredefinida.cantidadJugadores ?? _minJugadores).clamp(_minJugadores, _maxJugadores);
     _setPlayersCount(targetJugadores, context: context);
     form.updateValueAndValidity();
 
@@ -82,9 +79,7 @@ class FormPartidaProvider extends ChangeNotifier {
   void addJugadorToList({String? name, BuildContext? context}) {
     final jugadoresArray = form.control('jugadores') as FormArray<dynamic>;
     final playerNumber = jugadoresArray.controls.length + 1;
-    final resolvedName = (name != null && name.trim().isNotEmpty)
-        ? name
-        : _defaultPlayerName(context, playerNumber);
+    final resolvedName = (name != null && name.trim().isNotEmpty) ? name : _defaultPlayerName(context, playerNumber);
     final newFormGroup = createItem(cant: 1, name: resolvedName).first;
 
     jugadoresArray.add(newFormGroup);
@@ -142,10 +137,7 @@ class FormPartidaProvider extends ChangeNotifier {
       final nextNumber = jugadoresArray.controls.length + 1;
       jugadoresArray.add(
         fb.group({
-          'nombre': [
-            _defaultPlayerName(context, nextNumber),
-            Validators.required
-          ],
+          'nombre': [_defaultPlayerName(context, nextNumber), Validators.required],
         }),
       );
     }

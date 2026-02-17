@@ -98,18 +98,14 @@ class _AboutContent extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.bold,
-                              color: Preferences.isDarkMode
-                                  ? Colors.white
-                                  : AppThemes.colorCuarto,
+                              color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
                             ),
                           ),
                           const SizedBox(height: 8),
                           FutureBuilder<PackageInfo>(
                             future: PackageInfo.fromPlatform(),
                             builder: (context, snapshot) {
-                              final version = snapshot.hasData
-                                  ? 'v${snapshot.data!.version}'
-                                  : '';
+                              final version = snapshot.hasData ? 'v${snapshot.data!.version}' : '';
                               return TextScale(
                                 version,
                                 size: 14,
@@ -139,9 +135,7 @@ class _AboutContent extends StatelessWidget {
                               style: TextStyle(
                                 fontFamily: 'Poppins',
                                 height: 1.6,
-                                color: Preferences.isDarkMode
-                                    ? Colors.white70
-                                    : Colors.grey[700],
+                                color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[700],
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -158,15 +152,12 @@ class _AboutContent extends StatelessWidget {
                                   style: TextStyle(
                                     fontFamily: 'Poppins',
                                     height: 1.6,
-                                    color: Preferences.isDarkMode
-                                        ? Colors.white70
-                                        : Colors.grey[700],
+                                    color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[700],
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
                                 const SizedBox(height: 20),
-                                _PrivacyPolicyButton(
-                                    label: l10n.viewFullPrivacyPolicy),
+                                _PrivacyPolicyButton(label: l10n.viewFullPrivacyPolicy),
                               ],
                             ),
                           ),
@@ -225,17 +216,14 @@ class _AboutContent extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.bold,
-                  color: Preferences.isDarkMode
-                      ? Colors.white
-                      : AppThemes.colorCuarto,
+                  color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
                 ),
               ),
               const SizedBox(height: 8),
               FutureBuilder<PackageInfo>(
                 future: PackageInfo.fromPlatform(),
                 builder: (context, snapshot) {
-                  final version =
-                      snapshot.hasData ? 'v${snapshot.data!.version}' : '';
+                  final version = snapshot.hasData ? 'v${snapshot.data!.version}' : '';
                   return TextScale(
                     version,
                     size: 14,
@@ -257,9 +245,7 @@ class _AboutContent extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     height: 1.6,
-                    color: Preferences.isDarkMode
-                        ? Colors.white70
-                        : Colors.grey[700],
+                    color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[700],
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -277,9 +263,7 @@ class _AboutContent extends StatelessWidget {
                       style: TextStyle(
                         fontFamily: 'Poppins',
                         height: 1.6,
-                        color: Preferences.isDarkMode
-                            ? Colors.white70
-                            : Colors.grey[700],
+                        color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[700],
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -387,9 +371,7 @@ class _SectionCard extends StatelessWidget {
         color: AppThemes.themeColor_2,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.08)
-              : Colors.grey.withValues(alpha: 0.15),
+          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
         ),
         boxShadow: [
           BoxShadow(

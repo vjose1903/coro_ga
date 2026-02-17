@@ -37,8 +37,7 @@ class JugadorProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<SqlResponse> editJugador(BuildContext context,
-      {required Jugador jugador, required String newNombreJugador}) async {
+  Future<SqlResponse> editJugador(BuildContext context, {required Jugador jugador, required String newNombreJugador}) async {
     final SqlResponse response = await Jugador.edit(
       jugador: jugador,
       newNombreJugador: newNombreJugador,
@@ -61,10 +60,7 @@ class JugadorProvider extends ChangeNotifier {
     return response;
   }
 
-  Future<SqlResponse> changePuntuacion(
-      {required Jugador jugador,
-      required int newPuntuacion,
-      required String tipo}) async {
+  Future<SqlResponse> changePuntuacion({required Jugador jugador, required int newPuntuacion, required String tipo}) async {
     final Map body = jugador.toMap();
 
     if (tipo == 'aumentar') {
@@ -74,11 +70,7 @@ class JugadorProvider extends ChangeNotifier {
       body['puntuacion'] = body['puntuacion'] - newPuntuacion;
     }
 
-    final SqlResponse response = await Jugador.changePuntuacion(
-        jugador: jugador,
-        newPuntuacion: newPuntuacion,
-        tipo: tipo,
-        newData: body);
+    final SqlResponse response = await Jugador.changePuntuacion(jugador: jugador, newPuntuacion: newPuntuacion, tipo: tipo, newData: body);
 
     if (!response.hasError!) {
       jugadorEnTurno!.addHistorial(response.data['historial']);
@@ -90,10 +82,8 @@ class JugadorProvider extends ChangeNotifier {
     return response;
   }
 
-  Future<SqlResponse> deleteHistorial(
-      {required HistorialJugada historial}) async {
-    final SqlResponse response = await Jugador.deleteHistorial(
-        jugador: jugadorEnTurno!, historial: historial);
+  Future<SqlResponse> deleteHistorial({required HistorialJugada historial}) async {
+    final SqlResponse response = await Jugador.deleteHistorial(jugador: jugadorEnTurno!, historial: historial);
 
     if (!response.hasError!) {
       jugadorEnTurno!.puntuacion = response.data['newPuntuacion'];
@@ -103,59 +93,45 @@ class JugadorProvider extends ChangeNotifier {
     return response;
   }
 
-  Future<dynamic> deleteJugador(BuildContext context,
-      {required Jugador jugador,
-      required Function callBack,
-      PanelController? panelController}) async {
+  Future<dynamic> deleteJugador(BuildContext context, {required Jugador jugador, required Function callBack, PanelController? panelController}) async {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
     final l10n = AppLocalizations.of(context)!;
 
-    CustomAlertDialog.show(context,
-        menssage: l10n.confirmDeletePlayer(jugador.nombre!),
-        title: l10n.confirm,
-        dialogType: DialogType.error,
-        buttonsList: [
-          CustomActionsButtons.cancelButton({
-            'label': l10n.cancel,
-            'onTap': () {
-              Navigator.pop(context);
-              callBack({'tipo': 'cancelar'});
+    CustomAlertDialog.show(context, menssage: l10n.confirmDeletePlayer(jugador.nombre!), title: l10n.confirm, dialogType: DialogType.error, buttonsList: [
+      CustomActionsButtons.cancelButton({
+        'label': l10n.cancel,
+        'onTap': () {
+          Navigator.pop(context);
+          callBack({'tipo': 'cancelar'});
+        }
+      }),
+      CustomActionsButtons.aceptarButton({
+        'label': l10n.accept,
+        'onTap': () async {
+          Navigator.pop(context);
+
+          final response = await jugador.delete();
+          if (!context.mounted) {
+            callBack({'tipo': 'aceptar'});
+            return;
+          }
+
+          if (!response.hasError!) {
+            if (panelController != null) {
+              slideUpProvider.closeSlideUp(controller: panelController);
             }
-          }),
-          CustomActionsButtons.aceptarButton({
-            'label': l10n.accept,
-            'onTap': () async {
-              Navigator.pop(context);
 
-              final response = await jugador.delete();
-              if (!context.mounted) {
-                callBack({'tipo': 'aceptar'});
-                return;
-              }
-
-              if (!response.hasError!) {
-                if (panelController != null) {
-                  slideUpProvider.closeSlideUp(controller: panelController);
-                }
-
-                partidaProvider.removeJugador(jugador);
-                if (response.messages != null &&
-                    response.messages!.isNotEmpty) {
-                  Toast.show(
-                      type: ToastType.warning,
-                      context: context,
-                      message: response.messages!.first);
-                }
-              } else {
-                Toast.show(
-                    type: ToastType.error,
-                    context: context,
-                    message: response.messages!.first);
-              }
-              callBack({'tipo': 'aceptar'});
+            partidaProvider.removeJugador(jugador);
+            if (response.messages != null && response.messages!.isNotEmpty) {
+              Toast.show(type: ToastType.warning, context: context, message: response.messages!.first);
             }
-          })
-        ]);
+          } else {
+            Toast.show(type: ToastType.error, context: context, message: response.messages!.first);
+          }
+          callBack({'tipo': 'aceptar'});
+        }
+      })
+    ]);
   }
 }

@@ -20,16 +20,14 @@ class CustomActionsButtons {
     this.isPrimary = false,
     this.isDestructive = false,
   });
-  factory CustomActionsButtons.cancelButton(Map<String, dynamic> json) =>
-      CustomActionsButtons(
+  factory CustomActionsButtons.cancelButton(Map<String, dynamic> json) => CustomActionsButtons(
         label: json['label'] ?? 'Cancelar',
         onTap: json['onTap'] ?? () {},
         textColor: json['textColor'],
         isDestructive: true,
       );
 
-  factory CustomActionsButtons.aceptarButton(Map<String, dynamic> json) =>
-      CustomActionsButtons(
+  factory CustomActionsButtons.aceptarButton(Map<String, dynamic> json) => CustomActionsButtons(
         label: json['label'] ?? 'Aceptar',
         onTap: json['onTap'] ?? () {},
         textColor: json['textColor'],
@@ -42,9 +40,7 @@ class CustomActionsButtons {
   final bool isPrimary;
   final bool isDestructive;
 
-  static Color? defaultTextColor = Preferences.isDarkMode
-      ? Colors.white.withValues(alpha: 0.7)
-      : Colors.blueGrey[600]!.withValues(alpha: 0.7);
+  static Color? defaultTextColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.7) : Colors.blueGrey[600]!.withValues(alpha: 0.7);
 }
 
 class CustomAlertDialog {
@@ -57,21 +53,9 @@ class CustomAlertDialog {
     List<CustomActionsButtons>? buttonsList,
   }) {
     if (Platform.isAndroid) {
-      displayDialogAndroid(
-          context: context,
-          menssage: menssage,
-          title: title,
-          dialogType: dialogType,
-          body: body,
-          buttonsList: buttonsList);
+      displayDialogAndroid(context: context, menssage: menssage, title: title, dialogType: dialogType, body: body, buttonsList: buttonsList);
     } else {
-      displayDialogIOs(
-          context: context,
-          menssage: menssage,
-          title: title,
-          dialogType: dialogType,
-          body: body,
-          buttonsList: buttonsList);
+      displayDialogIOs(context: context, menssage: menssage, title: title, dialogType: dialogType, body: body, buttonsList: buttonsList);
     }
   }
 
@@ -101,8 +85,7 @@ class CustomAlertDialog {
                 vertical: useLandscapeLayout ? 16 : 24,
               ),
               child: Container(
-                constraints:
-                    BoxConstraints(maxWidth: useLandscapeLayout ? 520 : 340),
+                constraints: BoxConstraints(maxWidth: useLandscapeLayout ? 520 : 340),
                 decoration: BoxDecoration(
                   color: isDark ? AppThemes.themeColor_2 : Colors.white,
                   borderRadius: BorderRadius.circular(16),
@@ -118,11 +101,7 @@ class CustomAlertDialog {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // Header con icono
-                    _DialogHeader(
-                        title: title,
-                        dialogType: dialogType,
-                        isWide: isWide,
-                        useLandscapeLayout: useLandscapeLayout),
+                    _DialogHeader(title: title, dialogType: dialogType, isWide: isWide, useLandscapeLayout: useLandscapeLayout),
                     // Contenido
                     Padding(
                       padding: EdgeInsets.fromLTRB(
@@ -138,8 +117,7 @@ class CustomAlertDialog {
                       ),
                     ),
                     // Botones
-                    if (buttonsList != null && buttonsList.isNotEmpty)
-                      _DialogActions(buttons: buttonsList),
+                    if (buttonsList != null && buttonsList.isNotEmpty) _DialogActions(buttons: buttonsList),
                   ],
                 ),
               ),
@@ -239,8 +217,7 @@ class CustomAlertDialog {
     );
   }
 
-  static List<CupertinoDialogAction> _makeActionsButtonsIOS(
-      List<CustomActionsButtons>? buttons) {
+  static List<CupertinoDialogAction> _makeActionsButtonsIOS(List<CustomActionsButtons>? buttons) {
     if (buttons == null) return [];
 
     return buttons.map((button) {
@@ -270,11 +247,7 @@ class CustomAlertDialog {
 
 // Header del diálogo
 class _DialogHeader extends StatelessWidget {
-  const _DialogHeader(
-      {required this.title,
-      required this.useLandscapeLayout,
-      required this.isWide,
-      this.dialogType});
+  const _DialogHeader({required this.title, required this.useLandscapeLayout, required this.isWide, this.dialogType});
 
   final String title;
   final bool useLandscapeLayout;
@@ -289,9 +262,7 @@ class _DialogHeader extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.03)
-            : Colors.black.withValues(alpha: 0.02),
+        color: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.02),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
@@ -308,8 +279,7 @@ class _DialogHeader extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Center(
-                child: CustomAlertDialog._getIconWidget(dialogType,
-                    size: useLandscapeLayout ? (isWide ? 16 : 14) : 16),
+                child: CustomAlertDialog._getIconWidget(dialogType, size: useLandscapeLayout ? (isWide ? 16 : 14) : 16),
               ),
             ),
             const SizedBox(width: 10),
@@ -400,20 +370,10 @@ class _ActionButton extends StatelessWidget {
     } else if (isDestructive) {
       gradientColors = [const Color(0xFFEF5350), const Color(0xFFE53935)];
     } else {
-      gradientColors = isDark
-          ? [
-              Colors.white.withValues(alpha: 0.1),
-              Colors.white.withValues(alpha: 0.05)
-            ]
-          : [
-              Colors.grey.withValues(alpha: 0.15),
-              Colors.grey.withValues(alpha: 0.1)
-            ];
+      gradientColors = isDark ? [Colors.white.withValues(alpha: 0.1), Colors.white.withValues(alpha: 0.05)] : [Colors.grey.withValues(alpha: 0.15), Colors.grey.withValues(alpha: 0.1)];
     }
 
-    final textColor = (isPrimary || isDestructive)
-        ? Colors.white
-        : (isDark ? Colors.white70 : AppThemes.colorCuarto);
+    final textColor = (isPrimary || isDestructive) ? Colors.white : (isDark ? Colors.white70 : AppThemes.colorCuarto);
 
     return Material(
       color: Colors.transparent,

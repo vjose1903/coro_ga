@@ -41,26 +41,17 @@ class TextScale extends StatelessWidget {
     this.textHeightBehavior,
     this.selectionColor,
   }) : data = null;
-  static double resolveSize(BuildContext context,
-      {double? size, TextStyle? style}) {
-    final isLandscapeLayout =
-        ResponsiveLayoutBuilder.maybeOf(context)?.useLandscapeLayout ??
-            ResponsiveLayoutBuilder.resolveUseLandscapeLayout(context);
+  static double resolveSize(BuildContext context, {double? size, TextStyle? style}) {
+    final isLandscapeLayout = ResponsiveLayoutBuilder.maybeOf(context)?.useLandscapeLayout ?? ResponsiveLayoutBuilder.resolveUseLandscapeLayout(context);
     final isLargeDevice = ResponsiveLayoutBuilder.resolveIsWide(context);
     final landscapePhoneBoost = isLandscapeLayout && !isLargeDevice ? 1.7 : 1.0;
     final portraitBias = isLandscapeLayout ? 1.0 : 0.95;
     final maxFactor = isLargeDevice ? 1.05 : 1.25;
 
     final resolvedBaseSize = size ?? style?.fontSize ?? 14.0;
-    final scaledBase = ResponsiveApp.scaleText(resolvedBaseSize) *
-        portraitBias *
-        landscapePhoneBoost;
-    final minSize = ResponsiveApp.scaleText(resolvedBaseSize * 0.95) *
-        portraitBias *
-        landscapePhoneBoost;
-    final maxSize = ResponsiveApp.scaleText(resolvedBaseSize * maxFactor) *
-        portraitBias *
-        landscapePhoneBoost;
+    final scaledBase = ResponsiveApp.scaleText(resolvedBaseSize) * portraitBias * landscapePhoneBoost;
+    final minSize = ResponsiveApp.scaleText(resolvedBaseSize * 0.95) * portraitBias * landscapePhoneBoost;
+    final maxSize = ResponsiveApp.scaleText(resolvedBaseSize * maxFactor) * portraitBias * landscapePhoneBoost;
     return _clampFontSizeStatic(scaledBase, minSize, maxSize);
   }
 
@@ -85,8 +76,7 @@ class TextScale extends StatelessWidget {
   Widget build(BuildContext context) {
     final clampedSize = resolveSize(context, size: size, style: style);
 
-    final effectiveStyle =
-        (style ?? const TextStyle()).copyWith(fontSize: clampedSize);
+    final effectiveStyle = (style ?? const TextStyle()).copyWith(fontSize: clampedSize);
 
     if (textSpan != null) {
       return Text.rich(

@@ -13,21 +13,13 @@ class Colores {
 }
 
 class Fun {
-  static void logColor(
-      {required String color,
-      required dynamic body,
-      String title = '',
-      bool pretty = false}) {
+  static void logColor({required String color, required dynamic body, String title = '', bool pretty = false}) {
     if (!kReleaseMode) {
       if (title != '') {
         debugPrint('[$color] $title');
-        pretty
-            ? debugPrint(getPrettyJSONString(jsonDecode(body)))
-            : debugPrint(body.toString());
+        pretty ? debugPrint(getPrettyJSONString(jsonDecode(body))) : debugPrint(body.toString());
       } else {
-        pretty
-            ? debugPrint('[$color] ${getPrettyJSONString(jsonDecode(body))}')
-            : debugPrint('[$color] $body');
+        pretty ? debugPrint('[$color] ${getPrettyJSONString(jsonDecode(body))}') : debugPrint('[$color] $body');
       }
     }
   }

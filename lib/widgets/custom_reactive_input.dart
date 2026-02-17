@@ -60,8 +60,7 @@ class _CustomReactiveInputState extends State<CustomReactiveInput> {
   void didUpdateWidget(covariant CustomReactiveInput oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.focusNode != widget.focusNode) {
-      (oldWidget.focusNode ?? _internalFocusNode)
-          .removeListener(_onFocusChange);
+      (oldWidget.focusNode ?? _internalFocusNode).removeListener(_onFocusChange);
       _effectiveFocusNode.addListener(_onFocusChange);
     }
   }
@@ -81,8 +80,7 @@ class _CustomReactiveInputState extends State<CustomReactiveInput> {
         final value = control.value;
         final hasValue = value != null && value.toString().trim().isNotEmpty;
         final hasLabelTopPadding = hasValue || _effectiveFocusNode.hasFocus;
-        final isLandscape =
-            MediaQuery.orientationOf(context) == Orientation.landscape;
+        final isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
 
         return ReactiveTextField(
             key: widget.key,
@@ -97,16 +95,11 @@ class _CustomReactiveInputState extends State<CustomReactiveInput> {
             style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: TextScale.resolveSize(context, size: 16),
-              color: widget.enabled
-                  ? (Theme.of(context).textTheme.bodyLarge?.color ??
-                      AppThemes.colorQuinto)
-                  : AppThemes.labelInputDisabledColor,
+              color: widget.enabled ? (Theme.of(context).textTheme.bodyLarge?.color ?? AppThemes.colorQuinto) : AppThemes.labelInputDisabledColor,
             ),
             decoration: InputDecoration(
               isDense: isLandscape,
-              contentPadding: EdgeInsets.symmetric(
-                  horizontal: isLandscape ? 8 : 10,
-                  vertical: isLandscape ? 4 : 5),
+              contentPadding: EdgeInsets.symmetric(horizontal: isLandscape ? 8 : 10, vertical: isLandscape ? 4 : 5),
               label: widget.labelText == null
                   ? null
                   : Padding(
@@ -115,11 +108,7 @@ class _CustomReactiveInputState extends State<CustomReactiveInput> {
                         widget.labelText!,
                         size: 14,
                         style: TextStyle(
-                          color: widget.enabled
-                              ? (hasValue
-                                  ? AppThemes.colorQuinto
-                                  : AppThemes.labelInputColor)
-                              : AppThemes.labelInputDisabledColor,
+                          color: widget.enabled ? (hasValue ? AppThemes.colorQuinto : AppThemes.labelInputColor) : AppThemes.labelInputDisabledColor,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Poppins',
                         ),
@@ -145,20 +134,13 @@ class _CustomReactiveInputState extends State<CustomReactiveInput> {
                         fontFamily: 'Poppins',
                       ),
                     ),
-              suffixIcon: widget.innerRight == null
-                  ? null
-                  : IconScale(widget.innerRight!),
-              icon: widget.innerLeft == null
-                  ? null
-                  : IconScale(widget.innerLeft!),
+              suffixIcon: widget.innerRight == null ? null : IconScale(widget.innerRight!),
+              icon: widget.innerLeft == null ? null : IconScale(widget.innerLeft!),
 
               // FillColor --------
-              fillColor: widget.enabled
-                  ? AppThemes.inputColor
-                  : AppThemes.inputDisabledColor,
+              fillColor: widget.enabled ? AppThemes.inputColor : AppThemes.inputDisabledColor,
             ),
-            showErrors: (control) =>
-                control.invalid && (control.touched || control.dirty),
+            showErrors: (control) => control.invalid && (control.touched || control.dirty),
             validationMessages: {
               'required': (error) => L10n.fieldRequired,
               'min': (error) => L10n.minValue((error as Map)['min'].toString()),

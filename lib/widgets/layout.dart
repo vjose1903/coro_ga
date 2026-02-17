@@ -81,15 +81,13 @@ class _LayoutState extends State<Layout> with WidgetsBindingObserver {
     return OrientationBuilder(
       builder: (context, orientation) {
         ResponsiveApp.setMq(context);
-        final SlideUpProvider slideUpProvider =
-            context.watch<SlideUpProvider>();
+        final SlideUpProvider slideUpProvider = context.watch<SlideUpProvider>();
         final mediaQuery = MediaQuery.of(context);
         final screenHeight = mediaQuery.size.height;
         final keyboardHeight = mediaQuery.viewInsets.bottom;
         final topPadding = mediaQuery.padding.top;
 
-        final fraction =
-            slideUpProvider.maxHeightFraction ?? widget.maxPanelHeightFraction;
+        final fraction = slideUpProvider.maxHeightFraction ?? widget.maxPanelHeightFraction;
         final visibleHeight = screenHeight - keyboardHeight;
         final minTopMargin = topPadding + 40;
 
@@ -97,8 +95,7 @@ class _LayoutState extends State<Layout> with WidgetsBindingObserver {
           100.0,
           min(
             screenHeight * fraction,
-            min(visibleHeight * widget.maxPanelHeightFraction,
-                visibleHeight - minTopMargin),
+            min(visibleHeight * widget.maxPanelHeightFraction, visibleHeight - minTopMargin),
           ),
         );
         slideUpProvider.panelMaxHeight = maxHeight;
@@ -199,8 +196,7 @@ class _LayoutState extends State<Layout> with WidgetsBindingObserver {
     }
     slideUpProvider.resetSkipClean();
 
-    slideUpProvider.closeSlideUp(
-        controller: widget.panelController, isListener: isListener);
+    slideUpProvider.closeSlideUp(controller: widget.panelController, isListener: isListener);
   }
 }
 
@@ -264,9 +260,7 @@ class _AppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: ResponsiveApp.symmetric(
-            horizontal: useLandscapeLayout ? 10 : 12,
-            vertical: useLandscapeLayout ? 1 : 5),
+        padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 10 : 12, vertical: useLandscapeLayout ? 1 : 5),
         child: Row(
           children: [
             if (leading != null)
@@ -321,8 +315,7 @@ class _Body extends StatelessWidget {
         Expanded(
           child: DecoratedBox(
             decoration: BoxDecoration(
-              borderRadius:
-                  BorderRadius.only(topLeft: Radius.circular(topRadius)),
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(topRadius)),
               color: AppThemes.themeColor_1,
               boxShadow: [
                 BoxShadow(
@@ -333,8 +326,7 @@ class _Body extends StatelessWidget {
               ],
             ),
             child: ClipRRect(
-              borderRadius:
-                  BorderRadius.only(topLeft: Radius.circular(topRadius)),
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(topRadius)),
               child: child,
             ),
           ),
@@ -465,9 +457,7 @@ class _PanelHandleState extends State<_PanelHandle> {
           width: ResponsiveApp.scaleWidth(40),
           height: ResponsiveApp.scaleHeight(5),
           decoration: BoxDecoration(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.2)
-                : Colors.grey.withValues(alpha: 0.3),
+            color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(ResponsiveApp.scaleWidth(10)),
             boxShadow: [
               if (!isDark)
@@ -495,14 +485,12 @@ class SlideUpScrollController extends InheritedWidget {
   final ScrollController scrollController;
 
   static ScrollController? of(BuildContext context) {
-    final result =
-        context.dependOnInheritedWidgetOfExactType<SlideUpScrollController>();
+    final result = context.dependOnInheritedWidgetOfExactType<SlideUpScrollController>();
     return result?.scrollController;
   }
 
   @override
-  bool updateShouldNotify(SlideUpScrollController oldWidget) =>
-      scrollController != oldWidget.scrollController;
+  bool updateShouldNotify(SlideUpScrollController oldWidget) => scrollController != oldWidget.scrollController;
 }
 
 /// Mixin para widgets que necesitan scroll automático dentro del SlideUpPanel
@@ -514,15 +502,13 @@ mixin SlideUpAutoScrollMixin<T extends StatefulWidget> on State<T> {
   static const int _maxRetries = 50; // Máximo ~1s de reintentos
 
   /// Obtiene el ScrollController del panel o usa el fallback proporcionado
-  ScrollController getEffectiveController(
-      BuildContext context, ScrollController fallback) {
+  ScrollController getEffectiveController(BuildContext context, ScrollController fallback) {
     return SlideUpScrollController.of(context) ?? fallback;
   }
 
   /// Programa un scroll al final de la lista
   /// Se ejecuta cuando el panel está completamente abierto y el contenido está listo
-  void scheduleScrollToBottom(
-      BuildContext context, ScrollController controller) {
+  void scheduleScrollToBottom(BuildContext context, ScrollController controller) {
     // Cancelar cualquier scroll pendiente anterior
     cancelPendingScroll();
 

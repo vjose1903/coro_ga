@@ -18,17 +18,13 @@ class MyLoading {
       ..loadingStyle = EasyLoadingStyle.custom
       ..indicatorSize = 60.0
       ..radius = 16.0
-      ..backgroundColor = isDark
-          ? const Color(0xFF1E1E2E).withValues(alpha: 0.95)
-          : Colors.white.withValues(alpha: 0.95)
+      ..backgroundColor = isDark ? const Color(0xFF1E1E2E).withValues(alpha: 0.95) : Colors.white.withValues(alpha: 0.95)
       ..textColor = isDark ? Colors.white : AppThemes.colorCuarto
       ..textStyle = TextStyle(
         fontFamily: 'Poppins',
         fontSize: ResponsiveApp.scaleText(14),
         fontWeight: FontWeight.w500,
-        color: isDark
-            ? Colors.white70
-            : AppThemes.colorCuarto.withValues(alpha: 0.8),
+        color: isDark ? Colors.white70 : AppThemes.colorCuarto.withValues(alpha: 0.8),
       )
       ..indicatorColor = Colors.transparent
       ..maskColor = Colors.black.withValues(alpha: 0.6)
@@ -36,9 +32,7 @@ class MyLoading {
       ..dismissOnTap = false
       ..boxShadow = [
         BoxShadow(
-          color: isDark
-              ? Colors.black.withValues(alpha: 0.4)
-              : Colors.black.withValues(alpha: 0.15),
+          color: isDark ? Colors.black.withValues(alpha: 0.4) : Colors.black.withValues(alpha: 0.15),
           blurRadius: 20,
           offset: const Offset(0, 8),
         ),
@@ -49,8 +43,7 @@ class MyLoading {
             offset: const Offset(-2, -2),
           ),
       ]
-      ..contentPadding =
-          const EdgeInsets.symmetric(horizontal: 28, vertical: 24);
+      ..contentPadding = const EdgeInsets.symmetric(horizontal: 28, vertical: 24);
 
     await EasyLoading.show(
       maskType: EasyLoadingMaskType.custom,
@@ -80,8 +73,7 @@ class MyLoading {
     );
   }
 
-  static Future<void> showWithTimeout(
-      {String? message, int seconds = 3}) async {
+  static Future<void> showWithTimeout({String? message, int seconds = 3}) async {
     await show(message: message);
     await Future.delayed(Duration(seconds: seconds));
     await close();

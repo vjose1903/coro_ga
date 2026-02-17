@@ -8,61 +8,35 @@ class L10n {
   static bool get _isEnglish => Preferences.languageCode == 'en';
 
   // Traducciones estáticas para usar sin context (en modelos)
-  static String get errorEditingPlayer => _isEnglish
-      ? 'Could not edit the selected player.'
-      : 'No se pudo editar el jugador seleccionado.';
+  static String get errorEditingPlayer => _isEnglish ? 'Could not edit the selected player.' : 'No se pudo editar el jugador seleccionado.';
 
-  static String get errorDeletingHistory =>
-      _isEnglish ? 'Error deleting history' : 'Error eliminando el historial';
+  static String get errorDeletingHistory => _isEnglish ? 'Error deleting history' : 'Error eliminando el historial';
 
-  static String get noHistoryForGame => _isEnglish
-      ? 'The entered game has no history.'
-      : 'Partida ingresada no tiene historiales.';
+  static String get noHistoryForGame => _isEnglish ? 'The entered game has no history.' : 'Partida ingresada no tiene historiales.';
 
-  static String get minTwoPlayers => _isEnglish
-      ? 'You must add at least 2 players to the game'
-      : 'Debe de agregar almenos 2 jugadores a la partida';
+  static String get minTwoPlayers => _isEnglish ? 'You must add at least 2 players to the game' : 'Debe de agregar almenos 2 jugadores a la partida';
 
-  static String get noGamesRegistered =>
-      _isEnglish ? 'No games registered.' : 'No existen partidas registradas.';
+  static String get noGamesRegistered => _isEnglish ? 'No games registered.' : 'No existen partidas registradas.';
 
-  static String get errorDeletingGame => _isEnglish
-      ? 'Could not delete the selected game.'
-      : 'No se pudo borrar la partida seleccionada.';
+  static String get errorDeletingGame => _isEnglish ? 'Could not delete the selected game.' : 'No se pudo borrar la partida seleccionada.';
 
-  static String get errorEditingGame => _isEnglish
-      ? 'Could not edit the selected game.'
-      : 'No se pudo editar la partida seleccionada.';
+  static String get errorEditingGame => _isEnglish ? 'Could not edit the selected game.' : 'No se pudo editar la partida seleccionada.';
 
-  static String get noPlayersForGame => _isEnglish
-      ? 'The entered game has no players.'
-      : 'Partida ingresada no tiene jugadores.';
+  static String get noPlayersForGame => _isEnglish ? 'The entered game has no players.' : 'Partida ingresada no tiene jugadores.';
 
-  static String get errorDeletingPredefined => _isEnglish
-      ? 'Could not delete the selected predefined game.'
-      : 'No se pudo borrar la partida predefinida seleccionada.';
+  static String get errorDeletingPredefined => _isEnglish ? 'Could not delete the selected predefined game.' : 'No se pudo borrar la partida predefinida seleccionada.';
 
-  static String get errorEditingPredefined => _isEnglish
-      ? 'Could not edit the selected game.'
-      : 'No se pudo editar la partida seleccionada.';
+  static String get errorEditingPredefined => _isEnglish ? 'Could not edit the selected game.' : 'No se pudo editar la partida seleccionada.';
 
-  static String get errorInsertingHistory => _isEnglish
-      ? 'Error inserting play history.'
-      : 'Error ingresando el historial de la jugada.';
+  static String get errorInsertingHistory => _isEnglish ? 'Error inserting play history.' : 'Error ingresando el historial de la jugada.';
 
-  static String errorDeletingPlayerName(String nombre) => _isEnglish
-      ? 'Error deleting player: $nombre'
-      : 'Error eliminando al jugador: $nombre';
+  static String errorDeletingPlayerName(String nombre) => _isEnglish ? 'Error deleting player: $nombre' : 'Error eliminando al jugador: $nombre';
 
-  static String get someHistoryNotDeleted => _isEnglish
-      ? 'Some play history records could not be deleted'
-      : 'Algunos historiales de jugadas no pudieron ser eliminados';
+  static String get someHistoryNotDeleted => _isEnglish ? 'Some play history records could not be deleted' : 'Algunos historiales de jugadas no pudieron ser eliminados';
 
-  static String get fieldRequired =>
-      _isEnglish ? 'Required field.' : 'Campo requerido.';
+  static String get fieldRequired => _isEnglish ? 'Required field.' : 'Campo requerido.';
 
-  static String minValue(String min) =>
-      _isEnglish ? 'Minimum value is: $min' : 'Valor mínimo es: $min';
+  static String minValue(String min) => _isEnglish ? 'Minimum value is: $min' : 'Valor mínimo es: $min';
 
   /// Obtiene las traducciones del contexto
   static AppLocalizations of(BuildContext context) {
