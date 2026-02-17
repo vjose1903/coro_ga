@@ -66,46 +66,57 @@ class EditarEntidad extends StatelessWidget {
         child: LayoutBuilder(builder: (context, viewportConstraints) {
           final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
 
-          return SingleChildScrollView(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: ResponsiveApp.only(bottom: 10 + keyboardInset),
-            child: ConstrainedBox(
-              constraints:
-                  BoxConstraints(minHeight: viewportConstraints.maxHeight),
+          return AnimatedPadding(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOut,
+            padding: EdgeInsets.only(bottom: keyboardInset),
+            child: Padding(
+              padding: ResponsiveApp.only(bottom: 10),
               child: Column(
                 children: [
-                  // Header con avatar e información
-                  _EditHeader(
-                    tipo: tipo,
-                    nombre: entidad?.nombre ?? '',
-                    icon: icon,
-                    offset: offset,
-                    noNameLabel: AppLocalizations.of(context)!.noName,
-                    useLandscapeLayout: useLandscapeLayout,
-                    isWide: isWide,
-                    panelController: panelController,
-                    partida: partida,
-                    onRestart: partida != null && !partida.isSinIniciar
-                        ? () async {
-                            await partida.restartPartida();
-                            partidaProvider.refresh();
-                            if (panelController != null)
-                              slideUpProvider.closeSlideUp(
-                                  controller: panelController!);
-                          }
-                        : null,
+                  Expanded(
+                    child: SingleChildScrollView(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      child: Column(
+                        children: [
+                          // Header con avatar e información
+                          _EditHeader(
+                            tipo: tipo,
+                            nombre: entidad?.nombre ?? '',
+                            icon: icon,
+                            offset: offset,
+                            noNameLabel: AppLocalizations.of(context)!.noName,
+                            useLandscapeLayout: useLandscapeLayout,
+                            isWide: isWide,
+                            panelController: panelController,
+                            partida: partida,
+                            onRestart: partida != null && !partida.isSinIniciar
+                                ? () async {
+                                    await partida.restartPartida();
+                                    partidaProvider.refresh();
+                                    if (panelController != null) {
+                                      slideUpProvider.closeSlideUp(
+                                          controller: panelController!);
+                                    }
+                                  }
+                                : null,
+                          ),
+                          SizedBox(height: ResponsiveApp.scaleHeight(16)),
+
+                          // Formulario
+                          if (isPartida)
+                            EditPartida(
+                                key: const ValueKey('edit_partida'), form: form)
+                          else
+                            EditJugador(
+                                key: const ValueKey('edit_jugador'),
+                                form: form),
+                          SizedBox(height: ResponsiveApp.scaleHeight(16)),
+                        ],
+                      ),
+                    ),
                   ),
-                  SizedBox(height: ResponsiveApp.scaleHeight(16)),
-
-                  // Formulario
-                  if (isPartida)
-                    EditPartida(key: const ValueKey('edit_partida'), form: form)
-                  else
-                    EditJugador(
-                        key: const ValueKey('edit_jugador'), form: form),
-                  SizedBox(height: ResponsiveApp.scaleHeight(16)),
-
-                  // Botones de acción
                   Row(
                     children: [
                       // CANCELAR
