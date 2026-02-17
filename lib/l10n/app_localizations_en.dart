@@ -39,10 +39,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadingDataError => 'Error loading data.';
 
   @override
-  String get adErrorRematch => 'There was an error and the rematch could not be completed.';
+  String get adErrorRematch =>
+      'There was an error and the rematch could not be completed.';
 
   @override
-  String get rewardNotCompletedRematch => 'The reward was not completed to trigger the rematch.';
+  String get rewardNotCompletedRematch =>
+      'The reward was not completed to trigger the rematch.';
 
   @override
   String freeVersionLimitGames(int count) {
@@ -449,7 +451,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get minPlayersWarning => 'The number of players cannot be less than 2.';
+  String get minPlayersWarning =>
+      'The number of players cannot be less than 2.';
 
   @override
   String playerNumber(int number) {
@@ -460,7 +463,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newVersionTitle => 'New version available!';
 
   @override
-  String get newVersionAvailable => 'A new version of Coro Games is available. Update now to enjoy the latest improvements and features.';
+  String get newVersionAvailable =>
+      'A new version of Coro Games is available. Update now to enjoy the latest improvements and features.';
 
   @override
   String get updateNow => 'Update now';
@@ -469,7 +473,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unauthorizedVersion => 'Unauthorized Version';
 
   @override
-  String get illegitimateCopy => 'This copy of the app is not legitimate.\n\nPlease download the official version from Google Play Store to enjoy all features.';
+  String get illegitimateCopy =>
+      'This copy of the app is not legitimate.\n\nPlease download the official version from Google Play Store to enjoy all features.';
 
   @override
   String get closeApp => 'Close app';
@@ -499,7 +504,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noPlayersForGame => 'The entered game has no players.';
 
   @override
-  String get errorDeletingPredefined => 'Could not delete the selected predefined game.';
+  String get errorDeletingPredefined =>
+      'Could not delete the selected predefined game.';
 
   @override
   String get errorEditingPredefined => 'Could not edit the selected game.';
@@ -522,7 +528,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutAppTitle => 'What is Coro Games?';
 
   @override
-  String get aboutAppDescription => 'Coro Games is your perfect companion for keeping score in your favorite board games. Whether it\'s dominoes, cards, dice or any other game, our app lets you record scores, manage players and view game history quickly and easily.';
+  String get aboutAppDescription =>
+      'Coro Games is your perfect companion for keeping score in your favorite board games. Whether it\'s dominoes, cards, dice or any other game, our app lets you record scores, manage players and view game history quickly and easily.';
 
   @override
   String get privacyPolicyTitle => 'Privacy & Transparency';
@@ -538,19 +545,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reviewCardTitle => 'Do you like the app?';
 
   @override
-  String get reviewCardDescription => 'Your rating keeps Coro Games improving. Leave it on the store so other players can discover it.';
+  String get reviewCardDescription =>
+      'Your rating keeps Coro Games improving. Leave it on the store so other players can discover it.';
 
   @override
   String get reviewCardButton => 'Rate now';
 
   @override
-  String get reviewFallbackMessage => 'Unable to open the review prompt. Search for Coro Games in the store to leave your feedback.';
+  String get reviewFallbackMessage =>
+      'Unable to open the review prompt. Search for Coro Games in the store to leave your feedback.';
 
   @override
   String get noInternetTitle => 'No internet connection';
 
   @override
-  String get noInternetMessage => 'To use the app you need an internet connection.';
+  String get noInternetMessage =>
+      'To use the app you need an internet connection.';
 
   @override
   String get noInternetWaiting => 'Waiting for connection...';

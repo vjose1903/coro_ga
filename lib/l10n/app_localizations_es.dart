@@ -21,7 +21,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get emptyGamesTitle => '¡Comienza tu primera partida!';
 
   @override
-  String get emptyGamesSubtitle => 'Presiona el botón + para crear\nuna nueva partida';
+  String get emptyGamesSubtitle =>
+      'Presiona el botón + para crear\nuna nueva partida';
 
   @override
   String get swipeToEditOrDelete => 'Desliza para editar o borrar';
@@ -39,10 +40,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get loadingDataError => 'Error al cargar datos.';
 
   @override
-  String get adErrorRematch => 'Hubo un error y no se pudo completar la revancha.';
+  String get adErrorRematch =>
+      'Hubo un error y no se pudo completar la revancha.';
 
   @override
-  String get rewardNotCompletedRematch => 'No se completó la recompensa para hacer la revancha.';
+  String get rewardNotCompletedRematch =>
+      'No se completó la recompensa para hacer la revancha.';
 
   @override
   String freeVersionLimitGames(int count) {
@@ -147,7 +150,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dragToReorder => 'Arrastra para reordenar';
 
   @override
-  String get predefinedEditHint => 'Mantén presionado para reordenar o eliminar.';
+  String get predefinedEditHint =>
+      'Mantén presionado para reordenar o eliminar.';
 
   @override
   String get tapToSelect => 'Toca para seleccionar';
@@ -229,7 +233,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get scoreMustBeGreaterThanZero => 'Puntuación debe de ser mayor a 0';
 
   @override
-  String get enterScoreToContinue => 'Debe introducir una puntutación para continuar';
+  String get enterScoreToContinue =>
+      'Debe introducir una puntutación para continuar';
 
   @override
   String get warning => 'AVISO';
@@ -289,10 +294,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get purchaseRestored => '¡Compra restaurada! Ya eres Premium.';
 
   @override
-  String get purchaseFailed => 'No se pudo completar la compra. Intenta de nuevo.';
+  String get purchaseFailed =>
+      'No se pudo completar la compra. Intenta de nuevo.';
 
   @override
-  String get restoreFailed => 'No se pudo restaurar la compra. Intenta de nuevo.';
+  String get restoreFailed =>
+      'No se pudo restaurar la compra. Intenta de nuevo.';
 
   @override
   String get gameType_rounds => 'Rondas';
@@ -369,10 +376,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noName => 'Sin nombre';
 
   @override
-  String get gameNameCannotBeEmpty => 'El nombre de la partida no puede estar vacio.';
+  String get gameNameCannotBeEmpty =>
+      'El nombre de la partida no puede estar vacio.';
 
   @override
-  String get playerNameCannotBeEmpty => 'El nombre del jugador no puede estar vacio.';
+  String get playerNameCannotBeEmpty =>
+      'El nombre del jugador no puede estar vacio.';
 
   @override
   String get addPlayer => 'Agregar Jugador';
@@ -395,7 +404,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get enterNewPlayerName => 'Debe introducir el nombre del nuevo jugador';
+  String get enterNewPlayerName =>
+      'Debe introducir el nombre del nuevo jugador';
 
   @override
   String get winner => 'GANADOR';
@@ -449,7 +459,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get minPlayersWarning => 'La cantidad de jugadores no puede ser menor a 2.';
+  String get minPlayersWarning =>
+      'La cantidad de jugadores no puede ser menor a 2.';
 
   @override
   String playerNumber(int number) {
@@ -460,7 +471,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get newVersionTitle => '¡Nueva versión disponible!';
 
   @override
-  String get newVersionAvailable => 'Hay una nueva versión de Coro Games disponible. Actualiza ahora para disfrutar de las últimas mejoras y funcionalidades.';
+  String get newVersionAvailable =>
+      'Hay una nueva versión de Coro Games disponible. Actualiza ahora para disfrutar de las últimas mejoras y funcionalidades.';
 
   @override
   String get updateNow => 'Actualizar ahora';
@@ -469,7 +481,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get unauthorizedVersion => 'Versión No Autorizada';
 
   @override
-  String get illegitimateCopy => 'Esta copia de la aplicación no es legítima.\n\nPor favor, descarga la versión oficial desde Google Play Store para disfrutar de todas las funciones.';
+  String get illegitimateCopy =>
+      'Esta copia de la aplicación no es legítima.\n\nPor favor, descarga la versión oficial desde Google Play Store para disfrutar de todas las funciones.';
 
   @override
   String get closeApp => 'Cerrar aplicación';
@@ -484,7 +497,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noHistoryForGame => 'Partida ingresada no tiene historiales.';
 
   @override
-  String get minTwoPlayers => 'Debe de agregar almenos 2 jugadores a la partida';
+  String get minTwoPlayers =>
+      'Debe de agregar almenos 2 jugadores a la partida';
 
   @override
   String get noGamesRegistered => 'No existen partidas registradas.';
@@ -499,13 +513,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noPlayersForGame => 'Partida ingresada no tiene jugadores.';
 
   @override
-  String get errorDeletingPredefined => 'No se pudo borrar la partida predefinida seleccionada.';
+  String get errorDeletingPredefined =>
+      'No se pudo borrar la partida predefinida seleccionada.';
 
   @override
-  String get errorEditingPredefined => 'No se pudo editar la partida seleccionada.';
+  String get errorEditingPredefined =>
+      'No se pudo editar la partida seleccionada.';
 
   @override
-  String get errorInsertingHistory => 'Error ingresando el historial de la jugada.';
+  String get errorInsertingHistory =>
+      'Error ingresando el historial de la jugada.';
 
   @override
   String get fieldRequired => 'Campo requerido.';
@@ -522,7 +539,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get aboutAppTitle => '¿Qué es Coro Games?';
 
   @override
-  String get aboutAppDescription => 'Coro Games es tu compañero perfecto para llevar el puntaje de tus juegos de mesa favoritos. Ya sea dominó, cartas, dados o cualquier otro juego, nuestra app te permite registrar puntuaciones, gestionar jugadores y ver el historial de partidas de forma fácil y rápida.';
+  String get aboutAppDescription =>
+      'Coro Games es tu compañero perfecto para llevar el puntaje de tus juegos de mesa favoritos. Ya sea dominó, cartas, dados o cualquier otro juego, nuestra app te permite registrar puntuaciones, gestionar jugadores y ver el historial de partidas de forma fácil y rápida.';
 
   @override
   String get privacyPolicyTitle => 'Privacidad y Transparencia';
@@ -538,19 +556,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reviewCardTitle => '¿Te gusta la app?';
 
   @override
-  String get reviewCardDescription => 'Tu calificación nos ayuda a seguir mejorando Coro Games. Déjala directamente en la tienda para que más jugadores nos encuentren.';
+  String get reviewCardDescription =>
+      'Tu calificación nos ayuda a seguir mejorando Coro Games. Déjala directamente en la tienda para que más jugadores nos encuentren.';
 
   @override
   String get reviewCardButton => 'Calificar ahora';
 
   @override
-  String get reviewFallbackMessage => 'No pudimos abrir el cuadro de reseñas. Busca Coro Games en la tienda para dejar tu opinión.';
+  String get reviewFallbackMessage =>
+      'No pudimos abrir el cuadro de reseñas. Busca Coro Games en la tienda para dejar tu opinión.';
 
   @override
   String get noInternetTitle => 'Sin conexión a internet';
 
   @override
-  String get noInternetMessage => 'Para utilizar la app necesitas conexión a internet.';
+  String get noInternetMessage =>
+      'Para utilizar la app necesitas conexión a internet.';
 
   @override
   String get noInternetWaiting => 'Esperando conexión...';
