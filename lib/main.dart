@@ -58,16 +58,21 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   AppLifecycleState? _lastLifecycleState;
+  bool _isReapplyingSystemUi = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _configureSystemUiCallback();
     _applyImmersiveMode();
   }
 
   @override
   void dispose() {
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+      SystemChrome.setSystemUIChangeCallback(null);
+    }
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -96,10 +101,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void _applyImmersiveMode() {
     if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
 
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.manual,
-      overlays: [SystemUiOverlay.top],
-    );
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -107,6 +109,21 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         systemNavigationBarDividerColor: Colors.transparent,
       ),
     );
+  }
+
+  void _configureSystemUiCallback() {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
+
+    SystemChrome.setSystemUIChangeCallback((bool systemOverlaysAreVisible) async {
+      if (!mounted || !systemOverlaysAreVisible || _isReapplyingSystemUi) {
+        return;
+      }
+
+      _isReapplyingSystemUi = true;
+      await Future<void>.delayed(const Duration(milliseconds: 120));
+      _applyImmersiveMode();
+      _isReapplyingSystemUi = false;
+    });
   }
 
   @override

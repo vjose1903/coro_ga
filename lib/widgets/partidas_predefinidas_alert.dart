@@ -5,6 +5,9 @@ import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_shake_animated/flutter_shake_animated.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:reorderables/reorderables.dart';
+
 import '../helpers/helpers.dart';
 import '../l10n/app_localizations.dart';
 import '../models/models.dart';
@@ -14,8 +17,6 @@ import '../themes/app_themes.dart';
 import '../utils/utils.dart';
 import 'header_section.dart';
 import 'widgets.dart';
-import 'package:provider/provider.dart';
-import 'package:reorderables/reorderables.dart';
 
 class PartidasDefaultAlert extends StatelessWidget {
   const PartidasDefaultAlert({super.key});
@@ -49,7 +50,7 @@ class PartidasDefaultAlert extends StatelessWidget {
                       useLandscapeLayout: useLandscapeLayout,
                       isWide: isWide,
                     ),
-                    SizedBox(height: useLandscapeLayout ? 12 : 16),
+                    SizedBox(height: useLandscapeLayout ? (isWide ? 10 : 5) : 16),
 
                     // Lista de partidas
                     Flexible(
@@ -63,10 +64,13 @@ class PartidasDefaultAlert extends StatelessWidget {
                             color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
                           ),
                         ),
-                        child: const PartidasScrollView(),
+                        child: PartidasScrollView(
+                          useLandscapeLayout: useLandscapeLayout,
+                          isWide: isWide,
+                        ),
                       ),
                     ),
-                    SizedBox(height: useLandscapeLayout ? 10 : 14),
+                    SizedBox(height: useLandscapeLayout ? (isWide ? 10 : 5) : 14),
 
                     // Botón cerrar
                     Consumer<ReorderableProvider>(
@@ -74,6 +78,8 @@ class PartidasDefaultAlert extends StatelessWidget {
                         return Visibility(
                           visible: !reorderableProvider.isReording,
                           child: _CloseButton(
+                            useLandscapeLayout: useLandscapeLayout,
+                            isWide: isWide,
                             onTap: () {
                               Navigator.pop(context);
                               reorderableProvider.isReording = false;
@@ -92,19 +98,43 @@ class PartidasDefaultAlert extends StatelessWidget {
     );
   }
 
-  void _addPartidaPredefinida(BuildContext context) {
+  Future<void> _addPartidaPredefinida(BuildContext context) async {
     final PartidaPredefinidaProvider partidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
     final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
     if (!premiumProvider.canCreatePredefinedGame(partidaPredefinidaProvider.partidasPredefinidas.length)) {
-      Toast.show(type: ToastType.info, context: context, message: AppLocalizations.of(context)!.freeVersionLimitPredefined(PremiumProvider.freeMaxPredefinedGames), actionLabel: AppLocalizations.of(context)!.getPro, onAction: () => Navigator.pushNamed(context, 'premium'));
+      Toast.show(
+        type: ToastType.info,
+        context: context,
+        message: AppLocalizations.of(context)!.freeVersionLimitPredefined(PremiumProvider.freeMaxPredefinedGames),
+        actionLabel: AppLocalizations.of(context)!.getPro,
+        onAction: () => Navigator.pushNamed(context, 'premium'),
+      );
       return;
     }
 
-    DialogNavigator.of(context).push(FluidDialogPage(
-      builder: (context) => const FormPartidaPredefinida(),
-    ));
+    await partidaPredefinidaProvider.resetForm();
+    if (!context.mounted) return;
+    _openPartidaPredefinidaDialog(context);
   }
+}
+
+void _openPartidaPredefinidaDialog(BuildContext context) {
+  DialogNavigator.of(context).push(
+    FluidDialogPage(
+      builder: (context) {
+        final size = MediaQuery.sizeOf(context);
+        final isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
+        final dialogHeight = (size.height - (isLandscape ? 130 : 270)).clamp((isLandscape ? 100 : 250), size.height).toDouble();
+
+        return SizedBox(
+          width: size.width - 40,
+          height: dialogHeight,
+          child: const FormPartidaPredefinida(),
+        );
+      },
+    ),
+  );
 }
 
 class _PredefinidaHeader extends StatelessWidget {
@@ -132,14 +162,16 @@ class _PredefinidaHeader extends StatelessWidget {
       subtitle: isReordering ? AppLocalizations.of(context)!.dragToReorder : AppLocalizations.of(context)!.tapToSelect,
       useLandscapeLayout: useLandscapeLayout,
       isWide: isWide,
-      rightWidget: isReordering ? _DoneButton(onTap: onDone) : _AddButton(onTap: onAdd),
+      rightWidget: isReordering ? _DoneButton(onTap: onDone, useLandscapeLayout: useLandscapeLayout, isWide: isWide) : _AddButton(onTap: onAdd, useLandscapeLayout: useLandscapeLayout, isWide: isWide),
     );
   }
 }
 
 class _AddButton extends StatelessWidget {
-  const _AddButton({required this.onTap});
+  const _AddButton({required this.onTap, required this.useLandscapeLayout, required this.isWide});
   final VoidCallback onTap;
+  final bool useLandscapeLayout;
+  final bool isWide;
 
   @override
   Widget build(BuildContext context) {
@@ -147,14 +179,14 @@ class _AddButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(useLandscapeLayout ? 7 : 10),
         child: Container(
-          padding: const EdgeInsets.all(10),
+          padding: EdgeInsets.all(useLandscapeLayout ? 7 : 10),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               colors: [Color(0xFF4CAF50), Color(0xFF43A047)],
             ),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(useLandscapeLayout ? 7 : 10),
             boxShadow: [
               BoxShadow(
                 color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
@@ -163,7 +195,7 @@ class _AddButton extends StatelessWidget {
               ),
             ],
           ),
-          child: const IconScale(FontAwesomeIcons.plus, color: Colors.white, size: 16),
+          child: IconScale(FontAwesomeIcons.plus, color: Colors.white, size: useLandscapeLayout ? 12 : 16),
         ),
       ),
     );
@@ -171,8 +203,10 @@ class _AddButton extends StatelessWidget {
 }
 
 class _DoneButton extends StatelessWidget {
-  const _DoneButton({required this.onTap});
+  const _DoneButton({required this.onTap, required this.useLandscapeLayout, required this.isWide});
   final VoidCallback onTap;
+  final bool useLandscapeLayout;
+  final bool isWide;
 
   @override
   Widget build(BuildContext context) {
@@ -182,7 +216,7 @@ class _DoneButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: useLandscapeLayout ? 7 : 8),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
@@ -199,7 +233,7 @@ class _DoneButton extends StatelessWidget {
           child: TextScale(
             AppLocalizations.of(context)!.done,
             size: 13,
-            style: TextStyle(
+            style: const TextStyle(
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w600,
               color: Colors.white,
@@ -212,8 +246,10 @@ class _DoneButton extends StatelessWidget {
 }
 
 class _CloseButton extends StatelessWidget {
-  const _CloseButton({required this.onTap});
+  const _CloseButton({required this.onTap, required this.useLandscapeLayout, required this.isWide});
   final VoidCallback onTap;
+  final bool useLandscapeLayout;
+  final bool isWide;
 
   @override
   Widget build(BuildContext context) {
@@ -223,14 +259,14 @@ class _CloseButton extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(useLandscapeLayout ? (isWide ? 12 : 8) : 12),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            padding: EdgeInsets.symmetric(horizontal: useLandscapeLayout ? 15 : 20, vertical: useLandscapeLayout ? (isWide ? 9 : 6) : 12),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 colors: [Color(0xFFEF5350), Color(0xFFE53935)],
               ),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(useLandscapeLayout ? (isWide ? 12 : 8) : 12),
               boxShadow: [
                 BoxShadow(
                   color: Colors.red.withValues(alpha: 0.3),
@@ -242,12 +278,12 @@ class _CloseButton extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const IconScale(FontAwesomeIcons.xmark, color: Colors.white, size: 14),
+                IconScale(FontAwesomeIcons.xmark, color: Colors.white, size: useLandscapeLayout ? 10 : 14),
                 const SizedBox(width: 8),
                 TextScale(
                   AppLocalizations.of(context)!.close,
                   size: 14,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
@@ -263,7 +299,14 @@ class _CloseButton extends StatelessWidget {
 }
 
 class PartidasScrollView extends StatelessWidget {
-  const PartidasScrollView({super.key});
+  const PartidasScrollView({
+    required this.useLandscapeLayout,
+    required this.isWide,
+    super.key,
+  });
+
+  final bool useLandscapeLayout;
+  final bool isWide;
 
   @override
   Widget build(BuildContext context) {
@@ -271,11 +314,16 @@ class PartidasScrollView extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return FutureBuilder<List<Widget>>(
-      future: getPartidas(context, formPartidaPredefinidaProvider),
+      future: getPartidas(
+        context,
+        formPartidaPredefinidaProvider,
+        useLandscapeLayout: useLandscapeLayout,
+        isWide: isWide,
+      ),
       builder: (BuildContext context, AsyncSnapshot<List<Widget>> snapshot) {
         reordenarDataBase() async {
           for (var index = 0; index < snapshot.data!.length; index++) {
-            final PartidaPredefinida partidaPredefinida = (snapshot.data![index] as ReordenableItem).partidaPredefinida;
+            final PartidaPredefinida partidaPredefinida = (snapshot.data![index] as ReorderableItem).partidaPredefinida;
             partidaPredefinida.orden = index + 1;
             final partidaEdit = partidaPredefinida.toMap();
             await PartidaPredefinida.edit(id: partidaPredefinida.id!, partidaEdit: partidaEdit);
@@ -331,9 +379,6 @@ class PartidasScrollView extends StatelessWidget {
               builder: (context, constraints) {
                 const double spacing = 8;
                 const double padding = 10;
-                final useLandscapeLayout =
-                    ResponsiveLayoutBuilder.maybeOf(context)?.useLandscapeLayout ??
-                    ResponsiveLayoutBuilder.resolveUseLandscapeLayout(context);
                 final itemsPerRow = useLandscapeLayout ? 4 : 3;
                 final totalSpacing = spacing * (itemsPerRow - 1);
                 final double itemWidth = (constraints.maxWidth - (padding * 2) - totalSpacing) / itemsPerRow;
@@ -341,52 +386,60 @@ class PartidasScrollView extends StatelessWidget {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 4),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const IconScale(
-                          FontAwesomeIcons.circleInfo,
-                          size: 12,
-                          color: Colors.grey,
-                        ),
-                        const SizedBox(width: 6),
-                        Flexible(
-                          child: TextScale(
-                            l10n.predefinedEditHint,
-                            size: 12,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(color: Colors.grey),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 3),
                     Expanded(
                       child: SingleChildScrollView(
                         physics: const ClampingScrollPhysics(),
-                        padding: const EdgeInsets.all(padding),
-                        child: ReorderableWrap(
-                            enableReorder: reorderableProvider.isReording,
-                            needsLongPressDraggable: false,
-                            runSpacing: 15,
-                            spacing: spacing,
-                            maxMainAxisCount: itemsPerRow,
-                            scrollPhysics: const ClampingScrollPhysics(),
-                            onReorder: (oldIndex, newIndex) {
-                              reorderableProvider.onReorder(oldIndex: oldIndex, newIndex: newIndex, reordenableList: snapshot.data);
-                              reordenarDataBase();
-                            },
-                            onNoReorder: (index) => reordenarDataBase(),
-                            children: snapshot.data!.map<Widget>((widget) {
-                              if (widget is ReordenableItem) {
-                                return ReordenableItem(
-                                  partidaPredefinida: widget.partidaPredefinida,
-                                  itemWidth: itemWidth,
-                                );
-                              }
-                              return widget;
-                            }).toList()),
+                        padding: const EdgeInsets.only(left: padding, right: padding, bottom: padding, top: 5),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const IconScale(
+                                  FontAwesomeIcons.circleInfo,
+                                  size: 12,
+                                  color: Colors.grey,
+                                ),
+                                const SizedBox(width: 6),
+                                Flexible(
+                                  child: TextScale(
+                                    l10n.predefinedEditHint,
+                                    size: 12,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(color: Colors.grey),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 5),
+                            ReorderableWrap(
+                                enableReorder: reorderableProvider.isReording,
+                                needsLongPressDraggable: false,
+                                runSpacing: 15,
+                                spacing: spacing,
+                                maxMainAxisCount: itemsPerRow,
+                                scrollPhysics: const ClampingScrollPhysics(),
+                                onReorder: (oldIndex, newIndex) {
+                                  reorderableProvider.onReorder(oldIndex: oldIndex, newIndex: newIndex, reordenableList: snapshot.data);
+                                  reordenarDataBase();
+                                },
+                                onNoReorder: (index) => reordenarDataBase(),
+                                children: snapshot.data!.map<Widget>((widget) {
+                                  if (widget is ReorderableItem) {
+                                    return SizedBox(
+                                      width: itemWidth,
+                                      child: ReorderableItem(
+                                        partidaPredefinida: widget.partidaPredefinida,
+                                        useLandscapeLayout: useLandscapeLayout,
+                                        isWide: isWide,
+                                      ),
+                                    );
+                                  }
+                                  return widget;
+                                }).toList()),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -400,18 +453,33 @@ class PartidasScrollView extends StatelessWidget {
   }
 }
 
-Future<List<Widget>> getPartidas(BuildContext context, PartidaPredefinidaProvider formPartidaPredefinidaProvider) async {
+Future<List<Widget>> getPartidas(
+  BuildContext context,
+  PartidaPredefinidaProvider formPartidaPredefinidaProvider, {
+  required bool useLandscapeLayout,
+  required bool isWide,
+}) async {
   formPartidaPredefinidaProvider.partidasPredefinidas.sort((a, b) => a.orden!.compareTo(b.orden!));
 
   return formPartidaPredefinidaProvider.partidasPredefinidas.map((partida) {
-    return ReordenableItem(partidaPredefinida: partida);
+    return ReorderableItem(
+      partidaPredefinida: partida,
+      useLandscapeLayout: useLandscapeLayout,
+      isWide: isWide,
+    );
   }).toList();
 }
 
-class ReordenableItem extends StatelessWidget {
-  const ReordenableItem({super.key, required this.partidaPredefinida, this.itemWidth});
+class ReorderableItem extends StatelessWidget {
+  const ReorderableItem({
+    required this.partidaPredefinida,
+    required this.useLandscapeLayout,
+    required this.isWide,
+    super.key,
+  });
   final PartidaPredefinida partidaPredefinida;
-  final double? itemWidth;
+  final bool useLandscapeLayout;
+  final bool isWide;
 
   @override
   Widget build(BuildContext context) {
@@ -427,8 +495,8 @@ class ReordenableItem extends StatelessWidget {
           clipBehavior: Clip.none,
           children: [
             Container(
-              width: itemWidth ?? ResponsiveApp.size.width * 0.25,
-              height: 90,
+              width: double.infinity,
+              height: useLandscapeLayout ? (isWide ? 80 : 65) : 90,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
@@ -447,7 +515,7 @@ class ReordenableItem extends StatelessWidget {
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  onTap: () => !reorderableProvider.isReording ? selectPartidaPredefinida(context: context) : patchFormPartida(context: context, partida: partidaPredefinida),
+                  onTap: () => !reorderableProvider.isReording ? selectPartidaPredefinida(context: context) : openFormPartida(context: context),
                   onLongPress: () => reorderableProvider.isReording = true,
                   borderRadius: BorderRadius.circular(14),
                   child: Stack(
@@ -530,7 +598,7 @@ class ReordenableItem extends StatelessWidget {
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            onTap: () => patchFormPartida(context: context, partida: partidaPredefinida),
+                            onTap: () => openFormPartida(context: context),
                             borderRadius: BorderRadius.circular(20),
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -545,7 +613,7 @@ class ReordenableItem extends StatelessWidget {
                                   TextScale(
                                     l10n.edit,
                                     size: 12,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontFamily: 'Poppins',
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white,
@@ -600,7 +668,7 @@ class ReordenableItem extends StatelessWidget {
     });
   }
 
-  deletePartidaPredefinida(BuildContext context, PartidaPredefinida partida) {
+  void deletePartidaPredefinida(BuildContext context, PartidaPredefinida partida) {
     final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
     final l10n = AppLocalizations.of(context)!;
 
@@ -616,7 +684,7 @@ class ReordenableItem extends StatelessWidget {
     ]);
   }
 
-  selectPartidaPredefinida({required BuildContext context}) {
+  void selectPartidaPredefinida({required BuildContext context}) {
     final FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
     formPartidaProvider.rellenarFormulario(partidaPredefinida, context: context);
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -624,12 +692,10 @@ class ReordenableItem extends StatelessWidget {
     });
   }
 
-  patchFormPartida({required BuildContext context, required PartidaPredefinida partida}) {
+  void openFormPartida({required BuildContext context, PartidaPredefinida? partida}) {
     final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
-    formPartidaPredefinidaProvider.rellenarFormulario(partida);
-
-    DialogNavigator.of(context).push(FluidDialogPage(
-      builder: (context) => const FormPartidaPredefinida(),
-    ));
+    final partidaEditar = partida ?? partidaPredefinida;
+    formPartidaPredefinidaProvider.rellenarFormulario(partidaEditar);
+    _openPartidaPredefinidaDialog(context);
   }
 }

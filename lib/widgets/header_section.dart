@@ -17,6 +17,7 @@ class HeaderSection extends StatefulWidget {
     required this.title,
     required this.useLandscapeLayout,
     required this.isWide,
+    this.iconOffset = Offset.zero,
     this.subtitle,
     this.rightWidget,
     super.key,
@@ -29,6 +30,7 @@ class HeaderSection extends StatefulWidget {
   final String? subtitle;
   final bool useLandscapeLayout;
   final bool isWide;
+  final Offset iconOffset;
   final Widget? rightWidget;
 
   @override
@@ -43,8 +45,8 @@ class _HeaderSectionState extends State<HeaderSection> {
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
-    final avatarSize = widget.useLandscapeLayout ? (widget.isWide ? 36.0 : 37.0) : 42.0;
-    final iconSize = widget.useLandscapeLayout ? 13.0 : 18.0;
+    final avatarSize = widget.useLandscapeLayout ? (widget.isWide ? 36.0 : 25.0) : 36.0;
+    final iconSize = widget.useLandscapeLayout ? (12.0) : 18.0;
 
     return GestureDetector(
       onVerticalDragStart: (details) {
@@ -106,80 +108,42 @@ class _HeaderSectionState extends State<HeaderSection> {
             ),
           ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-          child: Row(
-            children: [
-              Container(
-                width: avatarSize,
-                height: avatarSize,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      widget.iconBackgroundColor,
-                      widget.iconBackgroundColor.withValues(alpha: 0.75),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: widget.iconBackgroundColor.withValues(alpha: 0.3),
-                      blurRadius: 6,
-                      offset: const Offset(0, 3),
-                    ),
+        child: Row(
+          children: [
+            Container(
+              width: avatarSize,
+              height: avatarSize,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    widget.iconBackgroundColor,
+                    widget.iconBackgroundColor.withValues(alpha: 0.75),
                   ],
                 ),
-                child: Center(
-                  // Compensa el baseline de algunos icon fonts (ej. FontAwesome)
-                  // para que el icono quede visualmente centrado.
-                  child: Transform.translate(
-                    offset: const Offset(-2.0, 0.8),
-                    child: IconScale(widget.icon, color: Colors.white, size: iconSize),
+                borderRadius: BorderRadius.circular(widget.isWide ? 12 : 8),
+                boxShadow: [
+                  BoxShadow(
+                    color: widget.iconBackgroundColor.withValues(alpha: 0.3),
+                    blurRadius: 6,
                   ),
+                ],
+              ),
+              child: Center(
+                child: Transform.translate(
+                  offset: widget.iconOffset,
+                  child: IconScale(widget.icon, color: Colors.white, size: iconSize),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: widget.useLandscapeLayout
-                    ? Row(
-                        children: [
-                          Flexible(
-                            child: TextScale(
-                              widget.title,
-                              size: 14,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.white : AppThemes.colorQuinto,
-                              ),
-                            ),
-                          ),
-                          if ((widget.subtitle ?? '').isNotEmpty) ...[
-                            SizedBox(width: ResponsiveApp.scaleWidth(4)),
-                            Flexible(
-                              child: TextScale(
-                                widget.subtitle!,
-                                size: 11,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  color: isDark ? Colors.grey[400] : Colors.grey[600],
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
-                      )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextScale(
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: widget.useLandscapeLayout
+                  ? Row(
+                      children: [
+                        Flexible(
+                          child: TextScale(
                             widget.title,
                             size: 14,
                             maxLines: 1,
@@ -190,9 +154,11 @@ class _HeaderSectionState extends State<HeaderSection> {
                               color: isDark ? Colors.white : AppThemes.colorQuinto,
                             ),
                           ),
-                          if ((widget.subtitle ?? '').isNotEmpty) ...[
-                            const SizedBox(height: 1),
-                            TextScale(
+                        ),
+                        if ((widget.subtitle ?? '').isNotEmpty) ...[
+                          SizedBox(width: ResponsiveApp.scaleWidth(4)),
+                          Flexible(
+                            child: TextScale(
                               widget.subtitle!,
                               size: 11,
                               maxLines: 1,
@@ -203,16 +169,46 @@ class _HeaderSectionState extends State<HeaderSection> {
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                          ],
+                          ),
                         ],
-                      ),
-              ),
-              if (widget.rightWidget != null) ...[
-                const SizedBox(width: 10),
-                widget.rightWidget!,
-              ],
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextScale(
+                          widget.title,
+                          size: 14,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : AppThemes.colorQuinto,
+                          ),
+                        ),
+                        if ((widget.subtitle ?? '').isNotEmpty) ...[
+                          const SizedBox(height: 1),
+                          TextScale(
+                            widget.subtitle!,
+                            size: 11,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              color: isDark ? Colors.grey[400] : Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+            ),
+            if (widget.rightWidget != null) ...[
+              const SizedBox(width: 10),
+              widget.rightWidget!,
             ],
-          ),
+          ],
         ),
       ),
     );

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:reactive_forms/reactive_forms.dart';
+
 import '../themes/app_themes.dart';
 import '../utils/l10n_helper.dart';
-import 'package:reactive_forms/reactive_forms.dart';
-import '../helpers/helpers.dart';
 import 'icon_scale.dart';
 import 'text_scale.dart';
 
-class CustomReactiveInput extends StatelessWidget {
+class CustomReactiveInput extends StatefulWidget {
   const CustomReactiveInput({
-    Key? key,
+    super.key,
     required this.formControlName,
     this.hintText,
     this.labelText,
@@ -22,7 +22,7 @@ class CustomReactiveInput extends StatelessWidget {
     this.maxLength,
     this.textCapitalization = TextCapitalization.none,
     this.focusNode,
-  }) : super(key: key);
+  });
   final String formControlName;
   final String? labelText;
   final String? hintText;
@@ -35,72 +35,110 @@ class CustomReactiveInput extends StatelessWidget {
   final bool? autoFocus;
   final TextCapitalization? textCapitalization;
   final FocusNode? focusNode;
-
   final int? maxLength;
+
+  @override
+  State<CustomReactiveInput> createState() => _CustomReactiveInputState();
+}
+
+class _CustomReactiveInputState extends State<CustomReactiveInput> {
+  late final FocusNode _internalFocusNode = FocusNode();
+
+  FocusNode get _effectiveFocusNode => widget.focusNode ?? _internalFocusNode;
+
+  void _onFocusChange() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _effectiveFocusNode.addListener(_onFocusChange);
+  }
+
+  @override
+  void didUpdateWidget(covariant CustomReactiveInput oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.focusNode != widget.focusNode) {
+      (oldWidget.focusNode ?? _internalFocusNode).removeListener(_onFocusChange);
+      _effectiveFocusNode.addListener(_onFocusChange);
+    }
+  }
+
+  @override
+  void dispose() {
+    _effectiveFocusNode.removeListener(_onFocusChange);
+    _internalFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return ReactiveValueListenableBuilder(
-      formControlName: formControlName,
+      formControlName: widget.formControlName,
       builder: (context, control, child) {
         final value = control.value;
         final hasValue = value != null && value.toString().trim().isNotEmpty;
+        final hasLabelTopPadding = hasValue || _effectiveFocusNode.hasFocus;
+        final isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
 
         return ReactiveTextField(
-            key: key,
-            formControlName: formControlName,
-            focusNode: focusNode,
-            autofocus: autoFocus!,
-            keyboardType: inputType,
-            obscureText: obscureText,
-            textCapitalization: textCapitalization!,
-            maxLength: maxLength,
-            readOnly: !enabled,
+            key: widget.key,
+            formControlName: widget.formControlName,
+            focusNode: _effectiveFocusNode,
+            autofocus: widget.autoFocus!,
+            keyboardType: widget.inputType,
+            obscureText: widget.obscureText,
+            textCapitalization: widget.textCapitalization!,
+            maxLength: widget.maxLength,
+            readOnly: !widget.enabled,
             style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: TextScale.resolveSize(context, size: 16),
-              color: enabled
-                  ? (Theme.of(context).textTheme.bodyLarge?.color ?? AppThemes.colorQuinto)
-                  : AppThemes.labelInputDisabledColor,
+              color: widget.enabled ? (Theme.of(context).textTheme.bodyLarge?.color ?? AppThemes.colorQuinto) : AppThemes.labelInputDisabledColor,
             ),
             decoration: InputDecoration(
-              label: labelText == null
+              isDense: isLandscape,
+              contentPadding: EdgeInsets.symmetric(horizontal: isLandscape ? 8 : 10, vertical: isLandscape ? 4 : 5),
+              label: widget.labelText == null
                   ? null
-                  : TextScale(
-                      labelText!,
-                      size: 14,
-                      style: TextStyle(
-                        color: enabled ? (hasValue ? AppThemes.colorQuinto : AppThemes.labelInputColor) : AppThemes.labelInputDisabledColor,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Poppins',
+                  : Padding(
+                      padding: EdgeInsets.only(top: hasLabelTopPadding ? 5 : 0),
+                      child: TextScale(
+                        widget.labelText!,
+                        size: 14,
+                        style: TextStyle(
+                          color: widget.enabled ? (hasValue ? AppThemes.colorQuinto : AppThemes.labelInputColor) : AppThemes.labelInputDisabledColor,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Poppins',
+                        ),
                       ),
                     ),
-              hint: hintText == null
+              hint: widget.hintText == null
                   ? null
                   : TextScale(
-                      hintText!,
+                      widget.hintText!,
                       size: 13,
                       style: TextStyle(
                         color: Colors.grey[500],
                         fontFamily: 'Poppins',
                       ),
                     ),
-              helper: helperText == null
+              helper: widget.helperText == null
                   ? null
                   : TextScale(
-                      helperText!,
+                      widget.helperText!,
                       size: 12,
                       style: TextStyle(
                         color: Colors.grey[500],
                         fontFamily: 'Poppins',
                       ),
                     ),
-              suffixIcon: innerRight == null ? null : IconScale(innerRight!),
-              icon: innerLeft == null ? null : IconScale(innerLeft!),
+              suffixIcon: widget.innerRight == null ? null : IconScale(widget.innerRight!),
+              icon: widget.innerLeft == null ? null : IconScale(widget.innerLeft!),
 
               // FillColor --------
-              fillColor: enabled ? AppThemes.inputColor : AppThemes.inputDisabledColor,
-
+              fillColor: widget.enabled ? AppThemes.inputColor : AppThemes.inputDisabledColor,
             ),
             showErrors: (control) => control.invalid && (control.touched || control.dirty),
             validationMessages: {

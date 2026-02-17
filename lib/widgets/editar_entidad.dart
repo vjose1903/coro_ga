@@ -15,7 +15,8 @@ import 'header_section.dart';
 import 'widgets.dart';
 
 class EditarEntidad extends StatelessWidget {
-  const EditarEntidad({super.key, this.pageController, this.panelController, this.onClose});
+  const EditarEntidad(
+      {super.key, this.pageController, this.panelController, this.onClose});
 
   final PageController? pageController;
   final PanelController? panelController;
@@ -23,7 +24,8 @@ class EditarEntidad extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final JugadorProvider jugadorProvider = context.watch<JugadorProvider>();
-    final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
+    final FormPartidaProvider formPartidaProvider =
+        context.watch<FormPartidaProvider>();
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
 
@@ -34,19 +36,23 @@ class EditarEntidad extends StatelessWidget {
     late String tipo;
     dynamic entidad;
     IconData icon;
+    Offset offset;
 
     final l10n = AppLocalizations.of(context)!;
     if (isPartida) {
       tipo = l10n.editGame.split(' ').last;
       entidad = partida;
       icon = FontAwesomeIcons.gamepad;
+      offset = const Offset(-1.5, 0);
     } else {
       tipo = l10n.editPlayer.split(' ').last;
       entidad = jugador;
       icon = FontAwesomeIcons.user;
+      offset = const Offset(0, 0);
     }
 
-    final FormGroup form = isPartida ? formPartidaProvider.form : jugadorProvider.formJugador;
+    final FormGroup form =
+        isPartida ? formPartidaProvider.form : jugadorProvider.formJugador;
 
     return ResponsiveLayoutBuilder(builder: (context, constraints, info) {
       final useLandscapeLayout = info.useLandscapeLayout;
@@ -57,86 +63,118 @@ class EditarEntidad extends StatelessWidget {
         bottom: false,
         left: useLandscapeLayout,
         right: useLandscapeLayout,
-        child: Container(
-          height: double.infinity,
-          padding: ResponsiveApp.only(bottom: 10),
-          child: Column(
-            children: [
-            // Header con avatar e información
-            _EditHeader(
-              tipo: tipo,
-              nombre: entidad?.nombre ?? '',
-              icon: icon,
-              noNameLabel: AppLocalizations.of(context)!.noName,
-              useLandscapeLayout: useLandscapeLayout,
-              isWide: isWide,
-              panelController: panelController,
-              partida: partida,
-              onRestart: partida != null && !partida.isSinIniciar
-                  ? () async {
-                      await partida.restartPartida();
-                      partidaProvider.refresh();
-                      if (panelController != null) slideUpProvider.closeSlideUp(controller: panelController!);
-                    }
-                  : null,
-            ),
-            SizedBox(height: ResponsiveApp.scaleHeight(16)),
+        child: LayoutBuilder(builder: (context, viewportConstraints) {
+          final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
 
-            // Formulario
-            if (isPartida) EditPartida(key: const ValueKey('edit_partida'), form: form) else EditJugador(key: const ValueKey('edit_jugador'), form: form),
-            SizedBox(height: ResponsiveApp.scaleHeight(16)),
-
-            // Botones de acción
-              Row(
+          return SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: ResponsiveApp.only(bottom: 10 + keyboardInset),
+            child: ConstrainedBox(
+              constraints:
+                  BoxConstraints(minHeight: viewportConstraints.maxHeight),
+              child: Column(
                 children: [
-                // CANCELAR
-                Expanded(
-                  child: _ActionButton(
-                      label: l10n.cancel,
-                      icon: FontAwesomeIcons.xmark,
-                      isDestructive: true,
-                      onTap: () async {
-                        FocusManager.instance.primaryFocus?.unfocus();
-                        if (onClose != null) {
-                          onClose!();
-                        } else if (pageController != null) {
-                          previusPage(pageController);
-                        } else if (panelController != null) {
-                          slideUpProvider.closeSlideUp(controller: panelController!);
-                        }
-                        resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
-                        await Future.delayed(const Duration(milliseconds: 200));
-                        jugadorProvider.formJugador.reset();
-                        formPartidaProvider.form.reset();
-                      },
-                      useLandscapeLayout: useLandscapeLayout),
-                ),
-                SizedBox(width: ResponsiveApp.scaleWidth(12)),
-                // ACEPTAR
-                Expanded(
-                  child: _ActionButton(
-                      label: l10n.save,
-                      icon: FontAwesomeIcons.check,
-                      isPrimary: true,
-                      onTap: () {
-                        aceptarFunction(context, entidad, form: form, jugadorProvider: jugadorProvider, partidaProvider: partidaProvider, previusPage: previusPage, resetEntidadesEditar: resetEntidadesEditar, isPartida: isPartida, pageController: pageController, panelController: panelController, onClose: onClose);
-                      },
-                      useLandscapeLayout: useLandscapeLayout),
-                ),
+                  // Header con avatar e información
+                  _EditHeader(
+                    tipo: tipo,
+                    nombre: entidad?.nombre ?? '',
+                    icon: icon,
+                    offset: offset,
+                    noNameLabel: AppLocalizations.of(context)!.noName,
+                    useLandscapeLayout: useLandscapeLayout,
+                    isWide: isWide,
+                    panelController: panelController,
+                    partida: partida,
+                    onRestart: partida != null && !partida.isSinIniciar
+                        ? () async {
+                            await partida.restartPartida();
+                            partidaProvider.refresh();
+                            if (panelController != null)
+                              slideUpProvider.closeSlideUp(
+                                  controller: panelController!);
+                          }
+                        : null,
+                  ),
+                  SizedBox(height: ResponsiveApp.scaleHeight(16)),
+
+                  // Formulario
+                  if (isPartida)
+                    EditPartida(key: const ValueKey('edit_partida'), form: form)
+                  else
+                    EditJugador(
+                        key: const ValueKey('edit_jugador'), form: form),
+                  SizedBox(height: ResponsiveApp.scaleHeight(16)),
+
+                  // Botones de acción
+                  Row(
+                    children: [
+                      // CANCELAR
+                      Expanded(
+                        child: _ActionButton(
+                            label: l10n.cancel,
+                            icon: FontAwesomeIcons.xmark,
+                            isDestructive: true,
+                            onTap: () async {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                              if (onClose != null) {
+                                onClose!();
+                              } else if (pageController != null) {
+                                previusPage(pageController);
+                              } else if (panelController != null) {
+                                slideUpProvider.closeSlideUp(
+                                    controller: panelController!);
+                              }
+                              resetEntidadesEditar(
+                                  jugadorProvider: jugadorProvider,
+                                  partidaProvider: partidaProvider);
+                              await Future.delayed(
+                                  const Duration(milliseconds: 200));
+                              jugadorProvider.formJugador.reset();
+                              formPartidaProvider.form.reset();
+                            },
+                            useLandscapeLayout: useLandscapeLayout),
+                      ),
+                      SizedBox(width: ResponsiveApp.scaleWidth(12)),
+                      // ACEPTAR
+                      Expanded(
+                        child: _ActionButton(
+                            label: l10n.save,
+                            icon: FontAwesomeIcons.check,
+                            isPrimary: true,
+                            onTap: () {
+                              aceptarFunction(context, entidad,
+                                  form: form,
+                                  jugadorProvider: jugadorProvider,
+                                  partidaProvider: partidaProvider,
+                                  previusPage: previusPage,
+                                  resetEntidadesEditar: resetEntidadesEditar,
+                                  isPartida: isPartida,
+                                  pageController: pageController,
+                                  panelController: panelController,
+                                  onClose: onClose);
+                            },
+                            useLandscapeLayout: useLandscapeLayout),
+                      ),
+                    ],
+                  )
                 ],
-              )
-            ],
-          ),
-        ),
+              ),
+            ),
+          );
+        }),
       );
     });
   }
 
   previusPage(pageController) async {
-    pageController.previousPage(duration: const Duration(milliseconds: 500), curve: Curves.easeInOutQuart);
+    pageController.previousPage(
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOutQuart);
   }
 
-  resetEntidadesEditar({required JugadorProvider jugadorProvider, required PartidaProvider partidaProvider}) async {
+  resetEntidadesEditar(
+      {required JugadorProvider jugadorProvider,
+      required PartidaProvider partidaProvider}) async {
     await Future.delayed(const Duration(milliseconds: 300));
     jugadorProvider.jugadorEditar = null;
     partidaProvider.partidaEditar = null;
@@ -181,11 +219,17 @@ class _EditJugadorState extends State<EditJugador> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-        child: ReactiveForm(
+    return ReactiveForm(
       formGroup: widget.form,
-      child: Column(children: <Widget>[CustomReactiveInput(key: const ValueKey('edit_jugador_nombre'), formControlName: 'nombre', labelText: AppLocalizations.of(context)!.name, textCapitalization: TextCapitalization.words, focusNode: _focusNode)]),
-    ));
+      child: Column(children: <Widget>[
+        CustomReactiveInput(
+            key: const ValueKey('edit_jugador_nombre'),
+            formControlName: 'nombre',
+            labelText: AppLocalizations.of(context)!.name,
+            textCapitalization: TextCapitalization.words,
+            focusNode: _focusNode)
+      ]),
+    );
   }
 }
 
@@ -229,14 +273,20 @@ class _EditPartidaState extends State<EditPartida> {
   Widget build(BuildContext context) {
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
-        final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
-        final dynamic tipoPartida = formPartidaProvider.form.control('tipo').value;
+        final FormPartidaProvider formPartidaProvider =
+            context.watch<FormPartidaProvider>();
+        final dynamic tipoPartida =
+            formPartidaProvider.form.control('tipo').value;
 
-        return Expanded(
-            child: ReactiveForm(
+        return ReactiveForm(
           formGroup: widget.form,
           child: Column(children: <Widget>[
-            CustomReactiveInput(key: const ValueKey('edit_partida_nombre'), formControlName: 'nombre', labelText: AppLocalizations.of(context)!.name, textCapitalization: TextCapitalization.words, focusNode: _focusNode),
+            CustomReactiveInput(
+                key: const ValueKey('edit_partida_nombre'),
+                formControlName: 'nombre',
+                labelText: AppLocalizations.of(context)!.name,
+                textCapitalization: TextCapitalization.words,
+                focusNode: _focusNode),
             SizedBox(height: ResponsiveApp.scaleHeight(10)),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 350),
@@ -247,8 +297,18 @@ class _EditPartidaState extends State<EditPartida> {
                       key: const ValueKey('tipo_solo'),
                       formControlName: 'tipo',
                       labelText: AppLocalizations.of(context)!.type,
-                      items: [DropdownMenuItem(value: 'Rondas', child: TextScale(AppLocalizations.of(context)!.rounds)), DropdownMenuItem(value: 'Puntuación', child: TextScale(AppLocalizations.of(context)!.score))],
-                      onChanged: (value) => formPartidaProvider.changeTipo(value),
+                      items: [
+                        DropdownMenuItem(
+                            value: 'Rondas',
+                            child: TextScale(
+                                AppLocalizations.of(context)!.rounds)),
+                        DropdownMenuItem(
+                            value: 'Puntuación',
+                            child:
+                                TextScale(AppLocalizations.of(context)!.score))
+                      ],
+                      onChanged: (value) =>
+                          formPartidaProvider.changeTipo(value),
                     )
                   : Row(
                       key: const ValueKey('tipo_y_max'),
@@ -258,45 +318,81 @@ class _EditPartidaState extends State<EditPartida> {
                           child: CustomReactiveDropDown(
                             formControlName: 'tipo',
                             labelText: AppLocalizations.of(context)!.type,
-                            items: [DropdownMenuItem(value: 'Rondas', child: TextScale(AppLocalizations.of(context)!.rounds)), DropdownMenuItem(value: 'Puntuación', child: TextScale(AppLocalizations.of(context)!.score))],
-                            onChanged: (value) => formPartidaProvider.changeTipo(value),
+                            items: [
+                              DropdownMenuItem(
+                                  value: 'Rondas',
+                                  child: TextScale(
+                                      AppLocalizations.of(context)!.rounds)),
+                              DropdownMenuItem(
+                                  value: 'Puntuación',
+                                  child: TextScale(
+                                      AppLocalizations.of(context)!.score))
+                            ],
+                            onChanged: (value) =>
+                                formPartidaProvider.changeTipo(value),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: CustomReactiveInput(formControlName: 'maxPuntuacion', labelText: tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScoreFull, inputType: TextInputType.number),
+                          child: CustomReactiveInput(
+                              formControlName: 'maxPuntuacion',
+                              labelText: tipoPartida == 'Rondas'
+                                  ? AppLocalizations.of(context)!.roundCount
+                                  : AppLocalizations.of(context)!.maxScoreFull,
+                              inputType: TextInputType.number),
                         ),
                       ],
                     ),
             ),
           ]),
-        ));
+        );
       },
     );
   }
 }
 
 aceptarFunction(BuildContext context, dynamic entidad,
-    {required FormGroup form, required bool isPartida, required JugadorProvider jugadorProvider, required PartidaProvider partidaProvider, required Function previusPage, required Function resetEntidadesEditar, PanelController? panelController, PageController? pageController, VoidCallback? onClose}) {
+    {required FormGroup form,
+    required bool isPartida,
+    required JugadorProvider jugadorProvider,
+    required PartidaProvider partidaProvider,
+    required Function previusPage,
+    required Function resetEntidadesEditar,
+    PanelController? panelController,
+    PageController? pageController,
+    VoidCallback? onClose}) {
   if (isPartida) {
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
     if (form.valid) {
       FocusManager.instance.primaryFocus?.unfocus();
-      partidaProvider.editPartida(context, partida: entidad, newNombrePartida: form.value['nombre'].toString()).then((value) async {
+      partidaProvider
+          .editPartida(context,
+              partida: entidad,
+              newNombrePartida: form.value['nombre'].toString())
+          .then((value) async {
         entidad.nombre = form.value['nombre'].toString();
         partidaProvider.refresh();
         form.reset();
-        resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
+        resetEntidadesEditar(
+            jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
 
-        if (panelController != null) slideUpProvider.closeSlideUp(controller: panelController);
+        if (panelController != null)
+          slideUpProvider.closeSlideUp(controller: panelController);
       });
     } else {
-      Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.gameNameCannotBeEmpty);
+      Toast.show(
+          type: ToastType.error,
+          context: context,
+          message: AppLocalizations.of(context)!.gameNameCannotBeEmpty);
     }
   } else {
     if (form.valid) {
       FocusManager.instance.primaryFocus?.unfocus();
-      jugadorProvider.editJugador(context, jugador: entidad, newNombreJugador: form.value['nombre'].toString()).then((value) {
+      jugadorProvider
+          .editJugador(context,
+              jugador: entidad,
+              newNombreJugador: form.value['nombre'].toString())
+          .then((value) {
         entidad.nombre = form.value['nombre'].toString();
         partidaProvider.refresh();
 
@@ -306,10 +402,14 @@ aceptarFunction(BuildContext context, dynamic entidad,
         } else {
           previusPage(pageController);
         }
-        resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
+        resetEntidadesEditar(
+            jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
       });
     } else {
-      Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.playerNameCannotBeEmpty);
+      Toast.show(
+          type: ToastType.error,
+          context: context,
+          message: AppLocalizations.of(context)!.playerNameCannotBeEmpty);
     }
   }
 }
@@ -323,6 +423,7 @@ class _EditHeader extends StatelessWidget {
     required this.tipo,
     required this.nombre,
     required this.icon,
+    required this.offset,
     required this.noNameLabel,
     required this.useLandscapeLayout,
     required this.isWide,
@@ -334,6 +435,7 @@ class _EditHeader extends StatelessWidget {
   final String tipo;
   final String nombre;
   final IconData icon;
+  final Offset offset;
   final String noNameLabel;
   final bool useLandscapeLayout;
   final bool isWide;
@@ -347,6 +449,7 @@ class _EditHeader extends StatelessWidget {
     return HeaderSection(
       panelController: panelController,
       icon: icon,
+      iconOffset: offset,
       iconBackgroundColor: AppThemes.colorPrimero,
       title: '${l10n.edit} $tipo',
       subtitle: nombre.isNotEmpty ? nombre : noNameLabel,
@@ -378,16 +481,21 @@ class _EditHeader extends StatelessWidget {
                     ],
                   );
                 },
-                borderRadius: useLandscapeLayout ? ResponsiveApp.borderRadius(6) : ResponsiveApp.borderRadius(10),
+                borderRadius: useLandscapeLayout
+                    ? ResponsiveApp.borderRadius(6)
+                    : ResponsiveApp.borderRadius(10),
                 child: Container(
-                  padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 6 : 10, vertical: 6),
+                  padding: ResponsiveApp.symmetric(
+                      horizontal: useLandscapeLayout ? 6 : 10, vertical: 6),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [Color(0xFFFFB300), Color(0xFFFF8F00)],
                     ),
-                    borderRadius: useLandscapeLayout ? ResponsiveApp.borderRadius(6) : ResponsiveApp.borderRadius(10),
+                    borderRadius: useLandscapeLayout
+                        ? ResponsiveApp.borderRadius(6)
+                        : ResponsiveApp.borderRadius(10),
                     boxShadow: [
                       BoxShadow(
                         color: const Color(0xFFFFA000).withValues(alpha: 0.3),
@@ -399,7 +507,8 @@ class _EditHeader extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const IconScale(Icons.restart_alt_rounded, color: Colors.white, size: 16),
+                      const IconScale(Icons.restart_alt_rounded,
+                          color: Colors.white, size: 16),
                       SizedBox(width: ResponsiveApp.scaleWidth(4)),
                       TextScale(
                         l10n.restart,
@@ -456,7 +565,12 @@ class _ActionButton extends StatelessWidget {
       ];
       textColor = Colors.white;
     } else {
-      gradientColors = isDark ? [Colors.white.withValues(alpha: 0.15), Colors.white.withValues(alpha: 0.1)] : [Colors.grey[200]!, Colors.grey[300]!];
+      gradientColors = isDark
+          ? [
+              Colors.white.withValues(alpha: 0.15),
+              Colors.white.withValues(alpha: 0.1)
+            ]
+          : [Colors.grey[200]!, Colors.grey[300]!];
       textColor = isDark ? Colors.white : AppThemes.colorQuinto;
     }
 
@@ -464,7 +578,9 @@ class _ActionButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: useLandscapeLayout ? ResponsiveApp.borderRadius(5) : ResponsiveApp.borderRadius(12),
+        borderRadius: useLandscapeLayout
+            ? ResponsiveApp.borderRadius(5)
+            : ResponsiveApp.borderRadius(12),
         child: Container(
           padding: ResponsiveApp.symmetric(vertical: 14),
           decoration: BoxDecoration(
@@ -473,7 +589,9 @@ class _ActionButton extends StatelessWidget {
               end: Alignment.bottomCenter,
               colors: gradientColors,
             ),
-            borderRadius: useLandscapeLayout ? ResponsiveApp.borderRadius(5) : ResponsiveApp.borderRadius(12),
+            borderRadius: useLandscapeLayout
+                ? ResponsiveApp.borderRadius(5)
+                : ResponsiveApp.borderRadius(12),
             boxShadow: [
               BoxShadow(
                 color: (isPrimary

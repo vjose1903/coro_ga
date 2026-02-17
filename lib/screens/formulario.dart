@@ -63,16 +63,24 @@ class _FormularioScreenState extends State<FormularioScreen> {
   }
 }
 
-openDefaultsPartidasDialog(BuildContext context) {
+void openDefaultsPartidasDialog(BuildContext context) {
   final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
   formPartidaPredefinidaProvider.resetForm();
 
-  FluidAlerts.show(context,
-      rootPage: SizedBox(
-        width: (ResponsiveApp.size.width - 40),
-        height: (ResponsiveApp.size.height - 150),
-        child: const PartidasDefaultAlert(),
-      ));
+  FluidAlerts.show(
+    context,
+    rootPage: OrientationBuilder(
+      builder: (context, _) {
+        final size = MediaQuery.sizeOf(context);
+        final isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
+        return SizedBox(
+          width: size.width - 40,
+          height: size.height - (isLandscape ? 50 : 150),
+          child: const PartidasDefaultAlert(),
+        );
+      },
+    ),
+  );
 }
 
 class _Body extends StatelessWidget {
@@ -93,6 +101,7 @@ class _Body extends StatelessWidget {
       return ResponsiveLayoutBuilder(
         builder: (context, constraints, info) {
           final bool useLandscapeLayout = info.useLandscapeLayout;
+          final bool isWide = info.isWide;
           final EdgeInsets contentPadding = ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 16 : 20);
 
           return SafeArea(
@@ -105,6 +114,7 @@ class _Body extends StatelessWidget {
                 bottom: useLandscapeLayout ? 20 : 40,
               ),
               child: ReactiveForm(
+                key: ValueKey(form),
                 formGroup: form,
                 child: useLandscapeLayout
                     ? Row(
@@ -123,7 +133,7 @@ class _Body extends StatelessWidget {
                           ),
                           const SizedBox(width: 20),
                           Expanded(
-                            child: _FormPlayersColumn(isDark: isDark, jugadoresController: jugadoresController, onCreate: () => _crearPartida(context, form, formPartidaProvider), useLandscapeLayout: useLandscapeLayout),
+                            child: _FormPlayersColumn(isDark: isDark, jugadoresController: jugadoresController, onCreate: () => _crearPartida(context, form, formPartidaProvider), useLandscapeLayout: useLandscapeLayout, isWide: isWide),
                           ),
                         ],
                       )
@@ -141,7 +151,7 @@ class _Body extends StatelessWidget {
                           ),
                           const SizedBox(height: 20),
                           Expanded(
-                            child: _FormPlayersColumn(isDark: isDark, jugadoresController: jugadoresController, onCreate: () => _crearPartida(context, form, formPartidaProvider), useLandscapeLayout: useLandscapeLayout),
+                            child: _FormPlayersColumn(isDark: isDark, jugadoresController: jugadoresController, onCreate: () => _crearPartida(context, form, formPartidaProvider), useLandscapeLayout: useLandscapeLayout, isWide: isWide),
                           ),
                         ],
                       ),
@@ -318,6 +328,8 @@ class _FormDetailsColumn extends StatelessWidget {
                     ),
                     Switch(
                       value: sinMaxPuntuacion,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      padding: EdgeInsets.zero,
                       activeThumbColor: AppThemes.colorPrimero,
                       activeTrackColor: AppThemes.colorPrimero.withValues(alpha: 0.35),
                       inactiveThumbColor: isDark ? Colors.white70 : Colors.grey[600],
@@ -344,19 +356,21 @@ class _FormPlayersColumn extends StatelessWidget {
     required this.jugadoresController,
     required this.onCreate,
     required this.useLandscapeLayout,
+    required this.isWide,
   });
 
   final bool isDark;
   final ScrollController jugadoresController;
   final VoidCallback onCreate;
   final bool useLandscapeLayout;
+  final bool isWide;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _JugadoresSection(jugadoresController: jugadoresController, useLandscapeLayout: useLandscapeLayout),
-        const SizedBox(height: 12),
+        _JugadoresSection(jugadoresController: jugadoresController, useLandscapeLayout: useLandscapeLayout, isWide: isWide),
+        SizedBox(height: useLandscapeLayout ? 8 : 12),
         Expanded(
           child: DecoratedBox(
             decoration: BoxDecoration(
@@ -448,9 +462,10 @@ class _PlantillasButton extends StatelessWidget {
 
 // Sección de jugadores con header
 class _JugadoresSection extends StatelessWidget {
-  const _JugadoresSection({required this.jugadoresController, required this.useLandscapeLayout});
+  const _JugadoresSection({required this.jugadoresController, required this.useLandscapeLayout, required this.isWide});
   final ScrollController jugadoresController;
   final bool useLandscapeLayout;
+  final bool isWide;
 
   @override
   Widget build(BuildContext context) {
@@ -476,13 +491,7 @@ class _JugadoresSection extends StatelessWidget {
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Center(
-                child: IconScale(
-                  FontAwesomeIcons.users,
-                  size: iconSize,
-                  color: Colors.white,
-                ),
-              ),
+              child: Center(child: Transform.translate(offset: const Offset(-1.0, 0.0), child: IconScale(FontAwesomeIcons.users, color: Colors.white, size: iconSize))),
             ),
             const SizedBox(width: 10),
             TextScale(
@@ -495,7 +504,7 @@ class _JugadoresSection extends StatelessWidget {
               ),
             ),
             Container(
-              margin: ResponsiveApp.only(left: 10),
+              margin: ResponsiveApp.only(left: useLandscapeLayout ? 5 : 10),
               padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 4 : 10, vertical: useLandscapeLayout ? 6 : 4),
               decoration: BoxDecoration(
                 color: AppThemes.colorTercero.withValues(alpha: 0.9),
@@ -513,10 +522,7 @@ class _JugadoresSection extends StatelessWidget {
             ),
           ],
         ),
-        if (formPartidaProvider.jugadores.length < 20)
-          _AddPlayerButton(
-            onTap: () => _addJugador(context, formPartidaProvider),
-          ),
+        if (formPartidaProvider.jugadores.length < 20) _AddPlayerButton(useLandscapeLayout: useLandscapeLayout, isWide: isWide, onTap: () => _addJugador(context, formPartidaProvider)),
       ],
     );
   }
@@ -548,8 +554,11 @@ class _JugadoresSection extends StatelessWidget {
 
 // Botón agregar jugador
 class _AddPlayerButton extends StatelessWidget {
-  const _AddPlayerButton({required this.onTap});
+  const _AddPlayerButton({required this.onTap, required this.useLandscapeLayout, required this.isWide});
+
   final VoidCallback onTap;
+  final bool useLandscapeLayout;
+  final bool isWide;
 
   @override
   Widget build(BuildContext context) {
@@ -557,17 +566,17 @@ class _AddPlayerButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(useLandscapeLayout ? 7 : 10),
         child: Container(
-          width: 36,
-          height: 36,
+          width: useLandscapeLayout ? 30 : 36,
+          height: useLandscapeLayout ? 30 : 36,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               colors: [Color(0xFF66BB6A), Color(0xFF43A047)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(useLandscapeLayout ? 7 : 10),
             boxShadow: [
               BoxShadow(
                 color: const Color(0xFF43A047).withValues(alpha: 0.35),
