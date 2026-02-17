@@ -8,9 +8,9 @@ import 'text_scale.dart';
 
 class CustomReactiveDropDown extends StatefulWidget {
   const CustomReactiveDropDown({
-    super.key,
     required this.formControlName,
     required this.items,
+    super.key,
     this.hintText,
     this.labelText,
     this.helperText,
@@ -65,7 +65,8 @@ class _CustomReactiveDropDownState extends State<CustomReactiveDropDown> {
   void didUpdateWidget(covariant CustomReactiveDropDown oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.focusNode != widget.focusNode) {
-      (oldWidget.focusNode ?? _internalFocusNode).removeListener(_onFocusChange);
+      (oldWidget.focusNode ?? _internalFocusNode)
+          .removeListener(_onFocusChange);
       _effectiveFocusNode.addListener(_onFocusChange);
     }
   }
@@ -85,7 +86,8 @@ class _CustomReactiveDropDownState extends State<CustomReactiveDropDown> {
         final value = control.value;
         final hasValue = value != null && value.toString().trim().isNotEmpty;
         final hasLabelTopPadding = hasValue || _effectiveFocusNode.hasFocus;
-        final isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
+        final isLandscape =
+            MediaQuery.orientationOf(context) == Orientation.landscape;
         const itemTextSize = 16.0;
 
         Widget scaleDropdownChild(Widget child) {
@@ -152,7 +154,9 @@ class _CustomReactiveDropDownState extends State<CustomReactiveDropDown> {
               }
               return Text.rich(
                 span!,
-                style: child.style?.copyWith(fontSize: TextScale.resolveSize(context, size: itemTextSize)),
+                style: child.style?.copyWith(
+                    fontSize:
+                        TextScale.resolveSize(context, size: itemTextSize)),
                 strutStyle: child.strutStyle,
                 textAlign: child.textAlign,
                 textDirection: child.textDirection,
@@ -186,7 +190,10 @@ class _CustomReactiveDropDownState extends State<CustomReactiveDropDown> {
             );
           }
 
-          return DefaultTextStyle.merge(style: TextStyle(fontSize: TextScale.resolveSize(context, size: itemTextSize)), child: child);
+          return DefaultTextStyle.merge(
+              style: TextStyle(
+                  fontSize: TextScale.resolveSize(context, size: itemTextSize)),
+              child: child);
         }
 
         final effectiveItems = widget.items
@@ -208,12 +215,18 @@ class _CustomReactiveDropDownState extends State<CustomReactiveDropDown> {
             style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: TextScale.resolveSize(context, size: itemTextSize),
-              color: widget.enabled ? (Theme.of(context).textTheme.bodyLarge?.color ?? AppThemes.colorQuinto) : AppThemes.labelInputDisabledColor,
+              color: widget.enabled
+                  ? (Theme.of(context).textTheme.bodyLarge?.color ??
+                      AppThemes.colorQuinto)
+                  : AppThemes.labelInputDisabledColor,
             ),
-            onChanged: (value) => widget.onChanged != null ? widget.onChanged!(value) : null,
+            onChanged: (value) =>
+                widget.onChanged != null ? widget.onChanged!(value) : null,
             decoration: InputDecoration(
               isDense: isLandscape,
-              contentPadding: EdgeInsets.symmetric(horizontal: isLandscape ? 8 : 10, vertical: isLandscape ? 1 : 5),
+              contentPadding: EdgeInsets.symmetric(
+                  horizontal: isLandscape ? 8 : 10,
+                  vertical: isLandscape ? 1 : 5),
               label: widget.labelText == null
                   ? null
                   : Padding(
@@ -222,7 +235,11 @@ class _CustomReactiveDropDownState extends State<CustomReactiveDropDown> {
                         widget.labelText!,
                         size: 14,
                         style: TextStyle(
-                          color: widget.enabled ? (hasValue ? AppThemes.colorQuinto : AppThemes.labelInputColor) : AppThemes.labelInputDisabledColor,
+                          color: widget.enabled
+                              ? (hasValue
+                                  ? AppThemes.colorQuinto
+                                  : AppThemes.labelInputColor)
+                              : AppThemes.labelInputDisabledColor,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Poppins',
                         ),
@@ -248,13 +265,20 @@ class _CustomReactiveDropDownState extends State<CustomReactiveDropDown> {
                         fontFamily: 'Poppins',
                       ),
                     ),
-              suffixIcon: widget.innerRight == null ? null : IconScale(widget.innerRight!),
-              icon: widget.innerLeft == null ? null : IconScale(widget.innerLeft!),
+              suffixIcon: widget.innerRight == null
+                  ? null
+                  : IconScale(widget.innerRight!),
+              icon: widget.innerLeft == null
+                  ? null
+                  : IconScale(widget.innerLeft!),
 
               // FillColor --------
-              fillColor: widget.enabled ? AppThemes.inputColor : AppThemes.inputDisabledColor,
+              fillColor: widget.enabled
+                  ? AppThemes.inputColor
+                  : AppThemes.inputDisabledColor,
             ),
-            showErrors: (control) => control.invalid && (control.touched || control.dirty),
+            showErrors: (control) =>
+                control.invalid && (control.touched || control.dirty),
             validationMessages: {
               'required': (error) => L10n.fieldRequired,
             });

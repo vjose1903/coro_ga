@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
-import '../l10n/app_localizations.dart';
-import '../themes/app_themes.dart';
-import '../shared_preferences/preferences.dart';
+import 'package:flutter/material.dart';
+
 import '../helpers/helpers.dart';
+import '../l10n/app_localizations.dart';
+import '../shared_preferences/preferences.dart';
+import '../themes/app_themes.dart';
 import 'text_scale.dart';
 
 class NoInternetModal extends StatelessWidget {
@@ -92,7 +93,8 @@ class NoInternetModal extends StatelessWidget {
                         height: 18,
                         child: CircularProgressIndicator(
                           strokeWidth: 2.2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       ),
                       const SizedBox(width: 10),

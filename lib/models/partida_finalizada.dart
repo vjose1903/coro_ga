@@ -15,6 +15,36 @@ class PartidaFinalizada {
     this.finalizadaAt,
   });
 
+  factory PartidaFinalizada.fromMap(Map<String, dynamic> json) {
+    final jugadoresRaw = json['jugadoresFinales'] ?? json['jugadores_finales'];
+    List<Map<String, dynamic>> jugadoresParsed = [];
+    if (jugadoresRaw is String && jugadoresRaw.isNotEmpty) {
+      final decoded = jsonDecode(jugadoresRaw);
+      if (decoded is List) {
+        jugadoresParsed =
+            decoded.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+      }
+    } else if (jugadoresRaw is List) {
+      jugadoresParsed =
+          jugadoresRaw.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+    }
+
+    final finalizadaAtRaw =
+        json['finalizadaAt'] ?? json['finalizada_at'] ?? json['finalizadaAt'];
+    return PartidaFinalizada(
+      id: json['id'],
+      nombre: json['nombre'],
+      tipo: json['tipo'],
+      maxPuntuacion: json['maxPuntuacion'] ?? json['max_puntuacion'],
+      jugadoresFinales: jugadoresParsed,
+      ganador: json['ganador'],
+      motivo: json['motivo'],
+      finalizadaAt: finalizadaAtRaw != null
+          ? DateTime.tryParse(finalizadaAtRaw.toString())
+          : null,
+    );
+  }
+
   static String tableName = 'PartidaFinalizada';
 
   int? id;
@@ -25,31 +55,6 @@ class PartidaFinalizada {
   String? ganador;
   String? motivo;
   DateTime? finalizadaAt;
-
-  factory PartidaFinalizada.fromMap(Map<String, dynamic> json) {
-    final jugadoresRaw = json['jugadoresFinales'] ?? json['jugadores_finales'];
-    List<Map<String, dynamic>> jugadoresParsed = [];
-    if (jugadoresRaw is String && jugadoresRaw.isNotEmpty) {
-      final decoded = jsonDecode(jugadoresRaw);
-      if (decoded is List) {
-        jugadoresParsed = decoded.map((e) => Map<String, dynamic>.from(e as Map)).toList();
-      }
-    } else if (jugadoresRaw is List) {
-      jugadoresParsed = jugadoresRaw.map((e) => Map<String, dynamic>.from(e as Map)).toList();
-    }
-
-    final finalizadaAtRaw = json['finalizadaAt'] ?? json['finalizada_at'] ?? json['finalizadaAt'];
-    return PartidaFinalizada(
-      id: json['id'],
-      nombre: json['nombre'],
-      tipo: json['tipo'],
-      maxPuntuacion: json['maxPuntuacion'] ?? json['max_puntuacion'],
-      jugadoresFinales: jugadoresParsed,
-      ganador: json['ganador'],
-      motivo: json['motivo'],
-      finalizadaAt: finalizadaAtRaw != null ? DateTime.tryParse(finalizadaAtRaw.toString()) : null,
-    );
-  }
 
   Map<String, dynamic> toMap() => {
         'id': id,
@@ -73,7 +78,9 @@ class PartidaFinalizada {
 
   String? getGanadorFromJugadores() {
     if (jugadoresFinales == null || jugadoresFinales!.isEmpty) return null;
-    final sorted = List<Map<String, dynamic>>.from(jugadoresFinales!)..sort((a, b) => ((a['puntuacion'] ?? 0) as num).compareTo((b['puntuacion'] ?? 0) as num));
+    final sorted = List<Map<String, dynamic>>.from(jugadoresFinales!)
+      ..sort((a, b) => ((a['puntuacion'] ?? 0) as num)
+          .compareTo((b['puntuacion'] ?? 0) as num));
     return sorted.last['nombre']?.toString();
   }
 
@@ -82,7 +89,6 @@ class PartidaFinalizada {
         .map(
           (item) => Jugador(
             nombre: item['nombre']?.toString(),
-            puntuacion: 0,
             historialJugadas: [],
           ),
         )
@@ -92,7 +98,6 @@ class PartidaFinalizada {
       tipo: tipo,
       maxPuntuacion: maxPuntuacion,
       jugadores: jugadores,
-      activo: true,
     );
   }
 
@@ -149,7 +154,8 @@ class PartidaFinalizada {
   }
 
   static Future<PartidaFinalizada?> findById(int id) async {
-    final response = await CrudHelper.getOne(tableName: PartidaFinalizada.tableName, id: id);
+    final response =
+        await CrudHelper.getOne(tableName: PartidaFinalizada.tableName, id: id);
     if (response.hasError!) return null;
     return PartidaFinalizada.fromMap(response.data);
   }

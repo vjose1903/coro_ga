@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
-import '../services/purchase_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class PremiumProvider extends ChangeNotifier {
+import '../services/purchase_service.dart';
 
+class PremiumProvider extends ChangeNotifier {
   PremiumProvider() {
     _loadPremiumStatus();
   }

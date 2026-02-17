@@ -20,16 +20,16 @@ class AppIntegrityService {
 
   // Package names permitidos (tu app normal y versión pro si la tienes)
   static const List<String> _allowedPackageNames = [
-    'com.inSpot.coro_games',      // App principal
-    'com.inSpot.corogames',      // App principal
-    'com.inSpot.coroGames',      // App principal
-    'com.inSpot.coro_games.pro',  // Versión pro si existe
+    'com.inSpot.coro_games', // App principal
+    'com.inSpot.corogames', // App principal
+    'com.inSpot.coroGames', // App principal
+    'com.inSpot.coro_games.pro', // Versión pro si existe
   ];
 
   // Instaladores permitidos
   static const List<String> _allowedInstallers = [
-    'com.android.vending',           // Google Play Store
-    'com.google.android.feedback',   // Google Play Store (alternativo)
+    'com.android.vending', // Google Play Store
+    'com.google.android.feedback', // Google Play Store (alternativo)
   ];
 
   // ⚠️ SOLO PARA PRUEBAS - Cambiar a true para simular piratería (solo funciona en debug)
@@ -64,7 +64,7 @@ class AppIntegrityService {
 
     try {
       final packageInfo = await PackageInfo.fromPlatform();
-      
+
       // 1. Verificar package name
       if (!_verifyPackageName(packageInfo.packageName)) {
         _failureReason = 'Package name no autorizado';
@@ -95,7 +95,6 @@ class AppIntegrityService {
       _isVerified = true;
       _hasChecked = true;
       return true;
-
     } catch (e) {
       // Si hay error en la verificación, asumir que está bien
       // (mejor que bloquear usuarios legítimos)
@@ -114,7 +113,7 @@ class AppIntegrityService {
     try {
       const platform = MethodChannel('com.inSpot.coro_games/integrity');
       final String? installer = await platform.invokeMethod('getInstaller');
-      
+
       if (installer == null || installer.isEmpty) {
         // Si no se puede obtener el instalador, podría ser:
         // - Instalación via ADB (desarrollo)
@@ -134,7 +133,8 @@ class AppIntegrityService {
     // Fallback: verificar si existe el archivo de Play Store
     // Esto es menos confiable pero funciona sin código nativo
     try {
-      final result = await Process.run('pm', ['list', 'packages', 'com.android.vending']);
+      final result =
+          await Process.run('pm', ['list', 'packages', 'com.android.vending']);
       return result.stdout.toString().contains('com.android.vending');
     } catch (e) {
       return true; // En caso de error, no bloquear
@@ -157,4 +157,3 @@ class AppIntegrityService {
     }
   }
 }
-

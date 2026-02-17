@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
 class LottieAnimation extends StatefulWidget {
-  const LottieAnimation({super.key, required this.animationJson});
+  const LottieAnimation({required this.animationJson, super.key});
   final String animationJson;
 
   @override
   State<LottieAnimation> createState() => _MyWidgetState();
 }
 
-class _MyWidgetState extends State<LottieAnimation> with SingleTickerProviderStateMixin {
+class _MyWidgetState extends State<LottieAnimation>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override

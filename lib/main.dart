@@ -17,8 +17,11 @@ void main() async {
 
   await Preferences.init();
 
-  final isPlatformDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
-  final bool initInDarkMode = Preferences.isSystemMode ? isPlatformDark : Preferences.isDarkMode;
+  final isPlatformDark =
+      WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+          Brightness.dark;
+  final bool initInDarkMode =
+      Preferences.isSystemMode ? isPlatformDark : Preferences.isDarkMode;
 
   final premiumProvider = PremiumProvider();
   final localeProvider = LocaleProvider();
@@ -32,7 +35,8 @@ void main() async {
     ChangeNotifierProvider(create: (_) => ReorderableProvider()),
     ChangeNotifierProvider(create: (_) => PageEditarProvider()),
     ChangeNotifierProvider(create: (_) => PartidaPredefinidaProvider()),
-    ChangeNotifierProvider(create: (_) => ThemeProvider(isDarkMode_: initInDarkMode)),
+    ChangeNotifierProvider(
+        create: (_) => ThemeProvider(isDarkMode_: initInDarkMode)),
     ChangeNotifierProvider.value(value: premiumProvider),
     ChangeNotifierProvider.value(value: localeProvider),
   ], child: const MyApp()));
@@ -43,10 +47,13 @@ class SmoothScrollBehavior extends MaterialScrollBehavior {
   const SmoothScrollBehavior();
 
   @override
-  ScrollPhysics getScrollPhysics(BuildContext context) => const ClampingScrollPhysics();
+  ScrollPhysics getScrollPhysics(BuildContext context) =>
+      const ClampingScrollPhysics();
 
   @override
-  Widget buildOverscrollIndicator(BuildContext context, Widget child, ScrollableDetails details) => child;
+  Widget buildOverscrollIndicator(
+          BuildContext context, Widget child, ScrollableDetails details) =>
+      child;
 }
 
 class MyApp extends StatefulWidget {
@@ -87,8 +94,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         _applyImmersiveMode();
       }
 
-      if (Preferences.isSystemMode && _lastLifecycleState == AppLifecycleState.resumed) {
-        final bool isActualSystemDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
+      if (Preferences.isSystemMode &&
+          _lastLifecycleState == AppLifecycleState.resumed) {
+        final bool isActualSystemDark =
+            WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+                Brightness.dark;
 
         if (isActualSystemDark != Preferences.isDarkMode) {
           Preferences.isDarkMode = isActualSystemDark;
@@ -114,7 +124,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void _configureSystemUiCallback() {
     if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
 
-    SystemChrome.setSystemUIChangeCallback((bool systemOverlaysAreVisible) async {
+    SystemChrome.setSystemUIChangeCallback(
+        (bool systemOverlaysAreVisible) async {
       if (!mounted || !systemOverlaysAreVisible || _isReapplyingSystemUi) {
         return;
       }

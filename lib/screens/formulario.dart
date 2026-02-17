@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -27,8 +29,9 @@ class _FormularioScreenState extends State<FormularioScreen> {
     super.initState();
 
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      if (Preferences.isFirstTimeOpen)
-        context.read<PartidaPredefinidaProvider>().seed();
+      if (Preferences.isFirstTimeOpen) {
+        unawaited(context.read<PartidaPredefinidaProvider>().seed());
+      }
 
       openDefaultsPartidasDialog(context);
     });
@@ -88,7 +91,7 @@ void openDefaultsPartidasDialog(BuildContext context) {
 }
 
 class _Body extends StatelessWidget {
-  _Body({super.key});
+  _Body();
 
   final ScrollController jugadoresController = ScrollController();
 
@@ -194,10 +197,12 @@ class _Body extends StatelessWidget {
       final GoogleAdsProvider googleAdsProvider =
           context.read<GoogleAdsProvider>();
 
-      MyLoading.show();
+      await MyLoading.show();
       final Partida partida = Partida.fromMap(form.value);
+      if (!context.mounted) return;
       final response = await partidaProvider.newPartida(partida, context);
-      MyLoading.close();
+      await MyLoading.close();
+      if (!context.mounted) return;
 
       if (!response.hasError!) {
         final newPartida = response.data;
@@ -387,7 +392,6 @@ class _FormDetailsColumn extends StatelessWidget {
                       width: 46,
                       height: 28,
                       child: FittedBox(
-                        fit: BoxFit.contain,
                         child: Switch(
                           value: sinMaxPuntuacion,
                           materialTapTargetSize:
@@ -752,7 +756,7 @@ class _CreateButton extends StatelessWidget {
               TextScale(
                 AppLocalizations.of(context)!.createGame,
                 size: 16,
-                style: TextStyle(
+                style: const TextStyle(
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -767,7 +771,7 @@ class _CreateButton extends StatelessWidget {
 }
 
 class _Inputs extends StatelessWidget {
-  const _Inputs({super.key, required this.jugadoresController});
+  const _Inputs({required this.jugadoresController});
   final ScrollController jugadoresController;
 
   @override
@@ -797,7 +801,6 @@ class _Inputs extends StatelessWidget {
 
 class _JugadorInput extends StatefulWidget {
   const _JugadorInput({
-    super.key,
     required this.index,
     required this.scrollController,
   });

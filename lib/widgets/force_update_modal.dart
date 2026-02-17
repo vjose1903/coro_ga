@@ -1,26 +1,27 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:animate_do/animate_do.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import '../l10n/app_localizations.dart';
 import '../services/version_service.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../helpers/helpers.dart';
 import 'icon_scale.dart';
 import 'text_scale.dart';
 
 class ForceUpdateModal extends StatelessWidget {
   const ForceUpdateModal({super.key});
 
-  static Future<void> showIfNeeded(BuildContext context, {bool forceShow = false}) async {
+  static Future<void> showIfNeeded(BuildContext context,
+      {bool forceShow = false}) async {
     // En desarrollo solo mostrar si se pasa forceShow
     if (kDebugMode && !forceShow) return;
 
     final updateAvailable = await VersionService.instance.checkForUpdate();
 
     if ((updateAvailable || forceShow) && context.mounted) {
-      showDialog(
+      await showDialog(
         context: context,
         barrierDismissible: false,
         barrierColor: Colors.black.withValues(alpha: 0.85),
@@ -76,7 +77,9 @@ class ForceUpdateModal extends StatelessWidget {
                 ZoomIn(
                   delay: const Duration(milliseconds: 200),
                   child: Image.asset(
-                    Preferences.isPremium ? 'assets/icon/iconCircular-pro.png' : 'assets/icon/iconCircular.png',
+                    Preferences.isPremium
+                        ? 'assets/icon/iconCircular-pro.png'
+                        : 'assets/icon/iconCircular.png',
                     width: 100,
                     height: 100,
                   ),

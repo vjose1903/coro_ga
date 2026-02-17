@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../screens/screens.dart';
+
 import '../models/menu_option.dart';
+import '../screens/screens.dart';
 
 class AppRoutes {
   static final menuOptions = <MenuOption>[

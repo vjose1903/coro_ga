@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -97,7 +99,6 @@ class FormPartidaPredefinida extends StatelessWidget {
             padding: EdgeInsets.all(formPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.max,
               children: [
                 // Header
                 _FormHeader(
@@ -203,7 +204,6 @@ class FormPartidaPredefinida extends StatelessWidget {
                                                     width: 46,
                                                     height: 28,
                                                     child: FittedBox(
-                                                      fit: BoxFit.contain,
                                                       child: Switch(
                                                         value: sinMaxPuntuacion,
                                                         materialTapTargetSize:
@@ -426,7 +426,6 @@ class FormPartidaPredefinida extends StatelessWidget {
                                               width: 46,
                                               height: 28,
                                               child: FittedBox(
-                                                fit: BoxFit.contain,
                                                 child: Switch(
                                                   value: sinMaxPuntuacion,
                                                   materialTapTargetSize:
@@ -550,7 +549,7 @@ class FormPartidaPredefinida extends StatelessWidget {
     });
   }
 
-  crearEditarPartida(
+  Future<void> crearEditarPartida(
       {required FormGroup form, required BuildContext context}) async {
     final PartidaPredefinidaProvider formPartidaPredefinidaProvider =
         context.read<PartidaPredefinidaProvider>();
@@ -577,21 +576,23 @@ class FormPartidaPredefinida extends StatelessWidget {
       }
 
       if (!response.hasError!) {
+        if (!context.mounted) return;
         // IMPORTANTE: Cerrar diálogo PRIMERO, mostrar anuncio DESPUÉS (pausa natural)
         DialogNavigator.of(context).pop();
-        formPartidaPredefinidaProvider.resetForm();
+        await formPartidaPredefinidaProvider.resetForm();
 
         // Mostrar anuncio después de un delay para dar pausa natural
         final bool shouldShowInterstitial =
             !premiumProvider.isPremium && !premiumProvider.simulatePremium;
         if (shouldShowInterstitial) {
-          Future.delayed(const Duration(milliseconds: 600), () {
+          unawaited(Future.delayed(const Duration(milliseconds: 600), () {
             googleAdsProvider.showInterstitialAd(onCloseFunction: () {
               googleAdsProvider.loadInterstitialAd();
             });
-          });
+          }));
         }
       } else {
+        if (!context.mounted) return;
         Toast.show(
             type: ToastType.error,
             context: context,
@@ -816,9 +817,9 @@ class _ActionButton extends StatelessWidget {
   const _ActionButton({
     required this.label,
     required this.icon,
+    required this.onTap,
     this.isPrimary = false,
     this.isDestructive = false,
-    required this.onTap,
   });
   final String label;
   final IconData icon;

@@ -9,7 +9,8 @@ class ConnectivityService {
   static final ConnectivityService instance = ConnectivityService._();
 
   final Connectivity _connectivity = Connectivity();
-  final StreamController<bool> _statusController = StreamController<bool>.broadcast();
+  final StreamController<bool> _statusController =
+      StreamController<bool>.broadcast();
   StreamSubscription<List<ConnectivityResult>>? _subscription;
 
   Stream<bool> get statusStream => _statusController.stream;
@@ -25,7 +26,8 @@ class ConnectivityService {
 
   Future<bool> hasInternetConnection() async {
     final results = await _connectivity.checkConnectivity();
-    if (results.isEmpty || (results.length == 1 && results.first == ConnectivityResult.none)) {
+    if (results.isEmpty ||
+        (results.length == 1 && results.first == ConnectivityResult.none)) {
       return false;
     }
     return _canReachInternet();

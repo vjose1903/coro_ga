@@ -30,7 +30,7 @@ class GoogleAdsProvider extends ChangeNotifier {
     MyLoading.close();
   }
 
-  loadInterstitialAd({int attempt = 1}) {
+  void loadInterstitialAd({int attempt = 1}) {
     if (Preferences.isPremium) return;
     if (interstitialAd == null) {
       _interstitialLoadAttempts = attempt;
@@ -67,7 +67,9 @@ class GoogleAdsProvider extends ChangeNotifier {
             }
           },
           onAdFailedToLoad: (err) {
-            Fun.logColor(color: Colores.red, body: 'Failed to load an interstitial ad: ${err.message}');
+            Fun.logColor(
+                color: Colores.red,
+                body: 'Failed to load an interstitial ad: ${err.message}');
             if (_interstitialLoadAttempts < 2) {
               loadInterstitialAd(attempt: _interstitialLoadAttempts + 1);
               return;
@@ -82,7 +84,7 @@ class GoogleAdsProvider extends ChangeNotifier {
     }
   }
 
-  showInterstitialAd({required Function onCloseFunction}) {
+  void showInterstitialAd({required Function onCloseFunction}) {
     if (Preferences.isPremium) {
       onCloseFunction();
       return;
@@ -98,12 +100,12 @@ class GoogleAdsProvider extends ChangeNotifier {
     loadInterstitialAd();
   }
 
-  cleanInterstitialAd() {
+  void cleanInterstitialAd() {
     if (interstitialAd != null) interstitialAd!.dispose();
     if (interstitialAd != null) interstitialAd = null;
   }
 
-  loadRewardedAd(RewardedAdLocation location, {int attempt = 1}) {
+  void loadRewardedAd(RewardedAdLocation location, {int attempt = 1}) {
     if (Preferences.isPremium) return;
     if (rewardedAd == null) {
       _rewardedLoadAttempts = attempt;
@@ -135,7 +137,9 @@ class GoogleAdsProvider extends ChangeNotifier {
             rewardedAd = ad;
           },
           onAdFailedToLoad: (err) {
-            Fun.logColor(color: Colores.red, body: 'Failed to load a rewarded ad: ${err.message}');
+            Fun.logColor(
+                color: Colores.red,
+                body: 'Failed to load a rewarded ad: ${err.message}');
             if (_rewardedLoadAttempts < 2) {
               loadRewardedAd(location, attempt: _rewardedLoadAttempts + 1);
               return;
@@ -149,7 +153,7 @@ class GoogleAdsProvider extends ChangeNotifier {
     }
   }
 
-  showRewardedAd({
+  void showRewardedAd({
     required Function onCloseFunction,
     required Function onRewardEarned,
     Function? onAdFailed,
@@ -173,7 +177,7 @@ class GoogleAdsProvider extends ChangeNotifier {
     }
   }
 
-  cleanRewardedAd() {
+  void cleanRewardedAd() {
     if (rewardedAd != null) rewardedAd!.dispose();
     rewardedAd = null;
     onRewardedCloseFunction_ = null;

@@ -1,4 +1,1 @@
-enum AdLocation {
-  home,
-  partida
-}
+enum AdLocation { home, partida }

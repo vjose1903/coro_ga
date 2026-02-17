@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../shared_preferences/preferences.dart';
 
 class LocaleProvider extends ChangeNotifier {
-
   LocaleProvider() {
     _loadSavedLocale();
   }
@@ -38,4 +37,3 @@ class LocaleProvider extends ChangeNotifier {
     return (code == 'es' || code == 'en') ? code : 'es';
   }
 }
-

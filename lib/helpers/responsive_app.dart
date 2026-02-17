@@ -31,7 +31,8 @@ class ResponsiveApp {
     _mediaQueryData = MediaQuery.of(context);
   }
 
-  static double get _scaleFactor => min(width / _baseWidth, height / _baseHeight);
+  static double get _scaleFactor =>
+      min(width / _baseWidth, height / _baseHeight);
 
   static double scaleWidth(double value) => value * width / _baseWidth;
   static double scaleHeight(double value) => value * height / _baseHeight;
@@ -45,10 +46,14 @@ class ResponsiveApp {
   static EdgeInsets all(double value) => EdgeInsets.all(scaleWidth(value));
 
   static EdgeInsets symmetric({double horizontal = 0, double vertical = 0}) =>
-      EdgeInsets.symmetric(horizontal: scaleWidth(horizontal), vertical: scaleHeight(vertical));
+      EdgeInsets.symmetric(
+          horizontal: scaleWidth(horizontal), vertical: scaleHeight(vertical));
 
   static EdgeInsets only(
-          {double left = 0, double top = 0, double right = 0, double bottom = 0}) =>
+          {double left = 0,
+          double top = 0,
+          double right = 0,
+          double bottom = 0}) =>
       EdgeInsets.only(
         left: scaleWidth(left),
         top: scaleHeight(top),

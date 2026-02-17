@@ -8,7 +8,7 @@ class SlideUpProvider extends ChangeNotifier {
   bool _closeOnOutsideClick = true;
   bool _isPanelFullyOpen = false;
   double _panelPosition = 0.0;
-  double _panelMaxHeight = 0.0;
+  double panelMaxHeight = 0.0;
   bool _isResizing = false;
   bool _skipCleanOnClose = false;
   bool _isDraggable = false;
@@ -21,7 +21,6 @@ class SlideUpProvider extends ChangeNotifier {
   bool get closeOnOutsideClick => _closeOnOutsideClick;
   bool get isPanelFullyOpen => _isPanelFullyOpen;
   double get panelPosition => _panelPosition;
-  double get panelMaxHeight => _panelMaxHeight;
   bool get isResizing => _isResizing;
   bool get skipCleanOnClose => _skipCleanOnClose;
   bool get isDraggable => _isDraggable;
@@ -41,15 +40,12 @@ class SlideUpProvider extends ChangeNotifier {
     }
   }
 
-  set panelMaxHeight(double value) {
-    _panelMaxHeight = value;
-  }
-
   void openSlideUp({
     required PanelController controller,
     Widget? bodyContent,
     double? topMargin,
-    double? maxHeightFraction, // Altura máxima como fracción de la pantalla (0.5 = 50%)
+    double?
+        maxHeightFraction, // Altura máxima como fracción de la pantalla (0.5 = 50%)
     bool closeOnOutsideClick = true,
     bool isDraggable = false,
   }) {
@@ -72,7 +68,10 @@ class SlideUpProvider extends ChangeNotifier {
     });
   }
 
-  void closeSlideUp({required PanelController controller, bool isListener = false, bool skipClean = false}) {
+  void closeSlideUp(
+      {required PanelController controller,
+      bool isListener = false,
+      bool skipClean = false}) {
     _skipCleanOnClose = skipClean;
     if (!isListener && controller.isAttached) controller.close();
     _topMargin = null;

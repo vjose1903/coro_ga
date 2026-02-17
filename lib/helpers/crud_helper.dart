@@ -1,13 +1,16 @@
-import 'helpers.dart';
-import '../models/models.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../models/models.dart';
+import 'helpers.dart';
+
 class CrudHelper {
-  static Future<SqlResponse> insert({required String tableName, required dynamic body}) async {
+  static Future<SqlResponse> insert(
+      {required String tableName, required dynamic body}) async {
     final response = SqlResponse();
     final db = await DatabaseHelper.database;
 
-    final res = await db.insert(tableName, body, conflictAlgorithm: ConflictAlgorithm.replace);
+    final res = await db.insert(tableName, body,
+        conflictAlgorithm: ConflictAlgorithm.replace);
     if (res > 0) {
       response.data = res;
     } else {
@@ -18,7 +21,11 @@ class CrudHelper {
     return response;
   }
 
-  static Future<SqlResponse> getOne({required String tableName, required int? id, List? whereArgs_, String? where_ = 'id = ?'}) async {
+  static Future<SqlResponse> getOne(
+      {required String tableName,
+      required int? id,
+      List? whereArgs_,
+      String? where_ = 'id = ?'}) async {
     final response = SqlResponse();
 
     whereArgs_ ??= [id];
@@ -35,7 +42,8 @@ class CrudHelper {
     return response;
   }
 
-  static Future<SqlResponse> getAll({required String tableName, List? whereArgs_, String? where_}) async {
+  static Future<SqlResponse> getAll(
+      {required String tableName, List? whereArgs_, String? where_}) async {
     final response = SqlResponse();
     response.data = [];
 
@@ -55,14 +63,19 @@ class CrudHelper {
   }
 
   static Future<SqlResponse> updateOne(
-      {required String tableName, required dynamic newData, int? id, List? whereArgs_, String? where_ = 'id = ?'}) async {
+      {required String tableName,
+      required dynamic newData,
+      int? id,
+      List? whereArgs_,
+      String? where_ = 'id = ?'}) async {
     final response = SqlResponse();
 
     whereArgs_ ??= [id];
     final db = await DatabaseHelper.database;
 
     try {
-      final dynamic res = await db.update(tableName, newData, where: where_, whereArgs: whereArgs_);
+      final dynamic res = await db.update(tableName, newData,
+          where: where_, whereArgs: whereArgs_);
       if (res > 0) {
         response.data = res;
       } else {
@@ -76,7 +89,11 @@ class CrudHelper {
     }
   }
 
-  static Future<SqlResponse> deleteOne({required String tableName, required int id, List? whereArgs_, String? where_ = 'id = ?'}) async {
+  static Future<SqlResponse> deleteOne(
+      {required String tableName,
+      required int id,
+      List? whereArgs_,
+      String? where_ = 'id = ?'}) async {
     final response = SqlResponse();
 
     final db = await DatabaseHelper.database;

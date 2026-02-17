@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 enum Env { free, pro }
 
 class AppConfig extends InheritedWidget {
-
-  const AppConfig({Key? key, required Widget child, required this.environment, required this.appName}) : super(key: key, child: child);
+  const AppConfig(
+      {required super.child,
+      required this.environment,
+      required this.appName,
+      super.key});
   final Env environment;
   final String appName;
 

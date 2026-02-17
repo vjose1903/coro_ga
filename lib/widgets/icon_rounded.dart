@@ -3,8 +3,8 @@ import 'icon_scale.dart';
 
 class IconRounded extends StatelessWidget {
   const IconRounded(
-      {super.key,
-      required this.icon,
+      {required this.icon,
+      super.key,
       this.iconColor = Colors.grey,
       this.iconSize = 15,
       this.backgroundColor,
@@ -22,7 +22,11 @@ class IconRounded extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
         margin: EdgeInsets.only(left: marginLeft!, right: marginRight!),
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: backgroundColor),
-        child: Padding(padding: const EdgeInsets.all(3), child: Center(child: IconScale(icon, size: iconSize, color: iconColor))));
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(50), color: backgroundColor),
+        child: Padding(
+            padding: const EdgeInsets.all(3),
+            child: Center(
+                child: IconScale(icon, size: iconSize, color: iconColor))));
   }
 }

@@ -10,7 +10,8 @@ import 'icon_scale.dart';
 import 'text_scale.dart';
 
 class CustomEstadoPartida extends StatelessWidget {
-  const CustomEstadoPartida({required this.useLandscapeLayout, required this.isWide, super.key});
+  const CustomEstadoPartida(
+      {required this.useLandscapeLayout, required this.isWide, super.key});
   final bool useLandscapeLayout;
   final bool isWide;
 
@@ -33,13 +34,17 @@ class CustomEstadoPartida extends StatelessWidget {
         color: Colors.amber[700]!,
       );
     } else {
-      return _GanadorPerdedor(partida: partida, useLandscapeLayout: useLandscapeLayout, isWide: isWide);
+      return _GanadorPerdedor(
+          partida: partida,
+          useLandscapeLayout: useLandscapeLayout,
+          isWide: isWide);
     }
   }
 }
 
 class _EstadoChip extends StatelessWidget {
-  const _EstadoChip({required this.icon, required this.label, required this.color});
+  const _EstadoChip(
+      {required this.icon, required this.label, required this.color});
   final IconData icon;
   final String label;
   final Color color;
@@ -89,7 +94,8 @@ class _EstadoChip extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w600,
-              color: Preferences.isDarkMode ? color : color.withValues(alpha: 0.9),
+              color:
+                  Preferences.isDarkMode ? color : color.withValues(alpha: 0.9),
             ),
           ),
         ],
@@ -99,7 +105,10 @@ class _EstadoChip extends StatelessWidget {
 }
 
 class _GanadorPerdedor extends StatelessWidget {
-  const _GanadorPerdedor({required this.partida, required this.useLandscapeLayout, required this.isWide});
+  const _GanadorPerdedor(
+      {required this.partida,
+      required this.useLandscapeLayout,
+      required this.isWide});
   final Partida partida;
   final bool useLandscapeLayout;
   final bool isWide;
@@ -115,20 +124,48 @@ class _GanadorPerdedor extends StatelessWidget {
         ? Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _PlayerStatusChip(icon: Icons.trending_up_rounded, label: _getTranslatedLabel(context, partida.getGandorOrPerdedorName(tipo: Estado.ganador)), color: Colors.green, isWinner: true, useLandscapeLayout: useLandscapeLayout, isWide: isWide),
+              _PlayerStatusChip(
+                  icon: Icons.trending_up_rounded,
+                  label: _getTranslatedLabel(context,
+                      partida.getGandorOrPerdedorName(tipo: Estado.ganador)),
+                  color: Colors.green,
+                  isWinner: true,
+                  useLandscapeLayout: useLandscapeLayout,
+                  isWide: isWide),
               const SizedBox(height: 10),
-              _PlayerStatusChip(icon: Icons.trending_down_rounded, label: _getTranslatedLabel(context, partida.getGandorOrPerdedorName(tipo: Estado.perdedor)), color: Colors.red[400]!, isWinner: false, useLandscapeLayout: useLandscapeLayout, isWide: isWide),
+              _PlayerStatusChip(
+                  icon: Icons.trending_down_rounded,
+                  label: _getTranslatedLabel(context,
+                      partida.getGandorOrPerdedorName(tipo: Estado.perdedor)),
+                  color: Colors.red[400]!,
+                  isWinner: false,
+                  useLandscapeLayout: useLandscapeLayout,
+                  isWide: isWide),
             ],
           )
         : Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
-                child: _PlayerStatusChip(icon: Icons.trending_up_rounded, label: _getTranslatedLabel(context, partida.getGandorOrPerdedorName(tipo: Estado.ganador)), color: Colors.green, isWinner: true, useLandscapeLayout: useLandscapeLayout, isWide: isWide),
+                child: _PlayerStatusChip(
+                    icon: Icons.trending_up_rounded,
+                    label: _getTranslatedLabel(context,
+                        partida.getGandorOrPerdedorName(tipo: Estado.ganador)),
+                    color: Colors.green,
+                    isWinner: true,
+                    useLandscapeLayout: useLandscapeLayout,
+                    isWide: isWide),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _PlayerStatusChip(icon: Icons.trending_down_rounded, label: _getTranslatedLabel(context, partida.getGandorOrPerdedorName(tipo: Estado.perdedor)), color: Colors.red[400]!, isWinner: false, useLandscapeLayout: useLandscapeLayout, isWide: isWide),
+                child: _PlayerStatusChip(
+                    icon: Icons.trending_down_rounded,
+                    label: _getTranslatedLabel(context,
+                        partida.getGandorOrPerdedorName(tipo: Estado.perdedor)),
+                    color: Colors.red[400]!,
+                    isWinner: false,
+                    useLandscapeLayout: useLandscapeLayout,
+                    isWide: isWide),
               ),
             ],
           );
@@ -154,7 +191,8 @@ class _PlayerStatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 14, vertical: useLandscapeLayout ? 5 : 10),
+      padding: EdgeInsets.symmetric(
+          horizontal: 14, vertical: useLandscapeLayout ? 5 : 10),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -195,7 +233,9 @@ class _PlayerStatusChip extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w600,
-                color: Preferences.isDarkMode ? color : color.withValues(alpha: 0.9),
+                color: Preferences.isDarkMode
+                    ? color
+                    : color.withValues(alpha: 0.9),
               ),
             ),
           ),

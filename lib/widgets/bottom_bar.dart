@@ -8,14 +8,20 @@ import '../providers/providers.dart';
 import '../shared_preferences/preferences.dart';
 
 class BottomBar extends StatelessWidget {
-  const BottomBar({super.key, required this.useLandscapeLayout, this.child, this.panelController});
+  const BottomBar(
+      {required this.useLandscapeLayout,
+      super.key,
+      this.child,
+      this.panelController});
   final bool useLandscapeLayout;
   final Widget? child;
   final PanelController? panelController;
 
   @override
   Widget build(BuildContext context) {
-    final Color backgroundColor = Preferences.isDarkMode ? const Color(0xEB333333) : const Color(0xFFC4D0E5);
+    final Color backgroundColor = Preferences.isDarkMode
+        ? const Color(0xEB333333)
+        : const Color(0xFFC4D0E5);
     final SlideUpProvider slideUpProvider = context.watch<SlideUpProvider>();
     final double bottomInset = MediaQuery.of(context).viewPadding.bottom;
 
@@ -23,7 +29,9 @@ class BottomBar extends StatelessWidget {
 
     // Usar la posición del panel para animar la altura suavemente
     // panelPosition va de 0 (cerrado) a 1 (abierto)
-    final double animatedHeight = panelController != null ? maxHeight * (1 - slideUpProvider.panelPosition) : maxHeight;
+    final double animatedHeight = panelController != null
+        ? maxHeight * (1 - slideUpProvider.panelPosition)
+        : maxHeight;
     final double height = animatedHeight > 0 ? animatedHeight + bottomInset : 0;
 
     return Container(

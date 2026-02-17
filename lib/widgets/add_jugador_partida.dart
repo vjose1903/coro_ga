@@ -15,7 +15,7 @@ import 'header_section.dart';
 import 'widgets.dart';
 
 class AddJugadorPartida extends StatelessWidget {
-  const AddJugadorPartida({super.key, required this.panelController});
+  const AddJugadorPartida({required this.panelController, super.key});
 
   final PanelController panelController;
 
@@ -26,7 +26,7 @@ class AddJugadorPartida extends StatelessWidget {
 }
 
 class AddJugador extends StatefulWidget {
-  const AddJugador({super.key, required this.panelController});
+  const AddJugador({required this.panelController, super.key});
 
   final PanelController panelController;
 
@@ -37,7 +37,7 @@ class AddJugador extends StatefulWidget {
 class _AddJugadorState extends State<AddJugador> {
   final ScrollController jugadoresController = ScrollController();
 
-  rebuildWidget() {
+  void rebuildWidget() {
     Fun.logColor(color: Colores.magenta, body: 'mounted: $mounted');
     if (mounted) setState(() {});
   }
@@ -49,7 +49,8 @@ class _AddJugadorState extends State<AddJugador> {
     final isDark = Preferences.isDarkMode;
     final FormGroup form = jugadorProvider.formJugador;
 
-    final int cantJugadores = partidaProvider.partidaEnTurno?.jugadores?.length ?? 0;
+    final int cantJugadores =
+        partidaProvider.partidaEnTurno?.jugadores?.length ?? 0;
 
     return ResponsiveLayoutBuilder(
       useMediaQuery: true,
@@ -65,15 +66,20 @@ class _AddJugadorState extends State<AddJugador> {
           child: SingleChildScrollView(
             physics: const ClampingScrollPhysics(),
             child: SizedBox(
-              height: (ResponsiveApp.size.height - (ResponsiveApp.size.height * 0.22)),
+              height: (ResponsiveApp.size.height -
+                  (ResponsiveApp.size.height * 0.22)),
               child: Column(
                 children: [
                   // Header
-                  _AddJugadorHeader(cantJugadores: cantJugadores, panelController: widget.panelController),
+                  _AddJugadorHeader(
+                      cantJugadores: cantJugadores,
+                      panelController: widget.panelController),
                   const SizedBox(height: 16),
 
                   // Sección jugadores actuales
-                  _SectionTitle(title: AppLocalizations.of(context)!.addPlayer, icon: FontAwesomeIcons.plus),
+                  _SectionTitle(
+                      title: AppLocalizations.of(context)!.addPlayer,
+                      icon: FontAwesomeIcons.plus),
                   const SizedBox(height: 10),
 
                   // Input Nombre + Botón agregar
@@ -89,7 +95,10 @@ class _AddJugadorState extends State<AddJugador> {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        _AddIconButton(useLandscapeLayout: useLandscapeLayout, isWide: isWide, onTap: () => _agregarJugador(context, form)),
+                        _AddIconButton(
+                            useLandscapeLayout: useLandscapeLayout,
+                            isWide: isWide,
+                            onTap: () => _agregarJugador(context, form)),
                       ],
                     ),
                   ),
@@ -110,7 +119,9 @@ class _AddJugadorState extends State<AddJugador> {
                         color: AppThemes.themeColor_1,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.08)
+                              : Colors.grey.withValues(alpha: 0.15),
                         ),
                       ),
                       child: ClipRRect(
@@ -120,7 +131,8 @@ class _AddJugadorState extends State<AddJugador> {
                           rebuildWidget: rebuildWidget,
                           useLandscapeLayout: useLandscapeLayout,
                           isWide: isWide,
-                          onEditJugador: (jugador) => _showEditarJugadorModal(context, jugador, useLandscapeLayout),
+                          onEditJugador: (jugador) => _showEditarJugadorModal(
+                              context, jugador, useLandscapeLayout),
                         ),
                       ),
                     ),
@@ -134,7 +146,8 @@ class _AddJugadorState extends State<AddJugador> {
     );
   }
 
-  void _showEditarJugadorModal(BuildContext context, Jugador jugador, bool useLandscapeLayout) {
+  void _showEditarJugadorModal(
+      BuildContext context, Jugador jugador, bool useLandscapeLayout) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     final jugadorProvider = context.read<JugadorProvider>();
@@ -144,7 +157,8 @@ class _AddJugadorState extends State<AddJugador> {
     jugadorProvider.formJugador.patchValue(jugador.toMap());
 
     // Cerrar el slideUp cuando se abre el modal (sin limpiar jugadorEditar)
-    slideUpProvider.closeSlideUp(controller: widget.panelController, skipClean: true);
+    slideUpProvider.closeSlideUp(
+        controller: widget.panelController, skipClean: true);
 
     showDialog(
       context: context,
@@ -168,7 +182,8 @@ class _AddJugadorState extends State<AddJugador> {
         if (!mounted) return;
         slideUpProvider.openSlideUp(
           controller: widget.panelController,
-          bodyContent: AddJugadorPartida(panelController: widget.panelController),
+          bodyContent:
+              AddJugadorPartida(panelController: widget.panelController),
         );
       });
     });
@@ -181,23 +196,39 @@ class _AddJugadorState extends State<AddJugador> {
     if (partida == null || partida.jugadores == null) return;
 
     if (!premiumProvider.canAddPlayer(partida.jugadores!.length)) {
-      Toast.show(type: ToastType.info, context: context, message: AppLocalizations.of(context)!.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers), actionLabel: AppLocalizations.of(context)!.getPro, onAction: () => Navigator.pushNamed(context, 'premium'));
+      Toast.show(
+          type: ToastType.info,
+          context: context,
+          message: AppLocalizations.of(context)!
+              .freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers),
+          actionLabel: AppLocalizations.of(context)!.getPro,
+          onAction: () => Navigator.pushNamed(context, 'premium'));
       return;
     }
 
     if (form.valid) {
       final Jugador nuevoJugador = Jugador.fromMap(form.value);
 
-      partidaProvider.addJugadorToPartida(context, jugador: nuevoJugador, partida: partida).then((value) async {
-        form.reset();
-        rebuildWidget();
+      await partidaProvider.addJugadorToPartida(
+        context,
+        jugador: nuevoJugador,
+        partida: partida,
+      );
+      form.reset();
+      rebuildWidget();
 
-        await Future.delayed(const Duration(milliseconds: 50));
+      await Future.delayed(const Duration(milliseconds: 50));
 
-        jugadoresController.animateTo(jugadoresController.position.maxScrollExtent, duration: const Duration(seconds: 1), curve: Curves.easeOutCubic);
-      });
+      await jugadoresController.animateTo(
+        jugadoresController.position.maxScrollExtent,
+        duration: const Duration(seconds: 1),
+        curve: Curves.easeOutCubic,
+      );
     } else {
-      Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.enterNewPlayerName);
+      Toast.show(
+          type: ToastType.error,
+          context: context,
+          message: AppLocalizations.of(context)!.enterNewPlayerName);
     }
   }
 }
@@ -207,7 +238,8 @@ class _AddJugadorState extends State<AddJugador> {
 // ============================================
 
 class _AddJugadorHeader extends StatelessWidget {
-  const _AddJugadorHeader({required this.cantJugadores, required this.panelController});
+  const _AddJugadorHeader(
+      {required this.cantJugadores, required this.panelController});
 
   final int cantJugadores;
   final PanelController panelController;
@@ -220,8 +252,11 @@ class _AddJugadorHeader extends StatelessWidget {
       iconBackgroundColor: const Color(0xFF4CAF50),
       title: AppLocalizations.of(context)!.players,
       subtitle: AppLocalizations.of(context)!.playersInGame(cantJugadores),
-      useLandscapeLayout: ResponsiveLayoutBuilder.maybeOf(context)?.useLandscapeLayout ?? ResponsiveLayoutBuilder.resolveUseLandscapeLayout(context),
-      isWide: ResponsiveLayoutBuilder.maybeOf(context)?.isWide ?? ResponsiveLayoutBuilder.resolveIsWide(context),
+      useLandscapeLayout:
+          ResponsiveLayoutBuilder.maybeOf(context)?.useLandscapeLayout ??
+              ResponsiveLayoutBuilder.resolveUseLandscapeLayout(context),
+      isWide: ResponsiveLayoutBuilder.maybeOf(context)?.isWide ??
+          ResponsiveLayoutBuilder.resolveIsWide(context),
     );
   }
 }
@@ -282,7 +317,10 @@ class _SectionTitle extends StatelessWidget {
 }
 
 class _AddIconButton extends StatelessWidget {
-  const _AddIconButton({required this.onTap, required this.useLandscapeLayout, required this.isWide});
+  const _AddIconButton(
+      {required this.onTap,
+      required this.useLandscapeLayout,
+      required this.isWide});
 
   final VoidCallback onTap;
   final bool useLandscapeLayout;

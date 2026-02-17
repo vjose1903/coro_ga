@@ -1,9 +1,11 @@
 import 'dart:io';
-import '../models/models.dart';
-import '../utils/utils.dart';
+
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
+
+import '../models/models.dart';
+import '../utils/utils.dart';
 
 class DatabaseHelper {
   factory DatabaseHelper() {
@@ -62,7 +64,7 @@ class DatabaseHelper {
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  static _databaseV1(Database db) async {
+  static Future<void> _databaseV1(Database db) async {
     Fun.logColor(
         color: Colores.yellow,
         body: '=========== BASE DE DATOS V1 ===========');
@@ -98,7 +100,7 @@ class DatabaseHelper {
   }
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  static _databaseV2(Database db) async {
+  static Future<void> _databaseV2(Database db) async {
     Fun.logColor(
         color: Colores.yellow,
         body: '=========== BASE DE DATOS V2 ===========');
@@ -114,7 +116,7 @@ class DatabaseHelper {
     ''');
   }
 
-  static _databaseV3(Database db) async {
+  static Future<void> _databaseV3(Database db) async {
     Fun.logColor(
         color: Colores.yellow,
         body: '=========== BASE DE DATOS V3 ===========');

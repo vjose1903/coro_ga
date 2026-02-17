@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 class PageEditarProvider extends ChangeNotifier {
   double actualPage = 0.0;
 
-  getActualPage() {
+  double getActualPage() {
     return actualPage;
   }
 
-  setActualPage(newPage) {
+  void setActualPage(double newPage) {
     actualPage = newPage;
   }
 }

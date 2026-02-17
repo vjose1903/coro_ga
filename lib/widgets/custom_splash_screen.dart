@@ -1,20 +1,20 @@
-import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:flutter/material.dart';
+
 import '../helpers/helpers.dart';
 import 'text_scale.dart';
 
 class CustomSplashScreen extends StatefulWidget {
-
   const CustomSplashScreen({
-    Key? key,
     required this.navigateRoute,
+    required this.imageSrc,
+    required this.backgroundColor,
+    super.key,
     this.duration = 2500,
     this.imageSize = 280,
-    required this.imageSrc,
-    this.text = "",
+    this.text = '',
     this.textStyle,
-    required this.backgroundColor,
-  }) : super(key: key);
+  });
   final Widget navigateRoute;
   final int duration;
   final double imageSize;
@@ -39,8 +39,10 @@ class _CustomSplashScreenState extends State<CustomSplashScreen> {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => widget.navigateRoute,
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                widget.navigateRoute,
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
               return FadeTransition(opacity: animation, child: child);
             },
             transitionDuration: const Duration(milliseconds: 500),
@@ -72,7 +74,9 @@ class _CustomSplashScreenState extends State<CustomSplashScreen> {
                 child: _AnimatedText(
                   text: widget.text,
                   style: widget.textStyle ??
-                      TextStyle(fontSize: ResponsiveApp.scaleText(30), fontFamily: 'Poppins'),
+                      TextStyle(
+                          fontSize: ResponsiveApp.scaleText(30),
+                          fontFamily: 'Poppins'),
                 ),
               ),
           ],
@@ -83,7 +87,6 @@ class _CustomSplashScreenState extends State<CustomSplashScreen> {
 }
 
 class _AnimatedText extends StatefulWidget {
-
   const _AnimatedText({required this.text, required this.style});
   final String text;
   final TextStyle style;

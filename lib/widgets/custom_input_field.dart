@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import '../themes/app_themes.dart';
+
 import '../helpers/helpers.dart';
+import '../themes/app_themes.dart';
 import 'icon_scale.dart';
 
 class CustomInputField<T> extends StatelessWidget {
-
   const CustomInputField({
-    Key? key,
     required this.initialValueFn,
     required this.onChanged,
+    super.key,
     this.hintText,
     this.labelText,
     this.helperText,
@@ -19,7 +19,7 @@ class CustomInputField<T> extends StatelessWidget {
     this.validators,
     this.controller,
     this.enabled = true,
-  }) : super(key: key);
+  });
   final String? hintText;
   final String? labelText;
   final String? helperText;
@@ -56,11 +56,17 @@ class CustomInputField<T> extends StatelessWidget {
         icon: innerLeft == null ? null : IconScale(innerLeft!),
 
         // FillColor --------
-        fillColor: enabled ? AppThemes.inputColor : AppThemes.inputDisabledColor,
+        fillColor:
+            enabled ? AppThemes.inputColor : AppThemes.inputDisabledColor,
 
         // Labels -----------
-        labelStyle: TextStyle(color: enabled ? AppThemes.labelInputColor : AppThemes.labelInputDisabledColor, fontFamily: 'Poppins'),
-        floatingLabelStyle: WidgetStateTextStyle.resolveWith((Set<WidgetState> states) {
+        labelStyle: TextStyle(
+            color: enabled
+                ? AppThemes.labelInputColor
+                : AppThemes.labelInputDisabledColor,
+            fontFamily: 'Poppins'),
+        floatingLabelStyle:
+            WidgetStateTextStyle.resolveWith((Set<WidgetState> states) {
           final Color? color = states.contains(WidgetState.error)
               ? enabled
                   ? Colors.red[900]

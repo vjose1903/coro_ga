@@ -1,25 +1,37 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'models.dart';
+
 import '../helpers/helpers.dart';
 import '../utils/utils.dart';
+import 'models.dart';
 
 class Partida extends DynamicClass {
+  Partida(
+      {this.nombre,
+      this.jugadores,
+      this.id,
+      this.activo = true,
+      this.createdAt,
+      this.tipo,
+      this.maxPuntuacion});
 
   factory Partida.fromJson(String str) => Partida.fromMap(json.decode(str));
 
   factory Partida.fromMap(Map<String, dynamic> json) => Partida(
-        id: json["id"],
-        nombre: json["nombre"],
-        tipo: json["tipo"],
-        maxPuntuacion: json["maxPuntuacion"],
-        activo: Fun.toBoolean(json["activo"]),
-        createdAt: json["created_at"],
-        jugadores: json["jugadores"] != null ? List<Jugador>.from(json["jugadores"].map((x) => Jugador.fromMap(x))) : null,
+        id: json['id'],
+        nombre: json['nombre'],
+        tipo: json['tipo'],
+        maxPuntuacion: json['maxPuntuacion'],
+        activo: Fun.toBoolean(json['activo']),
+        createdAt: json['created_at'],
+        jugadores: json['jugadores'] != null
+            ? List<Jugador>.from(
+                json['jugadores'].map((x) => Jugador.fromMap(x)))
+            : null,
       );
-  Partida({this.nombre, this.jugadores, this.id, this.activo = true, this.createdAt, this.tipo, this.maxPuntuacion});
 
   static String tableName = 'Partida';
 
@@ -34,40 +46,49 @@ class Partida extends DynamicClass {
   bool get tieneMaxPuntuacion => (maxPuntuacion ?? 0) > 0;
   bool get esSinMaxPuntuacion => !tieneMaxPuntuacion;
 
-  get cantJugadores {
+  int get cantJugadores {
     if (jugadores == null) return 0;
 
     return jugadores!.length;
   }
 
-  get isSinIniciar {
+  bool get isSinIniciar {
     final bool inicida = jugadores!.every((jugador) => jugador.puntuacion == 0);
     return inicida;
   }
 
-  get isEmpate {
+  bool get isEmpate {
     bool estado = true;
-    if (cantJugadores > 2) estado = jugadores!.every((jugador) => jugador.puntuacion == jugadores!.first.puntuacion);
-    if (cantJugadores == 2) estado = jugadores![0].puntuacion == jugadores![1].puntuacion;
+    if (cantJugadores > 2) {
+      estado = jugadores!.every(
+          (jugador) => jugador.puntuacion == jugadores!.first.puntuacion);
+    }
+    if (cantJugadores == 2) {
+      estado = jugadores![0].puntuacion == jugadores![1].puntuacion;
+    }
     return estado;
   }
 
-  get jugadoresMap {
-    return jugadores != null ? List<dynamic>.from(jugadores!.map((x) => x.toMap())) : [];
+  List<dynamic> get jugadoresMap {
+    return jugadores != null
+        ? List<dynamic>.from(jugadores!.map((x) => x.toMap()))
+        : [];
   }
 
-  get jugadoresSort {
+  List<Jugador> get jugadoresSort {
+    final List<Jugador> currentJugadores = jugadores ?? <Jugador>[];
     if (!Fun.arraySortedOrNot(jugadoresMap, 'id')) {
-      jugadores!.sort((a, b) => a.id!.compareTo(b.id!));
+      currentJugadores.sort((a, b) => a.id!.compareTo(b.id!));
     }
 
-    return jugadores;
+    return currentJugadores;
   }
 
-  ordenarPorPuntuacion() {
-    if (jugadores!.isEmpty) return [];
-    jugadores!.sort((a, b) => a.puntuacion!.compareTo(b.puntuacion!));
-    return jugadores;
+  List<Jugador> ordenarPorPuntuacion() {
+    final List<Jugador> currentJugadores = jugadores ?? <Jugador>[];
+    if (currentJugadores.isEmpty) return <Jugador>[];
+    currentJugadores.sort((a, b) => a.puntuacion!.compareTo(b.puntuacion!));
+    return currentJugadores;
   }
 
   String getJugadorEstatus(Jugador jugador) {
@@ -75,34 +96,42 @@ class Partida extends DynamicClass {
 
     if (jugador.nombre == getGandorOrPerdedorName(tipo: Estado.ganador)) {
       estado = Estado.ganador;
-    } else if (jugador.nombre == getGandorOrPerdedorName(tipo: Estado.perdedor)) {
+    } else if (jugador.nombre ==
+        getGandorOrPerdedorName(tipo: Estado.perdedor)) {
       estado = Estado.perdedor;
     } else {
-      final List<Jugador> empatados = jugadores!.where((judadorEnTurno) => judadorEnTurno.puntuacion == jugador.puntuacion).toList();
+      final List<Jugador> empatados = jugadores!
+          .where((judadorEnTurno) =>
+              judadorEnTurno.puntuacion == jugador.puntuacion)
+          .toList();
 
       estado = empatados.length > 1 ? Estado.empate : Estado.not;
     }
     return estado;
   }
 
-  getGandorOrPerdedorName({required String tipo}) {
+  String getGandorOrPerdedorName({required String tipo}) {
     final List<Jugador> sortedArray = ordenarPorPuntuacion();
-    final Jugador selected = tipo == Estado.ganador ? sortedArray.last : sortedArray.first;
+    final Jugador selected =
+        tipo == Estado.ganador ? sortedArray.last : sortedArray.first;
 
     final List<Jugador> empatados = jugadores!.where((judador) {
-      return judador.id != selected.id && judador.puntuacion == selected.puntuacion;
+      return judador.id != selected.id &&
+          judador.puntuacion == selected.puntuacion;
     }).toList();
 
-    return empatados.isNotEmpty ? Estado.empate : selected.nombre;
+    return empatados.isNotEmpty ? Estado.empate : (selected.nombre ?? '');
   }
 
   /// Retorna {nombre, puntuacion} del ganador/perdedor o del empate
   Map<String, dynamic> getGanadorOrPerdedor({required String tipo}) {
     final List<Jugador> sortedArray = ordenarPorPuntuacion();
-    final Jugador selected = tipo == Estado.ganador ? sortedArray.last : sortedArray.first;
+    final Jugador selected =
+        tipo == Estado.ganador ? sortedArray.last : sortedArray.first;
 
     final List<Jugador> empatados = jugadores!.where((judador) {
-      return judador.id != selected.id && judador.puntuacion == selected.puntuacion;
+      return judador.id != selected.id &&
+          judador.puntuacion == selected.puntuacion;
     }).toList();
 
     return {
@@ -115,22 +144,27 @@ class Partida extends DynamicClass {
     if (jugadores == null) return;
     for (final jugador in jugadores!) {
       jugador.puntuacion = 0;
-      if (jugador.historialJugadas != null && jugador.historialJugadas!.isNotEmpty) {
+      if (jugador.historialJugadas != null &&
+          jugador.historialJugadas!.isNotEmpty) {
         for (final historial in jugador.historialJugadas!) {
-          await CrudHelper.deleteOne(tableName: HistorialJugada.tableName, id: historial.id!);
+          await CrudHelper.deleteOne(
+              tableName: HistorialJugada.tableName, id: historial.id!);
         }
         jugador.historialJugadas!.clear();
       }
-      await CrudHelper.updateOne(tableName: Jugador.tableName, id: jugador.id!, newData: {'puntuacion': 0});
+      await CrudHelper.updateOne(
+          tableName: Jugador.tableName,
+          id: jugador.id!,
+          newData: {'puntuacion': 0});
     }
   }
 
-  addJugador(Jugador jugador) {
+  void addJugador(Jugador jugador) {
     jugadores ??= [];
     jugadores!.add(jugador);
   }
 
-  addJugadores(List<Jugador?> jugadores) {
+  void addJugadores(List<Jugador?> jugadores) {
     for (final jugador in jugadores) {
       addJugador(jugador!);
     }
@@ -138,12 +172,10 @@ class Partida extends DynamicClass {
 
   String toJson() => json.encode(toMap());
 
-  @override
   Partida getClassInstance(Map<String, dynamic> json) {
     return Partida.fromMap(json);
   }
 
-  @override
   Map<String, dynamic> getMapInstance(Partida model) {
     return model.toMap();
   }
@@ -156,7 +188,9 @@ class Partida extends DynamicClass {
         'maxPuntuacion': maxPuntuacion,
         'createdAt': createdAt?.toIso8601String(),
         'activo': '$activo',
-        'jugadores': jugadores != null ? List<dynamic>.from(jugadores!.map((x) => x.toMap())) : [],
+        'jugadores': jugadores != null
+            ? List<dynamic>.from(jugadores!.map((x) => x.toMap()))
+            : [],
       };
 
   Map<String, dynamic> toUpdateMap() => {
@@ -176,7 +210,8 @@ class Partida extends DynamicClass {
   // ==================================================================================================================================
   // ==================================================================================================================================
 
-  static createPartida(BuildContext context, {required Partida partida}) async {
+  static Future<SqlResponse> createPartida(BuildContext context,
+      {required Partida partida}) async {
     final SqlResponse response = SqlResponse();
     final List<Jugador>? jugadores = partida.jugadores;
 
@@ -190,7 +225,8 @@ class Partida extends DynamicClass {
 
     Fun.removeKeys(tempPartidaMap, ['id', 'jugadores', 'createdAt']);
 
-    final SqlResponse partidaRes = await CrudHelper.insert(tableName: Partida.tableName, body: tempPartidaMap);
+    final SqlResponse partidaRes = await CrudHelper.insert(
+        tableName: Partida.tableName, body: tempPartidaMap);
 
     for (final jugador in jugadores) {
       //
@@ -199,7 +235,8 @@ class Partida extends DynamicClass {
       final Map<String, dynamic> tempJugadorMap = jugador.toMap();
       Fun.removeKeys(tempJugadorMap, ['id', 'historialJugadas']);
 
-      final SqlResponse jugadorRes = await CrudHelper.insert(tableName: Jugador.tableName, body: tempJugadorMap);
+      final SqlResponse jugadorRes = await CrudHelper.insert(
+          tableName: Jugador.tableName, body: tempJugadorMap);
       jugador.historialJugadas = [];
       jugador.id = jugadorRes.data;
     }
@@ -211,28 +248,35 @@ class Partida extends DynamicClass {
     return response;
   }
 
-  static Future<SqlResponse> addNewJugador({required Partida partida, required Jugador jugador}) async {
+  static Future<SqlResponse> addNewJugador(
+      {required Partida partida, required Jugador jugador}) async {
     jugador.partidaId = partida.id;
 
     final Map<String, dynamic> tempJugadorMap = jugador.toMap();
     Fun.removeKeys(tempJugadorMap, ['id']);
 
-    final SqlResponse response = await CrudHelper.insert(tableName: Jugador.tableName, body: tempJugadorMap);
+    final SqlResponse response = await CrudHelper.insert(
+        tableName: Jugador.tableName, body: tempJugadorMap);
     jugador.id = response.data;
     partida.addJugador(jugador);
     response.data = partida;
     return response;
   }
 
-  static getPartidas() async {
-    final response = await CrudHelper.getAll(tableName: Partida.tableName, where_: 'activo = ?', whereArgs_: ['true']);
+  static Future<List<Partida>> getPartidas() async {
+    final response = await CrudHelper.getAll(
+        tableName: Partida.tableName,
+        where_: 'activo = ?',
+        whereArgs_: ['true']);
 
     if (!response.hasError!) {
-      final partidasParsed = List<Partida>.from(response.data.map((x) => Partida.fromMap(x)));
+      final partidasParsed =
+          List<Partida>.from(response.data.map((x) => Partida.fromMap(x)));
 
       // Ejecutar todas las consultas de jugadores en paralelo
-      await Future.wait(partidasParsed.map((partida) => findJugadores(partida: partida)));
-      
+      await Future.wait(
+          partidasParsed.map((partida) => findJugadores(partida: partida)));
+
       return partidasParsed;
     } else {
       response.addMsg(L10n.noGamesRegistered);
@@ -244,32 +288,40 @@ class Partida extends DynamicClass {
     final Map<String, dynamic> tempPartidaMap = partida.toUpdateMap();
     tempPartidaMap['activo'] = 'false';
 
-    final response = await CrudHelper.updateOne(tableName: Partida.tableName, id: partida.id, newData: tempPartidaMap);
+    final response = await CrudHelper.updateOne(
+        tableName: Partida.tableName, id: partida.id, newData: tempPartidaMap);
 
     if (response.hasError!) response.addMsg(L10n.errorDeletingGame);
 
     return response;
   }
 
-  static Future<SqlResponse> edit({required Partida partida, required String newNombrePartida}) async {
+  static Future<SqlResponse> edit(
+      {required Partida partida, required String newNombrePartida}) async {
     final Map<String, dynamic> tempPartidaMap = partida.toUpdateMap();
     tempPartidaMap['nombre'] = newNombrePartida;
 
-    final response = await CrudHelper.updateOne(tableName: Partida.tableName, id: partida.id, newData: tempPartidaMap);
+    final response = await CrudHelper.updateOne(
+        tableName: Partida.tableName, id: partida.id, newData: tempPartidaMap);
 
     if (response.hasError!) response.addMsg(L10n.errorEditingGame);
 
     return response;
   }
 
-  static findJugadores({required Partida partida}) async {
-    final response = await CrudHelper.getAll(tableName: Jugador.tableName, where_: 'partida_id = ?', whereArgs_: [partida.id]);
+  static Future<void> findJugadores({required Partida partida}) async {
+    final response = await CrudHelper.getAll(
+        tableName: Jugador.tableName,
+        where_: 'partida_id = ?',
+        whereArgs_: [partida.id]);
 
     if (!response.hasError!) {
-      final jugadoresParsed = List<Jugador>.from(response.data.map((x) => Jugador.fromMap(x)));
+      final jugadoresParsed =
+          List<Jugador>.from(response.data.map((x) => Jugador.fromMap(x)));
 
       // Ejecutar todas las consultas de historial en paralelo
-      await Future.wait(jugadoresParsed.map((jugador) => Jugador.findHistorial(jugador: jugador)));
+      await Future.wait(jugadoresParsed
+          .map((jugador) => Jugador.findHistorial(jugador: jugador)));
 
       partida.addJugadores(jugadoresParsed);
     } else {

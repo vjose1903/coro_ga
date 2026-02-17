@@ -3,11 +3,11 @@ import 'text_scale.dart';
 
 class ExpandedButtom extends StatelessWidget {
   const ExpandedButtom({
-    super.key,
     required this.label,
-    this.onTap,
     required this.backgroundColor,
     required this.textColor,
+    super.key,
+    this.onTap,
     this.fontSize = 15,
   });
 
@@ -28,7 +28,12 @@ class ExpandedButtom extends StatelessWidget {
           onTap: () => onTap != null ? onTap!() : null,
           child: Padding(
             padding: const EdgeInsets.all(7),
-            child: TextScale(label, style: TextStyle(fontFamily: 'Poppins', fontSize: fontSize, color: textColor), textAlign: TextAlign.center),
+            child: TextScale(label,
+                style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: fontSize,
+                    color: textColor),
+                textAlign: TextAlign.center),
           ),
         ),
       ),

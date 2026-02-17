@@ -3,12 +3,11 @@ import 'package:flutter/widgets.dart';
 
 /// Registra la pantalla actual en Firebase Analytics y muestra [child].
 class ScreenTracker extends StatefulWidget {
-
   const ScreenTracker({
     required this.screenName,
     required this.child,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
   final String screenName;
   final Widget child;
 
@@ -37,4 +36,3 @@ class _ScreenTrackerState extends State<ScreenTracker> {
   @override
   Widget build(BuildContext context) => widget.child;
 }
-

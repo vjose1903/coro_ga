@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:reactive_forms/reactive_forms.dart';
+
 import '../l10n/app_localizations.dart';
 import '../models/models.dart';
 import '../shared_preferences/preferences.dart';
 import '../utils/utils.dart';
-
-import 'package:reactive_forms/reactive_forms.dart';
 
 class PartidaPredefinidaProvider extends ChangeNotifier {
   List<PartidaPredefinida> partidasPredefinidas = [];
@@ -19,13 +19,13 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
     'orden': [null]
   });
 
-  get cantidadJugadores {
+  dynamic get cantidadJugadores {
     final cantidadJugadores = form.control('cantidadJugadores').value;
-    
+
     return cantidadJugadores ?? 0;
   }
 
-  void changeTipo(value) {
+  void changeTipo(dynamic value) {
     notifyListeners();
   }
 
@@ -47,8 +47,10 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void changeCantidadJugadores({required String tipo, required BuildContext context}) {
-    print("formPartidaPredefinida.control(cantidadJugadores).value: ${form.control("cantidadJugadores").value} ");
+  void changeCantidadJugadores(
+      {required String tipo, required BuildContext context}) {
+    print(
+        "formPartidaPredefinida.control(cantidadJugadores).value: ${form.control("cantidadJugadores").value} ");
     final int actualCantidad = form.control('cantidadJugadores').value;
 
     if (tipo == '+') {
@@ -58,20 +60,23 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
         form.control('cantidadJugadores').value -= 1;
       } else {
         final l10n = AppLocalizations.of(context)!;
-        Toast.show(type: ToastType.warning, context: context, message: l10n.minPlayersWarning);
+        Toast.show(
+            type: ToastType.warning,
+            context: context,
+            message: l10n.minPlayersWarning);
       }
     }
     notifyListeners();
   }
 
-  rellenarFormulario(PartidaPredefinida partida) {
+  void rellenarFormulario(PartidaPredefinida partida) {
     form.patchValue(partida.toMap());
     partidaPredefinidaEditar = partida;
     _syncSinMaxWithValue();
     notifyListeners();
   }
 
-  resetForm() async {
+  Future<Future<dynamic>> resetForm() async {
     form.reset();
     form.control('maxPuntuacion').value = 1;
     form.control('maxPuntuacion').setValidators([Validators.min(1)]);
@@ -83,8 +88,15 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
     return Future.delayed(const Duration(milliseconds: 10));
   }
 
-  seed() async {
-    final List<PartidaPredefinida> listado = [PartidaPredefinida(nombre: 'Domino', orden: 1, tipo: 'Puntuación', maxPuntuacion: 200, cantidadJugadores: 2)];
+  Future<void> seed() async {
+    final List<PartidaPredefinida> listado = [
+      PartidaPredefinida(
+          nombre: 'Domino',
+          orden: 1,
+          tipo: 'Puntuación',
+          maxPuntuacion: 200,
+          cantidadJugadores: 2)
+    ];
 
     for (var index = 0; index < listado.length; index++) {
       final PartidaPredefinida partida = listado[index];
@@ -98,7 +110,8 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
   Future<SqlResponse> newPartida({required PartidaPredefinida partida}) async {
     partida.orden = partidasPredefinidas.length + 1;
 
-    final response = await PartidaPredefinida.createPartidaPredefinida(partida: partida);
+    final response =
+        await PartidaPredefinida.createPartidaPredefinida(partida: partida);
     final PartidaPredefinida newPartida = response.data;
 
     partidasPredefinidas.add(newPartida);
@@ -108,17 +121,26 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
     return response;
   }
 
-  Future<SqlResponse> editPartida(BuildContext context, {required PartidaPredefinida partida, required Map<String, dynamic> partidaEdit}) async {
-    final responseFuture = PartidaPredefinida.edit(id: partida.id!, partidaEdit: partidaEdit);
-    final response = await responseFuture;
+  Future<SqlResponse> editPartida(BuildContext context,
+      {required PartidaPredefinida partida,
+      required Map<String, dynamic> partidaEdit}) async {
+    final SqlResponse response = await PartidaPredefinida.edit(
+        id: partida.id!, partidaEdit: partidaEdit);
 
     if (!response.hasError!) {
       notifyListeners();
-      return responseFuture;
-    } else {
-      Toast.show(type: ToastType.error, context: context, message: response.messages!.first);
-      return responseFuture;
+      return response;
     }
+
+    if (!context.mounted) {
+      return response;
+    }
+    Toast.show(
+      type: ToastType.error,
+      context: context,
+      message: response.messages!.first,
+    );
+    return response;
   }
 
   Future getPartidasPredefinidas() async {
@@ -131,17 +153,23 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
     return partidasFuture;
   }
 
-  Future<SqlResponse> deletePartidaPredefinida(BuildContext context, {required PartidaPredefinida partida}) async {
+  Future<SqlResponse> deletePartidaPredefinida(BuildContext context,
+      {required PartidaPredefinida partida}) async {
     final response = await PartidaPredefinida.delete(partida: partida);
 
     if (!response.hasError!) {
       partidasPredefinidas.remove(partida);
       notifyListeners();
       return response;
-    } else {
-      Toast.show(type: ToastType.error, context: context, message: response.messages!.first);
+    }
+    if (!context.mounted) {
       return response;
     }
+    Toast.show(
+        type: ToastType.error,
+        context: context,
+        message: response.messages!.first);
+    return response;
   }
 
   void _syncSinMaxWithValue() {

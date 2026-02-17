@@ -1,12 +1,15 @@
-import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:animations/animations.dart';
+import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
+
 import '../themes/app_themes.dart';
 
 class FluidAlerts {
   FluidAlerts();
 
-  static void show(BuildContext context, {required Widget rootPage, Alignment? firstAlignment = Alignment.center}) {
+  static void show(BuildContext context,
+      {required Widget rootPage,
+      Alignment? firstAlignment = Alignment.center}) {
     showModal(
       context: context,
       builder: (context) => FluidDialog(

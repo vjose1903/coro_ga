@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -190,7 +192,6 @@ class _PartidaScreenState extends State<PartidaScreen>
 
 class _Body extends StatelessWidget {
   const _Body({
-    super.key,
     required this.panelController,
     required this.showBanner,
     required this.useLandscapeLayout,
@@ -370,8 +371,8 @@ class _Body extends StatelessWidget {
             if (finalizadaRes.hasError!) return;
             final PartidaFinalizada finalizada =
                 finalizadaRes.data as PartidaFinalizada;
-
-            Navigator.push(
+            if (!context.mounted) return;
+            unawaited(Navigator.push(
               context,
               PageRouteBuilder(
                 settings: RouteSettings(arguments: {
@@ -384,7 +385,7 @@ class _Body extends StatelessWidget {
                         FadeTransition(opacity: animation, child: child),
                 transitionDuration: const Duration(milliseconds: 400),
               ),
-            );
+            ));
           },
         }),
       ],
@@ -451,11 +452,11 @@ class _EndGameButton extends StatelessWidget {
 
 class JugadoresCard extends StatelessWidget {
   const JugadoresCard(
-      {super.key,
-      required this.panelController,
-      this.expand = true,
+      {required this.panelController,
       required this.useLandscapeLayout,
-      required this.isWide});
+      required this.isWide,
+      super.key,
+      this.expand = true});
   final PanelController panelController;
   final bool expand;
   final bool useLandscapeLayout;
@@ -588,10 +589,10 @@ class _ActionButton extends StatelessWidget {
 
 class JugadoresList extends StatelessWidget {
   const JugadoresList(
-      {super.key,
-      required this.panelController,
+      {required this.panelController,
       required this.useLandscapeLayout,
-      required this.isWide});
+      required this.isWide,
+      super.key});
   final PanelController panelController;
   final bool useLandscapeLayout;
   final bool isWide;
@@ -613,10 +614,6 @@ class JugadoresList extends StatelessWidget {
         final columns = useLandscapeLayout && availableWidth >= 700 ? 3 : 2;
         final columnWidth =
             (availableWidth - horizontalSpacing * (columns - 1)) / columns;
-        final maxHeight = constraints.maxHeight.isFinite
-            ? constraints.maxHeight
-            : ResponsiveApp.size.height;
-
         return SizedBox(
           width: double.infinity,
           child: SingleChildScrollView(
@@ -657,11 +654,11 @@ class JugadoresList extends StatelessWidget {
 
 class JugadorInfo extends StatelessWidget {
   const JugadorInfo(
-      {super.key,
-      required this.jugador,
+      {required this.jugador,
       required this.panelController,
       required this.useLandscapeLayout,
-      required this.isWide});
+      required this.isWide,
+      super.key});
   final Jugador jugador;
   final PanelController panelController;
   final bool useLandscapeLayout;
@@ -864,7 +861,7 @@ class _JugadorCard extends StatelessWidget {
 
 class NavigationBar extends StatefulWidget {
   const NavigationBar(
-      {super.key, required this.useLandscapeLayout, required this.isWide});
+      {required this.useLandscapeLayout, required this.isWide, super.key});
   final bool useLandscapeLayout;
   final bool isWide;
 
@@ -950,8 +947,7 @@ class _NavigationBarState extends State<NavigationBar> {
 
 class _Chip extends StatelessWidget {
   const _Chip(
-      {super.key,
-      required this.partida,
+      {required this.partida,
       required this.scrollToGame,
       required this.isWide,
       required this.useLandscapeLayout});

@@ -23,7 +23,7 @@ import '../widgets/force_update_modal.dart';
 import '../widgets/widgets.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
   @override
   Widget build(BuildContext context) {
     ResponsiveApp.setMq(context);
@@ -38,13 +38,14 @@ class HomeScreen extends StatelessWidget {
 }
 
 class MainHome extends StatefulWidget {
-  const MainHome({Key? key}) : super(key: key);
+  const MainHome({super.key});
 
   @override
   State<MainHome> createState() => _MainHomeState();
 }
 
-class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin, RouteAware {
+class _MainHomeState extends State<MainHome>
+    with SingleTickerProviderStateMixin, RouteAware {
   late final PanelController panelController;
   late final AnimationController _fabAnimController;
   Route<dynamic>? _noInternetRoute;
@@ -99,7 +100,8 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
   void _handleInternetGate() {
     if (Preferences.isPremium) return;
     ConnectivityService.instance.initialize();
-    _internetSub ??= ConnectivityService.instance.statusStream.listen((hasInternet) {
+    _internetSub ??=
+        ConnectivityService.instance.statusStream.listen((hasInternet) {
       if (!mounted) return;
       if (!hasInternet) {
         _showNoInternetDialog();
@@ -132,11 +134,14 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
 
   void openMenuSlideUp() {
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
-    slideUpProvider.openSlideUp(controller: panelController, bodyContent: _Menu(panelController: panelController), isDraggable: false);
+    slideUpProvider.openSlideUp(
+        controller: panelController,
+        bodyContent: _Menu(panelController: panelController));
   }
 
   void navigateToForm() {
-    FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
+    final FormPartidaProvider formPartidaProvider =
+        context.read<FormPartidaProvider>();
     formPartidaProvider.resetForm(context: context);
     Navigator.pushNamed(context, 'formulario');
   }
@@ -154,15 +159,18 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
           body: Layout(
             appBarTitle: l10n.myGames,
             appBarTrailing: _AnimatedMenuButton(onTap: openMenuSlideUp),
-            bodyContent: _Body(panelController: panelController, showBanner: _showBanner),
+            bodyContent: _Body(
+                panelController: panelController, showBanner: _showBanner),
             panelController: panelController,
           ),
           floatingActionButton: Padding(
             padding: ResponsiveApp.only(bottom: 40),
             child: Visibility(
-              visible: !panelController.isAttached || panelController.isPanelClosed,
+              visible:
+                  !panelController.isAttached || panelController.isPanelClosed,
               child: ScaleTransition(
-                scale: CurvedAnimation(parent: _fabAnimController, curve: Curves.elasticOut),
+                scale: CurvedAnimation(
+                    parent: _fabAnimController, curve: Curves.elasticOut),
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
@@ -184,16 +192,27 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
                     elevation: 0,
                     shape: const CircleBorder(),
                     onPressed: () {
-                      final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-                      final PremiumProvider premiumProvider = context.read<PremiumProvider>();
+                      final PartidaProvider partidaProvider =
+                          context.read<PartidaProvider>();
+                      final PremiumProvider premiumProvider =
+                          context.read<PremiumProvider>();
 
-                      if (premiumProvider.canCreateGame(partidaProvider.partidas.length)) {
+                      if (premiumProvider
+                          .canCreateGame(partidaProvider.partidas.length)) {
                         navigateToForm();
                       } else {
-                        Toast.show(type: ToastType.info, context: context, message: l10n.freeVersionLimitGames(PremiumProvider.freeMaxGames), actionLabel: l10n.getPro, onAction: () => Navigator.pushNamed(context, 'premium'));
+                        Toast.show(
+                            type: ToastType.info,
+                            context: context,
+                            message: l10n.freeVersionLimitGames(
+                                PremiumProvider.freeMaxGames),
+                            actionLabel: l10n.getPro,
+                            onAction: () =>
+                                Navigator.pushNamed(context, 'premium'));
                       }
                     },
-                    child: const IconScale(Icons.add_rounded, size: 25, color: Colors.white),
+                    child: const IconScale(Icons.add_rounded,
+                        size: 25, color: Colors.white),
                   ),
                 ),
               ),
@@ -206,8 +225,8 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
 }
 
 class _AnimatedMenuButton extends StatelessWidget {
-  final VoidCallback onTap;
   const _AnimatedMenuButton({required this.onTap});
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -221,7 +240,7 @@ class _AnimatedMenuButton extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({Key? key, required this.panelController, required this.showBanner}) : super(key: key);
+  const _Body({required this.panelController, required this.showBanner});
   final PanelController panelController;
   final bool showBanner;
 
@@ -250,7 +269,11 @@ class _Body extends StatelessWidget {
 }
 
 class ListPartidas extends StatelessWidget {
-  const ListPartidas({Key? key, required this.panelController, this.padding, this.centerEmptyState = false}) : super(key: key);
+  const ListPartidas(
+      {required this.panelController,
+      super.key,
+      this.padding,
+      this.centerEmptyState = false});
   final PanelController panelController;
   final EdgeInsets? padding;
   final bool centerEmptyState;
@@ -261,13 +284,16 @@ class ListPartidas extends StatelessWidget {
     final List<Partida> partidas = partidaProvider.partidas;
 
     if (partidas.isEmpty) {
-      if (!partidaProvider.isFirstSearch) return _EmptyState(centerInAvailableSpace: centerEmptyState);
+      if (!partidaProvider.isFirstSearch) {
+        return _EmptyState(centerInAvailableSpace: centerEmptyState);
+      }
       return _LoadingState();
     }
 
     return ResponsiveLayoutBuilder(
       builder: (context, constraints, info) {
-        final listPadding = padding ?? ResponsiveApp.symmetric(vertical: 30, horizontal: 20);
+        final listPadding =
+            padding ?? ResponsiveApp.symmetric(vertical: 30, horizontal: 20);
         final maxWidth = constraints.maxWidth;
         final useLandscapeLayout = info.useLandscapeLayout;
         final useGrid = useLandscapeLayout;
@@ -285,9 +311,11 @@ class ListPartidas extends StatelessWidget {
             itemBuilder: (_, index) {
               final partida = partidas[index];
               return Padding(
-                padding: EdgeInsets.only(bottom: index < partidas.length - 1 ? 16 : 100),
+                padding: EdgeInsets.only(
+                    bottom: index < partidas.length - 1 ? 16 : 100),
                 child: FadeInUp(
-                  duration: Duration(milliseconds: 300 + (index < 5 ? index * 50 : 250)),
+                  duration: Duration(
+                      milliseconds: 300 + (index < 5 ? index * 50 : 250)),
                   child: PartidaCard(
                     partida: partida,
                     onTap: () {
@@ -296,23 +324,37 @@ class ListPartidas extends StatelessWidget {
                     },
                     functionBorrar: (handler) async {
                       final l10n = AppLocalizations.of(context)!;
-                      CustomAlertDialog.show(context, menssage: l10n.confirmDeleteGame(partida.nombre!), title: l10n.confirm, dialogType: DialogType.error, buttonsList: [
-                        CustomActionsButtons.cancelButton({
-                          'label': l10n.cancel,
-                          'onTap': () {
-                            Navigator.pop(context);
-                            handler(false);
-                          }
-                        }),
-                        CustomActionsButtons.aceptarButton({'label': l10n.accept, 'onTap': () => removePartida(context, handler, partidas, index)})
-                      ]);
+                      CustomAlertDialog.show(context,
+                          menssage: l10n.confirmDeleteGame(partida.nombre!),
+                          title: l10n.confirm,
+                          dialogType: DialogType.error,
+                          buttonsList: [
+                            CustomActionsButtons.cancelButton({
+                              'label': l10n.cancel,
+                              'onTap': () {
+                                Navigator.pop(context);
+                                handler(false);
+                              }
+                            }),
+                            CustomActionsButtons.aceptarButton({
+                              'label': l10n.accept,
+                              'onTap': () => removePartida(
+                                  context, handler, partidas, index)
+                            })
+                          ]);
                     },
                     functionEditar: () {
-                      final FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
-                      final SlideUpProvider slideUp = context.read<SlideUpProvider>();
+                      final FormPartidaProvider formPartidaProvider =
+                          context.read<FormPartidaProvider>();
+                      final SlideUpProvider slideUp =
+                          context.read<SlideUpProvider>();
                       formPartidaProvider.form.patchValue(partida.toMap());
                       partidaProvider.partidaEditar = partida;
-                      slideUp.openSlideUp(controller: panelController, maxHeightFraction: useLandscapeLayout ? 0.9 : 0.5, bodyContent: EditarEntidad(panelController: panelController));
+                      slideUp.openSlideUp(
+                          controller: panelController,
+                          maxHeightFraction: useLandscapeLayout ? 0.9 : 0.5,
+                          bodyContent:
+                              EditarEntidad(panelController: panelController));
                     },
                     functionReiniciar: () async {
                       await partida.restartPartida();
@@ -341,7 +383,8 @@ class ListPartidas extends StatelessWidget {
           itemBuilder: (_, index) {
             final partida = partidas[index];
             return FadeInUp(
-              duration: Duration(milliseconds: 300 + (index < 5 ? index * 50 : 250)),
+              duration:
+                  Duration(milliseconds: 300 + (index < 5 ? index * 50 : 250)),
               child: PartidaCard(
                 partida: partida,
                 onTap: () {
@@ -350,23 +393,37 @@ class ListPartidas extends StatelessWidget {
                 },
                 functionBorrar: (handler) async {
                   final l10n = AppLocalizations.of(context)!;
-                  CustomAlertDialog.show(context, menssage: l10n.confirmDeleteGame(partida.nombre!), title: l10n.confirm, dialogType: DialogType.error, buttonsList: [
-                    CustomActionsButtons.cancelButton({
-                      'label': l10n.cancel,
-                      'onTap': () {
-                        Navigator.pop(context);
-                        handler(false);
-                      }
-                    }),
-                    CustomActionsButtons.aceptarButton({'label': l10n.accept, 'onTap': () => removePartida(context, handler, partidas, index)})
-                  ]);
+                  CustomAlertDialog.show(context,
+                      menssage: l10n.confirmDeleteGame(partida.nombre!),
+                      title: l10n.confirm,
+                      dialogType: DialogType.error,
+                      buttonsList: [
+                        CustomActionsButtons.cancelButton({
+                          'label': l10n.cancel,
+                          'onTap': () {
+                            Navigator.pop(context);
+                            handler(false);
+                          }
+                        }),
+                        CustomActionsButtons.aceptarButton({
+                          'label': l10n.accept,
+                          'onTap': () =>
+                              removePartida(context, handler, partidas, index)
+                        })
+                      ]);
                 },
                 functionEditar: () {
-                  final FormPartidaProvider formPartidaProvider = context.read<FormPartidaProvider>();
-                  final SlideUpProvider slideUp = context.read<SlideUpProvider>();
+                  final FormPartidaProvider formPartidaProvider =
+                      context.read<FormPartidaProvider>();
+                  final SlideUpProvider slideUp =
+                      context.read<SlideUpProvider>();
                   formPartidaProvider.form.patchValue(partida.toMap());
                   partidaProvider.partidaEditar = partida;
-                  slideUp.openSlideUp(controller: panelController, maxHeightFraction: useLandscapeLayout ? 0.9 : 0.5, bodyContent: EditarEntidad(panelController: panelController));
+                  slideUp.openSlideUp(
+                      controller: panelController,
+                      maxHeightFraction: useLandscapeLayout ? 0.9 : 0.5,
+                      bodyContent:
+                          EditarEntidad(panelController: panelController));
                 },
                 functionReiniciar: () async {
                   await partida.restartPartida();
@@ -381,10 +438,12 @@ class ListPartidas extends StatelessWidget {
     );
   }
 
-  Future removePartida(BuildContext context, CompletionHandler handler, List<Partida> partidas, int index) async {
+  Future removePartida(BuildContext context, CompletionHandler handler,
+      List<Partida> partidas, int index) async {
     Navigator.pop(context);
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-    return partidaProvider.deletePartida(context, partida: partidas[index], handler: handler);
+    return partidaProvider.deletePartida(context,
+        partida: partidas[index], handler: handler);
   }
 }
 
@@ -396,11 +455,15 @@ class _EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final useLandscapeLayout = ResponsiveApp.isLandscapeFor(constraints) || constraints.maxWidth >= 700;
-        final iconPadding = useLandscapeLayout ? ResponsiveApp.all(24) : ResponsiveApp.all(40);
+        final useLandscapeLayout = ResponsiveApp.isLandscapeFor(constraints) ||
+            constraints.maxWidth >= 700;
+        final iconPadding =
+            useLandscapeLayout ? ResponsiveApp.all(24) : ResponsiveApp.all(40);
 
         final availableHeight = constraints.maxHeight;
-        final double contentHeight = useLandscapeLayout ? (availableHeight * 0.62).clamp(260.0, 420.0) : (availableHeight * 0.68).clamp(320.0, 520.0);
+        final double contentHeight = useLandscapeLayout
+            ? (availableHeight * 0.62).clamp(260.0, 420.0)
+            : (availableHeight * 0.68).clamp(320.0, 520.0);
 
         final effectiveIcon = (availableHeight * 0.50).clamp(60.0, 120.0);
         final double effectiveTitle = useLandscapeLayout ? 22 : 20;
@@ -409,7 +472,7 @@ class _EmptyState extends StatelessWidget {
 
         final badgeMaxWidth = constraints.maxWidth * 0.9;
 
-        Widget content = Column(
+        final Widget content = Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
@@ -440,7 +503,6 @@ class _EmptyState extends StatelessWidget {
             Builder(builder: (context) {
               final l10n = AppLocalizations.of(context)!;
               return Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   TextScale(
                     l10n.emptyGamesTitle,
@@ -449,7 +511,9 @@ class _EmptyState extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w600,
-                      color: Theme.of(context).brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.8) : AppThemes.colorCuarto,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white.withValues(alpha: 0.8)
+                          : AppThemes.colorCuarto,
                     ),
                   ),
                   SizedBox(height: useLandscapeLayout ? 8 : 12),
@@ -467,13 +531,14 @@ class _EmptyState extends StatelessWidget {
                   ConstrainedBox(
                     constraints: BoxConstraints(maxWidth: badgeMaxWidth),
                     child: Container(
-                      padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 18 : 20, vertical: useLandscapeLayout ? 10 : 10),
+                      padding: ResponsiveApp.symmetric(
+                          horizontal: useLandscapeLayout ? 18 : 20,
+                          vertical: useLandscapeLayout ? 10 : 10),
                       decoration: BoxDecoration(
                         color: AppThemes.colorPrimero.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(30),
                         border: Border.all(
                           color: AppThemes.colorPrimero.withValues(alpha: 0.3),
-                          width: 1,
                         ),
                       ),
                       child: Wrap(
@@ -482,7 +547,9 @@ class _EmptyState extends StatelessWidget {
                         spacing: 8,
                         runSpacing: 4,
                         children: [
-                          IconScale(Icons.swipe_left_rounded, size: useLandscapeLayout ? 18 : 18, color: AppThemes.colorPrimero),
+                          IconScale(Icons.swipe_left_rounded,
+                              size: useLandscapeLayout ? 18 : 18,
+                              color: AppThemes.colorPrimero),
                           TextScale(
                             l10n.swipeToEditOrDelete,
                             size: effectiveBadge,
@@ -564,9 +631,8 @@ class _LoadingState extends StatelessWidget {
 }
 
 class _Menu extends StatefulWidget {
+  const _Menu({required this.panelController});
   final PanelController panelController;
-
-  const _Menu({Key? key, required this.panelController}) : super(key: key);
 
   @override
   State<_Menu> createState() => _MenuState();
@@ -582,7 +648,8 @@ class _MenuState extends State<_Menu> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final inheritedController = SlideUpScrollController.of(context);
-    if (inheritedController != null && inheritedController != _currentController) {
+    if (inheritedController != null &&
+        inheritedController != _currentController) {
       _currentController = inheritedController;
     }
   }
@@ -595,13 +662,11 @@ class _MenuState extends State<_Menu> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeProvider themeProvider = context.watch<ThemeProvider>();
+    final ThemeProvider themeProvider = context.watch<ThemeProvider>();
     final controller = _controller;
     final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
+    return SizedBox.expand(
       child: ResponsiveLayoutBuilder(
         useMediaQuery: true,
         builder: (context, constraints, info) {
@@ -610,7 +675,8 @@ class _MenuState extends State<_Menu> {
           final bottomPadding = useLandscapeLayout ? 12.0 : 20.0;
           final headerSpacing = useLandscapeLayout ? 14.0 : 24.0;
           final sectionSpacing = useLandscapeLayout ? 14.0 : 16.0;
-          final reviewSection = _ReviewSection(useLandscapeLayout: useLandscapeLayout);
+          final reviewSection =
+              _ReviewSection(useLandscapeLayout: useLandscapeLayout);
           final aboutSection = _AboutButton(
             panelController: widget.panelController,
             useLandscapeLayout: useLandscapeLayout,
@@ -625,12 +691,14 @@ class _MenuState extends State<_Menu> {
                 onTap: () {
                   final navigator = Navigator.of(context);
                   final slideUpProvider = context.read<SlideUpProvider>();
-                  slideUpProvider.closeSlideUp(controller: widget.panelController);
+                  slideUpProvider.closeSlideUp(
+                      controller: widget.panelController);
                   Future.delayed(const Duration(milliseconds: 300), () {
                     navigator.pushNamed('premium');
                   });
                 },
-                onSimulateChanged: (value) => premiumProvider.setSimulatePremium(value),
+                onSimulateChanged: (value) =>
+                    premiumProvider.setSimulatePremium(value),
               );
             },
           );
@@ -647,14 +715,18 @@ class _MenuState extends State<_Menu> {
                   value: Preferences.isSystemMode,
                   onChanged: (value) {
                     Preferences.isSystemMode = value;
-                    Preferences.isDarkMode = PlatformDispatcher.instance.platformBrightness == Brightness.dark;
+                    Preferences.isDarkMode =
+                        PlatformDispatcher.instance.platformBrightness ==
+                            Brightness.dark;
                     themeProvider.changeCurrentTheme();
                     setState(() {});
                   },
                 ),
                 AnimatedCrossFade(
                   duration: const Duration(milliseconds: 300),
-                  crossFadeState: Preferences.isSystemMode ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+                  crossFadeState: Preferences.isSystemMode
+                      ? CrossFadeState.showFirst
+                      : CrossFadeState.showSecond,
                   firstChild: const SizedBox(height: 0),
                   secondChild: Padding(
                     padding: ResponsiveApp.only(top: 10),
@@ -689,7 +761,8 @@ class _MenuState extends State<_Menu> {
                 Padding(
                   padding: ResponsiveApp.only(left: 4),
                   child: Consumer<PremiumProvider>(
-                    builder: (context, premiumProvider, child) => _MenuHeader(isPremium: premiumProvider.isPremium),
+                    builder: (context, premiumProvider, child) =>
+                        _MenuHeader(isPremium: premiumProvider.isPremium),
                   ),
                 ),
                 SizedBox(height: headerSpacing),
@@ -742,25 +815,26 @@ class _MenuState extends State<_Menu> {
 }
 
 class _MenuHeader extends StatelessWidget {
-  final bool isPremium;
-
   const _MenuHeader({required this.isPremium});
+  final bool isPremium;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(
+        DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: Preferences.isDarkMode ? 0.3 : 0.12),
+                color: Colors.black
+                    .withValues(alpha: Preferences.isDarkMode ? 0.3 : 0.12),
                 blurRadius: 8,
                 offset: const Offset(3, 3),
               ),
               BoxShadow(
-                color: Colors.white.withValues(alpha: Preferences.isDarkMode ? 0.08 : 0.75),
+                color: Colors.white
+                    .withValues(alpha: Preferences.isDarkMode ? 0.08 : 0.75),
                 blurRadius: 8,
                 offset: const Offset(-3, -3),
               ),
@@ -786,7 +860,9 @@ class _MenuHeader extends StatelessWidget {
                   AppLocalizations.of(context)!.appTitle,
                   size: 22,
                   style: TextStyle(
-                    color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
+                    color: Preferences.isDarkMode
+                        ? Colors.white
+                        : AppThemes.colorCuarto,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1,
@@ -795,14 +871,15 @@ class _MenuHeader extends StatelessWidget {
                 if (isPremium) ...[
                   const SizedBox(width: 8),
                   Container(
-                    padding: ResponsiveApp.symmetric(horizontal: 8, vertical: 3),
+                    padding:
+                        ResponsiveApp.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
                       ),
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: TextScale(
+                    child: const TextScale(
                       'PRO',
                       size: 10,
                       style: TextStyle(
@@ -831,7 +908,11 @@ class _MenuHeader extends StatelessWidget {
 }
 
 class _MenuSection extends StatelessWidget {
-  const _MenuSection({required this.icon, required this.title, required this.child, required this.useLandscapeLayout});
+  const _MenuSection(
+      {required this.icon,
+      required this.title,
+      required this.child,
+      required this.useLandscapeLayout});
 
   final IconData icon;
   final String title;
@@ -843,11 +924,14 @@ class _MenuSection extends StatelessWidget {
     return Container(
       padding: ResponsiveApp.all(useLandscapeLayout ? 5 : 16),
       decoration: BoxDecoration(
-        color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.05) : Colors.grey.withValues(alpha: 0.08),
+        color: Preferences.isDarkMode
+            ? Colors.white.withValues(alpha: 0.05)
+            : Colors.grey.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15),
-          width: 1,
+          color: Preferences.isDarkMode
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.grey.withValues(alpha: 0.15),
         ),
       ),
       child: Column(
@@ -868,7 +952,9 @@ class _MenuSection extends StatelessWidget {
                 title,
                 size: 16,
                 style: TextStyle(
-                  color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
+                  color: Preferences.isDarkMode
+                      ? Colors.white
+                      : AppThemes.colorCuarto,
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w600,
                 ),
@@ -884,17 +970,16 @@ class _MenuSection extends StatelessWidget {
 }
 
 class _ThemeToggleRow extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
   const _ThemeToggleRow({
     required this.title,
     required this.subtitle,
     required this.value,
     required this.onChanged,
   });
+  final String title;
+  final String subtitle;
+  final bool value;
+  final ValueChanged<bool> onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -908,7 +993,9 @@ class _ThemeToggleRow extends StatelessWidget {
                 title,
                 size: 14,
                 style: TextStyle(
-                  color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.9) : Colors.grey[800],
+                  color: Preferences.isDarkMode
+                      ? Colors.white.withValues(alpha: 0.9)
+                      : Colors.grey[800],
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w500,
                 ),
@@ -928,7 +1015,6 @@ class _ThemeToggleRow extends StatelessWidget {
           width: 46,
           height: 28,
           child: FittedBox(
-            fit: BoxFit.contain,
             child: Switch(
               value: value,
               onChanged: onChanged,
@@ -936,8 +1022,11 @@ class _ThemeToggleRow extends StatelessWidget {
               padding: EdgeInsets.zero,
               activeThumbColor: AppThemes.colorPrimero,
               activeTrackColor: AppThemes.colorPrimero.withValues(alpha: 0.35),
-              inactiveThumbColor: Preferences.isDarkMode ? Colors.white70 : Colors.grey[600],
-              inactiveTrackColor: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.3),
+              inactiveThumbColor:
+                  Preferences.isDarkMode ? Colors.white70 : Colors.grey[600],
+              inactiveTrackColor: Preferences.isDarkMode
+                  ? Colors.white.withValues(alpha: 0.2)
+                  : Colors.grey.withValues(alpha: 0.3),
             ),
           ),
         ),
@@ -947,11 +1036,13 @@ class _ThemeToggleRow extends StatelessWidget {
 }
 
 class _ThemeSwitcher extends StatelessWidget {
+  const _ThemeSwitcher(
+      {required this.isDark,
+      required this.onTap,
+      required this.useLandscapeLayout});
   final bool isDark;
   final VoidCallback onTap;
   final bool useLandscapeLayout;
-
-  const _ThemeSwitcher({required this.isDark, required this.onTap, required this.useLandscapeLayout});
 
   @override
   Widget build(BuildContext context) {
@@ -966,8 +1057,14 @@ class _ThemeSwitcher extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _ThemeOption(icon: Icons.wb_sunny_rounded, label: AppLocalizations.of(context)!.lightTheme, isSelected: !isDark),
-            _ThemeOption(icon: Icons.nights_stay_rounded, label: AppLocalizations.of(context)!.darkTheme, isSelected: isDark),
+            _ThemeOption(
+                icon: Icons.wb_sunny_rounded,
+                label: AppLocalizations.of(context)!.lightTheme,
+                isSelected: !isDark),
+            _ThemeOption(
+                icon: Icons.nights_stay_rounded,
+                label: AppLocalizations.of(context)!.darkTheme,
+                isSelected: isDark),
           ],
         ),
       ),
@@ -976,11 +1073,11 @@ class _ThemeSwitcher extends StatelessWidget {
 }
 
 class _ThemeOption extends StatelessWidget {
+  const _ThemeOption(
+      {required this.icon, required this.label, required this.isSelected});
   final IconData icon;
   final String label;
   final bool isSelected;
-
-  const _ThemeOption({required this.icon, required this.label, required this.isSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -990,12 +1087,20 @@ class _ThemeOption extends StatelessWidget {
       decoration: BoxDecoration(
         color: isSelected ? AppThemes.colorPrimero : Colors.transparent,
         borderRadius: BorderRadius.circular(25),
-        boxShadow: isSelected ? [BoxShadow(color: AppThemes.colorPrimero.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 2))] : null,
+        boxShadow: isSelected
+            ? [
+                BoxShadow(
+                    color: AppThemes.colorPrimero.withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2))
+              ]
+            : null,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          IconScale(icon, size: 16, color: isSelected ? Colors.white : Colors.grey[500]),
+          IconScale(icon,
+              size: 16, color: isSelected ? Colors.white : Colors.grey[500]),
           const SizedBox(width: 6),
           TextScale(
             label,
@@ -1013,12 +1118,6 @@ class _ThemeOption extends StatelessWidget {
 }
 
 class _PremiumCard extends StatelessWidget {
-  final bool isPremium;
-  final bool simulatePremium;
-  final bool useLandscapeLayout;
-  final VoidCallback onTap;
-  final ValueChanged<bool> onSimulateChanged;
-
   const _PremiumCard({
     required this.isPremium,
     required this.simulatePremium,
@@ -1026,6 +1125,11 @@ class _PremiumCard extends StatelessWidget {
     required this.onTap,
     required this.onSimulateChanged,
   });
+  final bool isPremium;
+  final bool simulatePremium;
+  final bool useLandscapeLayout;
+  final VoidCallback onTap;
+  final ValueChanged<bool> onSimulateChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -1083,10 +1187,14 @@ class _PremiumCard extends StatelessWidget {
                       Row(
                         children: [
                           TextScale(
-                            isPremium ? AppLocalizations.of(context)!.youArePro : AppLocalizations.of(context)!.getPro,
+                            isPremium
+                                ? AppLocalizations.of(context)!.youArePro
+                                : AppLocalizations.of(context)!.getPro,
                             size: 17,
                             style: TextStyle(
-                              color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
+                              color: Preferences.isDarkMode
+                                  ? Colors.white
+                                  : AppThemes.colorCuarto,
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.bold,
                             ),
@@ -1094,7 +1202,8 @@ class _PremiumCard extends StatelessWidget {
                           if (isPremium) ...[
                             const SizedBox(width: 8),
                             Container(
-                              padding: ResponsiveApp.symmetric(horizontal: 8, vertical: 3),
+                              padding: ResponsiveApp.symmetric(
+                                  horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
                                 color: Colors.green.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(20),
@@ -1102,7 +1211,8 @@ class _PremiumCard extends StatelessWidget {
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const IconScale(Icons.check_circle, size: 12, color: Colors.green),
+                                  const IconScale(Icons.check_circle,
+                                      size: 12, color: Colors.green),
                                   const SizedBox(width: 4),
                                   TextScale(
                                     AppLocalizations.of(context)!.active,
@@ -1121,7 +1231,9 @@ class _PremiumCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       TextScale(
-                        isPremium ? AppLocalizations.of(context)!.allFeaturesUnlocked : AppLocalizations.of(context)!.noAdsUnlimitedGames,
+                        isPremium
+                            ? AppLocalizations.of(context)!.allFeaturesUnlocked
+                            : AppLocalizations.of(context)!.noAdsUnlimitedGames,
                         size: 12,
                         style: TextStyle(
                           color: Colors.grey[500],
@@ -1138,7 +1250,8 @@ class _PremiumCard extends StatelessWidget {
                       color: AppThemes.colorPrimero.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: IconScale(Icons.arrow_forward_ios_rounded, size: 16, color: AppThemes.colorPrimero),
+                    child: IconScale(Icons.arrow_forward_ios_rounded,
+                        size: 16, color: AppThemes.colorPrimero),
                   ),
               ],
             ),
@@ -1149,11 +1262,13 @@ class _PremiumCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.orange.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                  border:
+                      Border.all(color: Colors.orange.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
-                    IconScale(Icons.bug_report_rounded, size: 18, color: Colors.orange[700]),
+                    IconScale(Icons.bug_report_rounded,
+                        size: 18, color: Colors.orange[700]),
                     const SizedBox(width: 10),
                     Expanded(
                       child: TextScale(
@@ -1170,16 +1285,21 @@ class _PremiumCard extends StatelessWidget {
                       width: 46,
                       height: 28,
                       child: FittedBox(
-                        fit: BoxFit.contain,
                         child: Switch(
                           value: simulatePremium,
                           onChanged: onSimulateChanged,
-                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
                           padding: EdgeInsets.zero,
                           activeThumbColor: AppThemes.colorPrimero,
-                          activeTrackColor: AppThemes.colorPrimero.withValues(alpha: 0.35),
-                          inactiveThumbColor: Preferences.isDarkMode ? Colors.white70 : Colors.grey[600],
-                          inactiveTrackColor: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.3),
+                          activeTrackColor:
+                              AppThemes.colorPrimero.withValues(alpha: 0.35),
+                          inactiveThumbColor: Preferences.isDarkMode
+                              ? Colors.white70
+                              : Colors.grey[600],
+                          inactiveTrackColor: Preferences.isDarkMode
+                              ? Colors.white.withValues(alpha: 0.2)
+                              : Colors.grey.withValues(alpha: 0.3),
                         ),
                       ),
                     ),
@@ -1201,8 +1321,18 @@ class _LanguageSwitcher extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     final languages = [
-      {'code': 'es', 'flag': '🇪🇸', 'short': 'ES', 'name': l10n.languageSpanish},
-      {'code': 'en', 'flag': '🇺🇸', 'short': 'EN', 'name': l10n.languageEnglish},
+      {
+        'code': 'es',
+        'flag': '🇪🇸',
+        'short': 'ES',
+        'name': l10n.languageSpanish
+      },
+      {
+        'code': 'en',
+        'flag': '🇺🇸',
+        'short': 'EN',
+        'name': l10n.languageEnglish
+      },
     ];
 
     return Container(
@@ -1215,7 +1345,8 @@ class _LanguageSwitcher extends StatelessWidget {
         child: DropdownButton<String>(
           value: localeProvider.currentCode,
           isExpanded: true,
-          dropdownColor: Preferences.isDarkMode ? Colors.grey[850] : Colors.white,
+          dropdownColor:
+              Preferences.isDarkMode ? Colors.grey[850] : Colors.white,
           borderRadius: BorderRadius.circular(12),
           icon: IconScale(
             Icons.keyboard_arrow_down_rounded,
@@ -1226,7 +1357,8 @@ class _LanguageSwitcher extends StatelessWidget {
             return languages.map((lang) {
               return Row(
                 children: [
-                  TextScale(lang['flag']!, size: 18, style: const TextStyle(fontFamily: 'Poppins')),
+                  TextScale(lang['flag']!,
+                      size: 18, style: const TextStyle(fontFamily: 'Poppins')),
                   const SizedBox(width: 10),
                   TextScale(
                     lang['short']!,
@@ -1234,7 +1366,9 @@ class _LanguageSwitcher extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w600,
-                      color: Preferences.isDarkMode ? Colors.white : Colors.grey[800],
+                      color: Preferences.isDarkMode
+                          ? Colors.white
+                          : Colors.grey[800],
                     ),
                   ),
                 ],
@@ -1246,14 +1380,17 @@ class _LanguageSwitcher extends StatelessWidget {
               value: lang['code'],
               child: Row(
                 children: [
-                  TextScale(lang['flag']!, size: 18, style: const TextStyle(fontFamily: 'Poppins')),
+                  TextScale(lang['flag']!,
+                      size: 18, style: const TextStyle(fontFamily: 'Poppins')),
                   const SizedBox(width: 10),
                   TextScale(
                     lang['name']!,
                     size: 14,
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      color: Preferences.isDarkMode ? Colors.white : Colors.grey[800],
+                      color: Preferences.isDarkMode
+                          ? Colors.white
+                          : Colors.grey[800],
                     ),
                   ),
                 ],
@@ -1270,12 +1407,6 @@ class _LanguageSwitcher extends StatelessWidget {
 }
 
 class _MenuActionButton extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final VoidCallback onTap;
-  final bool useLandscapeLayout;
-  final Widget? trailing;
-
   const _MenuActionButton({
     required this.icon,
     required this.title,
@@ -1283,11 +1414,18 @@ class _MenuActionButton extends StatelessWidget {
     required this.useLandscapeLayout,
     this.trailing,
   });
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+  final bool useLandscapeLayout;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Preferences.isDarkMode;
-    final borderColor = isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.15);
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.grey.withValues(alpha: 0.15);
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(16),
@@ -1297,9 +1435,11 @@ class _MenuActionButton extends StatelessWidget {
         child: Container(
           padding: ResponsiveApp.all(useLandscapeLayout ? 5 : 16),
           decoration: BoxDecoration(
-            color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey.withValues(alpha: 0.08),
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.grey.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: borderColor, width: 1),
+            border: Border.all(color: borderColor),
           ),
           child: Row(
             children: [
@@ -1338,9 +1478,8 @@ class _MenuActionButton extends StatelessWidget {
 }
 
 class _ReviewSection extends StatefulWidget {
-  final bool useLandscapeLayout;
-
   const _ReviewSection({required this.useLandscapeLayout});
+  final bool useLandscapeLayout;
 
   @override
   State<_ReviewSection> createState() => _ReviewSectionState();
@@ -1359,10 +1498,12 @@ class _ReviewSectionState extends State<_ReviewSection> {
       if (available) {
         await inAppReview.requestReview();
       } else {
+        if (!mounted) return;
         Toast.info(context, message: l10n.reviewFallbackMessage);
       }
     } catch (error) {
       if (kDebugMode) debugPrint('Review request failed: $error');
+      if (!mounted) return;
       Toast.info(context, message: l10n.reviewFallbackMessage);
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -1403,26 +1544,26 @@ class _ReviewSectionState extends State<_ReviewSection> {
 }
 
 class _AboutButton extends StatelessWidget {
-  final PanelController panelController;
-  final bool useLandscapeLayout;
-
   const _AboutButton({
     required this.panelController,
     required this.useLandscapeLayout,
   });
+  final PanelController panelController;
+  final bool useLandscapeLayout;
 
   void _openAbout(BuildContext context) {
     final navigator = Navigator.of(context);
     final slideUpProvider = context.read<SlideUpProvider>();
     slideUpProvider.closeSlideUp(controller: panelController);
-    Future.delayed(const Duration(milliseconds: 300), () => navigator.pushNamed('about'));
+    Future.delayed(
+        const Duration(milliseconds: 300), () => navigator.pushNamed('about'));
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return _MenuActionButton(
-      icon: FontAwesomeIcons.infoCircle,
+      icon: FontAwesomeIcons.circleInfo,
       title: l10n.aboutTitle,
       onTap: () => _openAbout(context),
       useLandscapeLayout: useLandscapeLayout,

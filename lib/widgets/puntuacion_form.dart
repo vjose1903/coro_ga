@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -16,7 +18,7 @@ import 'header_section.dart';
 import 'widgets.dart';
 
 class PuntuacionForm extends StatelessWidget {
-  const PuntuacionForm({super.key, required this.panelController});
+  const PuntuacionForm({required this.panelController, super.key});
   final PanelController panelController;
 
   @override
@@ -26,7 +28,7 @@ class PuntuacionForm extends StatelessWidget {
 }
 
 class PuntuacionPage extends StatefulWidget {
-  const PuntuacionPage({super.key, required this.panelController});
+  const PuntuacionPage({required this.panelController, super.key});
   final PanelController panelController;
 
   @override
@@ -110,30 +112,27 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
             icon: Icons.remove_rounded,
             label: AppLocalizations.of(context)!.decrease,
             color: Colors.red[400]!,
-            onTap: () {
+            onTap: () async {
               final slideUpProvider = context.read<SlideUpProvider>();
               final previousScore = jugador.puntuacion ?? 0;
               final String puntuacion =
                   hasTeclado ? puntuacionController.text : '1';
 
-              changePuntuacion(
-                      jugadorProvider: jugadorProvider,
-                      puntuacion: puntuacion,
-                      tipo: 'reducir',
-                      context: context)
-                  .then((newPuntuacion) {
-                if (newPuntuacion != 0) {
-                  puntuacionController.text = '';
-                  slideUpProvider.closeSlideUp(
-                      controller: widget.panelController);
-                  _maybeShowScoreInterstitial(
-                    context: context,
-                    previousScore: previousScore,
-                    newScore: newPuntuacion,
-                    maxScore: maxScore,
-                  );
-                }
-              });
+              final int newPuntuacion = await changePuntuacion(
+                jugadorProvider: jugadorProvider,
+                puntuacion: puntuacion,
+                tipo: 'reducir',
+                context: context,
+              );
+              if (!context.mounted || newPuntuacion == 0) return;
+              puntuacionController.text = '';
+              slideUpProvider.closeSlideUp(controller: widget.panelController);
+              _maybeShowScoreInterstitial(
+                context: context,
+                previousScore: previousScore,
+                newScore: newPuntuacion,
+                maxScore: maxScore,
+              );
             },
           ),
         ),
@@ -143,58 +142,52 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
             icon: Icons.add_rounded,
             label: AppLocalizations.of(context)!.increase,
             color: Colors.green,
-            onTap: () {
+            onTap: () async {
               final slideUpProvider = context.read<SlideUpProvider>();
               final previousScore = jugador.puntuacion ?? 0;
               final String puntuacion =
                   hasTeclado ? puntuacionController.text : '1';
-              changePuntuacion(
-                      jugadorProvider: jugadorProvider,
-                      puntuacion: puntuacion,
-                      tipo: 'aumentar',
-                      context: context)
-                  .then((newPuntuacion) async {
-                if (newPuntuacion != 0) {
-                  puntuacionController.text = '';
-                  slideUpProvider.closeSlideUp(
-                      controller: widget.panelController);
-                  _maybeShowScoreInterstitial(
-                    context: context,
-                    previousScore: previousScore,
-                    newScore: newPuntuacion,
-                    maxScore: maxScore,
-                  );
-                  if (maxScore > 0 && newPuntuacion >= maxScore) {
-                    final ganador =
-                        partida.getGanadorOrPerdedor(tipo: Estado.ganador);
-                    final finalizadaRes =
-                        await partidaProvider.finalizarPartida(
-                      context,
-                      partida: partida,
-                      ganadorNombre: ganador['nombre']?.toString(),
-                      motivo: 'max_score',
-                    );
-                    if (finalizadaRes.hasError!) return;
-                    final PartidaFinalizada finalizada =
-                        finalizadaRes.data as PartidaFinalizada;
-                    Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                            settings: RouteSettings(arguments: {
-                              'partidaFinalizadaId': finalizada.id,
-                            }),
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) =>
-                                    const GanadorScreen(),
-                            transitionsBuilder: (context, animation,
-                                    secondaryAnimation, child) =>
-                                FadeTransition(
-                                    opacity: animation, child: child),
-                            transitionDuration:
-                                const Duration(milliseconds: 400)));
-                  }
-                }
-              });
+              final int newPuntuacion = await changePuntuacion(
+                jugadorProvider: jugadorProvider,
+                puntuacion: puntuacion,
+                tipo: 'aumentar',
+                context: context,
+              );
+              if (!context.mounted || newPuntuacion == 0) return;
+              puntuacionController.text = '';
+              slideUpProvider.closeSlideUp(controller: widget.panelController);
+              _maybeShowScoreInterstitial(
+                context: context,
+                previousScore: previousScore,
+                newScore: newPuntuacion,
+                maxScore: maxScore,
+              );
+              if (maxScore > 0 && newPuntuacion >= maxScore) {
+                final ganador =
+                    partida.getGanadorOrPerdedor(tipo: Estado.ganador);
+                final finalizadaRes = await partidaProvider.finalizarPartida(
+                  context,
+                  partida: partida,
+                  ganadorNombre: ganador['nombre']?.toString(),
+                  motivo: 'max_score',
+                );
+                if (finalizadaRes.hasError! || !context.mounted) return;
+                final PartidaFinalizada finalizada =
+                    finalizadaRes.data as PartidaFinalizada;
+                unawaited(Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                        settings: RouteSettings(arguments: {
+                          'partidaFinalizadaId': finalizada.id,
+                        }),
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            const GanadorScreen(),
+                        transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) =>
+                            FadeTransition(opacity: animation, child: child),
+                        transitionDuration:
+                            const Duration(milliseconds: 400))));
+              }
             },
           ),
         ),
@@ -386,12 +379,12 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
 
         return puntuacionActual;
       } else {
-        MyLoading.show();
+        await MyLoading.show();
         final SqlResponse response = await jugadorProvider.changePuntuacion(
             jugador: jugador, newPuntuacion: puntuacionInt, tipo: tipo);
         partidaProvider.refresh();
         jugadorProvider.changeJugadorEnTurno(response.data);
-        MyLoading.close();
+        await MyLoading.close();
         return response.data.puntuacion;
       }
     } else {
@@ -407,7 +400,7 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
 }
 
 class _ListHistorial extends StatefulWidget {
-  const _ListHistorial({super.key, required this.historialController});
+  const _ListHistorial({required this.historialController});
   final ScrollController historialController;
 
   @override
@@ -464,9 +457,9 @@ class _ListHistorialState extends State<_ListHistorial>
 
     // Scroll cuando cambia el jugador (después de init)
     if (_lastJugadorId != null &&
-        _lastJugadorId != jugador?.id &&
-        jugador?.historialJugadas != null &&
-        jugador!.historialJugadas!.isNotEmpty) {
+        _lastJugadorId != jugador.id &&
+        jugador.historialJugadas != null &&
+        jugador.historialJugadas!.isNotEmpty) {
       _lastJugadorId = jugador.id;
       scheduleScrollToBottom(context, effectiveController);
     }
@@ -533,10 +526,10 @@ class _ListHistorialState extends State<_ListHistorial>
 
 class _HistorialItem extends StatefulWidget {
   const _HistorialItem({
-    super.key,
     required this.historial,
     required this.jugadorNombre,
     required this.index,
+    super.key,
   });
   final HistorialJugada historial;
   final String jugadorNombre;
@@ -598,6 +591,7 @@ class _HistorialItemState extends State<_HistorialItem> {
                     'onTap': () async {
                       Navigator.pop(context);
                       await handler(true);
+                      if (!context.mounted) return;
                       final jugadorProvider = context.read<JugadorProvider>();
                       final partidaProvider = context.read<PartidaProvider>();
                       await jugadorProvider.deleteHistorial(
@@ -673,12 +667,11 @@ class _HistorialItemState extends State<_HistorialItem> {
 
 class _KeyboardSection extends StatelessWidget {
   const _KeyboardSection(
-      {super.key,
-      required this.puntuacionController,
-      this.errorText,
+      {required this.puntuacionController,
       required this.onType,
       required this.useLandscapeLayout,
-      required this.isWide});
+      required this.isWide,
+      this.errorText});
 
   final TextEditingController puntuacionController;
   final String? errorText;
@@ -976,7 +969,7 @@ class _ActionScoreButton extends StatelessWidget {
                 TextScale(
                   label,
                   size: 15,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w600,
                     color: Colors.white,

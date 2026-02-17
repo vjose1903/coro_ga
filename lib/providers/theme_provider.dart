@@ -10,7 +10,7 @@ class ThemeProvider extends ChangeNotifier {
     return isDarkMode ? AppThemes.darkTheme : AppThemes.lightTheme;
   }
 
-  changeCurrentTheme() {
+  void changeCurrentTheme() {
     isDarkMode = Preferences.isDarkMode;
 
     notifyListeners();

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:reactive_forms/reactive_forms.dart';
+
 import '../l10n/app_localizations.dart';
 import '../models/partida_predefinida.dart';
-import 'package:reactive_forms/reactive_forms.dart';
 
 class FormPartidaProvider extends ChangeNotifier {
   static const int _minJugadores = 2;
@@ -59,7 +60,7 @@ class FormPartidaProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  resetForm({bool restoreJugadores = true, BuildContext? context}) {
+  void resetForm({bool restoreJugadores = true, BuildContext? context}) {
     // Crear un FormGroup nuevo evita estado residual en controles reactivos.
     form = _buildBaseForm();
     if (restoreJugadores) {
@@ -141,7 +142,10 @@ class FormPartidaProvider extends ChangeNotifier {
       final nextNumber = jugadoresArray.controls.length + 1;
       jugadoresArray.add(
         fb.group({
-          'nombre': [_defaultPlayerName(context, nextNumber), Validators.required],
+          'nombre': [
+            _defaultPlayerName(context, nextNumber),
+            Validators.required
+          ],
         }),
       );
     }

@@ -10,7 +10,15 @@ class IconSize {
 }
 
 class CustomIconButtom extends StatelessWidget {
-  const CustomIconButtom({super.key, required this.icon, this.onTap, this.size = IconSize.max, this.iconSize = 30, this.splashColor = Colors.grey, this.backgroundColor = Colors.transparent, this.iconColor});
+  const CustomIconButtom(
+      {required this.icon,
+      super.key,
+      this.onTap,
+      this.size = IconSize.max,
+      this.iconSize = 30,
+      this.splashColor = Colors.grey,
+      this.backgroundColor = Colors.transparent,
+      this.iconColor});
 
   final IconData icon;
   final double? iconSize;
@@ -22,7 +30,8 @@ class CustomIconButtom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color myIconColor = iconColor ?? (Preferences.isDarkMode ? Colors.white : Colors.black);
+    final Color myIconColor =
+        iconColor ?? (Preferences.isDarkMode ? Colors.white : Colors.black);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(50),

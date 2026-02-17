@@ -31,15 +31,24 @@ class IconScale extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isLandscapeLayout = ResponsiveLayoutBuilder.maybeOf(context)?.useLandscapeLayout ?? ResponsiveLayoutBuilder.resolveUseLandscapeLayout(context);
+    final isLandscapeLayout =
+        ResponsiveLayoutBuilder.maybeOf(context)?.useLandscapeLayout ??
+            ResponsiveLayoutBuilder.resolveUseLandscapeLayout(context);
     final isLargeDevice = ResponsiveLayoutBuilder.resolveIsWide(context);
-    final landscapePhoneBoost = isLandscapeLayout && !isLargeDevice ? 0.65 : 0.6;
+    final landscapePhoneBoost =
+        isLandscapeLayout && !isLargeDevice ? 0.65 : 0.6;
     final portraitBias = isLandscapeLayout ? 0.9 : 1.9;
 
     final resolvedSize = size ?? 24.0;
-    final scaledBase = ResponsiveApp.scaleWidth(resolvedSize) * portraitBias * landscapePhoneBoost;
-    final minSize = ResponsiveApp.scaleWidth(resolvedSize * 0.9) * portraitBias * landscapePhoneBoost;
-    final maxSize = ResponsiveApp.scaleWidth(resolvedSize * 1.0) * portraitBias * landscapePhoneBoost;
+    final scaledBase = ResponsiveApp.scaleWidth(resolvedSize) *
+        portraitBias *
+        landscapePhoneBoost;
+    final minSize = ResponsiveApp.scaleWidth(resolvedSize * 0.9) *
+        portraitBias *
+        landscapePhoneBoost;
+    final maxSize = ResponsiveApp.scaleWidth(resolvedSize * 1.0) *
+        portraitBias *
+        landscapePhoneBoost;
     final clampedSize = _clampSize(scaledBase, minSize, maxSize);
 
     return Icon(

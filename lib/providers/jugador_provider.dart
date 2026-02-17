@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
+
 import '../l10n/app_localizations.dart';
 import '../models/models.dart';
 import '../utils/utils.dart';
 import 'providers.dart';
-import 'package:provider/provider.dart';
-import 'package:reactive_forms/reactive_forms.dart';
 
 class JugadorProvider extends ChangeNotifier {
   Jugador? jugadorEnTurno;
@@ -36,26 +37,48 @@ class JugadorProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<SqlResponse> editJugador(BuildContext context, {required Jugador jugador, required String newNombreJugador}) async {
-    final responseFuture = Jugador.edit(jugador: jugador, newNombreJugador: newNombreJugador);
-    final response = await responseFuture;
+  Future<SqlResponse> editJugador(BuildContext context,
+      {required Jugador jugador, required String newNombreJugador}) async {
+    final SqlResponse response = await Jugador.edit(
+      jugador: jugador,
+      newNombreJugador: newNombreJugador,
+    );
 
     if (!response.hasError!) {
       notifyListeners();
-      return responseFuture;
-    } else {
-      Toast.show(type: ToastType.error, context: context, message: response.messages!.first);
-      return responseFuture;
+      return response;
     }
+
+    if (!context.mounted) {
+      return response;
+    }
+
+    Toast.show(
+      type: ToastType.error,
+      context: context,
+      message: response.messages!.first,
+    );
+    return response;
   }
 
-  Future<SqlResponse> changePuntuacion({required Jugador jugador, required int newPuntuacion, required String tipo}) async {
+  Future<SqlResponse> changePuntuacion(
+      {required Jugador jugador,
+      required int newPuntuacion,
+      required String tipo}) async {
     final Map body = jugador.toMap();
 
-    if (tipo == 'aumentar') body['puntuacion'] = body['puntuacion'] + newPuntuacion;
-    if (tipo == 'reducir') body['puntuacion'] = body['puntuacion'] - newPuntuacion;
+    if (tipo == 'aumentar') {
+      body['puntuacion'] = body['puntuacion'] + newPuntuacion;
+    }
+    if (tipo == 'reducir') {
+      body['puntuacion'] = body['puntuacion'] - newPuntuacion;
+    }
 
-    final SqlResponse response = await Jugador.changePuntuacion(jugador: jugador, newPuntuacion: newPuntuacion, tipo: tipo, newData: body);
+    final SqlResponse response = await Jugador.changePuntuacion(
+        jugador: jugador,
+        newPuntuacion: newPuntuacion,
+        tipo: tipo,
+        newData: body);
 
     if (!response.hasError!) {
       jugadorEnTurno!.addHistorial(response.data['historial']);
@@ -67,8 +90,10 @@ class JugadorProvider extends ChangeNotifier {
     return response;
   }
 
-  Future<SqlResponse> deleteHistorial({required HistorialJugada historial}) async {
-    final SqlResponse response = await Jugador.deleteHistorial(jugador: jugadorEnTurno!, historial: historial);
+  Future<SqlResponse> deleteHistorial(
+      {required HistorialJugada historial}) async {
+    final SqlResponse response = await Jugador.deleteHistorial(
+        jugador: jugadorEnTurno!, historial: historial);
 
     if (!response.hasError!) {
       jugadorEnTurno!.puntuacion = response.data['newPuntuacion'];
@@ -79,7 +104,9 @@ class JugadorProvider extends ChangeNotifier {
   }
 
   Future<dynamic> deleteJugador(BuildContext context,
-      {required Jugador jugador, required Function callBack, PanelController? panelController}) async {
+      {required Jugador jugador,
+      required Function callBack,
+      PanelController? panelController}) async {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
     final l10n = AppLocalizations.of(context)!;
@@ -102,16 +129,29 @@ class JugadorProvider extends ChangeNotifier {
               Navigator.pop(context);
 
               final response = await jugador.delete();
+              if (!context.mounted) {
+                callBack({'tipo': 'aceptar'});
+                return;
+              }
 
               if (!response.hasError!) {
-                if (panelController != null) slideUpProvider.closeSlideUp(controller: panelController);
+                if (panelController != null) {
+                  slideUpProvider.closeSlideUp(controller: panelController);
+                }
 
                 partidaProvider.removeJugador(jugador);
-                if (response.messages != null && response.messages!.isNotEmpty) {
-                  Toast.show(type: ToastType.warning, context: context, message: response.messages!.first);
+                if (response.messages != null &&
+                    response.messages!.isNotEmpty) {
+                  Toast.show(
+                      type: ToastType.warning,
+                      context: context,
+                      message: response.messages!.first);
                 }
               } else {
-                Toast.show(type: ToastType.error, context: context, message: response.messages!.first);
+                Toast.show(
+                    type: ToastType.error,
+                    context: context,
+                    message: response.messages!.first);
               }
               callBack({'tipo': 'aceptar'});
             }

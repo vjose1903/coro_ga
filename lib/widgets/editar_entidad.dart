@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +17,8 @@ import 'header_section.dart';
 import 'widgets.dart';
 
 class EditarEntidad extends StatelessWidget {
-  const EditarEntidad({super.key, this.pageController, this.panelController, this.onClose});
+  const EditarEntidad(
+      {super.key, this.pageController, this.panelController, this.onClose});
 
   final PageController? pageController;
   final PanelController? panelController;
@@ -23,7 +26,8 @@ class EditarEntidad extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final JugadorProvider jugadorProvider = context.watch<JugadorProvider>();
-    final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
+    final FormPartidaProvider formPartidaProvider =
+        context.watch<FormPartidaProvider>();
     final PartidaProvider partidaProvider = context.watch<PartidaProvider>();
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
 
@@ -49,7 +53,8 @@ class EditarEntidad extends StatelessWidget {
       offset = const Offset(0, 0);
     }
 
-    final FormGroup form = isPartida ? formPartidaProvider.form : jugadorProvider.formJugador;
+    final FormGroup form =
+        isPartida ? formPartidaProvider.form : jugadorProvider.formJugador;
 
     return ResponsiveLayoutBuilder(
       useMediaQuery: true,
@@ -69,7 +74,8 @@ class EditarEntidad extends StatelessWidget {
                 children: [
                   Expanded(
                     child: SingleChildScrollView(
-                      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
                           minHeight: viewportConstraints.maxHeight,
@@ -87,15 +93,17 @@ class EditarEntidad extends StatelessWidget {
                               isWide: isWide,
                               panelController: panelController,
                               partida: partida,
-                              onRestart: partida != null && !partida.isSinIniciar
-                                  ? () async {
-                                      await partida.restartPartida();
-                                      partidaProvider.refresh();
-                                      if (panelController != null) {
-                                        slideUpProvider.closeSlideUp(controller: panelController!);
-                                      }
-                                    }
-                                  : null,
+                              onRestart:
+                                  partida != null && !partida.isSinIniciar
+                                      ? () async {
+                                          await partida.restartPartida();
+                                          partidaProvider.refresh();
+                                          if (panelController != null) {
+                                            slideUpProvider.closeSlideUp(
+                                                controller: panelController!);
+                                          }
+                                        }
+                                      : null,
                             ),
                             SizedBox(height: ResponsiveApp.scaleHeight(16)),
 
@@ -107,7 +115,9 @@ class EditarEntidad extends StatelessWidget {
                                 useLandscapeLayout: useLandscapeLayout,
                               )
                             else
-                              EditJugador(key: const ValueKey('edit_jugador'), form: form),
+                              EditJugador(
+                                  key: const ValueKey('edit_jugador'),
+                                  form: form),
                             SizedBox(height: ResponsiveApp.scaleHeight(16)),
                           ],
                         ),
@@ -127,12 +137,16 @@ class EditarEntidad extends StatelessWidget {
                               if (onClose != null) {
                                 onClose!();
                               } else if (pageController != null) {
-                                previusPage(pageController);
+                                await previusPage(pageController!);
                               } else if (panelController != null) {
-                                slideUpProvider.closeSlideUp(controller: panelController!);
+                                slideUpProvider.closeSlideUp(
+                                    controller: panelController!);
                               }
-                              resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
-                              await Future.delayed(const Duration(milliseconds: 200));
+                              await resetEntidadesEditar(
+                                  jugadorProvider: jugadorProvider,
+                                  partidaProvider: partidaProvider);
+                              await Future.delayed(
+                                  const Duration(milliseconds: 200));
                               jugadorProvider.formJugador.reset();
                               formPartidaProvider.form.reset();
                             },
@@ -146,7 +160,16 @@ class EditarEntidad extends StatelessWidget {
                             icon: FontAwesomeIcons.check,
                             isPrimary: true,
                             onTap: () {
-                              aceptarFunction(context, entidad, form: form, jugadorProvider: jugadorProvider, partidaProvider: partidaProvider, previusPage: previusPage, resetEntidadesEditar: resetEntidadesEditar, isPartida: isPartida, pageController: pageController, panelController: panelController, onClose: onClose);
+                              aceptarFunction(context, entidad,
+                                  form: form,
+                                  jugadorProvider: jugadorProvider,
+                                  partidaProvider: partidaProvider,
+                                  previusPage: previusPage,
+                                  resetEntidadesEditar: resetEntidadesEditar,
+                                  isPartida: isPartida,
+                                  pageController: pageController,
+                                  panelController: panelController,
+                                  onClose: onClose);
                             },
                             useLandscapeLayout: useLandscapeLayout),
                       ),
@@ -161,11 +184,16 @@ class EditarEntidad extends StatelessWidget {
     );
   }
 
-  previusPage(pageController) async {
-    pageController.previousPage(duration: const Duration(milliseconds: 500), curve: Curves.easeInOutQuart);
+  Future<void> previusPage(PageController pageController) async {
+    await pageController.previousPage(
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOutQuart,
+    );
   }
 
-  resetEntidadesEditar({required JugadorProvider jugadorProvider, required PartidaProvider partidaProvider}) async {
+  Future<void> resetEntidadesEditar(
+      {required JugadorProvider jugadorProvider,
+      required PartidaProvider partidaProvider}) async {
     await Future.delayed(const Duration(milliseconds: 300));
     jugadorProvider.jugadorEditar = null;
     partidaProvider.partidaEditar = null;
@@ -196,9 +224,9 @@ class _EditJugadorState extends State<EditJugador> {
     if (_focusRequested) return;
     _focusRequested = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 350), () {
+      unawaited(Future.delayed(const Duration(milliseconds: 350), () {
         if (mounted && !_focusNode.hasFocus) _focusNode.requestFocus();
-      });
+      }));
     });
   }
 
@@ -212,7 +240,14 @@ class _EditJugadorState extends State<EditJugador> {
   Widget build(BuildContext context) {
     return ReactiveForm(
       formGroup: widget.form,
-      child: Column(children: <Widget>[CustomReactiveInput(key: const ValueKey('edit_jugador_nombre'), formControlName: 'nombre', labelText: AppLocalizations.of(context)!.name, textCapitalization: TextCapitalization.words, focusNode: _focusNode)]),
+      child: Column(children: <Widget>[
+        CustomReactiveInput(
+            key: const ValueKey('edit_jugador_nombre'),
+            formControlName: 'nombre',
+            labelText: AppLocalizations.of(context)!.name,
+            textCapitalization: TextCapitalization.words,
+            focusNode: _focusNode)
+      ]),
     );
   }
 }
@@ -262,13 +297,20 @@ class _EditPartidaState extends State<EditPartida> {
   Widget build(BuildContext context) {
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
-        final FormPartidaProvider formPartidaProvider = context.watch<FormPartidaProvider>();
-        final dynamic tipoPartida = formPartidaProvider.form.control('tipo').value;
+        final FormPartidaProvider formPartidaProvider =
+            context.watch<FormPartidaProvider>();
+        final dynamic tipoPartida =
+            formPartidaProvider.form.control('tipo').value;
 
         return ReactiveForm(
           formGroup: widget.form,
           child: Column(children: <Widget>[
-            CustomReactiveInput(key: const ValueKey('edit_partida_nombre'), formControlName: 'nombre', labelText: AppLocalizations.of(context)!.name, textCapitalization: TextCapitalization.words, focusNode: _focusNode),
+            CustomReactiveInput(
+                key: const ValueKey('edit_partida_nombre'),
+                formControlName: 'nombre',
+                labelText: AppLocalizations.of(context)!.name,
+                textCapitalization: TextCapitalization.words,
+                focusNode: _focusNode),
             SizedBox(height: ResponsiveApp.scaleHeight(10)),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 350),
@@ -279,8 +321,18 @@ class _EditPartidaState extends State<EditPartida> {
                       key: const ValueKey('tipo_solo'),
                       formControlName: 'tipo',
                       labelText: AppLocalizations.of(context)!.type,
-                      items: [DropdownMenuItem(value: 'Rondas', child: TextScale(AppLocalizations.of(context)!.rounds)), DropdownMenuItem(value: 'Puntuación', child: TextScale(AppLocalizations.of(context)!.score))],
-                      onChanged: (value) => formPartidaProvider.changeTipo(value),
+                      items: [
+                        DropdownMenuItem(
+                            value: 'Rondas',
+                            child: TextScale(
+                                AppLocalizations.of(context)!.rounds)),
+                        DropdownMenuItem(
+                            value: 'Puntuación',
+                            child:
+                                TextScale(AppLocalizations.of(context)!.score))
+                      ],
+                      onChanged: (value) =>
+                          formPartidaProvider.changeTipo(value),
                     )
                   : widget.useLandscapeLayout
                       ? Row(
@@ -291,13 +343,30 @@ class _EditPartidaState extends State<EditPartida> {
                               child: CustomReactiveDropDown(
                                 formControlName: 'tipo',
                                 labelText: AppLocalizations.of(context)!.type,
-                                items: [DropdownMenuItem(value: 'Rondas', child: TextScale(AppLocalizations.of(context)!.rounds)), DropdownMenuItem(value: 'Puntuación', child: TextScale(AppLocalizations.of(context)!.score))],
-                                onChanged: (value) => formPartidaProvider.changeTipo(value),
+                                items: [
+                                  DropdownMenuItem(
+                                      value: 'Rondas',
+                                      child: TextScale(
+                                          AppLocalizations.of(context)!
+                                              .rounds)),
+                                  DropdownMenuItem(
+                                      value: 'Puntuación',
+                                      child: TextScale(
+                                          AppLocalizations.of(context)!.score))
+                                ],
+                                onChanged: (value) =>
+                                    formPartidaProvider.changeTipo(value),
                               ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
-                              child: CustomReactiveInput(formControlName: 'maxPuntuacion', labelText: tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScoreFull, inputType: TextInputType.number),
+                              child: CustomReactiveInput(
+                                  formControlName: 'maxPuntuacion',
+                                  labelText: tipoPartida == 'Rondas'
+                                      ? AppLocalizations.of(context)!.roundCount
+                                      : AppLocalizations.of(context)!
+                                          .maxScoreFull,
+                                  inputType: TextInputType.number),
                             ),
                           ],
                         )
@@ -307,11 +376,27 @@ class _EditPartidaState extends State<EditPartida> {
                             CustomReactiveDropDown(
                               formControlName: 'tipo',
                               labelText: AppLocalizations.of(context)!.type,
-                              items: [DropdownMenuItem(value: 'Rondas', child: TextScale(AppLocalizations.of(context)!.rounds)), DropdownMenuItem(value: 'Puntuación', child: TextScale(AppLocalizations.of(context)!.score))],
-                              onChanged: (value) => formPartidaProvider.changeTipo(value),
+                              items: [
+                                DropdownMenuItem(
+                                    value: 'Rondas',
+                                    child: TextScale(
+                                        AppLocalizations.of(context)!.rounds)),
+                                DropdownMenuItem(
+                                    value: 'Puntuación',
+                                    child: TextScale(
+                                        AppLocalizations.of(context)!.score))
+                              ],
+                              onChanged: (value) =>
+                                  formPartidaProvider.changeTipo(value),
                             ),
                             const SizedBox(height: 10),
-                            CustomReactiveInput(formControlName: 'maxPuntuacion', labelText: tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScoreFull, inputType: TextInputType.number),
+                            CustomReactiveInput(
+                                formControlName: 'maxPuntuacion',
+                                labelText: tipoPartida == 'Rondas'
+                                    ? AppLocalizations.of(context)!.roundCount
+                                    : AppLocalizations.of(context)!
+                                        .maxScoreFull,
+                                inputType: TextInputType.number),
                           ],
                         ),
             ),
@@ -322,27 +407,49 @@ class _EditPartidaState extends State<EditPartida> {
   }
 }
 
-aceptarFunction(BuildContext context, dynamic entidad,
-    {required FormGroup form, required bool isPartida, required JugadorProvider jugadorProvider, required PartidaProvider partidaProvider, required Function previusPage, required Function resetEntidadesEditar, PanelController? panelController, PageController? pageController, VoidCallback? onClose}) {
+void aceptarFunction(BuildContext context, dynamic entidad,
+    {required FormGroup form,
+    required bool isPartida,
+    required JugadorProvider jugadorProvider,
+    required PartidaProvider partidaProvider,
+    required Function previusPage,
+    required Function resetEntidadesEditar,
+    PanelController? panelController,
+    PageController? pageController,
+    VoidCallback? onClose}) {
   if (isPartida) {
     final SlideUpProvider slideUpProvider = context.read<SlideUpProvider>();
     if (form.valid) {
       FocusManager.instance.primaryFocus?.unfocus();
-      partidaProvider.editPartida(context, partida: entidad, newNombrePartida: form.value['nombre'].toString()).then((value) async {
+      partidaProvider
+          .editPartida(context,
+              partida: entidad,
+              newNombrePartida: form.value['nombre'].toString())
+          .then((value) async {
         entidad.nombre = form.value['nombre'].toString();
         partidaProvider.refresh();
         form.reset();
-        resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
+        resetEntidadesEditar(
+            jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
 
-        if (panelController != null) slideUpProvider.closeSlideUp(controller: panelController);
+        if (panelController != null) {
+          slideUpProvider.closeSlideUp(controller: panelController);
+        }
       });
     } else {
-      Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.gameNameCannotBeEmpty);
+      Toast.show(
+          type: ToastType.error,
+          context: context,
+          message: AppLocalizations.of(context)!.gameNameCannotBeEmpty);
     }
   } else {
     if (form.valid) {
       FocusManager.instance.primaryFocus?.unfocus();
-      jugadorProvider.editJugador(context, jugador: entidad, newNombreJugador: form.value['nombre'].toString()).then((value) {
+      jugadorProvider
+          .editJugador(context,
+              jugador: entidad,
+              newNombreJugador: form.value['nombre'].toString())
+          .then((value) {
         entidad.nombre = form.value['nombre'].toString();
         partidaProvider.refresh();
 
@@ -352,10 +459,14 @@ aceptarFunction(BuildContext context, dynamic entidad,
         } else {
           previusPage(pageController);
         }
-        resetEntidadesEditar(jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
+        resetEntidadesEditar(
+            jugadorProvider: jugadorProvider, partidaProvider: partidaProvider);
       });
     } else {
-      Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.playerNameCannotBeEmpty);
+      Toast.show(
+          type: ToastType.error,
+          context: context,
+          message: AppLocalizations.of(context)!.playerNameCannotBeEmpty);
     }
   }
 }
@@ -427,16 +538,21 @@ class _EditHeader extends StatelessWidget {
                     ],
                   );
                 },
-                borderRadius: useLandscapeLayout ? ResponsiveApp.borderRadius(6) : ResponsiveApp.borderRadius(10),
+                borderRadius: useLandscapeLayout
+                    ? ResponsiveApp.borderRadius(6)
+                    : ResponsiveApp.borderRadius(10),
                 child: Container(
-                  padding: ResponsiveApp.symmetric(horizontal: useLandscapeLayout ? 6 : 10, vertical: 6),
+                  padding: ResponsiveApp.symmetric(
+                      horizontal: useLandscapeLayout ? 6 : 10, vertical: 6),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [Color(0xFFFFB300), Color(0xFFFF8F00)],
                     ),
-                    borderRadius: useLandscapeLayout ? ResponsiveApp.borderRadius(6) : ResponsiveApp.borderRadius(10),
+                    borderRadius: useLandscapeLayout
+                        ? ResponsiveApp.borderRadius(6)
+                        : ResponsiveApp.borderRadius(10),
                     boxShadow: [
                       BoxShadow(
                         color: const Color(0xFFFFA000).withValues(alpha: 0.3),
@@ -448,7 +564,8 @@ class _EditHeader extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const IconScale(Icons.restart_alt_rounded, color: Colors.white, size: 16),
+                      const IconScale(Icons.restart_alt_rounded,
+                          color: Colors.white, size: 16),
                       SizedBox(width: ResponsiveApp.scaleWidth(4)),
                       TextScale(
                         l10n.restart,
@@ -505,7 +622,12 @@ class _ActionButton extends StatelessWidget {
       ];
       textColor = Colors.white;
     } else {
-      gradientColors = isDark ? [Colors.white.withValues(alpha: 0.15), Colors.white.withValues(alpha: 0.1)] : [Colors.grey[200]!, Colors.grey[300]!];
+      gradientColors = isDark
+          ? [
+              Colors.white.withValues(alpha: 0.15),
+              Colors.white.withValues(alpha: 0.1)
+            ]
+          : [Colors.grey[200]!, Colors.grey[300]!];
       textColor = isDark ? Colors.white : AppThemes.colorQuinto;
     }
 
@@ -513,7 +635,9 @@ class _ActionButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: useLandscapeLayout ? ResponsiveApp.borderRadius(5) : ResponsiveApp.borderRadius(12),
+        borderRadius: useLandscapeLayout
+            ? ResponsiveApp.borderRadius(5)
+            : ResponsiveApp.borderRadius(12),
         child: Container(
           padding: ResponsiveApp.symmetric(vertical: 14),
           decoration: BoxDecoration(
@@ -522,7 +646,9 @@ class _ActionButton extends StatelessWidget {
               end: Alignment.bottomCenter,
               colors: gradientColors,
             ),
-            borderRadius: useLandscapeLayout ? ResponsiveApp.borderRadius(5) : ResponsiveApp.borderRadius(12),
+            borderRadius: useLandscapeLayout
+                ? ResponsiveApp.borderRadius(5)
+                : ResponsiveApp.borderRadius(12),
             boxShadow: [
               BoxShadow(
                 color: (isPrimary

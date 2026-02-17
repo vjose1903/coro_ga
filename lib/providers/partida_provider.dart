@@ -1,8 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
+import 'package:flutter_swipe_action_cell/core/cell.dart';
+
 import '../models/models.dart';
 import '../utils/utils.dart';
-import 'package:flutter_swipe_action_cell/core/cell.dart';
 
 class PartidaProvider extends ChangeNotifier {
   bool isFirstSearch = true;
@@ -73,13 +74,13 @@ class PartidaProvider extends ChangeNotifier {
     return response.data;
   }
 
-  getPartidas() async {
-    MyLoading.show();
+  Future<List<Partida>> getPartidas() async {
+    await MyLoading.show();
 
     partidas = await Partida.getPartidas();
     isFirstSearch = false;
     notifyListeners();
-    MyLoading.close();
+    await MyLoading.close();
     return partidas;
   }
 
