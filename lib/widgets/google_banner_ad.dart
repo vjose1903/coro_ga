@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 
 import '../helpers/helpers.dart';
 import '../providers/premium_provider.dart';
-import 'responsive_layout_builder.dart';
 
 class GoogleBannerAd extends StatefulWidget {
   const GoogleBannerAd({
@@ -33,6 +32,8 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
   Timer? _retryTimer;
   int _retryAttempt = 0;
   static const double _horizontalPadding = 16;
+  static const double _bannerMinWidth = 320;
+  static const double _bannerHeight = 50;
 
   @override
   void initState() {
@@ -50,31 +51,32 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     }
   }
 
-  Future<void> _loadBanner({int? width}) async {
+  Future<void> _loadBanner() async {
     if (_isLoading || !mounted || _bannerAd != null) return;
+
+    final availableWidth = _availableBannerWidth(context);
+    if (availableWidth < _bannerMinWidth) {
+      debugPrint(
+        'BannerAd skipped: location=${widget.location}, availableWidth=$availableWidth < $_bannerMinWidth',
+      );
+      return;
+    }
+
     _isLoading = true;
     _loadScheduled = false;
 
     final adUnitId = AdHelper.getBannerAdUnitId(widget.location);
-    debugPrint('BannerAd load start: location=${widget.location}, unitId=$adUnitId');
+    debugPrint(
+        'BannerAd load start: location=${widget.location}, unitId=$adUnitId');
     if (adUnitId.isEmpty) {
-      debugPrint('BannerAd load aborted: empty adUnitId for location=${widget.location}');
+      debugPrint(
+          'BannerAd load aborted: empty adUnitId for location=${widget.location}');
       _isLoading = false;
       return;
     }
 
-    final mediaSize = MediaQuery.of(context).size;
-    final isLargeDevice = ResponsiveLayoutBuilder.resolveIsWide(context);
-    final int resolvedWidth = width ?? mediaSize.width.truncate();
-    final adaptiveSize = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(resolvedWidth);
-    if (!mounted || adaptiveSize == null) {
-      debugPrint('BannerAd load aborted: adaptive size null for width=$resolvedWidth');
-      _isLoading = false;
-      return;
-    }
-
-    // In larger devices anchored adaptive can be too tall; cap to full banner height.
-    final AdSize chosenSize = isLargeDevice && adaptiveSize.height > 60 ? AdSize.fullBanner : adaptiveSize;
+    // Use a fixed size banner to avoid rotation/layout width mismatches.
+    const AdSize chosenSize = AdSize.banner;
     _adSize = chosenSize;
 
     _disposeBanner();
@@ -103,7 +105,8 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
           debugPrint('Loaded');
           debugPrint('   ');
           debugPrint('   ');
-          debugPrint('BannerAd loaded: location=${widget.location}, unitId=$adUnitId, size=${_bannerAd?.size}');
+          debugPrint(
+              'BannerAd loaded: location=${widget.location}, unitId=$adUnitId, size=${_bannerAd?.size}');
 
           final info = (ad as BannerAd).responseInfo;
           debugPrint('Winner adapter: ${info?.mediationAdapterClassName}');
@@ -147,9 +150,7 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     _loadScheduled = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      final horizontalPadding = widget.usePadding ? _horizontalPadding * 2 : 0.0;
-      final width = (MediaQuery.of(context).size.width - horizontalPadding).truncate();
-      _loadBanner(width: width);
+      _loadBanner();
     });
   }
 
@@ -176,14 +177,35 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
       _scheduleBannerLoad();
     }
 
-    final double width = _bannerAd?.size.width.toDouble() ?? _adSize?.width.toDouble() ?? 320;
-    final double height = _bannerAd?.size.height.toDouble() ?? _adSize?.height.toDouble() ?? 50;
+    final availableWidth = _availableBannerWidth(context);
+    if (availableWidth < _bannerMinWidth) {
+      if (_bannerAd != null || _isLoading) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          _retryTimer?.cancel();
+          _disposeBanner();
+          _isLoading = false;
+          setState(() {});
+        });
+      }
+      return const SizedBox.shrink();
+    }
+
+    final double width = _bannerAd?.size.width.toDouble() ??
+        _adSize?.width.toDouble() ??
+        _bannerMinWidth;
+    final double height = _bannerAd?.size.height.toDouble() ??
+        _adSize?.height.toDouble() ??
+        _bannerHeight;
 
     final banner = Container(
       key: _bannerAd != null ? ObjectKey(_bannerAd) : null,
       width: width,
       alignment: Alignment.topCenter,
-      child: _bannerAd == null ? SizedBox(width: width, height: height) : SizedBox(width: width, height: height, child: AdWidget(ad: _bannerAd!)),
+      child: _bannerAd == null
+          ? SizedBox(width: width, height: height)
+          : SizedBox(
+              width: width, height: height, child: AdWidget(ad: _bannerAd!)),
     );
 
     if (!widget.usePadding) return banner;
@@ -192,6 +214,13 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
       padding: const EdgeInsets.symmetric(horizontal: _horizontalPadding),
       child: banner,
     );
+  }
+
+  double _availableBannerWidth(BuildContext context) {
+    final mediaWidth = MediaQuery.of(context).size.width;
+    final horizontalInsets = widget.usePadding ? _horizontalPadding * 2 : 0;
+    final available = mediaWidth - horizontalInsets;
+    return available > 0 ? available : 0;
   }
 
   void _disposeBanner() {
@@ -204,15 +233,15 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
   void _scheduleRetry() {
     if (!mounted) return;
     _retryTimer?.cancel();
-    final delay = Duration(seconds: (_retryAttempt >= 3) ? 30 : 10 * (_retryAttempt + 1));
+    final delay =
+        Duration(seconds: (_retryAttempt >= 3) ? 30 : 10 * (_retryAttempt + 1));
     _retryAttempt += 1;
-    debugPrint('BannerAd retry scheduled: location=${widget.location}, attempt=$_retryAttempt, in=${delay.inSeconds}s');
+    debugPrint(
+        'BannerAd retry scheduled: location=${widget.location}, attempt=$_retryAttempt, in=${delay.inSeconds}s');
     _retryTimer = Timer(delay, () {
       _retryTimer = null;
       if (!mounted) return;
-      final horizontalPadding = widget.usePadding ? _horizontalPadding * 2 : 0.0;
-      final width = (MediaQuery.of(context).size.width - horizontalPadding).truncate();
-      _loadBanner(width: width);
+      _loadBanner();
     });
   }
 

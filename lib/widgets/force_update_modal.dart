@@ -92,8 +92,8 @@ class ForceUpdateModal extends StatelessWidget {
                       return TextScale(
                         l10n.newVersionTitle,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: ResponsiveApp.scaleText(22),
+                        size: 22,
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontFamily: 'Poppins',
                           color: Colors.white,
@@ -114,8 +114,8 @@ class ForceUpdateModal extends StatelessWidget {
                       return TextScale(
                         l10n.newVersionAvailable,
                         textAlign: TextAlign.center,
+                        size: 14,
                         style: TextStyle(
-                          fontSize: ResponsiveApp.scaleText(14),
                           fontFamily: 'Poppins',
                           color: Colors.white.withValues(alpha: 0.85),
                           height: 1.5,
@@ -156,8 +156,8 @@ class ForceUpdateModal extends StatelessWidget {
                               final l10n = AppLocalizations.of(context)!;
                               return TextScale(
                                 l10n.updateNow,
+                                size: 16,
                                 style: TextStyle(
-                                  fontSize: ResponsiveApp.scaleText(16),
                                   fontFamily: 'Poppins',
                                   fontWeight: FontWeight.w600,
                                   color: AppThemes.colorCuarto,

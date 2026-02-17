@@ -45,8 +45,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
     }
 
     if (_partidaFinalizadaId != null) {
-      _partidaFinalizadaFuture =
-          PartidaFinalizada.findById(_partidaFinalizadaId!);
+      _partidaFinalizadaFuture = PartidaFinalizada.findById(_partidaFinalizadaId!);
     } else {
       _partidaFinalizadaFuture = Future.value(null);
     }
@@ -54,18 +53,13 @@ class _GanadorScreenState extends State<GanadorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final GoogleAdsProvider googleAdsProvider =
-        context.read<GoogleAdsProvider>();
+    final GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
     final PremiumProvider premiumProvider = context.read<PremiumProvider>();
     googleAdsProvider.loadInterstitialAd();
-    if (!premiumProvider.isPremium)
-      googleAdsProvider.loadRewardedAd(RewardedAdLocation.revancha);
+    if (!premiumProvider.isPremium) googleAdsProvider.loadRewardedAd(RewardedAdLocation.revancha);
 
-    final Color ganadorColor = Preferences.isDarkMode
-        ? Colors.white.withValues(alpha: 0.7)
-        : const Color(0xFF06187E);
-    final Color partidaColor =
-        Preferences.isDarkMode ? AppThemes.colorSegundo : Colors.grey[700]!;
+    final Color ganadorColor = Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF06187E);
+    final Color partidaColor = Preferences.isDarkMode ? AppThemes.colorSegundo : Colors.grey[700]!;
 
     final boxDecoration = BoxDecoration(
       gradient: LinearGradient(
@@ -83,14 +77,10 @@ class _GanadorScreenState extends State<GanadorScreen> {
         builder: (context, snapshot) {
           _partidaFinalizada = snapshot.data;
 
-          final fallbackPartida = _routeArgs?['partida']?.toString() ??
-              AppLocalizations.of(context)!.noName;
-          final fallbackJugador =
-              _routeArgs?['jugador']?.toString() ?? Estado.empate;
+          final fallbackPartida = _routeArgs?['partida']?.toString() ?? AppLocalizations.of(context)!.noName;
+          final fallbackJugador = _routeArgs?['jugador']?.toString() ?? Estado.empate;
           final String partida = _partidaFinalizada?.nombre ?? fallbackPartida;
-          final String jugador = _partidaFinalizada?.ganador ??
-              _partidaFinalizada?.getGanadorFromJugadores() ??
-              fallbackJugador;
+          final String jugador = _partidaFinalizada?.ganador ?? _partidaFinalizada?.getGanadorFromJugadores() ?? fallbackJugador;
 
           return Scaffold(
             body: Stack(
@@ -109,60 +99,36 @@ class _GanadorScreenState extends State<GanadorScreen> {
                       final closeTop = isCompactHeight ? 12.0 : 20.0;
                       final closeRight = isNarrow ? 12.0 : 20.0;
                       final headerTop = isCompactHeight ? 28.0 : 40.0;
-                      final trophyHeight =
-                          (maxH * (isCompactHeight ? 0.32 : 0.38))
-                              .clamp(160.0, 320.0);
-                      final titleSize =
-                          (ResponsiveApp.scaleText(30) * (isNarrow ? 0.9 : 1.0))
-                              .clamp(22.0, 34.0);
-                      final subtitleSize =
-                          (ResponsiveApp.scaleText(20) * (isNarrow ? 0.9 : 1.0))
-                              .clamp(16.0, 24.0);
-                      final nameSize =
-                          (ResponsiveApp.scaleText(30) * (isNarrow ? 0.9 : 1.0))
-                              .clamp(22.0, 34.0);
-                      final rematchSize = (ResponsiveApp.scaleText(15) *
-                              (isNarrow ? 0.95 : 1.0))
-                          .clamp(13.0, 18.0);
-                      final watchAdSize = (ResponsiveApp.scaleText(10) *
-                              (isNarrow ? 0.95 : 1.0))
-                          .clamp(9.0, 12.0);
-                      final landscapeTitleSize =
-                          (titleSize * 1.18).clamp(24.0, 42.0);
-                      final landscapeSubtitleSize =
-                          (subtitleSize * 1.15).clamp(17.0, 30.0);
-                      final landscapeNameSize =
-                          (nameSize * 1.2).clamp(24.0, 44.0);
-                      final landscapeRematchSize =
-                          (rematchSize * 1.5).clamp(14.0, 26.0);
-                      final landscapeWatchAdSize =
-                          (watchAdSize * 1.3).clamp(10.0, 18.0);
+                      final trophyHeight = (maxH * (isCompactHeight ? 0.32 : 0.38)).clamp(160.0, 320.0);
+                      final titleSize = (ResponsiveApp.scaleText(30) * (isNarrow ? 0.9 : 1.0)).clamp(22.0, 34.0);
+                      final subtitleSize = (ResponsiveApp.scaleText(20) * (isNarrow ? 0.9 : 1.0)).clamp(16.0, 24.0);
+                      final nameSize = (ResponsiveApp.scaleText(30) * (isNarrow ? 0.9 : 1.0)).clamp(22.0, 34.0);
+                      final rematchSize = (ResponsiveApp.scaleText(15) * (isNarrow ? 0.95 : 1.0)).clamp(13.0, 18.0);
+                      final watchAdSize = (ResponsiveApp.scaleText(10) * (isNarrow ? 0.95 : 1.0)).clamp(9.0, 12.0);
+                      final landscapeTitleSize = (titleSize * 1.18).clamp(24.0, 42.0);
+                      final landscapeSubtitleSize = (subtitleSize * 1.15).clamp(17.0, 30.0);
+                      final landscapeNameSize = (nameSize * 1.2).clamp(24.0, 44.0);
+                      final landscapeRematchSize = (rematchSize * 1.5).clamp(14.0, 26.0);
+                      final landscapeWatchAdSize = (watchAdSize * 1.3).clamp(10.0, 18.0);
 
                       final closeButton = Positioned(
                         top: closeTop,
                         right: closeRight,
                         child: WidgetAnimator(
-                          incomingEffect:
-                              WidgetTransitionEffects.incomingSlideInFromRight(
-                                  delay: const Duration(
-                                      seconds: 2, milliseconds: 500),
-                                  duration: const Duration(seconds: 1)),
+                          incomingEffect: WidgetTransitionEffects.incomingSlideInFromRight(delay: const Duration(seconds: 2, milliseconds: 500), duration: const Duration(seconds: 1)),
                           child: CustomIconButtom(
-                              iconSize:
-                                  useLandscapeLayout ? (isWide ? 40 : 30) : 40,
+                              iconSize: useLandscapeLayout ? (isWide ? 40 : 30) : 40,
                               iconColor: ganadorColor,
                               icon: Icons.close,
                               onTap: () {
                                 void goHome() {
-                                  Navigator.of(context)
-                                      .pushReplacementNamed('home');
+                                  Navigator.of(context).pushReplacementNamed('home');
                                 }
 
                                 if (Preferences.isPremium) {
                                   goHome();
                                 } else {
-                                  googleAdsProvider.showInterstitialAd(
-                                      onCloseFunction: () {
+                                  googleAdsProvider.showInterstitialAd(onCloseFunction: () {
                                     if (!context.mounted) return;
                                     goHome();
                                     googleAdsProvider.loadInterstitialAd();
@@ -174,188 +140,99 @@ class _GanadorScreenState extends State<GanadorScreen> {
 
                       if (useLandscapeLayout) {
                         return SingleChildScrollView(
-                          padding: EdgeInsets.only(
-                              bottom: isCompactHeight ? 20 : 30),
+                          padding: EdgeInsets.only(bottom: isCompactHeight ? 20 : 30),
                           child: ConstrainedBox(
                             constraints: BoxConstraints(minHeight: maxH),
                             child: Stack(
                               children: [
                                 closeButton,
                                 Padding(
-                                  padding: EdgeInsets.only(
-                                      top: headerTop, left: 24, right: 24),
+                                  padding: EdgeInsets.only(top: headerTop, left: 24, right: 24),
                                   child: SizedBox(
                                     height: maxH - headerTop,
                                     child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
                                         Expanded(
                                           flex: 11,
                                           child: Center(
                                             child: ConstrainedBox(
-                                              constraints: const BoxConstraints(
-                                                  maxWidth: 440),
+                                              constraints: const BoxConstraints(maxWidth: 440),
                                               child: Column(
                                                 mainAxisSize: MainAxisSize.min,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   TextAnimator(
-                                                    AppLocalizations.of(
-                                                            context)!
-                                                        .winner,
-                                                    initialDelay:
-                                                        const Duration(
-                                                            seconds: 1),
-                                                    incomingEffect: WidgetTransitionEffects
-                                                        .incomingOffsetThenScaleAndStep(
-                                                            duration:
-                                                                const Duration(
-                                                                    milliseconds:
-                                                                        800)),
+                                                    AppLocalizations.of(context)!.winner,
+                                                    initialDelay: const Duration(seconds: 1),
+                                                    incomingEffect: WidgetTransitionEffects.incomingOffsetThenScaleAndStep(duration: const Duration(milliseconds: 800)),
                                                     style: TextStyle(
                                                       color: ganadorColor,
                                                       fontFamily: 'Poppins',
-                                                      fontSize:
-                                                          landscapeTitleSize,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                      fontSize: landscapeTitleSize,
+                                                      fontWeight: FontWeight.bold,
                                                       letterSpacing: 3,
                                                     ),
                                                   ),
                                                   const SizedBox(height: 8),
                                                   TextAnimator(
                                                     partida,
-                                                    initialDelay:
-                                                        const Duration(
-                                                            seconds: 1,
-                                                            milliseconds: 800),
-                                                    incomingEffect:
-                                                        WidgetTransitionEffects
-                                                            .incomingScaleDown(
-                                                                duration:
-                                                                    const Duration(
-                                                                        seconds:
-                                                                            1)),
+                                                    initialDelay: const Duration(seconds: 1, milliseconds: 800),
+                                                    incomingEffect: WidgetTransitionEffects.incomingScaleDown(duration: const Duration(seconds: 1)),
                                                     style: TextStyle(
                                                       color: partidaColor,
                                                       fontFamily: 'Poppins',
-                                                      fontSize:
-                                                          landscapeSubtitleSize,
+                                                      fontSize: landscapeSubtitleSize,
                                                     ),
                                                   ),
                                                   const SizedBox(height: 18),
                                                   TextAnimator(
                                                     jugador,
-                                                    spaceDelay:
-                                                        const Duration(),
-                                                    characterDelay:
-                                                        const Duration(
-                                                            milliseconds: 180),
-                                                    incomingEffect:
-                                                        WidgetTransitionEffects
-                                                            .incomingScaleUp(),
-                                                    atRestEffect:
-                                                        WidgetRestingEffects
-                                                            .pulse(
-                                                                effectStrength:
-                                                                    0.8),
-                                                    initialDelay:
-                                                        const Duration(
-                                                            seconds: 2),
+                                                    spaceDelay: const Duration(),
+                                                    characterDelay: const Duration(milliseconds: 180),
+                                                    incomingEffect: WidgetTransitionEffects.incomingScaleUp(),
+                                                    atRestEffect: WidgetRestingEffects.pulse(effectStrength: 0.8),
+                                                    initialDelay: const Duration(seconds: 2),
                                                     style: TextStyle(
                                                       color: ganadorColor,
                                                       fontFamily: 'Poppins',
-                                                      fontSize:
-                                                          landscapeNameSize,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                      fontSize: landscapeNameSize,
+                                                      fontWeight: FontWeight.bold,
                                                       letterSpacing: 2.5,
                                                     ),
                                                   ),
-                                                  SizedBox(
-                                                      height: isCompactHeight
-                                                          ? 18
-                                                          : 24),
+                                                  SizedBox(height: isCompactHeight ? 18 : 24),
                                                   SizedBox(
                                                     width: 280,
                                                     child: WidgetAnimator(
-                                                      incomingEffect: WidgetTransitionEffects
-                                                          .outgoingScaleUp(
-                                                              delay:
-                                                                  const Duration(
-                                                                      seconds:
-                                                                          2),
-                                                              duration:
-                                                                  const Duration(
-                                                                      seconds:
-                                                                          1)),
+                                                      incomingEffect: WidgetTransitionEffects.outgoingScaleUp(delay: const Duration(seconds: 2), duration: const Duration(seconds: 1)),
                                                       child: ElevatedButton(
                                                         style: ButtonStyle(
-                                                          backgroundColor:
-                                                              WidgetStateProperty
-                                                                  .all(Colors
-                                                                          .green[
-                                                                      400]),
-                                                          shape:
-                                                              WidgetStateProperty
-                                                                  .all(
-                                                            RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            18)),
+                                                          backgroundColor: WidgetStateProperty.all(Colors.green[400]),
+                                                          shape: WidgetStateProperty.all(
+                                                            RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                                                           ),
-                                                          padding: WidgetStateProperty
-                                                              .all(const EdgeInsets
-                                                                  .symmetric(
-                                                                  horizontal:
-                                                                      20,
-                                                                  vertical:
-                                                                      12)),
+                                                          padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 20, vertical: 12)),
                                                         ),
-                                                        onPressed: () =>
-                                                            revanchaFunction(),
+                                                        onPressed: () => revanchaFunction(),
                                                         child: Column(
-                                                          mainAxisSize:
-                                                              MainAxisSize.min,
+                                                          mainAxisSize: MainAxisSize.min,
                                                           children: [
                                                             TextScale(
-                                                              AppLocalizations.of(
-                                                                      context)!
-                                                                  .rematch,
+                                                              AppLocalizations.of(context)!.rematch,
+                                                              size: landscapeRematchSize,
                                                               style: TextStyle(
-                                                                fontSize:
-                                                                    landscapeRematchSize,
-                                                                fontFamily:
-                                                                    'Poppins',
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                letterSpacing:
-                                                                    2,
-                                                                color: Colors
-                                                                    .green[900],
+                                                                fontFamily: 'Poppins',
+                                                                fontWeight: FontWeight.bold,
+                                                                letterSpacing: 2,
+                                                                color: Colors.green[900],
                                                               ),
                                                             ),
-                                                            if (!premiumProvider
-                                                                .isPremium)
+                                                            if (!premiumProvider.isPremium)
                                                               TextScale(
-                                                                AppLocalizations.of(
-                                                                        context)!
-                                                                    .watchAd,
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        landscapeWatchAdSize,
-                                                                    fontFamily:
-                                                                        'Poppins',
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .normal,
-                                                                    color: Colors
-                                                                            .green[
-                                                                        900]),
+                                                                AppLocalizations.of(context)!.watchAd,
+                                                                size: landscapeWatchAdSize,
+                                                                style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.normal, color: Colors.green[900]),
                                                               ),
                                                           ],
                                                         ),
@@ -372,15 +249,11 @@ class _GanadorScreenState extends State<GanadorScreen> {
                                           flex: 9,
                                           child: Center(
                                             child: SizedBox(
-                                              height: (trophyHeight * 1.05)
-                                                  .clamp(180.0, 360.0),
+                                              height: (trophyHeight * 1.05).clamp(180.0, 360.0),
                                               child: Bounce(
-                                                delay:
-                                                    const Duration(seconds: 1),
+                                                delay: const Duration(seconds: 1),
                                                 infinite: true,
-                                                child: const LottieAnimation(
-                                                    animationJson:
-                                                        'assets/animations/trophy.json'),
+                                                child: const LottieAnimation(animationJson: 'assets/animations/trophy.json'),
                                               ),
                                             ),
                                           ),
@@ -396,8 +269,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
                       }
 
                       return SingleChildScrollView(
-                        padding:
-                            EdgeInsets.only(bottom: isCompactHeight ? 20 : 40),
+                        padding: EdgeInsets.only(bottom: isCompactHeight ? 20 : 40),
                         child: ConstrainedBox(
                           constraints: BoxConstraints(minHeight: maxH),
                           child: Stack(
@@ -409,104 +281,35 @@ class _GanadorScreenState extends State<GanadorScreen> {
                                   width: double.infinity,
                                   child: Column(
                                     children: [
-                                      TextAnimator(
-                                          AppLocalizations.of(context)!.winner,
-                                          initialDelay:
-                                              const Duration(seconds: 1),
-                                          incomingEffect: WidgetTransitionEffects
-                                              .incomingOffsetThenScaleAndStep(
-                                                  duration: const Duration(
-                                                      milliseconds: 800)),
-                                          style: TextStyle(
-                                              color: ganadorColor,
-                                              fontFamily: 'Poppins',
-                                              fontSize: titleSize,
-                                              fontWeight: FontWeight.bold,
-                                              letterSpacing: 3)),
-                                      TextAnimator(partida,
-                                          initialDelay: const Duration(
-                                              seconds: 1, milliseconds: 800),
-                                          incomingEffect:
-                                              WidgetTransitionEffects
-                                                  .incomingScaleDown(
-                                                      duration: const Duration(
-                                                          seconds: 1)),
-                                          style: TextStyle(
-                                              color: partidaColor,
-                                              fontFamily: 'Poppins',
-                                              fontSize: subtitleSize)),
-                                      SizedBox(
-                                          height: isCompactHeight ? 12 : 20),
+                                      TextAnimator(AppLocalizations.of(context)!.winner,
+                                          initialDelay: const Duration(seconds: 1), incomingEffect: WidgetTransitionEffects.incomingOffsetThenScaleAndStep(duration: const Duration(milliseconds: 800)), style: TextStyle(color: ganadorColor, fontFamily: 'Poppins', fontSize: titleSize, fontWeight: FontWeight.bold, letterSpacing: 3)),
+                                      TextAnimator(partida, initialDelay: const Duration(seconds: 1, milliseconds: 800), incomingEffect: WidgetTransitionEffects.incomingScaleDown(duration: const Duration(seconds: 1)), style: TextStyle(color: partidaColor, fontFamily: 'Poppins', fontSize: subtitleSize)),
+                                      SizedBox(height: isCompactHeight ? 12 : 20),
                                       SizedBox(
                                         height: trophyHeight,
-                                        child: Bounce(
-                                            delay: const Duration(seconds: 1),
-                                            infinite: true,
-                                            child: const LottieAnimation(
-                                                animationJson:
-                                                    'assets/animations/trophy.json')),
+                                        child: Bounce(delay: const Duration(seconds: 1), infinite: true, child: const LottieAnimation(animationJson: 'assets/animations/trophy.json')),
                                       ),
-                                      SizedBox(
-                                          height: isCompactHeight ? 8 : 10),
+                                      SizedBox(height: isCompactHeight ? 8 : 10),
                                       TextAnimator(jugador,
                                           spaceDelay: const Duration(),
-                                          characterDelay:
-                                              const Duration(milliseconds: 180),
-                                          incomingEffect:
-                                              WidgetTransitionEffects
-                                                  .incomingScaleUp(),
-                                          atRestEffect:
-                                              WidgetRestingEffects.pulse(
-                                                  effectStrength: 0.8),
-                                          initialDelay:
-                                              const Duration(seconds: 2),
-                                          style: TextStyle(
-                                              color: ganadorColor,
-                                              fontFamily: 'Poppins',
-                                              fontSize: nameSize,
-                                              fontWeight: FontWeight.bold,
-                                              letterSpacing: 3)),
-                                      SizedBox(
-                                          height: isCompactHeight ? 24 : 40),
+                                          characterDelay: const Duration(milliseconds: 180),
+                                          incomingEffect: WidgetTransitionEffects.incomingScaleUp(),
+                                          atRestEffect: WidgetRestingEffects.pulse(effectStrength: 0.8),
+                                          initialDelay: const Duration(seconds: 2),
+                                          style: TextStyle(color: ganadorColor, fontFamily: 'Poppins', fontSize: nameSize, fontWeight: FontWeight.bold, letterSpacing: 3)),
+                                      SizedBox(height: isCompactHeight ? 24 : 40),
                                       WidgetAnimator(
-                                        incomingEffect: WidgetTransitionEffects
-                                            .outgoingScaleUp(
-                                                delay:
-                                                    const Duration(seconds: 2),
-                                                duration:
-                                                    const Duration(seconds: 1)),
+                                        incomingEffect: WidgetTransitionEffects.outgoingScaleUp(delay: const Duration(seconds: 2), duration: const Duration(seconds: 1)),
                                         child: ElevatedButton(
-                                          style: ButtonStyle(
-                                              backgroundColor:
-                                                  WidgetStateProperty.all(
-                                                      Colors.green[400])),
+                                          style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.green[400])),
                                           onPressed: () => revanchaFunction(),
                                           child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 20, vertical: 10),
+                                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                             child: Column(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
-                                                TextScale(
-                                                    AppLocalizations.of(
-                                                            context)!
-                                                        .rematch,
-                                                    style: TextStyle(
-                                                        fontSize: rematchSize,
-                                                        fontFamily: 'Poppins',
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        letterSpacing: 2)),
-                                                if (!premiumProvider.isPremium)
-                                                  TextScale(
-                                                      AppLocalizations.of(
-                                                              context)!
-                                                          .watchAd,
-                                                      style: TextStyle(
-                                                          fontSize: watchAdSize,
-                                                          fontFamily: 'Poppins',
-                                                          fontWeight: FontWeight
-                                                              .normal)),
+                                                TextScale(AppLocalizations.of(context)!.rematch, style: TextStyle(fontSize: rematchSize, fontFamily: 'Poppins', fontWeight: FontWeight.bold, letterSpacing: 2)),
+                                                if (!premiumProvider.isPremium) TextScale(AppLocalizations.of(context)!.watchAd, style: TextStyle(fontSize: watchAdSize, fontFamily: 'Poppins', fontWeight: FontWeight.normal)),
                                               ],
                                             ),
                                           ),
@@ -533,8 +336,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
 
   revanchaFunction() async {
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-    final GoogleAdsProvider googleAdsProvider =
-        context.read<GoogleAdsProvider>();
+    final GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
     final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
     final Partida? partidaSnapshot = _partidaFinalizada?.toPartidaForRematch();
@@ -551,8 +353,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
         Toast.show(
           type: ToastType.error,
           context: context,
-          message: response.messages?.first ??
-              AppLocalizations.of(context)!.errorRegisteringGame,
+          message: response.messages?.first ?? AppLocalizations.of(context)!.errorRegisteringGame,
         );
         return;
       }

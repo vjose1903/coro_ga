@@ -77,9 +77,7 @@ class TextScale extends StatelessWidget {
   Widget build(BuildContext context) {
     final clampedSize = resolveSize(context, size: size, style: style);
 
-    final effectiveStyle = (style ?? const TextStyle()).copyWith(
-      fontSize: clampedSize,
-    );
+    final effectiveStyle = (style ?? const TextStyle()).copyWith(fontSize: clampedSize);
 
     if (textSpan != null) {
       return Text.rich(

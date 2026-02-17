@@ -88,6 +88,8 @@ class _PartidaScreenState extends State<PartidaScreen>
           if (partidaProvider.partidaEnTurno == null) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (!mounted) return;
+              final route = ModalRoute.of(context);
+              if (route is! PageRoute || !route.isCurrent) return;
               final navigator = Navigator.of(context);
               if (navigator.canPop()) {
                 navigator.pop();
@@ -236,13 +238,20 @@ class _Body extends StatelessWidget {
         hasFooter: true,
         appBarTitle: partida.nombre,
         appBarLeading: CustomIconButtom(
-          iconSize: ResponsiveApp.isSmallHeight ? 19 : 20,
+          iconSize: useLandscapeLayout ? 19 : 20,
           iconColor: Colors.white,
           icon: Icons.arrow_back_ios_new,
-          onTap: () => Navigator.pop(context),
+          onTap: () {
+            final navigator = Navigator.of(context);
+            if (navigator.canPop()) {
+              navigator.pop();
+            } else {
+              navigator.pushNamedAndRemoveUntil('home', (route) => false);
+            }
+          },
         ),
         appBarTrailing: CustomIconButtom(
-          iconSize: ResponsiveApp.isSmallHeight ? 19 : 20,
+          iconSize: useLandscapeLayout ? 19 : 20,
           iconColor: Colors.white,
           icon: Icons.edit_outlined,
           onTap: () {
@@ -784,52 +793,29 @@ class _JugadorCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: EdgeInsets.all(contentPadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Stack(
+              fit: StackFit.expand,
               children: [
-                // Nombre
-                TextScale(
-                  jugador.nombre!,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  size: nameFontSize,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w600,
-                    color: Preferences.isDarkMode
-                        ? AppThemes.colorPrimero
-                        : AppThemes.colorTercero,
-                  ),
-                ),
-                // Puntuación
-                Expanded(
-                  child: Center(
-                    child: ShaderMask(
-                      shaderCallback: (bounds) => LinearGradient(
-                        colors: isWinner
-                            ? [Colors.green[400]!, Colors.green[600]!]
-                            : isLoser
-                                ? [Colors.red[300]!, Colors.red[500]!]
-                                : [
-                                    AppThemes.colorPrimero,
-                                    AppThemes.colorTercero
-                                  ],
-                      ).createShader(bounds),
-                      child: TextScale(
-                        jugador.puntuacion.toString(),
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: scoreFontSize,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
+                // Nombre (arriba izquierda)
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: TextScale(
+                    jugador.nombre!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    size: nameFontSize,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w600,
+                      color: Preferences.isDarkMode
+                          ? AppThemes.colorPrimero
+                          : AppThemes.colorTercero,
                     ),
                   ),
                 ),
-                // Icono de estado
+                // Icono de estado (abajo derecha)
                 Align(
-                  alignment: Alignment.centerRight,
+                  alignment: Alignment.bottomRight,
                   child: Container(
                     padding: EdgeInsets.all(iconPadding),
                     decoration: BoxDecoration(
@@ -840,6 +826,30 @@ class _JugadorCard extends StatelessWidget {
                       config['icon'],
                       size: iconSize,
                       color: config['color'],
+                    ),
+                  ),
+                ),
+                // Puntuación (centrada y por encima del resto)
+                Center(
+                  child: ShaderMask(
+                    shaderCallback: (bounds) => LinearGradient(
+                      colors: isWinner
+                          ? [Colors.green[400]!, Colors.green[600]!]
+                          : isLoser
+                              ? [Colors.red[300]!, Colors.red[500]!]
+                              : [
+                                  AppThemes.colorPrimero,
+                                  AppThemes.colorTercero
+                                ],
+                    ).createShader(bounds),
+                    child: TextScale(
+                      jugador.puntuacion.toString(),
+                      size: scoreFontSize,
+                      style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),

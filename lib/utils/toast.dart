@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../helpers/helpers.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:toastification/toastification.dart';
+
+import '../helpers/helpers.dart';
 import '../widgets/icon_scale.dart';
 import '../widgets/text_scale.dart';
 
@@ -87,10 +88,10 @@ class Toast {
       title: title != null
           ? TextScale(
               title,
+              size: 14,
               style: TextStyle(
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w600,
-                fontSize: ResponsiveApp.scaleText(14),
                 color: isDark ? Colors.white : Colors.black87,
               ),
             )
@@ -102,9 +103,9 @@ class Toast {
               children: [
                 TextScale(
                   message,
+                  size: 13,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: ResponsiveApp.scaleText(13),
                     color: isDark ? Colors.white70 : Colors.black54,
                   ),
                 ),
@@ -138,11 +139,11 @@ class Toast {
                           ),
                           child: TextScale(
                             actionLabel,
-                            style: TextStyle(
+                            size: 12,
+                            style: const TextStyle(
                               fontFamily: 'Poppins',
                               color: Colors.white,
                               fontWeight: FontWeight.w500,
-                              fontSize: ResponsiveApp.scaleText(12),
                             ),
                           ),
                         ),
@@ -160,9 +161,7 @@ class Toast {
       borderRadius: BorderRadius.circular(14),
       boxShadow: [
         BoxShadow(
-          color: isDark
-              ? Colors.black.withValues(alpha: 0.3)
-              : Colors.black.withValues(alpha: 0.1),
+          color: isDark ? Colors.black.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.1),
           blurRadius: 12,
           offset: const Offset(0, 4),
         ),

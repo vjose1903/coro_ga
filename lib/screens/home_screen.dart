@@ -1,5 +1,5 @@
-import 'dart:ui';
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/foundation.dart';
@@ -14,13 +14,13 @@ import '../helpers/helpers.dart';
 import '../l10n/app_localizations.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
+import '../routes/route_observer.dart';
+import '../services/connectivity_service.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 import '../utils/utils.dart';
 import '../widgets/force_update_modal.dart';
 import '../widgets/widgets.dart';
-import '../routes/route_observer.dart';
-import '../services/connectivity_service.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -831,12 +831,12 @@ class _MenuHeader extends StatelessWidget {
 }
 
 class _MenuSection extends StatelessWidget {
+  const _MenuSection({required this.icon, required this.title, required this.child, required this.useLandscapeLayout});
+
   final IconData icon;
   final String title;
   final Widget child;
   final bool useLandscapeLayout;
-
-  const _MenuSection({required this.icon, required this.title, required this.child, required this.useLandscapeLayout});
 
   @override
   Widget build(BuildContext context) {
@@ -924,11 +924,22 @@ class _ThemeToggleRow extends StatelessWidget {
             ],
           ),
         ),
-        Switch.adaptive(
-          value: value,
-          onChanged: onChanged,
-          activeColor: AppThemes.colorPrimero,
-          activeTrackColor: AppThemes.colorPrimero.withValues(alpha: 0.4),
+        SizedBox(
+          width: 46,
+          height: 28,
+          child: FittedBox(
+            fit: BoxFit.contain,
+            child: Switch(
+              value: value,
+              onChanged: onChanged,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              padding: EdgeInsets.zero,
+              activeThumbColor: AppThemes.colorPrimero,
+              activeTrackColor: AppThemes.colorPrimero.withValues(alpha: 0.35),
+              inactiveThumbColor: Preferences.isDarkMode ? Colors.white70 : Colors.grey[600],
+              inactiveTrackColor: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.3),
+            ),
+          ),
         ),
       ],
     );
@@ -1155,10 +1166,22 @@ class _PremiumCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Switch.adaptive(
-                      value: simulatePremium,
-                      onChanged: onSimulateChanged,
-                      activeColor: Colors.orange,
+                    SizedBox(
+                      width: 46,
+                      height: 28,
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: Switch(
+                          value: simulatePremium,
+                          onChanged: onSimulateChanged,
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          padding: EdgeInsets.zero,
+                          activeThumbColor: AppThemes.colorPrimero,
+                          activeTrackColor: AppThemes.colorPrimero.withValues(alpha: 0.35),
+                          inactiveThumbColor: Preferences.isDarkMode ? Colors.white70 : Colors.grey[600],
+                          inactiveTrackColor: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.3),
+                        ),
+                      ),
                     ),
                   ],
                 ),

@@ -296,8 +296,8 @@ class _AddIconButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Container(
-          width: useLandscapeLayout ? (isWide ? 40 : 42) : 52,
-          height: useLandscapeLayout ? (isWide ? 40 : 42) : 52,
+          width: useLandscapeLayout ? (isWide ? 40 : 38) : 52,
+          height: useLandscapeLayout ? (isWide ? 40 : 38) : 52,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
@@ -317,7 +317,7 @@ class _AddIconButton extends StatelessWidget {
             child: IconScale(
               FontAwesomeIcons.plus,
               color: Colors.white,
-              size: isWide ? 20 : 17,
+              size: isWide ? 19 : 15,
             ),
           ),
         ),

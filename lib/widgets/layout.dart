@@ -275,7 +275,7 @@ class _AppBar extends StatelessWidget {
               Expanded(
                 child: TextScale(
                   title!,
-                  size: useLandscapeLayout ? 22 : 15,
+                  size: useLandscapeLayout ? 20 : 18,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(

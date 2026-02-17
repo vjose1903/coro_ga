@@ -18,11 +18,14 @@ class FormPartidaPredefinida extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.watch<PartidaPredefinidaProvider>();
+    final PartidaPredefinidaProvider formPartidaPredefinidaProvider =
+        context.watch<PartidaPredefinidaProvider>();
     final form = formPartidaPredefinidaProvider.form;
     final dynamic tipoPartida = form.control('tipo').value;
-    final bool isEditing = formPartidaPredefinidaProvider.partidaPredefinidaEditar != null;
-    final bool sinMaxPuntuacion = formPartidaPredefinidaProvider.sinMaxPuntuacion;
+    final bool isEditing =
+        formPartidaPredefinidaProvider.partidaPredefinidaEditar != null;
+    final bool sinMaxPuntuacion =
+        formPartidaPredefinidaProvider.sinMaxPuntuacion;
 
     return Consumer(builder: (BuildContext context, value, Widget? child) {
       return ResponsiveLayoutBuilder(
@@ -31,17 +34,22 @@ class FormPartidaPredefinida extends StatelessWidget {
           final useLandscapeLayout = info.useLandscapeLayout;
           final isWide = info.isWide;
           final sectionSpacing = useLandscapeLayout ? 10.0 : 14.0;
-          final formPadding = useLandscapeLayout ? (isWide ? 12.0 : 14.0) : 16.0;
-          final showMaxScore = tipoPartida != null && tipoPartida != '' && !sinMaxPuntuacion;
+          final formPadding =
+              useLandscapeLayout ? (isWide ? 12.0 : 14.0) : 16.0;
+          final showMaxScore =
+              tipoPartida != null && tipoPartida != '' && !sinMaxPuntuacion;
           final scoreGap = useLandscapeLayout ? 10.0 : 12.0;
 
           Widget buildTypeAndScoreRow() {
             return LayoutBuilder(
               builder: (context, rowConstraints) {
                 final totalWidth = rowConstraints.maxWidth;
-                final availableWidth = showMaxScore ? (totalWidth - scoreGap) : totalWidth;
-                final scoreFieldWidth = showMaxScore ? (availableWidth * 0.40) : 0.0;
-                final typeFieldWidth = showMaxScore ? (availableWidth * 0.60) : availableWidth;
+                final availableWidth =
+                    showMaxScore ? (totalWidth - scoreGap) : totalWidth;
+                final scoreFieldWidth =
+                    showMaxScore ? (availableWidth * 0.40) : 0.0;
+                final typeFieldWidth =
+                    showMaxScore ? (availableWidth * 0.60) : availableWidth;
 
                 return Row(
                   children: [
@@ -50,8 +58,18 @@ class FormPartidaPredefinida extends StatelessWidget {
                       child: CustomReactiveDropDown(
                         formControlName: 'tipo',
                         labelText: AppLocalizations.of(context)!.type,
-                        items: [DropdownMenuItem(value: 'Rondas', child: TextScale(AppLocalizations.of(context)!.rounds)), DropdownMenuItem(value: 'Puntuación', child: TextScale(AppLocalizations.of(context)!.score))],
-                        onChanged: (value) => formPartidaPredefinidaProvider.changeTipo(value),
+                        items: [
+                          DropdownMenuItem(
+                              value: 'Rondas',
+                              child: TextScale(
+                                  AppLocalizations.of(context)!.rounds)),
+                          DropdownMenuItem(
+                              value: 'Puntuación',
+                              child: TextScale(
+                                  AppLocalizations.of(context)!.score))
+                        ],
+                        onChanged: (value) =>
+                            formPartidaPredefinidaProvider.changeTipo(value),
                       ),
                     ),
                     if (showMaxScore) ...[
@@ -62,7 +80,9 @@ class FormPartidaPredefinida extends StatelessWidget {
                         width: scoreFieldWidth,
                         child: CustomReactiveInput(
                           formControlName: 'maxPuntuacion',
-                          labelText: tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.roundCount : AppLocalizations.of(context)!.maxScore,
+                          labelText: tipoPartida == 'Rondas'
+                              ? AppLocalizations.of(context)!.roundCount
+                              : AppLocalizations.of(context)!.maxScore,
                           inputType: TextInputType.number,
                         ),
                       ),
@@ -80,7 +100,10 @@ class FormPartidaPredefinida extends StatelessWidget {
               mainAxisSize: MainAxisSize.max,
               children: [
                 // Header
-                _FormHeader(isEditing: isEditing, useLandscapeLayout: useLandscapeLayout, isWide: isWide),
+                _FormHeader(
+                    isEditing: isEditing,
+                    useLandscapeLayout: useLandscapeLayout,
+                    isWide: isWide),
                 SizedBox(height: useLandscapeLayout ? 10 : 15),
 
                 Expanded(
@@ -94,35 +117,62 @@ class FormPartidaPredefinida extends StatelessWidget {
                               children: [
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       CustomReactiveInput(
                                         formControlName: 'nombre',
-                                        labelText: AppLocalizations.of(context)!.gameName,
-                                        textCapitalization: TextCapitalization.words,
+                                        labelText: AppLocalizations.of(context)!
+                                            .gameName,
+                                        textCapitalization:
+                                            TextCapitalization.words,
                                       ),
                                       SizedBox(height: sectionSpacing),
                                       buildTypeAndScoreRow(),
                                       SizedBox(height: sectionSpacing),
-                                      if (tipoPartida != '' && tipoPartida != null)
+                                      if (tipoPartida != '' &&
+                                          tipoPartida != null)
                                         Material(
                                           color: Colors.transparent,
                                           child: InkWell(
-                                            borderRadius: BorderRadius.circular(useLandscapeLayout ? 8 : 12),
-                                            splashColor: AppThemes.colorPrimero.withValues(alpha: 0.12),
-                                            highlightColor: AppThemes.colorPrimero.withValues(alpha: 0.06),
-                                            onTap: () => formPartidaPredefinidaProvider.setSinMaxPuntuacion(!sinMaxPuntuacion),
+                                            borderRadius: BorderRadius.circular(
+                                                useLandscapeLayout ? 8 : 12),
+                                            splashColor: AppThemes.colorPrimero
+                                                .withValues(alpha: 0.12),
+                                            highlightColor: AppThemes
+                                                .colorPrimero
+                                                .withValues(alpha: 0.06),
+                                            onTap: () =>
+                                                formPartidaPredefinidaProvider
+                                                    .setSinMaxPuntuacion(
+                                                        !sinMaxPuntuacion),
                                             child: Ink(
-                                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 1),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 1),
                                               decoration: BoxDecoration(
-                                                color: AppThemes.inputColor.withValues(alpha: 0.05),
-                                                borderRadius: BorderRadius.circular(12),
+                                                color: AppThemes.inputColor
+                                                    .withValues(alpha: 0.05),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
                                                 border: Border.all(
-                                                  color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.2),
+                                                  color: Preferences.isDarkMode
+                                                      ? Colors.white.withValues(
+                                                          alpha: 0.08)
+                                                      : Colors.grey.withValues(
+                                                          alpha: 0.2),
                                                 ),
                                                 boxShadow: [
                                                   BoxShadow(
-                                                    color: Preferences.isDarkMode ? Colors.black.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.05),
+                                                    color: Preferences
+                                                            .isDarkMode
+                                                        ? Colors.black
+                                                            .withValues(
+                                                                alpha: 0.2)
+                                                        : Colors.black
+                                                            .withValues(
+                                                                alpha: 0.05),
                                                     blurRadius: 6,
                                                     offset: const Offset(0, 2),
                                                   ),
@@ -132,23 +182,68 @@ class FormPartidaPredefinida extends StatelessWidget {
                                                 children: [
                                                   Expanded(
                                                     child: TextScale(
-                                                      tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.noMaxRounds : AppLocalizations.of(context)!.noMaxScore,
+                                                      tipoPartida == 'Rondas'
+                                                          ? AppLocalizations.of(
+                                                                  context)!
+                                                              .noMaxRounds
+                                                          : AppLocalizations.of(
+                                                                  context)!
+                                                              .noMaxScore,
                                                       size: 12,
                                                       style: TextStyle(
                                                         fontFamily: 'Poppins',
-                                                        color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[700],
+                                                        color: Preferences
+                                                                .isDarkMode
+                                                            ? Colors.white70
+                                                            : Colors.grey[700],
                                                       ),
                                                     ),
                                                   ),
-                                                  Switch(
-                                                    value: sinMaxPuntuacion,
-                                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                    padding: EdgeInsets.zero,
-                                                    activeThumbColor: AppThemes.colorPrimero,
-                                                    activeTrackColor: AppThemes.colorPrimero.withValues(alpha: 0.35),
-                                                    inactiveThumbColor: Preferences.isDarkMode ? Colors.white70 : Colors.grey[600],
-                                                    inactiveTrackColor: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.3),
-                                                    onChanged: (value) => formPartidaPredefinidaProvider.setSinMaxPuntuacion(value),
+                                                  SizedBox(
+                                                    width: 46,
+                                                    height: 28,
+                                                    child: FittedBox(
+                                                      fit: BoxFit.contain,
+                                                      child: Switch(
+                                                        value: sinMaxPuntuacion,
+                                                        materialTapTargetSize:
+                                                            MaterialTapTargetSize
+                                                                .shrinkWrap,
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                        activeThumbColor:
+                                                            AppThemes
+                                                                .colorPrimero,
+                                                        activeTrackColor:
+                                                            AppThemes
+                                                                .colorPrimero
+                                                                .withValues(
+                                                                    alpha:
+                                                                        0.35),
+                                                        inactiveThumbColor:
+                                                            Preferences
+                                                                    .isDarkMode
+                                                                ? Colors.white70
+                                                                : Colors
+                                                                    .grey[600],
+                                                        inactiveTrackColor:
+                                                            Preferences
+                                                                    .isDarkMode
+                                                                ? Colors
+                                                                    .white
+                                                                    .withValues(
+                                                                        alpha:
+                                                                            0.2)
+                                                                : Colors.grey
+                                                                    .withValues(
+                                                                        alpha:
+                                                                            0.3),
+                                                        onChanged: (value) =>
+                                                            formPartidaPredefinidaProvider
+                                                                .setSinMaxPuntuacion(
+                                                                    value),
+                                                      ),
+                                                    ),
                                                   ),
                                                 ],
                                               ),
@@ -161,22 +256,51 @@ class FormPartidaPredefinida extends StatelessWidget {
                                 const SizedBox(width: 14),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       _JugadoresCounter(
-                                        cantidad: formPartidaPredefinidaProvider.form.control('cantidadJugadores').value ?? 2,
-                                        onRemove: () => formPartidaPredefinidaProvider.changeCantidadJugadores(context: context, tipo: '-'),
+                                        cantidad: formPartidaPredefinidaProvider
+                                                .form
+                                                .control('cantidadJugadores')
+                                                .value ??
+                                            2,
+                                        onRemove: () =>
+                                            formPartidaPredefinidaProvider
+                                                .changeCantidadJugadores(
+                                                    context: context,
+                                                    tipo: '-'),
                                         useLandscapeLayout: useLandscapeLayout,
                                         isWide: isWide,
                                         onAdd: () {
-                                          final PremiumProvider premiumProvider = context.read<PremiumProvider>();
+                                          final PremiumProvider
+                                              premiumProvider =
+                                              context.read<PremiumProvider>();
 
-                                          if (!premiumProvider.canAddPlayer(formPartidaPredefinidaProvider.cantidadJugadores)) {
-                                            Toast.show(type: ToastType.info, context: context, message: AppLocalizations.of(context)!.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers), actionLabel: AppLocalizations.of(context)!.getPro, onAction: () => Navigator.pushNamed(context, 'premium'));
+                                          if (!premiumProvider.canAddPlayer(
+                                              formPartidaPredefinidaProvider
+                                                  .cantidadJugadores)) {
+                                            Toast.show(
+                                                type: ToastType.info,
+                                                context: context,
+                                                message: AppLocalizations.of(
+                                                        context)!
+                                                    .freeVersionLimitPlayers(
+                                                        PremiumProvider
+                                                            .freeMaxPlayers),
+                                                actionLabel:
+                                                    AppLocalizations.of(
+                                                            context)!
+                                                        .getPro,
+                                                onAction: () =>
+                                                    Navigator.pushNamed(
+                                                        context, 'premium'));
                                             return;
                                           }
 
-                                          formPartidaPredefinidaProvider.changeCantidadJugadores(context: context, tipo: '+');
+                                          formPartidaPredefinidaProvider
+                                              .changeCantidadJugadores(
+                                                  context: context, tipo: '+');
                                         },
                                       ),
                                       const SizedBox(height: 16),
@@ -184,22 +308,37 @@ class FormPartidaPredefinida extends StatelessWidget {
                                         children: [
                                           Expanded(
                                             child: _ActionButton(
-                                              label: AppLocalizations.of(context)!.back,
+                                              label:
+                                                  AppLocalizations.of(context)!
+                                                      .back,
                                               icon: FontAwesomeIcons.arrowLeft,
                                               isDestructive: true,
                                               onTap: () {
-                                                context.read<PartidaPredefinidaProvider>().resetForm();
-                                                DialogNavigator.of(context).pop();
+                                                context
+                                                    .read<
+                                                        PartidaPredefinidaProvider>()
+                                                    .resetForm();
+                                                DialogNavigator.of(context)
+                                                    .pop();
                                               },
                                             ),
                                           ),
                                           const SizedBox(width: 10),
                                           Expanded(
                                             child: _ActionButton(
-                                              label: isEditing ? AppLocalizations.of(context)!.save : AppLocalizations.of(context)!.create,
-                                              icon: isEditing ? FontAwesomeIcons.floppyDisk : FontAwesomeIcons.plus,
+                                              label: isEditing
+                                                  ? AppLocalizations.of(
+                                                          context)!
+                                                      .save
+                                                  : AppLocalizations.of(
+                                                          context)!
+                                                      .create,
+                                              icon: isEditing
+                                                  ? FontAwesomeIcons.floppyDisk
+                                                  : FontAwesomeIcons.plus,
                                               isPrimary: true,
-                                              onTap: () => crearEditarPartida(context: context, form: form),
+                                              onTap: () => crearEditarPartida(
+                                                  context: context, form: form),
                                             ),
                                           ),
                                         ],
@@ -215,7 +354,8 @@ class FormPartidaPredefinida extends StatelessWidget {
                                 // Nombre
                                 CustomReactiveInput(
                                   formControlName: 'nombre',
-                                  labelText: AppLocalizations.of(context)!.gameName,
+                                  labelText:
+                                      AppLocalizations.of(context)!.gameName,
                                   textCapitalization: TextCapitalization.words,
                                 ),
                                 SizedBox(height: sectionSpacing),
@@ -227,20 +367,36 @@ class FormPartidaPredefinida extends StatelessWidget {
                                     color: Colors.transparent,
                                     child: InkWell(
                                       borderRadius: BorderRadius.circular(12),
-                                      splashColor: AppThemes.colorPrimero.withValues(alpha: 0.12),
-                                      highlightColor: AppThemes.colorPrimero.withValues(alpha: 0.06),
-                                      onTap: () => formPartidaPredefinidaProvider.setSinMaxPuntuacion(!sinMaxPuntuacion),
+                                      splashColor: AppThemes.colorPrimero
+                                          .withValues(alpha: 0.12),
+                                      highlightColor: AppThemes.colorPrimero
+                                          .withValues(alpha: 0.06),
+                                      onTap: () =>
+                                          formPartidaPredefinidaProvider
+                                              .setSinMaxPuntuacion(
+                                                  !sinMaxPuntuacion),
                                       child: Ink(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12, vertical: 3),
                                         decoration: BoxDecoration(
-                                          color: AppThemes.inputColor.withValues(alpha: 0.05),
-                                          borderRadius: BorderRadius.circular(12),
+                                          color: AppThemes.inputColor
+                                              .withValues(alpha: 0.05),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                           border: Border.all(
-                                            color: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.2),
+                                            color: Preferences.isDarkMode
+                                                ? Colors.white
+                                                    .withValues(alpha: 0.08)
+                                                : Colors.grey
+                                                    .withValues(alpha: 0.2),
                                           ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Preferences.isDarkMode ? Colors.black.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.05),
+                                              color: Preferences.isDarkMode
+                                                  ? Colors.black
+                                                      .withValues(alpha: 0.2)
+                                                  : Colors.black
+                                                      .withValues(alpha: 0.05),
                                               blurRadius: 6,
                                               offset: const Offset(0, 2),
                                             ),
@@ -250,23 +406,56 @@ class FormPartidaPredefinida extends StatelessWidget {
                                           children: [
                                             Expanded(
                                               child: TextScale(
-                                                tipoPartida == 'Rondas' ? AppLocalizations.of(context)!.noMaxRounds : AppLocalizations.of(context)!.noMaxScore,
+                                                tipoPartida == 'Rondas'
+                                                    ? AppLocalizations.of(
+                                                            context)!
+                                                        .noMaxRounds
+                                                    : AppLocalizations.of(
+                                                            context)!
+                                                        .noMaxScore,
                                                 size: 12,
                                                 style: TextStyle(
                                                   fontFamily: 'Poppins',
-                                                  color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[700],
+                                                  color: Preferences.isDarkMode
+                                                      ? Colors.white70
+                                                      : Colors.grey[700],
                                                 ),
                                               ),
                                             ),
-                                            Switch(
-                                              value: sinMaxPuntuacion,
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              padding: EdgeInsets.zero,
-                                              activeThumbColor: AppThemes.colorPrimero,
-                                              activeTrackColor: AppThemes.colorPrimero.withValues(alpha: 0.35),
-                                              inactiveThumbColor: Preferences.isDarkMode ? Colors.white70 : Colors.grey[600],
-                                              inactiveTrackColor: Preferences.isDarkMode ? Colors.white.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.3),
-                                              onChanged: (value) => formPartidaPredefinidaProvider.setSinMaxPuntuacion(value),
+                                            SizedBox(
+                                              width: 46,
+                                              height: 28,
+                                              child: FittedBox(
+                                                fit: BoxFit.contain,
+                                                child: Switch(
+                                                  value: sinMaxPuntuacion,
+                                                  materialTapTargetSize:
+                                                      MaterialTapTargetSize
+                                                          .shrinkWrap,
+                                                  padding: EdgeInsets.zero,
+                                                  activeThumbColor:
+                                                      AppThemes.colorPrimero,
+                                                  activeTrackColor: AppThemes
+                                                      .colorPrimero
+                                                      .withValues(alpha: 0.35),
+                                                  inactiveThumbColor:
+                                                      Preferences.isDarkMode
+                                                          ? Colors.white70
+                                                          : Colors.grey[600],
+                                                  inactiveTrackColor:
+                                                      Preferences.isDarkMode
+                                                          ? Colors.white
+                                                              .withValues(
+                                                                  alpha: 0.2)
+                                                          : Colors.grey
+                                                              .withValues(
+                                                                  alpha: 0.3),
+                                                  onChanged: (value) =>
+                                                      formPartidaPredefinidaProvider
+                                                          .setSinMaxPuntuacion(
+                                                              value),
+                                                ),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -277,17 +466,38 @@ class FormPartidaPredefinida extends StatelessWidget {
                                 SizedBox(height: useLandscapeLayout ? 16 : 20),
 
                                 _JugadoresCounter(
-                                  cantidad: formPartidaPredefinidaProvider.form.control('cantidadJugadores').value ?? 2,
-                                  onRemove: () => formPartidaPredefinidaProvider.changeCantidadJugadores(context: context, tipo: '-'),
+                                  cantidad: formPartidaPredefinidaProvider.form
+                                          .control('cantidadJugadores')
+                                          .value ??
+                                      2,
+                                  onRemove: () => formPartidaPredefinidaProvider
+                                      .changeCantidadJugadores(
+                                          context: context, tipo: '-'),
                                   useLandscapeLayout: useLandscapeLayout,
                                   isWide: isWide,
                                   onAdd: () {
-                                    final PremiumProvider premiumProvider = context.read<PremiumProvider>();
-                                    if (!premiumProvider.canAddPlayer(formPartidaPredefinidaProvider.cantidadJugadores)) {
-                                      Toast.show(type: ToastType.info, context: context, message: AppLocalizations.of(context)!.freeVersionLimitPlayers(PremiumProvider.freeMaxPlayers), actionLabel: AppLocalizations.of(context)!.getPro, onAction: () => Navigator.pushNamed(context, 'premium'));
+                                    final PremiumProvider premiumProvider =
+                                        context.read<PremiumProvider>();
+                                    if (!premiumProvider.canAddPlayer(
+                                        formPartidaPredefinidaProvider
+                                            .cantidadJugadores)) {
+                                      Toast.show(
+                                          type: ToastType.info,
+                                          context: context,
+                                          message: AppLocalizations.of(context)!
+                                              .freeVersionLimitPlayers(
+                                                  PremiumProvider
+                                                      .freeMaxPlayers),
+                                          actionLabel:
+                                              AppLocalizations.of(context)!
+                                                  .getPro,
+                                          onAction: () => Navigator.pushNamed(
+                                              context, 'premium'));
                                       return;
                                     }
-                                    formPartidaPredefinidaProvider.changeCantidadJugadores(context: context, tipo: '+');
+                                    formPartidaPredefinidaProvider
+                                        .changeCantidadJugadores(
+                                            context: context, tipo: '+');
                                   },
                                 ),
                                 SizedBox(height: useLandscapeLayout ? 22 : 30),
@@ -295,22 +505,33 @@ class FormPartidaPredefinida extends StatelessWidget {
                                   children: [
                                     Expanded(
                                       child: _ActionButton(
-                                        label: AppLocalizations.of(context)!.back,
+                                        label:
+                                            AppLocalizations.of(context)!.back,
                                         icon: FontAwesomeIcons.arrowLeft,
                                         isDestructive: true,
                                         onTap: () {
-                                          context.read<PartidaPredefinidaProvider>().resetForm();
+                                          context
+                                              .read<
+                                                  PartidaPredefinidaProvider>()
+                                              .resetForm();
                                           DialogNavigator.of(context).pop();
                                         },
                                       ),
                                     ),
-                                    SizedBox(width: useLandscapeLayout ? 10 : 12),
+                                    SizedBox(
+                                        width: useLandscapeLayout ? 10 : 12),
                                     Expanded(
                                       child: _ActionButton(
-                                        label: isEditing ? AppLocalizations.of(context)!.save : AppLocalizations.of(context)!.create,
-                                        icon: isEditing ? FontAwesomeIcons.floppyDisk : FontAwesomeIcons.plus,
+                                        label: isEditing
+                                            ? AppLocalizations.of(context)!.save
+                                            : AppLocalizations.of(context)!
+                                                .create,
+                                        icon: isEditing
+                                            ? FontAwesomeIcons.floppyDisk
+                                            : FontAwesomeIcons.plus,
                                         isPrimary: true,
-                                        onTap: () => crearEditarPartida(context: context, form: form),
+                                        onTap: () => crearEditarPartida(
+                                            context: context, form: form),
                                       ),
                                     ),
                                   ],
@@ -329,22 +550,30 @@ class FormPartidaPredefinida extends StatelessWidget {
     });
   }
 
-  crearEditarPartida({required FormGroup form, required BuildContext context}) async {
-    final PartidaPredefinidaProvider formPartidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
+  crearEditarPartida(
+      {required FormGroup form, required BuildContext context}) async {
+    final PartidaPredefinidaProvider formPartidaPredefinidaProvider =
+        context.read<PartidaPredefinidaProvider>();
     form.markAllAsTouched();
 
     if (form.valid) {
-      final PartidaPredefinidaProvider partidaPredefinidaProvider = context.read<PartidaPredefinidaProvider>();
-      final GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
+      final PartidaPredefinidaProvider partidaPredefinidaProvider =
+          context.read<PartidaPredefinidaProvider>();
+      final GoogleAdsProvider googleAdsProvider =
+          context.read<GoogleAdsProvider>();
       final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
       SqlResponse response = SqlResponse();
 
       if (formPartidaPredefinidaProvider.partidaPredefinidaEditar != null) {
-        response = await partidaPredefinidaProvider.editPartida(context, partida: formPartidaPredefinidaProvider.partidaPredefinidaEditar!, partidaEdit: form.value);
+        response = await partidaPredefinidaProvider.editPartida(context,
+            partida: formPartidaPredefinidaProvider.partidaPredefinidaEditar!,
+            partidaEdit: form.value);
       } else {
-        final PartidaPredefinida partida = PartidaPredefinida.fromMap(form.value);
-        response = await partidaPredefinidaProvider.newPartida(partida: partida);
+        final PartidaPredefinida partida =
+            PartidaPredefinida.fromMap(form.value);
+        response =
+            await partidaPredefinidaProvider.newPartida(partida: partida);
       }
 
       if (!response.hasError!) {
@@ -353,7 +582,8 @@ class FormPartidaPredefinida extends StatelessWidget {
         formPartidaPredefinidaProvider.resetForm();
 
         // Mostrar anuncio después de un delay para dar pausa natural
-        final bool shouldShowInterstitial = !premiumProvider.isPremium && !premiumProvider.simulatePremium;
+        final bool shouldShowInterstitial =
+            !premiumProvider.isPremium && !premiumProvider.simulatePremium;
         if (shouldShowInterstitial) {
           Future.delayed(const Duration(milliseconds: 600), () {
             googleAdsProvider.showInterstitialAd(onCloseFunction: () {
@@ -362,17 +592,26 @@ class FormPartidaPredefinida extends StatelessWidget {
           });
         }
       } else {
-        Toast.show(type: ToastType.error, context: context, message: AppLocalizations.of(context)!.errorRegisteringGame);
+        Toast.show(
+            type: ToastType.error,
+            context: context,
+            message: AppLocalizations.of(context)!.errorRegisteringGame);
       }
     } else {
-      Toast.show(type: ToastType.warning, context: context, message: AppLocalizations.of(context)!.checkAllFields);
+      Toast.show(
+          type: ToastType.warning,
+          context: context,
+          message: AppLocalizations.of(context)!.checkAllFields);
     }
   }
 }
 
 // Header del formulario con neumorfismo
 class _FormHeader extends StatelessWidget {
-  const _FormHeader({required this.isEditing, required this.useLandscapeLayout, required this.isWide});
+  const _FormHeader(
+      {required this.isEditing,
+      required this.useLandscapeLayout,
+      required this.isWide});
 
   final bool isEditing;
   final bool useLandscapeLayout;
@@ -384,9 +623,14 @@ class _FormHeader extends StatelessWidget {
       panelController: null,
       icon: isEditing ? FontAwesomeIcons.penToSquare : FontAwesomeIcons.gamepad,
       iconOffset: isEditing ? const Offset(0.6, -0.7) : const Offset(-1.5, 0),
-      iconBackgroundColor: isEditing ? const Color(0xFF29B6F6) : const Color(0xFF66BB6A),
-      title: isEditing ? AppLocalizations.of(context)!.editPredefinedGame : AppLocalizations.of(context)!.newPredefinedGame,
-      subtitle: isEditing ? AppLocalizations.of(context)!.modifyGameData : AppLocalizations.of(context)!.configureYourPredefined,
+      iconBackgroundColor:
+          isEditing ? const Color(0xFF29B6F6) : const Color(0xFF66BB6A),
+      title: isEditing
+          ? AppLocalizations.of(context)!.editPredefinedGame
+          : AppLocalizations.of(context)!.newPredefinedGame,
+      subtitle: isEditing
+          ? AppLocalizations.of(context)!.modifyGameData
+          : AppLocalizations.of(context)!.configureYourPredefined,
       useLandscapeLayout: useLandscapeLayout,
       isWide: isWide,
     );
@@ -415,16 +659,22 @@ class _JugadoresCounter extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.02),
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.03)
+            : Colors.black.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.white.withValues(alpha: 0.7),
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.04)
+                : Colors.white.withValues(alpha: 0.7),
             offset: const Offset(-2, -2),
             blurRadius: 4,
           ),
           BoxShadow(
-            color: isDark ? Colors.black.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.08),
+            color: isDark
+                ? Colors.black.withValues(alpha: 0.3)
+                : Colors.black.withValues(alpha: 0.08),
             offset: const Offset(2, 2),
             blurRadius: 4,
           ),
@@ -473,7 +723,9 @@ class _JugadoresCounter extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: isDark ? Colors.black.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.05),
+                        color: isDark
+                            ? Colors.black.withValues(alpha: 0.2)
+                            : Colors.black.withValues(alpha: 0.05),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
@@ -511,7 +763,12 @@ class _JugadoresCounter extends StatelessWidget {
 
 // Botón del contador
 class _CounterButton extends StatelessWidget {
-  const _CounterButton({required this.icon, required this.color, required this.onTap, required this.useLandscapeLayout, required this.isWide});
+  const _CounterButton(
+      {required this.icon,
+      required this.color,
+      required this.onTap,
+      required this.useLandscapeLayout,
+      required this.isWide});
 
   final IconData icon;
   final Color color;
@@ -545,7 +802,8 @@ class _CounterButton extends StatelessWidget {
             ],
           ),
           child: Center(
-            child: IconScale(icon, size: useLandscapeLayout ? 12 : 16, color: Colors.white),
+            child: IconScale(icon,
+                size: useLandscapeLayout ? 12 : 16, color: Colors.white),
           ),
         ),
       ),

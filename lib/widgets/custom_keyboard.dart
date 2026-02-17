@@ -21,10 +21,18 @@ class CustomKeyboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    // Altura responsive: en pantallas pequeñas (<700px) reduce proporcionalmente
-    final defaultHeight = screenHeight < 700 ? (screenHeight * 0.045).clamp(28.0, 38.0) : 38.0;
-    final height = useLandscapeLayout ? (isWide ? defaultHeight : defaultHeight + 6) : defaultHeight;
+    final size = MediaQuery.of(context).size;
+    final shortestSide = size.shortestSide;
+    final screenHeight = size.height;
+    final isSmallDevice = shortestSide < 360 || screenHeight < 700;
+
+    // Combina altura disponible + densidad del dispositivo.
+    final baseHeight = (screenHeight * 0.052).clamp(30.0, 40.0);
+    final compactHeight = (screenHeight * 0.046).clamp(28.0, 36.0);
+    final keyboardBaseHeight = isSmallDevice ? compactHeight : baseHeight;
+
+    final orientationAdjustedHeight = useLandscapeLayout ? (isWide ? keyboardBaseHeight : keyboardBaseHeight + 4) : keyboardBaseHeight;
+    final height = orientationAdjustedHeight.clamp(isSmallDevice ? 28.0 : 30.0, isSmallDevice ? 36.0 : 42.0);
 
     return Table(
       children: [
