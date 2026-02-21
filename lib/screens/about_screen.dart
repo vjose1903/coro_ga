@@ -59,123 +59,127 @@ class _AboutContent extends StatelessWidget {
       builder: (context, constraints, info) {
         final useLandscapeLayout = info.useLandscapeLayout;
         if (useLandscapeLayout) {
-          return Padding(
-            padding: const EdgeInsets.all(24),
-            child: SizedBox(
-              height: constraints.maxHeight,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          DecoratedBox(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(24),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.25),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 8),
+          return SafeArea(
+            top: false,
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: SizedBox(
+                height: constraints.maxHeight,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            DecoratedBox(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(24),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.25),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(24),
+                                child: Image.asset(
+                                  'assets/icon/icon.png',
+                                  width: 120,
+                                  height: 120,
+                                  fit: BoxFit.cover,
                                 ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(24),
-                              child: Image.asset(
-                                'assets/icon/icon.png',
-                                width: 120,
-                                height: 120,
-                                fit: BoxFit.cover,
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 24),
-                          TextScale(
-                            'Coro Games',
-                            size: 28,
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.bold,
-                              color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          FutureBuilder<PackageInfo>(
-                            future: PackageInfo.fromPlatform(),
-                            builder: (context, snapshot) {
-                              final version = snapshot.hasData ? 'v${snapshot.data!.version}' : '';
-                              return TextScale(
-                                version,
-                                size: 14,
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  color: Colors.grey[500],
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 24),
-                  Expanded(
-                    flex: 2,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          _SectionCard(
-                            icon: FontAwesomeIcons.gamepad,
-                            title: l10n.aboutAppTitle,
-                            child: TextScale(
-                              l10n.aboutAppDescription,
-                              size: 14,
+                            const SizedBox(height: 24),
+                            TextScale(
+                              'Coro Games',
+                              size: 28,
                               style: TextStyle(
                                 fontFamily: 'Poppins',
-                                height: 1.6,
-                                color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[700],
+                                fontWeight: FontWeight.bold,
+                                color: Preferences.isDarkMode ? Colors.white : AppThemes.colorCuarto,
                               ),
-                              textAlign: TextAlign.center,
                             ),
-                          ),
-                          const SizedBox(height: 16),
-                          _SectionCard(
-                            icon: FontAwesomeIcons.shieldHalved,
-                            title: l10n.privacyPolicyTitle,
-                            child: Column(
-                              children: [
-                                TextScale(
-                                  l10n.privacyPolicyDescription,
+                            const SizedBox(height: 8),
+                            FutureBuilder<PackageInfo>(
+                              future: PackageInfo.fromPlatform(),
+                              builder: (context, snapshot) {
+                                final version = snapshot.hasData ? 'v${snapshot.data!.version}' : '';
+                                return TextScale(
+                                  version,
                                   size: 14,
                                   style: TextStyle(
                                     fontFamily: 'Poppins',
-                                    height: 1.6,
-                                    color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[700],
+                                    color: Colors.grey[500],
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 20),
-                                _PrivacyPolicyButton(label: l10n.viewFullPrivacyPolicy),
-                              ],
+                                );
+                              },
                             ),
-                          ),
-                          const SizedBox(height: 32),
-                          TextScale(
-                            '© 2024-${DateTime.now().year} Coro Games',
-                            size: 12,
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              color: Colors.grey[500],
-                            ),
-                          ),
-                          const SizedBox(height: 40),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 24),
+                    Expanded(
+                      flex: 2,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            _SectionCard(
+                              icon: FontAwesomeIcons.gamepad,
+                              title: l10n.aboutAppTitle,
+                              child: TextScale(
+                                l10n.aboutAppDescription,
+                                size: 14,
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  height: 1.6,
+                                  color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[700],
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            _SectionCard(
+                              icon: FontAwesomeIcons.shieldHalved,
+                              title: l10n.privacyPolicyTitle,
+                              child: Column(
+                                children: [
+                                  TextScale(
+                                    l10n.privacyPolicyDescription,
+                                    size: 14,
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      height: 1.6,
+                                      color: Preferences.isDarkMode ? Colors.white70 : Colors.grey[700],
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 20),
+                                  _PrivacyPolicyButton(label: l10n.viewFullPrivacyPolicy),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+                            TextScale(
+                              '© 2024-${DateTime.now().year} Coro Games',
+                              size: 12,
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                color: Colors.grey[500],
+                              ),
+                            ),
+                            const SizedBox(height: 40),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );

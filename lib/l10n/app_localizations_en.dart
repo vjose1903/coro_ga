@@ -43,6 +43,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'There was an error and the rematch could not be completed.';
 
   @override
+  String get rematchExecutionError =>
+      'An error occurred while executing the rematch.';
+
+  @override
   String get rewardNotCompletedRematch =>
       'The reward was not completed to trigger the rematch.';
 

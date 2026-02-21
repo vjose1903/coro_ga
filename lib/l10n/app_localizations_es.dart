@@ -44,6 +44,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Hubo un error y no se pudo completar la revancha.';
 
   @override
+  String get rematchExecutionError =>
+      'Ha ocurrido un error al ejecutar la revancha.';
+
+  @override
   String get rewardNotCompletedRematch =>
       'No se completó la recompensa para hacer la revancha.';
 

@@ -124,8 +124,33 @@ void _openPartidaPredefinidaDialog(BuildContext context) {
     FluidDialogPage(
       builder: (context) {
         final size = MediaQuery.sizeOf(context);
+        final mediaQuery = MediaQuery.of(context);
         final isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
-        final dialogHeight = (size.height - (isLandscape ? 130 : 270)).clamp((isLandscape ? 100 : 250), size.height).toDouble();
+        final bool isTablet = size.shortestSide >= 600;
+        final safeVertical = mediaQuery.padding.top + mediaQuery.padding.bottom;
+        final keyboardVertical = mediaQuery.viewInsets.bottom;
+        final availableHeight = (size.height - safeVertical - keyboardVertical).clamp(0.0, size.height);
+        final aspectRatio = size.width / size.height;
+        final isCompactLandscape = isLandscape && (availableHeight < 430 || aspectRatio > 2.0);
+
+        final double dialogHeight;
+        if (isLandscape) {
+          if (isTablet) {
+            final adaptive = 270 + ((availableHeight - 500).clamp(0.0, 240.0) * 0.18);
+            dialogHeight = adaptive.clamp(260.0, 315.0).toDouble();
+          } else {
+            final adaptive = (isCompactLandscape ? 225.0 : 220.0) + ((availableHeight - 340).clamp(0.0, 120.0) * 0.16);
+            dialogHeight = adaptive.clamp(220.0, 242.0).toDouble();
+          }
+        } else {
+          if (isTablet) {
+            final adaptive = 515 + ((availableHeight - 900).clamp(0.0, 400.0) * 0.2);
+            dialogHeight = adaptive.clamp(480.0, 595.0).toDouble();
+          } else {
+            final adaptive = 396 + ((availableHeight - 700).clamp(0.0, 260.0) * 0.2);
+            dialogHeight = adaptive.clamp(378.0, 448.0).toDouble();
+          }
+        }
 
         return SizedBox(
           width: size.width - 40,

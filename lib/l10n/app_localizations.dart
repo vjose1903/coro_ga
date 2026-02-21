@@ -164,6 +164,12 @@ abstract class AppLocalizations {
   /// **'There was an error and the rematch could not be completed.'**
   String get adErrorRematch;
 
+  /// No description provided for @rematchExecutionError.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred while executing the rematch.'**
+  String get rematchExecutionError;
+
   /// No description provided for @rewardNotCompletedRematch.
   ///
   /// In en, this message translates to:

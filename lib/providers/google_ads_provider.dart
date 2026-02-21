@@ -10,6 +10,7 @@ class GoogleAdsProvider extends ChangeNotifier {
   Function? onCloseFunction_;
   bool _showOnLoad = false;
   int _interstitialLoadAttempts = 0;
+  bool _isInterstitialLoading = false;
   bool _adLoadingVisible = false;
 
   RewardedAd? rewardedAd;
@@ -17,6 +18,7 @@ class GoogleAdsProvider extends ChangeNotifier {
   Function? onRewardEarnedFunction_;
   Function? onRewardedErrorFunction_;
   int _rewardedLoadAttempts = 0;
+  bool _isRewardedLoading = false;
 
   void _showAdLoading() {
     if (_adLoadingVisible) return;
@@ -32,54 +34,58 @@ class GoogleAdsProvider extends ChangeNotifier {
 
   void loadInterstitialAd({int attempt = 1}) {
     if (Preferences.isPremium) return;
-    if (interstitialAd == null) {
-      _interstitialLoadAttempts = attempt;
-      final adUnitId = AdHelper.getInterstitialAdUnitId();
-      if (adUnitId.isEmpty) {
-        return;
-      }
-      InterstitialAd.load(
-        adUnitId: adUnitId,
-        request: const AdRequest(),
-        adLoadCallback: InterstitialAdLoadCallback(
-          onAdLoaded: (ad) {
-            ad.fullScreenContentCallback = FullScreenContentCallback(
-              onAdShowedFullScreenContent: (ad) {
-                _hideAdLoading();
-              },
-              onAdFailedToShowFullScreenContent: (ad, error) {
-                _hideAdLoading();
-                onCloseFunction_ != null ? onCloseFunction_!() : null;
-                cleanInterstitialAd();
-              },
-              onAdDismissedFullScreenContent: (ad) {
-                _hideAdLoading();
-                onCloseFunction_ != null ? onCloseFunction_!() : null;
+    if (interstitialAd != null || _isInterstitialLoading) return;
 
-                cleanInterstitialAd();
-              },
-            );
-
-            interstitialAd = ad;
-            if (_showOnLoad) {
-              _showOnLoad = false;
-              interstitialAd!.show();
-            }
-          },
-          onAdFailedToLoad: (err) {
-            Fun.logColor(color: Colores.red, body: 'Failed to load an interstitial ad: ${err.message}');
-            if (_interstitialLoadAttempts < 2) {
-              loadInterstitialAd(attempt: _interstitialLoadAttempts + 1);
-              return;
-            }
-            _hideAdLoading();
-            onCloseFunction_ != null ? onCloseFunction_!() : null;
-            _showOnLoad = false;
-            cleanInterstitialAd();
-          },
-        ),
-      );
+    _isInterstitialLoading = true;
+    _interstitialLoadAttempts = attempt;
+    final adUnitId = AdHelper.getInterstitialAdUnitId();
+    if (adUnitId.isEmpty) {
+      _isInterstitialLoading = false;
+      return;
     }
+    InterstitialAd.load(
+      adUnitId: adUnitId,
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          _isInterstitialLoading = false;
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdShowedFullScreenContent: (ad) {
+              _hideAdLoading();
+            },
+            onAdFailedToShowFullScreenContent: (ad, error) {
+              _hideAdLoading();
+              onCloseFunction_ != null ? onCloseFunction_!() : null;
+              cleanInterstitialAd();
+            },
+            onAdDismissedFullScreenContent: (ad) {
+              _hideAdLoading();
+              onCloseFunction_ != null ? onCloseFunction_!() : null;
+
+              cleanInterstitialAd();
+            },
+          );
+
+          interstitialAd = ad;
+          if (_showOnLoad) {
+            _showOnLoad = false;
+            interstitialAd!.show();
+          }
+        },
+        onAdFailedToLoad: (err) {
+          _isInterstitialLoading = false;
+          Fun.logColor(color: Colores.red, body: 'Failed to load an interstitial ad: ${err.message}');
+          if (_interstitialLoadAttempts < 2) {
+            loadInterstitialAd(attempt: _interstitialLoadAttempts + 1);
+            return;
+          }
+          _hideAdLoading();
+          onCloseFunction_ != null ? onCloseFunction_!() : null;
+          _showOnLoad = false;
+          cleanInterstitialAd();
+        },
+      ),
+    );
   }
 
   void showInterstitialAd({required Function onCloseFunction}) {
@@ -99,54 +105,59 @@ class GoogleAdsProvider extends ChangeNotifier {
   }
 
   void cleanInterstitialAd() {
+    _isInterstitialLoading = false;
     if (interstitialAd != null) interstitialAd!.dispose();
     if (interstitialAd != null) interstitialAd = null;
   }
 
   void loadRewardedAd(RewardedAdLocation location, {int attempt = 1}) {
     if (Preferences.isPremium) return;
-    if (rewardedAd == null) {
-      _rewardedLoadAttempts = attempt;
-      final adUnitId = AdHelper.getRewardedAdUnitId(location);
-      if (adUnitId.isEmpty) {
-        return;
-      }
-      RewardedAd.load(
-        adUnitId: adUnitId,
-        request: const AdRequest(),
-        rewardedAdLoadCallback: RewardedAdLoadCallback(
-          onAdLoaded: (ad) {
-            ad.fullScreenContentCallback = FullScreenContentCallback(
-              onAdShowedFullScreenContent: (ad) {
-                _hideAdLoading();
-              },
-              onAdFailedToShowFullScreenContent: (ad, error) {
-                _hideAdLoading();
-                onRewardedErrorFunction_?.call();
-                cleanRewardedAd();
-              },
-              onAdDismissedFullScreenContent: (ad) {
-                _hideAdLoading();
-                onRewardedCloseFunction_?.call();
-                cleanRewardedAd();
-              },
-            );
+    if (rewardedAd != null || _isRewardedLoading) return;
 
-            rewardedAd = ad;
-          },
-          onAdFailedToLoad: (err) {
-            Fun.logColor(color: Colores.red, body: 'Failed to load a rewarded ad: ${err.message}');
-            if (_rewardedLoadAttempts < 2) {
-              loadRewardedAd(location, attempt: _rewardedLoadAttempts + 1);
-              return;
-            }
-            _hideAdLoading();
-            onRewardedErrorFunction_?.call();
-            cleanRewardedAd();
-          },
-        ),
-      );
+    _isRewardedLoading = true;
+    _rewardedLoadAttempts = attempt;
+    final adUnitId = AdHelper.getRewardedAdUnitId(location);
+    if (adUnitId.isEmpty) {
+      _isRewardedLoading = false;
+      return;
     }
+    RewardedAd.load(
+      adUnitId: adUnitId,
+      request: const AdRequest(),
+      rewardedAdLoadCallback: RewardedAdLoadCallback(
+        onAdLoaded: (ad) {
+          _isRewardedLoading = false;
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdShowedFullScreenContent: (ad) {
+              _hideAdLoading();
+            },
+            onAdFailedToShowFullScreenContent: (ad, error) {
+              _hideAdLoading();
+              onRewardedErrorFunction_?.call();
+              cleanRewardedAd();
+            },
+            onAdDismissedFullScreenContent: (ad) {
+              _hideAdLoading();
+              onRewardedCloseFunction_?.call();
+              cleanRewardedAd();
+            },
+          );
+
+          rewardedAd = ad;
+        },
+        onAdFailedToLoad: (err) {
+          _isRewardedLoading = false;
+          Fun.logColor(color: Colores.red, body: 'Failed to load a rewarded ad: ${err.message}');
+          if (_rewardedLoadAttempts < 2) {
+            loadRewardedAd(location, attempt: _rewardedLoadAttempts + 1);
+            return;
+          }
+          _hideAdLoading();
+          onRewardedErrorFunction_?.call();
+          cleanRewardedAd();
+        },
+      ),
+    );
   }
 
   void showRewardedAd({
@@ -174,6 +185,7 @@ class GoogleAdsProvider extends ChangeNotifier {
   }
 
   void cleanRewardedAd() {
+    _isRewardedLoading = false;
     if (rewardedAd != null) rewardedAd!.dispose();
     rewardedAd = null;
     onRewardedCloseFunction_ = null;

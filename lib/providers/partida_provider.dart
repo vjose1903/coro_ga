@@ -51,9 +51,16 @@ class PartidaProvider extends ChangeNotifier {
 
   Future<SqlResponse> newPartida(Partida partida, BuildContext context) async {
     final response = await Partida.createPartida(context, partida: partida);
-    final Partida newPartida = response.data;
+    if (response.hasError == true) return response;
 
-    partidas.add(newPartida);
+    final data = response.data;
+    if (data is! Partida) {
+      response.hasError = true;
+      response.addMsg('Invalid game creation response.');
+      return response;
+    }
+
+    partidas.add(data);
     notifyListeners();
 
     return response;

@@ -227,7 +227,7 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final content = Column(
       children: [
         Expanded(
           child: SizedBox.expand(
@@ -236,16 +236,31 @@ class _Body extends StatelessWidget {
         ),
         // Banner de anuncios
         const SizedBox(height: 10),
-        if (showBanner)
-          Padding(
+        Visibility(
+          visible: showBanner,
+          maintainState: true,
+          maintainAnimation: true,
+          maintainSize: true,
+          child: Padding(
             padding: ResponsiveApp.only(bottom: 16),
             child: const GoogleBannerAd(
               key: ValueKey('home_banner'),
               location: AdLocation.home,
             ),
           ),
+        ),
       ],
     );
+
+    if (ResponsiveApp.isLandscape) {
+      return SafeArea(
+        top: false,
+        bottom: false,
+        child: content,
+      );
+    }
+
+    return content;
   }
 }
 
@@ -823,6 +838,7 @@ class _MenuHeader extends StatelessWidget {
         ),
       ],
     );
+
   }
 }
 

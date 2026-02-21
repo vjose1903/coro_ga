@@ -252,13 +252,17 @@ class _Body extends StatelessWidget {
                               _EndGameButton(label: l10n.endGame, onTap: () => _confirmEndGame(context, partida), isWide: isWide, useLandscapeLayout: useLandscapeLayout),
                               SizedBox(height: adSpacing),
                             ],
-                            if (showBanner) ...[
-                              GoogleBannerAd(
+                            Visibility(
+                              visible: showBanner,
+                              maintainState: true,
+                              maintainAnimation: true,
+                              maintainSize: true,
+                              child: GoogleBannerAd(
                                 key: ValueKey('partida_banner_${partida.id ?? 'none'}'),
                                 location: AdLocation.partida,
                                 usePadding: false,
                               ),
-                            ],
+                            ),
                           ],
                         ),
                       ),
@@ -286,14 +290,17 @@ class _Body extends StatelessWidget {
                       ),
                       SizedBox(height: adSpacing),
                     ],
-                    if (showBanner) ...[
-                      // Anuncio separado de la lista de jugadores
-                      GoogleBannerAd(
+                    Visibility(
+                      visible: showBanner,
+                      maintainState: true,
+                      maintainAnimation: true,
+                      maintainSize: true,
+                      child: GoogleBannerAd(
                         key: ValueKey('partida_banner_${partida.id ?? 'none'}'),
                         location: AdLocation.partida,
                       ),
-                      SizedBox(height: adSpacing),
-                    ],
+                    ),
+                    if (showBanner) SizedBox(height: adSpacing),
                   ])));
   }
 

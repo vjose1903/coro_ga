@@ -29,6 +29,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
   Map? _routeArgs;
   bool _playIntroAnimations = true;
   bool _introAnimationMarkQueued = false;
+  bool _isProcessingRematch = false;
 
   @override
   void initState() {
@@ -64,6 +65,11 @@ class _GanadorScreenState extends State<GanadorScreen> {
         _playIntroAnimations = false;
       });
     });
+  }
+
+  void _goHomeAndResetStack() {
+    if (!mounted) return;
+    Navigator.of(context).pushNamedAndRemoveUntil('home', (route) => false);
   }
 
   @override
@@ -140,16 +146,12 @@ class _GanadorScreenState extends State<GanadorScreen> {
                               iconColor: ganadorColor,
                               icon: Icons.close,
                               onTap: () {
-                                void goHome() {
-                                  Navigator.of(context).pushReplacementNamed('home');
-                                }
-
                                 if (Preferences.isPremium) {
-                                  goHome();
+                                  _goHomeAndResetStack();
                                 } else {
                                   googleAdsProvider.showInterstitialAd(onCloseFunction: () {
                                     if (!context.mounted) return;
-                                    goHome();
+                                    _goHomeAndResetStack();
                                     googleAdsProvider.loadInterstitialAd();
                                   });
                                 }
@@ -226,7 +228,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
                                                       incomingEffect: _playIntroAnimations ? WidgetTransitionEffects.outgoingScaleUp(delay: const Duration(seconds: 2), duration: const Duration(seconds: 1)) : WidgetTransitionEffects(),
                                                       child: ElevatedButton(
                                                         style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.green[400])),
-                                                        onPressed: () => revanchaFunction(),
+                                                        onPressed: _isProcessingRematch ? null : () => revanchaFunction(),
                                                         child: Column(
                                                           mainAxisSize: MainAxisSize.min,
                                                           children: [
@@ -325,7 +327,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
                                         incomingEffect: _playIntroAnimations ? WidgetTransitionEffects.outgoingScaleUp(delay: const Duration(seconds: 2), duration: const Duration(seconds: 1)) : WidgetTransitionEffects(),
                                         child: ElevatedButton(
                                           style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.green[400])),
-                                          onPressed: () => revanchaFunction(),
+                                          onPressed: _isProcessingRematch ? null : () => revanchaFunction(),
                                           child: Padding(
                                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                             child: Column(
@@ -372,13 +374,27 @@ class _GanadorScreenState extends State<GanadorScreen> {
   }
 
   Future<void> revanchaFunction() async {
+    if (_isProcessingRematch) return;
+    if (mounted) {
+      setState(() {
+        _isProcessingRematch = true;
+      });
+    } else {
+      _isProcessingRematch = true;
+    }
+
     final PartidaProvider partidaProvider = context.read<PartidaProvider>();
     final GoogleAdsProvider googleAdsProvider = context.read<GoogleAdsProvider>();
     final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
     final Partida? partidaSnapshot = _partidaFinalizada?.toPartidaForRematch();
     if (partidaSnapshot == null) {
-      unawaited(Navigator.of(context).pushReplacementNamed('home'));
+      Toast.show(
+        type: ToastType.error,
+        context: context,
+        message: AppLocalizations.of(context)!.rematchExecutionError,
+      );
+      _goHomeAndResetStack();
       return;
     }
 
@@ -390,8 +406,9 @@ class _GanadorScreenState extends State<GanadorScreen> {
         Toast.show(
           type: ToastType.error,
           context: context,
-          message: response.messages?.first ?? AppLocalizations.of(context)!.errorRegisteringGame,
+          message: AppLocalizations.of(context)!.rematchExecutionError,
         );
+        _goHomeAndResetStack();
         return;
       }
       final Partida nuevaPartida = response.data as Partida;
@@ -403,6 +420,17 @@ class _GanadorScreenState extends State<GanadorScreen> {
     }
 
     if (!premiumProvider.isPremium) {
+      if (googleAdsProvider.rewardedAd == null) {
+        googleAdsProvider.loadRewardedAd(RewardedAdLocation.revancha);
+        Toast.show(
+          type: ToastType.error,
+          context: context,
+          message: AppLocalizations.of(context)!.rematchExecutionError,
+        );
+        _goHomeAndResetStack();
+        return;
+      }
+
       bool rewardEarned = false;
       bool adFailed = false;
       googleAdsProvider.showRewardedAd(
@@ -419,7 +447,8 @@ class _GanadorScreenState extends State<GanadorScreen> {
               message: AppLocalizations.of(context)!.rewardNotCompletedRematch,
             );
           }
-          Navigator.of(context).pushReplacementNamed('home');
+          googleAdsProvider.loadRewardedAd(RewardedAdLocation.revancha);
+          _goHomeAndResetStack();
         },
         onRewardEarned: () {
           rewardEarned = true;
@@ -430,9 +459,10 @@ class _GanadorScreenState extends State<GanadorScreen> {
           Toast.show(
             type: ToastType.error,
             context: context,
-            message: AppLocalizations.of(context)!.adErrorRematch,
+            message: AppLocalizations.of(context)!.rematchExecutionError,
           );
-          Navigator.of(context).pushReplacementNamed('home');
+          googleAdsProvider.loadRewardedAd(RewardedAdLocation.revancha);
+          _goHomeAndResetStack();
         },
       );
     } else {

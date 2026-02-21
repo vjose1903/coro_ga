@@ -71,7 +71,7 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Future<dynamic>> resetForm() async {
+  Future<void> resetForm() async {
     form.reset();
     form.control('maxPuntuacion').value = 1;
     form.control('maxPuntuacion').setValidators([Validators.min(1)]);
@@ -80,7 +80,7 @@ class PartidaPredefinidaProvider extends ChangeNotifier {
     sinMaxPuntuacion = false;
     notifyListeners();
 
-    return Future.delayed(const Duration(milliseconds: 10));
+    await Future<void>.microtask(() {});
   }
 
   Future<void> seed() async {

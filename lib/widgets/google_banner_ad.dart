@@ -53,6 +53,7 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
 
   Future<void> _loadBanner() async {
     if (_isLoading || !mounted || _bannerAd != null) return;
+    _loadScheduled = false;
 
     final availableWidth = _availableBannerWidth(context);
     if (availableWidth < _bannerMinWidth) {
@@ -63,7 +64,6 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     }
 
     _isLoading = true;
-    _loadScheduled = false;
 
     final adUnitId = AdHelper.getBannerAdUnitId(widget.location);
     debugPrint('BannerAd load start: location=${widget.location}, unitId=$adUnitId');
