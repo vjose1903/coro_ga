@@ -952,7 +952,9 @@ class JugadoresHistoryList extends StatelessWidget {
             : MediaQuery.of(context).size.height;
         const spacing = 12.0;
         final columns = useLandscapeLayout && availableWidth >= 700 ? 3 : 2;
-        final cardHeight = (availableHeight - spacing) / 2;
+        final cardHeight = useLandscapeLayout
+            ? availableHeight
+            : (availableHeight - spacing) / 2;
 
         return GridView.builder(
           physics: const ClampingScrollPhysics(),
@@ -1063,6 +1065,7 @@ class _JugadorHistoryPanel extends StatefulWidget {
 
 class _JugadorHistoryPanelState extends State<_JugadorHistoryPanel> {
   late final ScrollController _historyScrollController;
+  int? _lastGlobalTurnCount;
 
   @override
   void initState() {
@@ -1102,6 +1105,7 @@ class _JugadorHistoryPanelState extends State<_JugadorHistoryPanel> {
       widget.partida,
       widget.jugador,
     );
+    final globalTurnCount = PartidaHistorialTimeline.buildTurns(widget.partida).length;
     final entries = widget.showFullHistory
         ? allEntries
         : allEntries
@@ -1109,6 +1113,11 @@ class _JugadorHistoryPanelState extends State<_JugadorHistoryPanel> {
             .toList();
     final isDark = Preferences.isDarkMode;
     final currentScore = widget.jugador.puntuacion ?? 0;
+
+    if (_lastGlobalTurnCount != globalTurnCount) {
+      _lastGlobalTurnCount = globalTurnCount;
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToLatest());
+    }
 
     return Material(
       color: Colors.transparent,
@@ -1231,14 +1240,14 @@ class _JugadorHistoryPanelState extends State<_JugadorHistoryPanel> {
                           )
                         : ListView.separated(
                             controller: _historyScrollController,
-                            physics: const ClampingScrollPhysics(),
-                            padding: const EdgeInsets.only(top: 2),
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: EdgeInsets.zero,
                             itemCount: entries.length,
                             separatorBuilder: (_, __) => Divider(
                               color: isDark
                                   ? Colors.white.withValues(alpha: 0.06)
                                   : Colors.grey.withValues(alpha: 0.15),
-                              height: 8,
+                              height: 6,
                             ),
                             itemBuilder: (context, index) => _ScoreHistoryTile(
                               entry: entries[index],
@@ -1277,7 +1286,7 @@ class _ScoreHistoryTile extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: compact ? 8 : 10,
-        vertical: compact ? 2 : 4,
+        vertical: compact ? 1 : 4,
       ),
       child: Row(
         children: [
@@ -1295,7 +1304,7 @@ class _ScoreHistoryTile extends StatelessWidget {
             entry.isPlaceholder
                 ? '0'
                 : '${entry.isIncrease ? '+' : '-'}${entry.score}',
-            size: compact ? 12.5 : 14,
+            size: compact ? 12 : 14,
             style: TextStyle(
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w600,
