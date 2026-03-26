@@ -28,6 +28,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get swipeToEditOrDelete => 'Desliza para editar o borrar';
 
   @override
+  String get swipeAgainToExit => 'Desliza de nuevo para salir';
+
+  @override
+  String get pressAgainToExit => 'Presione otra vez para salir';
+
+  @override
   String get loadingGames => 'Cargando partidas...';
 
   @override
@@ -569,14 +575,4 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get reviewFallbackMessage =>
       'No pudimos abrir el cuadro de reseñas. Busca Coro Games en la tienda para dejar tu opinión.';
-
-  @override
-  String get noInternetTitle => 'Sin conexión a internet';
-
-  @override
-  String get noInternetMessage =>
-      'Para utilizar la app necesitas conexión a internet.';
-
-  @override
-  String get noInternetWaiting => 'Esperando conexión...';
 }

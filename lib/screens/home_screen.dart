@@ -1,10 +1,12 @@
-import 'dart:async';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
+import 'package:fluttertoast/fluttertoast.dart' as native_toast;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +17,6 @@ import '../l10n/app_localizations.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
 import '../routes/route_observer.dart';
-import '../services/connectivity_service.dart';
 import '../shared_preferences/preferences.dart';
 import '../themes/app_themes.dart';
 import '../utils/utils.dart';
@@ -45,11 +46,38 @@ class MainHome extends StatefulWidget {
 }
 
 class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin, RouteAware {
+  static const MethodChannel _backOriginChannel = MethodChannel('com.inSpot.coro_games/back_origin');
   late final PanelController panelController;
   late final AnimationController _fabAnimController;
-  Route<dynamic>? _noInternetRoute;
-  StreamSubscription<bool>? _internetSub;
   bool _showBanner = true;
+  DateTime? _lastBackSwipeAt;
+
+  Future<void> _handleAndroidBackGesture() async {
+    final bool wasBackButton = await _consumeBackButtonPress();
+    final now = DateTime.now();
+    if (_lastBackSwipeAt == null || now.difference(_lastBackSwipeAt!) > const Duration(seconds: 2)) {
+      _lastBackSwipeAt = now;
+      final l10n = AppLocalizations.of(context)!;
+      await native_toast.Fluttertoast.cancel();
+      await native_toast.Fluttertoast.showToast(
+        msg: wasBackButton ? l10n.pressAgainToExit : l10n.swipeAgainToExit,
+        toastLength: native_toast.Toast.LENGTH_SHORT,
+        gravity: native_toast.ToastGravity.BOTTOM,
+      );
+      return;
+    }
+    await SystemNavigator.pop();
+  }
+
+  Future<bool> _consumeBackButtonPress() async {
+    if (kIsWeb || !Platform.isAndroid) return false;
+    try {
+      final result = await _backOriginChannel.invokeMethod<bool>('consumeBackButtonPress');
+      return result ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
 
   @override
   void initState() {
@@ -63,7 +91,6 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ForceUpdateModal.showIfNeeded(context);
       _fabAnimController.forward();
-      _handleInternetGate();
     });
   }
 
@@ -91,43 +118,8 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
   @override
   void dispose() {
     routeObserver.unsubscribe(this);
-    _internetSub?.cancel();
     _fabAnimController.dispose();
     super.dispose();
-  }
-
-  void _handleInternetGate() {
-    if (Preferences.isPremium) return;
-    ConnectivityService.instance.initialize();
-    _internetSub ??= ConnectivityService.instance.statusStream.listen((hasInternet) {
-      if (!mounted) return;
-      if (!hasInternet) {
-        _showNoInternetDialog();
-      } else {
-        _dismissNoInternetDialog();
-      }
-    });
-  }
-
-  void _showNoInternetDialog() {
-    if (_noInternetRoute != null) return;
-    final route = DialogRoute(
-      context: context,
-      barrierDismissible: false,
-      barrierColor: Colors.black.withValues(alpha: 0.85),
-      builder: (_) => const NoInternetModal(),
-    );
-    _noInternetRoute = route;
-    Navigator.of(context, rootNavigator: true).push(route);
-  }
-
-  void _dismissNoInternetDialog() {
-    final route = _noInternetRoute;
-    if (route == null) return;
-    if (route.isActive) {
-      Navigator.of(context, rootNavigator: true).removeRoute(route);
-    }
-    _noInternetRoute = null;
   }
 
   void openMenuSlideUp() {
@@ -143,57 +135,67 @@ class _MainHomeState extends State<MainHome> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
+    final isAndroid = !kIsWeb && Platform.isAndroid;
+    final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
+    final shouldInterceptExitGesture = isAndroid && isCurrentRoute;
     return Consumer(
       builder: (BuildContext context, value, Widget? child) {
         context.watch<SlideUpProvider>();
         context.watch<ThemeProvider>();
 
         final l10n = AppLocalizations.of(context)!;
-        return Scaffold(
-          resizeToAvoidBottomInset: false,
-          body: Layout(
-            appBarTitle: l10n.myGames,
-            appBarTrailing: _AnimatedMenuButton(onTap: openMenuSlideUp),
-            bodyContent: _Body(panelController: panelController, showBanner: _showBanner),
-            panelController: panelController,
-          ),
-          floatingActionButton: Padding(
-            padding: ResponsiveApp.only(bottom: 40),
-            child: Visibility(
-              visible: !panelController.isAttached || panelController.isPanelClosed,
-              child: ScaleTransition(
-                scale: CurvedAnimation(parent: _fabAnimController, curve: Curves.elasticOut),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppThemes.colorTercero.withValues(alpha: 0.4),
-                        blurRadius: 12,
-                        offset: const Offset(0, 6),
+        return PopScope(
+          canPop: !shouldInterceptExitGesture,
+          onPopInvoked: (didPop) {
+            if (didPop || !shouldInterceptExitGesture) return;
+            _handleAndroidBackGesture();
+          },
+          child: Scaffold(
+            resizeToAvoidBottomInset: false,
+            body: Layout(
+              appBarTitle: l10n.myGames,
+              appBarTrailing: _AnimatedMenuButton(onTap: openMenuSlideUp),
+              bodyContent: _Body(panelController: panelController, showBanner: _showBanner),
+              panelController: panelController,
+            ),
+            floatingActionButton: Padding(
+              padding: ResponsiveApp.only(bottom: 40),
+              child: Visibility(
+                visible: !panelController.isAttached || panelController.isPanelClosed,
+                child: ScaleTransition(
+                  scale: CurvedAnimation(parent: _fabAnimController, curve: Curves.elasticOut),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [AppThemes.colorPrimero, AppThemes.colorTercero],
                       ),
-                    ],
-                  ),
-                  child: FloatingActionButton(
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    shape: const CircleBorder(),
-                    onPressed: () {
-                      final PartidaProvider partidaProvider = context.read<PartidaProvider>();
-                      final PremiumProvider premiumProvider = context.read<PremiumProvider>();
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppThemes.colorTercero.withValues(alpha: 0.4),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: FloatingActionButton(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      shape: const CircleBorder(),
+                      onPressed: () {
+                        final PartidaProvider partidaProvider = context.read<PartidaProvider>();
+                        final PremiumProvider premiumProvider = context.read<PremiumProvider>();
 
-                      if (premiumProvider.canCreateGame(partidaProvider.partidas.length)) {
-                        navigateToForm();
-                      } else {
-                        Toast.show(type: ToastType.info, context: context, message: l10n.freeVersionLimitGames(PremiumProvider.freeMaxGames), actionLabel: l10n.getPro, onAction: () => Navigator.pushNamed(context, 'premium'));
-                      }
-                    },
-                    child: const IconScale(Icons.add_rounded, size: 25, color: Colors.white),
+                        if (premiumProvider.canCreateGame(partidaProvider.partidas.length)) {
+                          navigateToForm();
+                        } else {
+                          Toast.show(type: ToastType.info, context: context, message: l10n.freeVersionLimitGames(PremiumProvider.freeMaxGames), actionLabel: l10n.getPro, onAction: () => Navigator.pushNamed(context, 'premium'));
+                        }
+                      },
+                      child: const IconScale(Icons.add_rounded, size: 25, color: Colors.white),
+                    ),
                   ),
                 ),
               ),
@@ -251,16 +253,11 @@ class _Body extends StatelessWidget {
         ),
       ],
     );
-
-    if (ResponsiveApp.isLandscape) {
-      return SafeArea(
-        top: false,
-        bottom: false,
-        child: content,
-      );
-    }
-
-    return content;
+    return SafeArea(
+      top: false,
+      bottom: false,
+      child: content,
+    );
   }
 }
 
@@ -838,7 +835,6 @@ class _MenuHeader extends StatelessWidget {
         ),
       ],
     );
-
   }
 }
 

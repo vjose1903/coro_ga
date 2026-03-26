@@ -164,18 +164,16 @@ class _PuntuacionPageState extends State<PuntuacionPage> {
                   partida: partida,
                   ganadorNombre: ganador['nombre']?.toString(),
                   motivo: 'max_score',
+                  keepPartidaEnTurno: true,
                 );
                 if (finalizadaRes.hasError! || !context.mounted) return;
                 final PartidaFinalizada finalizada = finalizadaRes.data as PartidaFinalizada;
-                unawaited(Navigator.push(
+                unawaited(
+                  GanadorScreen.showFullScreenDialog(
                     context,
-                    PageRouteBuilder(
-                        settings: RouteSettings(arguments: {
-                          'partidaFinalizadaId': finalizada.id,
-                        }),
-                        pageBuilder: (context, animation, secondaryAnimation) => const GanadorScreen(),
-                        transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
-                        transitionDuration: const Duration(milliseconds: 400))));
+                    partidaFinalizadaId: finalizada.id,
+                  ),
+                );
               }
             },
           ),

@@ -38,6 +38,12 @@ class PartidaProvider extends ChangeNotifier {
     });
   }
 
+  void clearPartidaEnTurno() {
+    if (partidaEnTurno == null) return;
+    partidaEnTurno = null;
+    notifyListeners();
+  }
+
   void removeJugador(Jugador jugador) {
     final int index = partidaEnTurno!.jugadores!.indexWhere((item) => item.id == jugador.id);
     partidaEnTurno!.jugadores!.removeAt(index);
@@ -123,6 +129,7 @@ class PartidaProvider extends ChangeNotifier {
     required Partida partida,
     String? ganadorNombre,
     String? motivo,
+    bool keepPartidaEnTurno = false,
   }) async {
     final response = SqlResponse();
     if (_isFinalizing) {
@@ -163,7 +170,7 @@ class PartidaProvider extends ChangeNotifier {
       }
 
       partidas.removeWhere((item) => item.id == partida.id);
-      if (partidaEnTurno?.id == partida.id) {
+      if (!keepPartidaEnTurno && partidaEnTurno?.id == partida.id) {
         partidaEnTurno = null;
       }
       notifyListeners();

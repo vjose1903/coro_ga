@@ -134,6 +134,18 @@ abstract class AppLocalizations {
   /// **'Swipe to edit or delete'**
   String get swipeToEditOrDelete;
 
+  /// No description provided for @swipeAgainToExit.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe again to exit'**
+  String get swipeAgainToExit;
+
+  /// No description provided for @pressAgainToExit.
+  ///
+  /// In en, this message translates to:
+  /// **'Press again to exit'**
+  String get pressAgainToExit;
+
   /// No description provided for @loadingGames.
   ///
   /// In en, this message translates to:
@@ -1093,24 +1105,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unable to open the review prompt. Search for Coro Games in the store to leave your feedback.'**
   String get reviewFallbackMessage;
-
-  /// No description provided for @noInternetTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'No internet connection'**
-  String get noInternetTitle;
-
-  /// No description provided for @noInternetMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'To use the app you need an internet connection.'**
-  String get noInternetMessage;
-
-  /// No description provided for @noInternetWaiting.
-  ///
-  /// In en, this message translates to:
-  /// **'Waiting for connection...'**
-  String get noInternetWaiting;
 }
 
 class _AppLocalizationsDelegate

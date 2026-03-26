@@ -57,15 +57,17 @@ class _PartidaScreenState extends State<PartidaScreen> with SingleTickerProvider
   }
 
   @override
-  void didPushNext() {
-    if (!_showBanner) return;
-    setState(() => _showBanner = false);
-  }
+  void didPushNext() {}
 
   @override
   void didPopNext() {
-    if (_showBanner) return;
-    setState(() => _showBanner = true);
+    context.read<SlideUpProvider>().closeSlideUp(
+      controller: panelController,
+      skipClean: true,
+    );
+    if (!_showBanner) {
+      setState(() => _showBanner = true);
+    }
   }
 
   @override
@@ -257,8 +259,7 @@ class _Body extends StatelessWidget {
                               maintainState: true,
                               maintainAnimation: true,
                               maintainSize: true,
-                              child: GoogleBannerAd(
-                                key: ValueKey('partida_banner_${partida.id ?? 'none'}'),
+                              child: const GoogleBannerAd(
                                 location: AdLocation.partida,
                                 usePadding: false,
                               ),
@@ -295,8 +296,7 @@ class _Body extends StatelessWidget {
                       maintainState: true,
                       maintainAnimation: true,
                       maintainSize: true,
-                      child: GoogleBannerAd(
-                        key: ValueKey('partida_banner_${partida.id ?? 'none'}'),
+                      child: const GoogleBannerAd(
                         location: AdLocation.partida,
                       ),
                     ),
@@ -327,21 +327,17 @@ class _Body extends StatelessWidget {
                   partida: partida,
                   ganadorNombre: ganador['nombre']?.toString(),
                   motivo: 'manual',
+                  keepPartidaEnTurno: true,
                 );
             if (finalizadaRes.hasError!) return;
             final PartidaFinalizada finalizada = finalizadaRes.data as PartidaFinalizada;
             if (!context.mounted) return;
-            unawaited(Navigator.push(
-              context,
-              PageRouteBuilder(
-                settings: RouteSettings(arguments: {
-                  'partidaFinalizadaId': finalizada.id,
-                }),
-                pageBuilder: (context, animation, secondaryAnimation) => const GanadorScreen(),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
-                transitionDuration: const Duration(milliseconds: 400),
+            unawaited(
+              GanadorScreen.showFullScreenDialog(
+                context,
+                partidaFinalizadaId: finalizada.id,
               ),
-            ));
+            );
           },
         }),
       ],

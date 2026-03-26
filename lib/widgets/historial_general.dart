@@ -285,6 +285,7 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
           partida: partida,
           ganadorNombre: ganador['nombre']?.toString(),
           motivo: 'max_score',
+          keepPartidaEnTurno: true,
         );
         if (finalizadaRes.hasError!) return;
         final PartidaFinalizada finalizada = finalizadaRes.data as PartidaFinalizada;
@@ -294,17 +295,12 @@ class _HistorialGeneralState extends State<HistorialGeneral> with SlideUpAutoScr
           controller: widget.panelController,
         );
 
-        unawaited(Navigator.push(
-          context,
-          PageRouteBuilder(
-            settings: RouteSettings(arguments: {
-              'partidaFinalizadaId': finalizada.id,
-            }),
-            pageBuilder: (context, animation, secondaryAnimation) => const GanadorScreen(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
-            transitionDuration: const Duration(milliseconds: 400),
+        unawaited(
+          GanadorScreen.showFullScreenDialog(
+            context,
+            partidaFinalizadaId: finalizada.id,
           ),
-        ));
+        );
       } else if (maxScore > 0 && puntuacionActual < (maxScore / 2) && newPuntuacion >= (maxScore / 2)) {
         final premiumProvider = context.read<PremiumProvider>();
         if (!premiumProvider.isPremium) {

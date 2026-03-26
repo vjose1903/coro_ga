@@ -31,13 +31,21 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
   bool _loadScheduled = false;
   Timer? _retryTimer;
   int _retryAttempt = 0;
+  static final Map<AdLocation, int> _locationLoadOwner = <AdLocation, int>{};
+  static final Map<AdLocation, int> _locationRetryAttempt = <AdLocation, int>{};
+  static final Map<AdLocation, DateTime> _locationNextAllowedLoadAt = <AdLocation, DateTime>{};
   static const double _horizontalPadding = 16;
   static const double _bannerMinWidth = 320;
   static const double _bannerHeight = 50;
+  String get _instanceTag => 'GoogleBannerAd#${identityHashCode(this)}(${widget.location.name})';
+  int get _instanceId => identityHashCode(this);
+  bool get _hasActiveLocationOwner => _locationLoadOwner[widget.location] != null;
+  bool get _isLocationOwner => _locationLoadOwner[widget.location] == _instanceId;
 
   @override
   void initState() {
     super.initState();
+    debugPrint('$_instanceTag init');
     _scheduleBannerLoad();
   }
 
@@ -45,6 +53,9 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
   void didUpdateWidget(covariant GoogleBannerAd oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.location != widget.location) {
+      debugPrint('$_instanceTag location changed ${oldWidget.location.name} -> ${widget.location.name}');
+      _retryTimer?.cancel();
+      _retryTimer = null;
       _disposeBanner();
       _isLoading = false;
       _scheduleBannerLoad();
@@ -52,24 +63,46 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
   }
 
   Future<void> _loadBanner() async {
-    if (_isLoading || !mounted || _bannerAd != null) return;
+    if (_isLoading || !mounted || _bannerAd != null || _retryTimer != null) {
+      debugPrint(
+        '$_instanceTag load skipped isLoading=$_isLoading mounted=$mounted hasBanner=${_bannerAd != null} hasRetry=${_retryTimer != null}',
+      );
+      return;
+    }
     _loadScheduled = false;
+
+    final now = DateTime.now();
+    final nextAllowedLoadAt = _locationNextAllowedLoadAt[widget.location];
+    if (nextAllowedLoadAt != null && nextAllowedLoadAt.isAfter(now)) {
+      final wait = nextAllowedLoadAt.difference(now);
+      debugPrint('$_instanceTag global cooldown active wait=${wait.inMilliseconds}ms');
+      _scheduleRetry(delayOverride: wait, incrementGlobalAttempt: false);
+      return;
+    }
+
+    if (_hasActiveLocationOwner && !_isLocationOwner) {
+      debugPrint('$_instanceTag load skipped because another instance owns loading for ${widget.location.name}');
+      _scheduleRetry(delayOverride: const Duration(seconds: 1), incrementGlobalAttempt: false);
+      return;
+    }
 
     final availableWidth = _availableBannerWidth(context);
     if (availableWidth < _bannerMinWidth) {
       debugPrint(
-        'BannerAd skipped: location=${widget.location}, availableWidth=$availableWidth < $_bannerMinWidth',
+        '$_instanceTag width skipped availableWidth=$availableWidth < $_bannerMinWidth',
       );
       return;
     }
 
     _isLoading = true;
+    _locationLoadOwner[widget.location] = _instanceId;
 
     final adUnitId = AdHelper.getBannerAdUnitId(widget.location);
-    debugPrint('BannerAd load start: location=${widget.location}, unitId=$adUnitId');
+    debugPrint('$_instanceTag load start unitId=$adUnitId');
     if (adUnitId.isEmpty) {
       debugPrint('BannerAd load aborted: empty adUnitId for location=${widget.location}');
       _isLoading = false;
+      _releaseLocationOwnerIfNeeded();
       return;
     }
 
@@ -85,6 +118,7 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
       size: chosenSize,
       listener: BannerAdListener(
         onAdLoaded: (ad) {
+          _releaseLocationOwnerIfNeeded();
           if (!mounted) {
             ad.dispose();
             return;
@@ -93,6 +127,8 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
             _bannerAd = ad as BannerAd;
             _retryAttempt = 0;
           });
+          _locationRetryAttempt[widget.location] = 0;
+          _locationNextAllowedLoadAt.remove(widget.location);
           _retryTimer?.cancel();
           _isLoading = false;
 
@@ -103,7 +139,7 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
           debugPrint('Loaded');
           debugPrint('   ');
           debugPrint('   ');
-          debugPrint('BannerAd loaded: location=${widget.location}, unitId=$adUnitId, size=${_bannerAd?.size}');
+          debugPrint('$_instanceTag loaded unitId=$adUnitId size=${_bannerAd?.size}');
 
           final info = (ad as BannerAd).responseInfo;
           debugPrint('Winner adapter: ${info?.mediationAdapterClassName}');
@@ -115,13 +151,14 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
         },
         onAdFailedToLoad: (ad, error) {
           ad.dispose();
+          _releaseLocationOwnerIfNeeded();
           if (!mounted) return;
           _isLoading = false;
           debugPrint(
-            'BannerAd failed: location=${widget.location}, unitId=$adUnitId, code=${error.code}, message=${error.message}, domain=${error.domain}',
+            '$_instanceTag failed unitId=$adUnitId code=${error.code} message=${error.message} domain=${error.domain}',
           );
           FirebaseCrashlytics.instance.log(
-            'BannerAd failed: location=${widget.location}, unitId=$adUnitId, code=${error.code}, message=${error.message}, domain=${error.domain}',
+            '$_instanceTag failed unitId=$adUnitId code=${error.code} message=${error.message} domain=${error.domain}',
           );
           FirebaseCrashlytics.instance.recordError(
             error,
@@ -135,7 +172,7 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
               'domain=${error.domain}',
             ],
           );
-          _scheduleRetry();
+          _scheduleRetry(incrementGlobalAttempt: true);
         },
       ),
     );
@@ -143,7 +180,13 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
   }
 
   void _scheduleBannerLoad() {
-    if (_loadScheduled || !mounted) return;
+    if (_loadScheduled || !mounted || _retryTimer != null) {
+      debugPrint(
+        '$_instanceTag schedule skipped loadScheduled=$_loadScheduled mounted=$mounted hasRetry=${_retryTimer != null}',
+      );
+      return;
+    }
+    debugPrint('$_instanceTag schedule load');
     _loadScheduled = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -161,6 +204,8 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
       if (_bannerAd != null || _isLoading) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
+            _retryTimer?.cancel();
+            _retryTimer = null;
             _disposeBanner();
             _isLoading = false;
             setState(() {});
@@ -170,7 +215,7 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
       return const SizedBox.shrink();
     }
 
-    if (_bannerAd == null && !_isLoading) {
+    if (_bannerAd == null && !_isLoading && _retryTimer == null) {
       _scheduleBannerLoad();
     }
 
@@ -192,7 +237,6 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     final double height = _bannerAd?.size.height.toDouble() ?? _adSize?.height.toDouble() ?? _bannerHeight;
 
     final banner = Container(
-      key: _bannerAd != null ? ObjectKey(_bannerAd) : null,
       width: width,
       alignment: Alignment.topCenter,
       child: _bannerAd == null ? SizedBox(width: width, height: height) : SizedBox(width: width, height: height, child: AdWidget(ad: _bannerAd!)),
@@ -220,22 +264,43 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     }
   }
 
-  void _scheduleRetry() {
+  void _releaseLocationOwnerIfNeeded() {
+    if (_isLocationOwner) {
+      _locationLoadOwner.remove(widget.location);
+    }
+  }
+
+  void _scheduleRetry({required bool incrementGlobalAttempt, Duration? delayOverride}) {
     if (!mounted) return;
     _retryTimer?.cancel();
-    final delay = Duration(seconds: (_retryAttempt >= 3) ? 30 : 10 * (_retryAttempt + 1));
-    _retryAttempt += 1;
-    debugPrint('BannerAd retry scheduled: location=${widget.location}, attempt=$_retryAttempt, in=${delay.inSeconds}s');
-    _retryTimer = Timer(delay, () {
+    int globalAttempt = _locationRetryAttempt[widget.location] ?? 0;
+    if (incrementGlobalAttempt) {
+      globalAttempt += 1;
+      _locationRetryAttempt[widget.location] = globalAttempt;
+    }
+    _retryAttempt = globalAttempt;
+
+    final attemptForDelay = globalAttempt <= 0 ? 1 : globalAttempt;
+    final delay = delayOverride ?? Duration(seconds: 10 + ((attemptForDelay - 1) * 5));
+    final normalizedDelay = delay < const Duration(milliseconds: 300) ? const Duration(milliseconds: 300) : delay;
+    _locationNextAllowedLoadAt[widget.location] = DateTime.now().add(normalizedDelay);
+
+    debugPrint(
+      '$_instanceTag retry scheduled attempt=$_retryAttempt in=${normalizedDelay.inMilliseconds}ms increment=$incrementGlobalAttempt',
+    );
+    _retryTimer = Timer(normalizedDelay, () {
       _retryTimer = null;
       if (!mounted) return;
+      debugPrint('$_instanceTag retry fired');
       _loadBanner();
     });
   }
 
   @override
   void dispose() {
+    debugPrint('$_instanceTag dispose');
     _retryTimer?.cancel();
+    _releaseLocationOwnerIfNeeded();
     _disposeBanner();
     _isLoading = false;
     super.dispose();

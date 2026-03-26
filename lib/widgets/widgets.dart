@@ -16,7 +16,6 @@ export 'package:game_score/widgets/icon_scale.dart';
 export 'package:game_score/widgets/jugadores_actuales.dart';
 export 'package:game_score/widgets/layout.dart';
 export 'package:game_score/widgets/lottie_animation.dart';
-export 'package:game_score/widgets/no_internet_modal.dart';
 export 'package:game_score/widgets/partida_card.dart';
 export 'package:game_score/widgets/partidas_predefinidas_alert.dart';
 export 'package:game_score/widgets/puntuacion_form.dart';

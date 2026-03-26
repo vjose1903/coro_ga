@@ -23,7 +23,8 @@ class BottomBar extends StatelessWidget {
 
     // Usar la posición del panel para animar la altura suavemente
     // panelPosition va de 0 (cerrado) a 1 (abierto)
-    final double animatedHeight = panelController != null ? maxHeight * (1 - slideUpProvider.panelPosition) : maxHeight;
+    final bool shouldAnimateWithPanel = panelController?.isAttached ?? false;
+    final double animatedHeight = shouldAnimateWithPanel ? maxHeight * (1 - slideUpProvider.panelPosition) : maxHeight;
     final double height = animatedHeight > 0 ? animatedHeight + bottomInset : 0;
 
     return Container(

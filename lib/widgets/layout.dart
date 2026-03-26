@@ -102,8 +102,6 @@ class _LayoutState extends State<Layout> with WidgetsBindingObserver {
 
         final isDark = Preferences.isDarkMode;
 
-        final size = mediaQuery.size;
-
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle.light.copyWith(
             statusBarColor: Colors.transparent,
@@ -111,7 +109,6 @@ class _LayoutState extends State<Layout> with WidgetsBindingObserver {
           child: Padding(
             padding: EdgeInsets.only(bottom: keyboardHeight),
             child: SlidingUpPanel(
-              key: ValueKey(size),
               controller: widget.panelController,
               scrollController: _panelScrollController,
               minHeight: 0,

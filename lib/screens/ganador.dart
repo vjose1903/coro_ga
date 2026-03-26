@@ -18,6 +18,29 @@ import '../widgets/widgets.dart';
 class GanadorScreen extends StatefulWidget {
   const GanadorScreen({super.key});
 
+  static Future<void> showFullScreenDialog(
+    BuildContext context, {
+    required int? partidaFinalizadaId,
+  }) {
+    return showGeneralDialog<void>(
+      context: context,
+      useRootNavigator: false,
+      barrierLabel: 'ganador_dialog',
+      barrierColor: Colors.black.withValues(alpha: 0.6),
+      transitionDuration: const Duration(milliseconds: 250),
+      routeSettings: RouteSettings(arguments: {
+        'partidaFinalizadaId': partidaFinalizadaId,
+      }),
+      pageBuilder: (context, animation, secondaryAnimation) => const GanadorScreen(),
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: child,
+        );
+      },
+    );
+  }
+
   @override
   State<GanadorScreen> createState() => _GanadorScreenState();
 }
@@ -67,9 +90,18 @@ class _GanadorScreenState extends State<GanadorScreen> {
     });
   }
 
-  void _goHomeAndResetStack() {
+  void _goHomeFromWinner() {
     if (!mounted) return;
-    Navigator.of(context).pushNamedAndRemoveUntil('home', (route) => false);
+    context.read<PartidaProvider>().clearPartidaEnTurno();
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop();
+    }
+    if (navigator.canPop()) {
+      navigator.pop();
+    } else {
+      navigator.pushReplacementNamed('home');
+    }
   }
 
   @override
@@ -147,11 +179,11 @@ class _GanadorScreenState extends State<GanadorScreen> {
                               icon: Icons.close,
                               onTap: () {
                                 if (Preferences.isPremium) {
-                                  _goHomeAndResetStack();
+                                  _goHomeFromWinner();
                                 } else {
                                   googleAdsProvider.showInterstitialAd(onCloseFunction: () {
                                     if (!context.mounted) return;
-                                    _goHomeAndResetStack();
+                                    _goHomeFromWinner();
                                     googleAdsProvider.loadInterstitialAd();
                                   });
                                 }
@@ -394,7 +426,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
         context: context,
         message: AppLocalizations.of(context)!.rematchExecutionError,
       );
-      _goHomeAndResetStack();
+      _goHomeFromWinner();
       return;
     }
 
@@ -408,15 +440,19 @@ class _GanadorScreenState extends State<GanadorScreen> {
           context: context,
           message: AppLocalizations.of(context)!.rematchExecutionError,
         );
-        _goHomeAndResetStack();
+        _goHomeFromWinner();
         return;
       }
       final Partida nuevaPartida = response.data as Partida;
       partidaProvider.changePartidaEnTurno(nuevaPartida);
       await MyLoading.close();
-      unawaited(
-        Navigator.of(context).pushNamedAndRemoveUntil('partida', (route) => false),
-      );
+      if (!mounted) return;
+      final navigator = Navigator.of(context);
+      if (navigator.canPop()) {
+        navigator.pop();
+      } else {
+        unawaited(navigator.pushReplacementNamed('partida'));
+      }
     }
 
     if (!premiumProvider.isPremium) {
@@ -427,7 +463,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
           context: context,
           message: AppLocalizations.of(context)!.rematchExecutionError,
         );
-        _goHomeAndResetStack();
+        _goHomeFromWinner();
         return;
       }
 
@@ -448,7 +484,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
             );
           }
           googleAdsProvider.loadRewardedAd(RewardedAdLocation.revancha);
-          _goHomeAndResetStack();
+          _goHomeFromWinner();
         },
         onRewardEarned: () {
           rewardEarned = true;
@@ -462,7 +498,7 @@ class _GanadorScreenState extends State<GanadorScreen> {
             message: AppLocalizations.of(context)!.rematchExecutionError,
           );
           googleAdsProvider.loadRewardedAd(RewardedAdLocation.revancha);
-          _goHomeAndResetStack();
+          _goHomeFromWinner();
         },
       );
     } else {
