@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -79,7 +81,8 @@ class Preferences {
   static const bool _kTestPremium = false;
 
   static bool get isPremium {
-    return (kDebugMode && _kTestPremium) || (_prefs.getBool('isPremium') ?? false);
+    return (kDebugMode && _kTestPremium) ||
+        (_prefs.getBool('isPremium') ?? false);
   }
 
   static set isPremium(bool value) {
@@ -104,5 +107,35 @@ class Preferences {
 
   static set cachedIosAdIds(String value) {
     _prefs.setString('cachedIosAdIds', value);
+  }
+
+  // ==============================================================
+  // Modos de visualizacion por partida
+  // ==============================================================
+
+  static Map<String, dynamic> _getPartidaViewModes() {
+    final rawValue = _prefs.getString('partidaViewModes');
+    if (rawValue == null || rawValue.isEmpty) return <String, dynamic>{};
+
+    try {
+      final decoded = json.decode(rawValue);
+      if (decoded is Map<String, dynamic>) return decoded;
+      if (decoded is Map) {
+        return decoded.map((key, value) => MapEntry('$key', value));
+      }
+    } catch (_) {}
+
+    return <String, dynamic>{};
+  }
+
+  static String getPartidaViewMode(int partidaId) {
+    final viewModes = _getPartidaViewModes();
+    return viewModes['$partidaId']?.toString() ?? 'current';
+  }
+
+  static void setPartidaViewMode(int partidaId, String mode) {
+    final viewModes = _getPartidaViewModes();
+    viewModes['$partidaId'] = mode;
+    _prefs.setString('partidaViewModes', json.encode(viewModes));
   }
 }
