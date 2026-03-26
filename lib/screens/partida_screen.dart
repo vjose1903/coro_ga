@@ -317,10 +317,10 @@ class _Body extends StatelessWidget {
     final mediaQuery = MediaQuery.of(context);
     final double bottomInset = mediaQuery.viewPadding.bottom;
     final double baseBottomMargin = compactHeight
-        ? (useLandscapeLayout ? 17 : 60)
-        : (useLandscapeLayout ? 25 : 90);
+        ? (useLandscapeLayout ? 30 : 60)
+        : (useLandscapeLayout ? 42 : 90);
     const double bottomBarHeight = 65;
-    final double landscapeBottomReserved = bottomBarHeight + bottomInset + 8;
+    final double landscapeBottomReserved = bottomBarHeight + bottomInset + 26;
     final double bottomMarginBase =
         useLandscapeLayout && baseBottomMargin < landscapeBottomReserved
             ? landscapeBottomReserved
