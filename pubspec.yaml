@@ -3,7 +3,7 @@ description: Aplicación para anotar puntuaciones de juegos favoritos.
 
 publish_to: "none"
 
-version: 5.0.5+55
+version: 6.0.0+60
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
