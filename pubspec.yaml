@@ -3,7 +3,7 @@ description: Aplicación para anotar puntuaciones de juegos favoritos.
 
 publish_to: "none"
 
-version: 6.0.0+60
+version: 6.0.1+61
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -54,9 +54,12 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.4
 
 # 👇 CONFIGURACIÓN DE ICONOS (OBLIGATORIA PARA iOS)
-flutter_icons:
+flutter_launcher_icons:
   ios: true
   image_path: "assets/icon/icon.png"
+  image_path_ios_dark_transparent: "assets/icon/icon-dark.png"
+  image_path_ios_tinted_grayscale: "assets/icon/icon-tinted.png"
+  desaturate_tinted_to_grayscale_ios: true
   remove_alpha_ios: true
 
 flutter:
