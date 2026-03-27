@@ -54,6 +54,7 @@ analysis_benchmark.json
 .pub-cache/
 .pub/
 build/
+release_builds/
 flutter_*.png
 linked_*.ds
 unlinked.ds
@@ -101,11 +102,8 @@ unlinked_spec.ds
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
 
-# macOS
 **/Flutter/ephemeral/
 **/Pods/
-**/macos/Flutter/GeneratedPluginRegistrant.swift
-**/macos/Flutter/ephemeral
 **/xcuserdata/
 
 # Coverage

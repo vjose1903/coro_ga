@@ -10,7 +10,7 @@ cd $CI_PRIMARY_REPOSITORY_PATH # change working directory to the root of your cl
 git clone https://github.com/flutter/flutter.git --depth 1 -b stable $HOME/flutter
 export PATH="$PATH:$HOME/flutter/bin"
 
-# Install Flutter artifacts for iOS (--ios), or macOS (--macos) platforms.
+# Install Flutter artifacts for iOS.
 flutter precache --ios
 
 # Install Flutter dependencies.
