@@ -1101,11 +1101,14 @@ class _JugadorHistoryPanelState extends State<_JugadorHistoryPanel> {
   Widget build(BuildContext context) {
     final estado = widget.partida.getJugadorEstatus(widget.jugador);
     final config = _estadoConfig(estado);
+    final isWinner = estado == Estado.ganador;
+    final isLoser = estado == Estado.perdedor;
     final allEntries = PartidaHistorialTimeline.buildEntriesForJugador(
       widget.partida,
       widget.jugador,
     );
-    final globalTurnCount = PartidaHistorialTimeline.buildTurns(widget.partida).length;
+    final globalTurnCount =
+        PartidaHistorialTimeline.buildTurns(widget.partida).length;
     final entries = widget.showFullHistory
         ? allEntries
         : allEntries
@@ -1113,6 +1116,11 @@ class _JugadorHistoryPanelState extends State<_JugadorHistoryPanel> {
             .toList();
     final isDark = Preferences.isDarkMode;
     final currentScore = widget.jugador.puntuacion ?? 0;
+    final Color lightHeaderBorderColor = isWinner
+        ? Colors.green.withValues(alpha: 0.4)
+        : isLoser
+            ? Colors.red.withValues(alpha: 0.3)
+            : AppThemes.colorPrimero.withValues(alpha: 0.2);
 
     if (_lastGlobalTurnCount != globalTurnCount) {
       _lastGlobalTurnCount = globalTurnCount;
@@ -1151,13 +1159,22 @@ class _JugadorHistoryPanelState extends State<_JugadorHistoryPanel> {
                   vertical: widget.useLandscapeLayout ? 6 : 7,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2A2D3E).withValues(
-                    alpha: isDark ? 0.92 : 0.82,
-                  ),
+                  gradient: isDark
+                      ? null
+                      : const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0xFFE8ECFF), Color(0xFFD4DBFF)],
+                        ),
+                  color: isDark
+                      ? const Color(0xFF2A2D3E).withValues(alpha: 0.92)
+                      : null,
                   borderRadius: BorderRadius.circular(11),
                   border: Border.all(
-                    color: (config['color'] as Color).withValues(alpha: 0.75),
-                    width: 1.2,
+                    color: isDark
+                        ? (config['color'] as Color).withValues(alpha: 0.75)
+                        : lightHeaderBorderColor,
+                    width: isDark ? 1.2 : (isWinner || isLoser ? 2 : 1),
                   ),
                 ),
                 child: SizedBox(
@@ -1175,22 +1192,52 @@ class _JugadorHistoryPanelState extends State<_JugadorHistoryPanel> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               size: widget.useLandscapeLayout ? 12 : 13,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontFamily: 'Poppins',
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF5B7CFF),
+                                color: isDark
+                                    ? const Color(0xFF5B7CFF)
+                                    : AppThemes.colorTercero,
                               ),
                             ),
                             const SizedBox(height: 6),
-                            TextScale(
-                              currentScore.toString(),
-                              size: widget.useLandscapeLayout ? 21 : 24,
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.bold,
-                                color: config['color'] as Color,
-                              ),
-                            ),
+                            isDark
+                                ? TextScale(
+                                    currentScore.toString(),
+                                    size: widget.useLandscapeLayout ? 21 : 24,
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.bold,
+                                      color: config['color'] as Color,
+                                    ),
+                                  )
+                                : ShaderMask(
+                                    shaderCallback: (bounds) => LinearGradient(
+                                      colors: isWinner
+                                          ? [
+                                              Colors.green[400]!,
+                                              Colors.green[600]!,
+                                            ]
+                                          : isLoser
+                                              ? [
+                                                  Colors.red[300]!,
+                                                  Colors.red[500]!,
+                                                ]
+                                              : [
+                                                  AppThemes.colorPrimero,
+                                                  AppThemes.colorTercero,
+                                                ],
+                                    ).createShader(bounds),
+                                    child: TextScale(
+                                      currentScore.toString(),
+                                      size: widget.useLandscapeLayout ? 21 : 24,
+                                      style: const TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
                           ],
                         ),
                       ),
