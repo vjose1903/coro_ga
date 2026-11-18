@@ -122,3 +122,4 @@ app.*.symbols
 
 # Scripts de build con credenciales
 build_release.sh
+revenue/RevenueCat.json
